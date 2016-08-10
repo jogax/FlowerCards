@@ -8,24 +8,139 @@
 
 /* Begin PBXBuildFile section */
 		2025F0BE1D5B18F300561FBF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0BD1D5B18F300561FBF /* AppDelegate.swift */; };
-		2025F0C01D5B18F300561FBF /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 2025F0BF1D5B18F300561FBF /* GameScene.sks */; };
-		2025F0C21D5B18F300561FBF /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0C11D5B18F300561FBF /* GameScene.swift */; };
-		2025F0C41D5B18F300561FBF /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0C31D5B18F300561FBF /* GameViewController.swift */; };
+		2025F0C41D5B18F300561FBF /* xxGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0C31D5B18F300561FBF /* xxGameViewController.swift */; };
 		2025F0C71D5B18F300561FBF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2025F0C51D5B18F300561FBF /* Main.storyboard */; };
 		2025F0C91D5B18F300561FBF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2025F0C81D5B18F300561FBF /* Assets.xcassets */; };
 		2025F0CC1D5B18F300561FBF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2025F0CA1D5B18F300561FBF /* LaunchScreen.storyboard */; };
+		2025F0D51D5B1A1E00561FBF /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0D31D5B1A1E00561FBF /* GameViewController.swift */; };
+		2025F0D61D5B1A1E00561FBF /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0D41D5B1A1E00561FBF /* Extensions.swift */; };
+		2025F0D81D5B1D2200561FBF /* Pods in Resources */ = {isa = PBXBuildFile; fileRef = 2025F0D71D5B1D2200561FBF /* Pods */; };
+		2025F0E61D5B208900561FBF /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E41D5B208900561FBF /* Realm.framework */; };
+		2025F0E71D5B208900561FBF /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E41D5B208900561FBF /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2025F0E81D5B208900561FBF /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E51D5B208900561FBF /* RealmSwift.framework */; };
+		2025F0E91D5B208900561FBF /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E51D5B208900561FBF /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2025F0F01D5B219C00561FBF /* MySKButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0EB1D5B219C00561FBF /* MySKButton.swift */; };
+		2025F0F11D5B219C00561FBF /* MySKLanguages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0EC1D5B219C00561FBF /* MySKLanguages.swift */; };
+		2025F0F21D5B219C00561FBF /* MySKSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0ED1D5B219C00561FBF /* MySKSlider.swift */; };
+		2025F0F31D5B219C00561FBF /* MyRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0EE1D5B219C00561FBF /* MyRandom.swift */; };
+		2025F0F41D5B219C00561FBF /* MySKNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0EF1D5B219C00561FBF /* MySKNode.swift */; };
+		2025F0FB1D5B21AC00561FBF /* MyStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0F51D5B21AC00561FBF /* MyStructs.swift */; };
+		2025F0FC1D5B21AC00561FBF /* MySKPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0F61D5B21AC00561FBF /* MySKPlayer.swift */; };
+		2025F0FD1D5B21AC00561FBF /* MySKTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0F71D5B21AC00561FBF /* MySKTable.swift */; };
+		2025F0FE1D5B21AC00561FBF /* MySKStatistic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0F81D5B21AC00561FBF /* MySKStatistic.swift */; };
+		2025F0FF1D5B21AC00561FBF /* MySKDetailedStatistic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0F91D5B21AC00561FBF /* MySKDetailedStatistic.swift */; };
+		2025F1001D5B21AC00561FBF /* MySKGameStatistic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0FA1D5B21AC00561FBF /* MySKGameStatistic.swift */; };
+		2025F1061D5B226E00561FBF /* PlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1011D5B226E00561FBF /* PlayerModel.swift */; };
+		2025F1071D5B226E00561FBF /* GamePredefinitionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1021D5B226E00561FBF /* GamePredefinitionModel.swift */; };
+		2025F1081D5B226E00561FBF /* GamePredefinitions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1031D5B226E00561FBF /* GamePredefinitions.swift */; };
+		2025F1091D5B226E00561FBF /* GameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1041D5B226E00561FBF /* GameModel.swift */; };
+		2025F10A1D5B226E00561FBF /* PeerToPeerServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1051D5B226E00561FBF /* PeerToPeerServiceManager.swift */; };
+		2025F10C1D5B231200561FBF /* LevelsForPlayWithCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F10B1D5B231200561FBF /* LevelsForPlayWithCards.swift */; };
+		2025F1121D5B236E00561FBF /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F10D1D5B236E00561FBF /* Language.swift */; };
+		2025F1131D5B236E00561FBF /* ru.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F10E1D5B236E00561FBF /* ru.swift */; };
+		2025F1141D5B236E00561FBF /* de.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F10F1D5B236E00561FBF /* de.swift */; };
+		2025F1151D5B236E00561FBF /* en.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1101D5B236E00561FBF /* en.swift */; };
+		2025F1161D5B236E00561FBF /* hu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1111D5B236E00561FBF /* hu.swift */; };
+		2025F1191D5B23BB00561FBF /* StatisticModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1171D5B23BB00561FBF /* StatisticModel.swift */; };
+		2025F11A1D5B23BB00561FBF /* Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1181D5B23BB00561FBF /* Stack.swift */; };
+		2025F11C1D5B23C500561FBF /* sprites.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 2025F11B1D5B23C500561FBF /* sprites.atlas */; };
+		2025F11E1D5B23F600561FBF /* DrawImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F11D1D5B23F600561FBF /* DrawImages.swift */; };
+		2025F1221D5B246E00561FBF /* RecordIDModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1211D5B246E00561FBF /* RecordIDModel.swift */; };
+		2025F1241D5B253900561FBF /* CardGameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1231D5B253900561FBF /* CardGameScene.swift */; };
+		2025F1261D5B256A00561FBF /* JGXLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1251D5B256A00561FBF /* JGXLine.swift */; };
+		2025F12C1D5B25C300561FBF /* Mirror.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F1271D5B25C300561FBF /* Mirror.m4a */; };
+		2025F12D1D5B25C300561FBF /* Lost.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F1281D5B25C300561FBF /* Lost.m4a */; };
+		2025F12E1D5B25C300561FBF /* Mirror1.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F1291D5B25C300561FBF /* Mirror1.m4a */; };
+		2025F12F1D5B25C300561FBF /* Mirror2.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F12A1D5B25C300561FBF /* Mirror2.m4a */; };
+		2025F1301D5B25C300561FBF /* Mirror3.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F12B1D5B25C300561FBF /* Mirror3.m4a */; };
+		2025F1321D5B26A200561FBF /* MySKPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1311D5B26A200561FBF /* MySKPanel.swift */; };
+		2025F1341D5B27C200561FBF /* ChooseGamePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */; };
+		20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20720A751D5B55E600389C0C /* Mirror4.m4a */; };
+		20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1051D5B445300963590 /* MyMusic.m4a */; };
+		20B1F1081D5B44F900963590 /* cardBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1071D5B44F900963590 /* cardBackground.png */; };
+		20B1F10A1D5B454700963590 /* OK.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1091D5B454700963590 /* OK.m4a */; };
+		20B1F10C1D5B458E00963590 /* Container.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F10B1D5B458E00963590 /* Container.m4a */; };
+		20B1F10E1D5B45DB00963590 /* NoSound.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F10D1D5B45DB00963590 /* NoSound.m4a */; };
+		20B1F1101D5B483000963590 /* Winner.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F10F1D5B483000963590 /* Winner.m4a */; };
+		27FC725BB5FD5284C6E90A56 /* Pods_FlowerCards.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0912CB345E0E83ECC2EC999C /* Pods_FlowerCards.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		2025F0EA1D5B208900561FBF /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				2025F0E91D5B208900561FBF /* RealmSwift.framework in Embed Frameworks */,
+				2025F0E71D5B208900561FBF /* Realm.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		0912CB345E0E83ECC2EC999C /* Pods_FlowerCards.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_FlowerCards.framework; path = "/Users/JozsefRomhanyi/Documents/MySwiftProjects/FlowerCards/build/Debug-iphoneos/Pods_FlowerCards.framework"; sourceTree = "<absolute>"; };
 		2025F0BA1D5B18F300561FBF /* FlowerCards.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlowerCards.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2025F0BD1D5B18F300561FBF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		2025F0BF1D5B18F300561FBF /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
-		2025F0C11D5B18F300561FBF /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
-		2025F0C31D5B18F300561FBF /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
+		2025F0C31D5B18F300561FBF /* xxGameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xxGameViewController.swift; sourceTree = "<group>"; };
 		2025F0C61D5B18F300561FBF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		2025F0C81D5B18F300561FBF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2025F0CB1D5B18F300561FBF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2025F0CD1D5B18F300561FBF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2025F0D31D5B1A1E00561FBF /* GameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
+		2025F0D41D5B1A1E00561FBF /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		2025F0D71D5B1D2200561FBF /* Pods */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Pods; sourceTree = "<group>"; };
+		2025F0DE1D5B1F7200561FBF /* Realm */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Realm; path = Pods/Realm; sourceTree = "<group>"; };
+		2025F0E01D5B1F7600561FBF /* RealmSwift */ = {isa = PBXFileReference; lastKnownFileType = folder; name = RealmSwift; path = Pods/RealmSwift; sourceTree = "<group>"; };
+		2025F0E41D5B208900561FBF /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = "<group>"; };
+		2025F0E51D5B208900561FBF /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = "<group>"; };
+		2025F0EB1D5B219C00561FBF /* MySKButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKButton.swift; sourceTree = "<group>"; };
+		2025F0EC1D5B219C00561FBF /* MySKLanguages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKLanguages.swift; sourceTree = "<group>"; };
+		2025F0ED1D5B219C00561FBF /* MySKSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKSlider.swift; sourceTree = "<group>"; };
+		2025F0EE1D5B219C00561FBF /* MyRandom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyRandom.swift; sourceTree = "<group>"; };
+		2025F0EF1D5B219C00561FBF /* MySKNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKNode.swift; sourceTree = "<group>"; };
+		2025F0F51D5B21AC00561FBF /* MyStructs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyStructs.swift; sourceTree = "<group>"; };
+		2025F0F61D5B21AC00561FBF /* MySKPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKPlayer.swift; sourceTree = "<group>"; };
+		2025F0F71D5B21AC00561FBF /* MySKTable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKTable.swift; sourceTree = "<group>"; };
+		2025F0F81D5B21AC00561FBF /* MySKStatistic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKStatistic.swift; sourceTree = "<group>"; };
+		2025F0F91D5B21AC00561FBF /* MySKDetailedStatistic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKDetailedStatistic.swift; sourceTree = "<group>"; };
+		2025F0FA1D5B21AC00561FBF /* MySKGameStatistic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKGameStatistic.swift; sourceTree = "<group>"; };
+		2025F1011D5B226E00561FBF /* PlayerModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerModel.swift; sourceTree = "<group>"; };
+		2025F1021D5B226E00561FBF /* GamePredefinitionModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GamePredefinitionModel.swift; sourceTree = "<group>"; };
+		2025F1031D5B226E00561FBF /* GamePredefinitions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GamePredefinitions.swift; sourceTree = "<group>"; };
+		2025F1041D5B226E00561FBF /* GameModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameModel.swift; sourceTree = "<group>"; };
+		2025F1051D5B226E00561FBF /* PeerToPeerServiceManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PeerToPeerServiceManager.swift; sourceTree = "<group>"; };
+		2025F10B1D5B231200561FBF /* LevelsForPlayWithCards.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelsForPlayWithCards.swift; sourceTree = "<group>"; };
+		2025F10D1D5B236E00561FBF /* Language.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
+		2025F10E1D5B236E00561FBF /* ru.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ru.swift; sourceTree = "<group>"; };
+		2025F10F1D5B236E00561FBF /* de.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = de.swift; sourceTree = "<group>"; };
+		2025F1101D5B236E00561FBF /* en.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = en.swift; sourceTree = "<group>"; };
+		2025F1111D5B236E00561FBF /* hu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = hu.swift; sourceTree = "<group>"; };
+		2025F1171D5B23BB00561FBF /* StatisticModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatisticModel.swift; sourceTree = "<group>"; };
+		2025F1181D5B23BB00561FBF /* Stack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stack.swift; sourceTree = "<group>"; };
+		2025F11B1D5B23C500561FBF /* sprites.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = sprites.atlas; sourceTree = "<group>"; };
+		2025F11D1D5B23F600561FBF /* DrawImages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawImages.swift; sourceTree = "<group>"; };
+		2025F1211D5B246E00561FBF /* RecordIDModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordIDModel.swift; sourceTree = "<group>"; };
+		2025F1231D5B253900561FBF /* CardGameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardGameScene.swift; sourceTree = "<group>"; };
+		2025F1251D5B256A00561FBF /* JGXLine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JGXLine.swift; sourceTree = "<group>"; };
+		2025F1271D5B25C300561FBF /* Mirror.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror.m4a; sourceTree = "<group>"; };
+		2025F1281D5B25C300561FBF /* Lost.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Lost.m4a; sourceTree = "<group>"; };
+		2025F1291D5B25C300561FBF /* Mirror1.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror1.m4a; sourceTree = "<group>"; };
+		2025F12A1D5B25C300561FBF /* Mirror2.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror2.m4a; sourceTree = "<group>"; };
+		2025F12B1D5B25C300561FBF /* Mirror3.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror3.m4a; sourceTree = "<group>"; };
+		2025F1311D5B26A200561FBF /* MySKPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKPanel.swift; sourceTree = "<group>"; };
+		2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseGamePanel.swift; sourceTree = "<group>"; };
+		20720A751D5B55E600389C0C /* Mirror4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror4.m4a; sourceTree = "<group>"; };
+		20B1F1051D5B445300963590 /* MyMusic.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = MyMusic.m4a; sourceTree = "<group>"; };
+		20B1F1071D5B44F900963590 /* cardBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cardBackground.png; sourceTree = "<group>"; };
+		20B1F1091D5B454700963590 /* OK.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = OK.m4a; sourceTree = "<group>"; };
+		20B1F10B1D5B458E00963590 /* Container.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Container.m4a; sourceTree = "<group>"; };
+		20B1F10D1D5B45DB00963590 /* NoSound.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = NoSound.m4a; sourceTree = "<group>"; };
+		20B1F10F1D5B483000963590 /* Winner.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Winner.m4a; sourceTree = "<group>"; };
+		3740D4C15C5D8B354301D359 /* Pods-FlowerCards.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FlowerCards.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FlowerCards/Pods-FlowerCards.debug.xcconfig"; sourceTree = "<group>"; };
+		5EB57CF9449DCB84ABC15571 /* Pods-FlowerCards.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FlowerCards.release.xcconfig"; path = "Pods/Target Support Files/Pods-FlowerCards/Pods-FlowerCards.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,6 +148,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2025F0E61D5B208900561FBF /* Realm.framework in Frameworks */,
+				27FC725BB5FD5284C6E90A56 /* Pods_FlowerCards.framework in Frameworks */,
+				2025F0E81D5B208900561FBF /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +162,8 @@
 			children = (
 				2025F0BC1D5B18F300561FBF /* FlowerCards */,
 				2025F0BB1D5B18F300561FBF /* Products */,
+				4DC3695124F59546A5902E5E /* Pods */,
+				40E43C69DAF1E087E8038AB9 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -58,16 +178,80 @@
 		2025F0BC1D5B18F300561FBF /* FlowerCards */ = {
 			isa = PBXGroup;
 			children = (
+				2025F1011D5B226E00561FBF /* PlayerModel.swift */,
+				2025F1021D5B226E00561FBF /* GamePredefinitionModel.swift */,
+				2025F1031D5B226E00561FBF /* GamePredefinitions.swift */,
+				2025F1041D5B226E00561FBF /* GameModel.swift */,
+				2025F1051D5B226E00561FBF /* PeerToPeerServiceManager.swift */,
+				2025F0F51D5B21AC00561FBF /* MyStructs.swift */,
+				2025F0F61D5B21AC00561FBF /* MySKPlayer.swift */,
+				2025F0F71D5B21AC00561FBF /* MySKTable.swift */,
+				2025F0F81D5B21AC00561FBF /* MySKStatistic.swift */,
+				2025F0F91D5B21AC00561FBF /* MySKDetailedStatistic.swift */,
+				2025F0FA1D5B21AC00561FBF /* MySKGameStatistic.swift */,
+				2025F0EB1D5B219C00561FBF /* MySKButton.swift */,
+				2025F0EC1D5B219C00561FBF /* MySKLanguages.swift */,
+				2025F0ED1D5B219C00561FBF /* MySKSlider.swift */,
+				2025F0EE1D5B219C00561FBF /* MyRandom.swift */,
+				2025F0EF1D5B219C00561FBF /* MySKNode.swift */,
 				2025F0BD1D5B18F300561FBF /* AppDelegate.swift */,
-				2025F0BF1D5B18F300561FBF /* GameScene.sks */,
-				2025F0C11D5B18F300561FBF /* GameScene.swift */,
-				2025F0C31D5B18F300561FBF /* GameViewController.swift */,
+				2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */,
+				2025F1311D5B26A200561FBF /* MySKPanel.swift */,
+				2025F1281D5B25C300561FBF /* Lost.m4a */,
+				2025F1271D5B25C300561FBF /* Mirror.m4a */,
+				2025F1291D5B25C300561FBF /* Mirror1.m4a */,
+				2025F12A1D5B25C300561FBF /* Mirror2.m4a */,
+				2025F12B1D5B25C300561FBF /* Mirror3.m4a */,
+				20720A751D5B55E600389C0C /* Mirror4.m4a */,
+				2025F1251D5B256A00561FBF /* JGXLine.swift */,
+				2025F1231D5B253900561FBF /* CardGameScene.swift */,
+				2025F1211D5B246E00561FBF /* RecordIDModel.swift */,
+				2025F11D1D5B23F600561FBF /* DrawImages.swift */,
+				2025F11B1D5B23C500561FBF /* sprites.atlas */,
+				2025F1171D5B23BB00561FBF /* StatisticModel.swift */,
+				2025F1181D5B23BB00561FBF /* Stack.swift */,
+				2025F10D1D5B236E00561FBF /* Language.swift */,
+				2025F10E1D5B236E00561FBF /* ru.swift */,
+				2025F10F1D5B236E00561FBF /* de.swift */,
+				2025F1101D5B236E00561FBF /* en.swift */,
+				2025F1111D5B236E00561FBF /* hu.swift */,
+				2025F10B1D5B231200561FBF /* LevelsForPlayWithCards.swift */,
+				2025F0C31D5B18F300561FBF /* xxGameViewController.swift */,
+				2025F0D31D5B1A1E00561FBF /* GameViewController.swift */,
+				20B1F10F1D5B483000963590 /* Winner.m4a */,
+				20B1F10D1D5B45DB00963590 /* NoSound.m4a */,
+				20B1F10B1D5B458E00963590 /* Container.m4a */,
+				20B1F1091D5B454700963590 /* OK.m4a */,
+				20B1F1071D5B44F900963590 /* cardBackground.png */,
+				20B1F1051D5B445300963590 /* MyMusic.m4a */,
+				2025F0D41D5B1A1E00561FBF /* Extensions.swift */,
 				2025F0C51D5B18F300561FBF /* Main.storyboard */,
 				2025F0C81D5B18F300561FBF /* Assets.xcassets */,
 				2025F0CA1D5B18F300561FBF /* LaunchScreen.storyboard */,
 				2025F0CD1D5B18F300561FBF /* Info.plist */,
 			);
 			path = FlowerCards;
+			sourceTree = "<group>";
+		};
+		40E43C69DAF1E087E8038AB9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2025F0E41D5B208900561FBF /* Realm.framework */,
+				2025F0E51D5B208900561FBF /* RealmSwift.framework */,
+				2025F0E01D5B1F7600561FBF /* RealmSwift */,
+				2025F0DE1D5B1F7200561FBF /* Realm */,
+				2025F0D71D5B1D2200561FBF /* Pods */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4DC3695124F59546A5902E5E /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				3740D4C15C5D8B354301D359 /* Pods-FlowerCards.debug.xcconfig */,
+				5EB57CF9449DCB84ABC15571 /* Pods-FlowerCards.release.xcconfig */,
+			);
+			name = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -77,9 +261,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2025F0D01D5B18F300561FBF /* Build configuration list for PBXNativeTarget "FlowerCards" */;
 			buildPhases = (
+				8E32560C8CFE510322FD4856 /* Check Pods Manifest.lock */,
 				2025F0B61D5B18F300561FBF /* Sources */,
 				2025F0B71D5B18F300561FBF /* Frameworks */,
 				2025F0B81D5B18F300561FBF /* Resources */,
+				0CCC029B3BF36829731D03AF /* Embed Pods Frameworks */,
+				756EF9E3547834ADC75C523D /* Copy Pods Resources */,
+				2025F0EA1D5B208900561FBF /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -102,6 +290,7 @@
 				TargetAttributes = {
 					2025F0B91D5B18F300561FBF = {
 						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = WT499VC842;
 					};
 				};
 			};
@@ -128,22 +317,114 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2025F0C01D5B18F300561FBF /* GameScene.sks in Resources */,
+				20B1F10E1D5B45DB00963590 /* NoSound.m4a in Resources */,
+				20B1F10C1D5B458E00963590 /* Container.m4a in Resources */,
+				20B1F10A1D5B454700963590 /* OK.m4a in Resources */,
 				2025F0CC1D5B18F300561FBF /* LaunchScreen.storyboard in Resources */,
+				2025F12E1D5B25C300561FBF /* Mirror1.m4a in Resources */,
+				2025F12D1D5B25C300561FBF /* Lost.m4a in Resources */,
+				20B1F1081D5B44F900963590 /* cardBackground.png in Resources */,
 				2025F0C91D5B18F300561FBF /* Assets.xcassets in Resources */,
+				2025F0D81D5B1D2200561FBF /* Pods in Resources */,
+				2025F11C1D5B23C500561FBF /* sprites.atlas in Resources */,
 				2025F0C71D5B18F300561FBF /* Main.storyboard in Resources */,
+				2025F1301D5B25C300561FBF /* Mirror3.m4a in Resources */,
+				20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */,
+				20B1F1101D5B483000963590 /* Winner.m4a in Resources */,
+				20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */,
+				2025F12F1D5B25C300561FBF /* Mirror2.m4a in Resources */,
+				2025F12C1D5B25C300561FBF /* Mirror.m4a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0CCC029B3BF36829731D03AF /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FlowerCards/Pods-FlowerCards-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		756EF9E3547834ADC75C523D /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FlowerCards/Pods-FlowerCards-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8E32560C8CFE510322FD4856 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		2025F0B61D5B18F300561FBF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2025F0C21D5B18F300561FBF /* GameScene.swift in Sources */,
-				2025F0C41D5B18F300561FBF /* GameViewController.swift in Sources */,
+				2025F1261D5B256A00561FBF /* JGXLine.swift in Sources */,
+				2025F0D61D5B1A1E00561FBF /* Extensions.swift in Sources */,
+				2025F0F31D5B219C00561FBF /* MyRandom.swift in Sources */,
+				2025F0FF1D5B21AC00561FBF /* MySKDetailedStatistic.swift in Sources */,
+				2025F0FE1D5B21AC00561FBF /* MySKStatistic.swift in Sources */,
+				2025F1341D5B27C200561FBF /* ChooseGamePanel.swift in Sources */,
+				2025F1321D5B26A200561FBF /* MySKPanel.swift in Sources */,
+				2025F1091D5B226E00561FBF /* GameModel.swift in Sources */,
+				2025F0F41D5B219C00561FBF /* MySKNode.swift in Sources */,
+				2025F0F21D5B219C00561FBF /* MySKSlider.swift in Sources */,
+				2025F1191D5B23BB00561FBF /* StatisticModel.swift in Sources */,
+				2025F10A1D5B226E00561FBF /* PeerToPeerServiceManager.swift in Sources */,
+				2025F0FB1D5B21AC00561FBF /* MyStructs.swift in Sources */,
+				2025F11E1D5B23F600561FBF /* DrawImages.swift in Sources */,
+				2025F1131D5B236E00561FBF /* ru.swift in Sources */,
+				2025F1001D5B21AC00561FBF /* MySKGameStatistic.swift in Sources */,
+				2025F0F11D5B219C00561FBF /* MySKLanguages.swift in Sources */,
+				2025F1071D5B226E00561FBF /* GamePredefinitionModel.swift in Sources */,
+				2025F1241D5B253900561FBF /* CardGameScene.swift in Sources */,
+				2025F0FD1D5B21AC00561FBF /* MySKTable.swift in Sources */,
+				2025F1061D5B226E00561FBF /* PlayerModel.swift in Sources */,
+				2025F1221D5B246E00561FBF /* RecordIDModel.swift in Sources */,
+				2025F0C41D5B18F300561FBF /* xxGameViewController.swift in Sources */,
+				2025F10C1D5B231200561FBF /* LevelsForPlayWithCards.swift in Sources */,
+				2025F1151D5B236E00561FBF /* en.swift in Sources */,
+				2025F1081D5B226E00561FBF /* GamePredefinitions.swift in Sources */,
+				2025F0FC1D5B21AC00561FBF /* MySKPlayer.swift in Sources */,
+				2025F11A1D5B23BB00561FBF /* Stack.swift in Sources */,
+				2025F0F01D5B219C00561FBF /* MySKButton.swift in Sources */,
+				2025F1161D5B236E00561FBF /* hu.swift in Sources */,
+				2025F0D51D5B1A1E00561FBF /* GameViewController.swift in Sources */,
+				2025F1141D5B236E00561FBF /* de.swift in Sources */,
+				2025F1121D5B236E00561FBF /* Language.swift in Sources */,
 				2025F0BE1D5B18F300561FBF /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -213,6 +494,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Debug;
 		};
@@ -257,23 +539,39 @@
 		};
 		2025F0D11D5B18F300561FBF /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3740D4C15C5D8B354301D359 /* Pods-FlowerCards.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = FlowerCards/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.FlowerCards;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
 		2025F0D21D5B18F300561FBF /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5EB57CF9449DCB84ABC15571 /* Pods-FlowerCards.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = FlowerCards/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.FlowerCards;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};
@@ -296,6 +594,7 @@
 				2025F0D21D5B18F300561FBF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
