@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		2025F0BE1D5B18F300561FBF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0BD1D5B18F300561FBF /* AppDelegate.swift */; };
-		2025F0C41D5B18F300561FBF /* xxGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0C31D5B18F300561FBF /* xxGameViewController.swift */; };
 		2025F0C71D5B18F300561FBF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2025F0C51D5B18F300561FBF /* Main.storyboard */; };
 		2025F0C91D5B18F300561FBF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2025F0C81D5B18F300561FBF /* Assets.xcassets */; };
 		2025F0CC1D5B18F300561FBF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2025F0CA1D5B18F300561FBF /* LaunchScreen.storyboard */; };
@@ -85,7 +84,6 @@
 		0912CB345E0E83ECC2EC999C /* Pods_FlowerCards.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_FlowerCards.framework; path = "/Users/JozsefRomhanyi/Documents/MySwiftProjects/FlowerCards/build/Debug-iphoneos/Pods_FlowerCards.framework"; sourceTree = "<absolute>"; };
 		2025F0BA1D5B18F300561FBF /* FlowerCards.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlowerCards.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2025F0BD1D5B18F300561FBF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		2025F0C31D5B18F300561FBF /* xxGameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xxGameViewController.swift; sourceTree = "<group>"; };
 		2025F0C61D5B18F300561FBF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		2025F0C81D5B18F300561FBF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2025F0CB1D5B18F300561FBF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -199,12 +197,6 @@
 				2025F0BD1D5B18F300561FBF /* AppDelegate.swift */,
 				2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */,
 				2025F1311D5B26A200561FBF /* MySKPanel.swift */,
-				2025F1281D5B25C300561FBF /* Lost.m4a */,
-				2025F1271D5B25C300561FBF /* Mirror.m4a */,
-				2025F1291D5B25C300561FBF /* Mirror1.m4a */,
-				2025F12A1D5B25C300561FBF /* Mirror2.m4a */,
-				2025F12B1D5B25C300561FBF /* Mirror3.m4a */,
-				20720A751D5B55E600389C0C /* Mirror4.m4a */,
 				2025F1251D5B256A00561FBF /* JGXLine.swift */,
 				2025F1231D5B253900561FBF /* CardGameScene.swift */,
 				2025F1211D5B246E00561FBF /* RecordIDModel.swift */,
@@ -212,27 +204,48 @@
 				2025F11B1D5B23C500561FBF /* sprites.atlas */,
 				2025F1171D5B23BB00561FBF /* StatisticModel.swift */,
 				2025F1181D5B23BB00561FBF /* Stack.swift */,
-				2025F10D1D5B236E00561FBF /* Language.swift */,
-				2025F10E1D5B236E00561FBF /* ru.swift */,
-				2025F10F1D5B236E00561FBF /* de.swift */,
-				2025F1101D5B236E00561FBF /* en.swift */,
-				2025F1111D5B236E00561FBF /* hu.swift */,
 				2025F10B1D5B231200561FBF /* LevelsForPlayWithCards.swift */,
-				2025F0C31D5B18F300561FBF /* xxGameViewController.swift */,
 				2025F0D31D5B1A1E00561FBF /* GameViewController.swift */,
-				20B1F10F1D5B483000963590 /* Winner.m4a */,
-				20B1F10D1D5B45DB00963590 /* NoSound.m4a */,
-				20B1F10B1D5B458E00963590 /* Container.m4a */,
-				20B1F1091D5B454700963590 /* OK.m4a */,
 				20B1F1071D5B44F900963590 /* cardBackground.png */,
-				20B1F1051D5B445300963590 /* MyMusic.m4a */,
 				2025F0D41D5B1A1E00561FBF /* Extensions.swift */,
 				2025F0C51D5B18F300561FBF /* Main.storyboard */,
 				2025F0C81D5B18F300561FBF /* Assets.xcassets */,
 				2025F0CA1D5B18F300561FBF /* LaunchScreen.storyboard */,
 				2025F0CD1D5B18F300561FBF /* Info.plist */,
+				20720A791D5B72BB00389C0C /* Music */,
+				20720A7A1D5B732B00389C0C /* Language */,
 			);
 			path = FlowerCards;
+			sourceTree = "<group>";
+		};
+		20720A791D5B72BB00389C0C /* Music */ = {
+			isa = PBXGroup;
+			children = (
+				20B1F10B1D5B458E00963590 /* Container.m4a */,
+				2025F1281D5B25C300561FBF /* Lost.m4a */,
+				2025F1291D5B25C300561FBF /* Mirror1.m4a */,
+				2025F12A1D5B25C300561FBF /* Mirror2.m4a */,
+				2025F12B1D5B25C300561FBF /* Mirror3.m4a */,
+				20720A751D5B55E600389C0C /* Mirror4.m4a */,
+				2025F1271D5B25C300561FBF /* Mirror.m4a */,
+				20B1F1051D5B445300963590 /* MyMusic.m4a */,
+				20B1F10D1D5B45DB00963590 /* NoSound.m4a */,
+				20B1F1091D5B454700963590 /* OK.m4a */,
+				20B1F10F1D5B483000963590 /* Winner.m4a */,
+			);
+			name = Music;
+			sourceTree = "<group>";
+		};
+		20720A7A1D5B732B00389C0C /* Language */ = {
+			isa = PBXGroup;
+			children = (
+				2025F10D1D5B236E00561FBF /* Language.swift */,
+				2025F10E1D5B236E00561FBF /* ru.swift */,
+				2025F10F1D5B236E00561FBF /* de.swift */,
+				2025F1101D5B236E00561FBF /* en.swift */,
+				2025F1111D5B236E00561FBF /* hu.swift */,
+			);
+			name = Language;
 			sourceTree = "<group>";
 		};
 		40E43C69DAF1E087E8038AB9 /* Frameworks */ = {
@@ -418,7 +431,6 @@
 				2025F0FD1D5B21AC00561FBF /* MySKTable.swift in Sources */,
 				2025F1061D5B226E00561FBF /* PlayerModel.swift in Sources */,
 				2025F1221D5B246E00561FBF /* RecordIDModel.swift in Sources */,
-				2025F0C41D5B18F300561FBF /* xxGameViewController.swift in Sources */,
 				2025F10C1D5B231200561FBF /* LevelsForPlayWithCards.swift in Sources */,
 				2025F1151D5B236E00561FBF /* en.swift in Sources */,
 				2025F1081D5B226E00561FBF /* GamePredefinitions.swift in Sources */,
