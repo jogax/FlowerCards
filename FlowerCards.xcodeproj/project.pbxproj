@@ -134,7 +134,7 @@
 		2025F1311D5B26A200561FBF /* MySKPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKPanel.swift; sourceTree = "<group>"; };
 		2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseGamePanel.swift; sourceTree = "<group>"; };
 		20720A751D5B55E600389C0C /* Mirror4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror4.m4a; sourceTree = "<group>"; };
-		20720A771D5B71FF00389C0C /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; };
+		20720A771D5B71FF00389C0C /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Podfile; path = FlowerCards/Podfile; sourceTree = "<group>"; };
 		20B1F1051D5B445300963590 /* MyMusic.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = MyMusic.m4a; sourceTree = "<group>"; };
 		20B1F1071D5B44F900963590 /* cardBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cardBackground.png; sourceTree = "<group>"; };
 		20B1F1091D5B454700963590 /* OK.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = OK.m4a; sourceTree = "<group>"; };
@@ -199,7 +199,6 @@
 				2025F0BD1D5B18F300561FBF /* AppDelegate.swift */,
 				2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */,
 				2025F1311D5B26A200561FBF /* MySKPanel.swift */,
-				20720A771D5B71FF00389C0C /* Podfile */,
 				2025F1281D5B25C300561FBF /* Lost.m4a */,
 				2025F1271D5B25C300561FBF /* Mirror.m4a */,
 				2025F1291D5B25C300561FBF /* Mirror1.m4a */,
@@ -251,6 +250,7 @@
 		4DC3695124F59546A5902E5E /* Pods */ = {
 			isa = PBXGroup;
 			children = (
+				20720A771D5B71FF00389C0C /* Podfile */,
 				3740D4C15C5D8B354301D359 /* Pods-FlowerCards.debug.xcconfig */,
 				5EB57CF9449DCB84ABC15571 /* Pods-FlowerCards.release.xcconfig */,
 			);
