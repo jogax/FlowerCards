@@ -116,7 +116,7 @@ class MySKDetailedStatistic: MySKTable {
  
     func callBackFromGameStatistic(startGame: Bool = false, gameNumber: Int = 0, levelIndex: Int = 0) {
         if startGame {
-            callBack(startGame, gameNumber, levelIndex - 1)
+            callBack(startGame, gameNumber, levelIndex)
         }
     }
 

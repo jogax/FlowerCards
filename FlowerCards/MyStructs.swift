@@ -457,6 +457,9 @@ enum PeerToPeerCommands: Int {
     DidEnterBackGround, // sendInfo
             //
             //      parameter:  
+    StopCompetition, // sendInfo
+            //
+            //      parameter:
     MaxValue
     
     var commandName: String {

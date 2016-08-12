@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '54FCCBBC6155F69469857CCE'
+               BlueprintIdentifier = 'D0A7AA0A03330B235E18B8A8'
                BlueprintName = 'Pods-FlowerCards'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'Pods_FlowerCards.framework'>

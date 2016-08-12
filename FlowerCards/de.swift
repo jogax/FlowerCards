@@ -83,7 +83,7 @@ let deDictionary: [TextConstants: String] = [
     .TCGame:             "Spiel",
     .TCChoosePartner:    "Wähle einen Gegner:",
     .TCWantToPlayWithYou:"% will mit Dir spielen!!",
-    .TCOpponent:         "Gegner%",
+    .TCOpponent:         "Gegner: %",
     .TCOpponentHasFinished: "% hat das Spiel #% beendet!\r\n" +
                          "sein Bonus: %\r\n" +
                          "seine Punkte: %\r\n" +
@@ -100,6 +100,8 @@ let deDictionary: [TextConstants: String] = [
     .TCGameArt:         "Art",
     .TCVictory:         "Sieg",
     .TCStart:           "Start",
+    .TCStopCompetition: "Stop Wettbewerb",
+    .TCOpponentStoppedTheGame: "% hat das Spiel stopped",
 ]
 
 

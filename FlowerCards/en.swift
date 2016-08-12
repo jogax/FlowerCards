@@ -83,7 +83,7 @@ let enDictionary: [TextConstants: String] = [
     .TCGame:             "Game",
     .TCChoosePartner:    "Choose an opponent:",
     .TCWantToPlayWithYou:"% want play with you!",
-    .TCOpponent:          "Opponent%",
+    .TCOpponent:          "Opponent: %",
     .TCOpponentHasFinished: "% has finished the Game #%!\r\n" +
                             "his bonus: %\r\n" +
                             "his score : %\r\n" +
@@ -100,4 +100,6 @@ let enDictionary: [TextConstants: String] = [
     .TCGameArt:         "Type",
     .TCVictory:         "Victory",
     .TCStart:           "Start",
+    .TCStopCompetition: "Stop competiton",
+    .TCOpponentStoppedTheGame: "% has stopped the competition!",
 ]

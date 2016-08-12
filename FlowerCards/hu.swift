@@ -83,7 +83,7 @@ let huDictionary: [TextConstants: String] = [
     .TCGame:             "Játék",
     .TCChoosePartner:    "Válassz ellenfelet:",
     .TCWantToPlayWithYou:"% szeretne veled játszani!",
-    .TCOpponent:          "Ellenfél%",
+    .TCOpponent:          "Ellenfél: %",
     .TCOpponentHasFinished: "% befejezte a #% játékot!\r\n" +
                             "bonuszpontjai: %\r\n" +
                             "pontszáma: %\r\n" +
@@ -100,4 +100,6 @@ let huDictionary: [TextConstants: String] = [
     .TCGameArt:         "Tipus",
     .TCVictory:         "Győzelem",
     .TCStart:           "Start",
+    .TCStopCompetition: "Verseny leállítása",
+    .TCOpponentStoppedTheGame: "% leállította a játékot",
 ]

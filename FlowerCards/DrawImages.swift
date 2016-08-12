@@ -872,20 +872,22 @@ class DrawImages {
         let w = size.width / 100
         let h = size.height / 100
         
-        CGContextSetStrokeColorWithColor(ctx, UIColor.greenColor().CGColor)
-        CGContextSetLineJoin (ctx, .Round)
-        CGContextSetLineCap (ctx, .Round)
+        CGContextSetStrokeColorWithColor(ctx, UIColor.blackColor().CGColor)
+        CGContextSetFillColorWithColor(ctx, UIColor.blackColor().CGColor)
+//        CGContextSetLineJoin (ctx, .Round)
+//        CGContextSetLineCap (ctx, .Round)
         
-        CGContextSetLineWidth(ctx, w * 15)
+        CGContextSetLineWidth(ctx, w * 1)
         let points = [
             CGPointMake(w * 5, h * 5),
             CGPointMake(w * 95, h * 50),
             CGPointMake(w * 5, h * 95),
             CGPointMake(w * 5, h * 5),
         ]
-        CGContextSetFillColorWithColor(ctx, UIColor.greenColor().CGColor)
         CGContextAddLines(ctx, points, points.count)
+        CGContextFillPath(ctx)
         CGContextStrokePath(ctx)
+        CGContextClosePath(ctx)
         
         
         

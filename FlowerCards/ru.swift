@@ -83,7 +83,7 @@ let ruDictionary: [TextConstants: String] = [
     .TCGame:             "Игра",
     .TCChoosePartner:    "Выбери противника:",
     .TCWantToPlayWithYou:"% хочет с тобой поиграть!",
-    .TCOpponent:         "Противник%",
+    .TCOpponent:         "Противник:%",
     .TCOpponentHasFinished: "% закончил игру #%!\r\n" +
                         "его/ee бонус: %\r\n" +
                         "его/ee очки: %\r\n" +
@@ -100,4 +100,7 @@ let ruDictionary: [TextConstants: String] = [
     .TCGameArt:         "Tип",
     .TCVictory:         "Победa",
     .TCStart:           "Старт",
+    .TCStopCompetition: "Стоп cоревнование",
+    .TCOpponentStoppedTheGame: "% остановил игру",
+
 ]

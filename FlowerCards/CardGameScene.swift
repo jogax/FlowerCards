@@ -278,7 +278,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var labelBackground = SKSpriteNode()
     var levelLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var gameNumberLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    var showTimeLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var showTimeLabel1 = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var showTimeLabel2 = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var playerLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var cardCountLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var showScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
@@ -560,7 +561,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        cardPlaceButtonAddedToParent = true
 
 
-        showTimeLeft()
         
         
         bgImage = setBGImageNode()
@@ -604,15 +604,27 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let showScoreText: String = GV.language.getText(.TCGameScore, values: "\(levelScore)")
         let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
         
-        createLabels(showTimeLabel, text: "", column: 1, row: 1)
+//        let labelsBackground = SKSpriteNode()
+//        labelsBackground.color = UIColor.whiteColor()
+//        labelsBackground.alpha = 0.3
+//        labelsBackground.size = CGSizeMake(self.size.width, self.size.height * 0.1)
+//        labelsBackground.position = CGPointMake(self.size.width / 2, self.frame.minY + labelsBackground.size.height / 2)
+//        self.addChild(labelsBackground)
+//        labelsBackground.zPosition = zPosition + 1
+        
         createLabels(gameNumberLabel, text: GV.language.getText(.TCGameNumber) + " \(gameNumber + 1)", column: 2, row: 1)
         createLabels(levelLabel, text: GV.language.getText(TextConstants.TCLevel) + ": \(levelIndex + 1)", column: 4, row: 1)
-        
+
         createLabels(playerLabel, text: GV.language.getText(TextConstants.TCPlayer) + ": \(name)", column: 1, row: 2)
-        createLabels(showScoreLabel, text: showScoreText, column: 1, row: 3)
+        createLabels(opponentLabel, text: GV.language.getText(.TCOpponent), column: 1, row: 3)
         
-        createLabels(opponentLabel, text: GV.language.getText(.TCOpponent), column: 3, row: 2)
+        createLabels(showTimeLabel1, text: "", column: 2, row: 2)
+        createLabels(showTimeLabel2, text: "", column: 2, row: 3)
+        
+        
+        createLabels(showScoreLabel, text: showScoreText, column: 3, row: 2)
         createLabels(opponentScoreLabel, text: "", column: 3, row: 3)
+        
         opponentLabel.hidden = true
         opponentScoreLabel.hidden = true
         
@@ -646,7 +658,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             case 2:
                 xPos = self.position.x + self.size.width * 0.4
             case 3:
-                xPos = self.position.x + self.size.width * 0.65
+                xPos = self.position.x + self.size.width * 0.59
             case 4:
                 xPos = self.position.x + self.size.width * 0.8
             case 5:
@@ -741,7 +753,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         showCardCount()
         showTippCount()
         showLevelScore()
-        showTimeLeft()
         return true
     }
     
@@ -1799,7 +1810,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             newGame(false)
         }
         if multiPlayer {
-            opponentLabel.text = GV.language.getText(.TCOpponent, values: "(", opponent.name, ")")
+            opponentLabel.text = GV.language.getText(.TCOpponent, values: opponent.name)
             opponentLabel.hidden = false
             opponentScoreLabel.hidden = false
             showLevelScore(true, opponentScore: opponent.score)
@@ -1816,6 +1827,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             let statistic = realm.objects(StatisticModel).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).first!
             animateFinishGame()
             saveStatisticAndGame(statistic)
+            multiPlayer = false
+            opponentLabel.hidden = true
+            opponentScoreLabel.hidden = true
+            showLevelScore(false, opponentScore: opponent.score)
+
         }
         
     }
@@ -2299,67 +2315,79 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let alert = UIAlertController(title: congratulations ? congratulationsTxt : GV.language.getText(.TCChooseGame),
             message: statisticsTxt,
             preferredStyle: .Alert)
-        let againAction = UIAlertAction(title: GV.language.getText(.TCGameAgain), style: .Default,
-            handler: {(paramAction:UIAlertAction!) in
-                self.newGame(false)
-        })
-        alert.addAction(againAction)
-        let newGameAction = UIAlertAction(title: GV.language.getText(TextConstants.TCNewGame), style: .Default,
-            handler: {(paramAction:UIAlertAction!) in
-                self.newGame(true)
-                //self.gameArrayChanged = true
-
-        })
-        alert.addAction(newGameAction)
         
-        let chooseGameAction = UIAlertAction(title: GV.language.getText(.TCChooseGameNumber), style: .Default,
-                                          handler: {(paramAction:UIAlertAction!) in
-                                            self.chooseGameNumber()
-                                            //self.gameArrayChanged = true
-                                            
-        })
-        alert.addAction(chooseGameAction)
-        
-        if levelIndex > 0 {
-            let easierAction = UIAlertAction(title: GV.language.getText(.TCPreviousLevel), style: .Default,
-                handler: {(paramAction:UIAlertAction!) in
-//                    print("newGame from set Previous Level")
-                    self.setLevel(self.previousLevel)
-                    self.newGame(true)
+        if multiPlayer {
+            let stopAction = UIAlertAction(title: GV.language.getText(.TCStopCompetition), style: .Default,
+                                            handler: {(paramAction:UIAlertAction!) in
+                                                self.stopCompetition()
             })
-            alert.addAction(easierAction)
-        }
-        
-        if GV.peerToPeerService!.hasOtherPlayers() {
-            let competitionAction = UIAlertAction(title: GV.language.getText(.TCCompetition), style: .Default,
-                                                 handler: {(paramAction:UIAlertAction!) in
-                                                    self.choosePartner()
-                                                    //self.gameArrayChanged = true
-                                                    
-            })
-            alert.addAction(competitionAction)
+            alert.addAction(stopAction)
             
-        }
-
-        if levelIndex < GV.levelsForPlay.levelParam.count - 1 {
-            let complexerAction = UIAlertAction(title: GV.language.getText(TextConstants.TCNextLevel), style: .Default,
+        } else {
+            let againAction = UIAlertAction(title: GV.language.getText(.TCGameAgain), style: .Default,
                 handler: {(paramAction:UIAlertAction!) in
-//                    print("newGame from set Next Level")
-                    self.setLevel(self.nextLevel)
-                    self.newGame(true)
+                    self.newGame(false)
             })
-            alert.addAction(complexerAction)
+            alert.addAction(againAction)
+            let newGameAction = UIAlertAction(title: GV.language.getText(TextConstants.TCNewGame), style: .Default,
+                handler: {(paramAction:UIAlertAction!) in
+                    self.newGame(true)
+                    //self.gameArrayChanged = true
+
+            })
+            alert.addAction(newGameAction)
+            
+            let chooseGameAction = UIAlertAction(title: GV.language.getText(.TCChooseGameNumber), style: .Default,
+                                              handler: {(paramAction:UIAlertAction!) in
+                                                self.chooseGameNumber()
+                                                //self.gameArrayChanged = true
+                                                
+            })
+            alert.addAction(chooseGameAction)
+            
+            if levelIndex > 0 {
+                let easierAction = UIAlertAction(title: GV.language.getText(.TCPreviousLevel), style: .Default,
+                    handler: {(paramAction:UIAlertAction!) in
+    //                    print("newGame from set Previous Level")
+                        self.setLevel(self.previousLevel)
+                        self.newGame(true)
+                })
+                alert.addAction(easierAction)
+            }
+            
+            if GV.peerToPeerService!.hasOtherPlayers() {
+                let competitionAction = UIAlertAction(title: GV.language.getText(.TCCompetition), style: .Default,
+                                                     handler: {(paramAction:UIAlertAction!) in
+                                                        self.choosePartner()
+                                                        //self.gameArrayChanged = true
+                                                        
+                })
+                alert.addAction(competitionAction)
+                
+            }
+
+            if levelIndex < GV.levelsForPlay.levelParam.count - 1 {
+                let complexerAction = UIAlertAction(title: GV.language.getText(TextConstants.TCNextLevel), style: .Default,
+                    handler: {(paramAction:UIAlertAction!) in
+    //                    print("newGame from set Next Level")
+                        self.setLevel(self.nextLevel)
+                        self.newGame(true)
+                })
+                alert.addAction(complexerAction)
+            }
         }
         if !congratulations {
             let cancelAction = UIAlertAction(title: GV.language.getText(TextConstants.TCCancel), style: .Default,
                 handler: {(paramAction:UIAlertAction!) in
-//                    self.setLevel(self.nextLevel)
-//                    self.newGame(true)
-//                    self.startTimer(&self.showTippAtTimer, sleepTime: self.showTippSleepTime, selector: self.showTippSelector, repeats: true)
             })
             alert.addAction(cancelAction)
         }
         return alert
+    }
+    
+    func stopCompetition() {
+        GV.peerToPeerService?.sendInfo(.StopCompetition, message: [])
+        opponent.hasFinished = true
     }
 
 
@@ -2788,8 +2816,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        print("setGreenLineSize")
         lineWidthMultiplier = lineWidthMultiplierSpecial
         drawHelpLinesSpec()
-        lastGreenPair!.fixed = true
-        
+        if lastGreenPair != nil {
+            lastGreenPair!.fixed = true
+        }
         stopTimer(&greenLineTimer)
     }
 
@@ -3102,8 +3131,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         
     }
-    func showTimeLeft() {
-    }
     
     func calculateSpritePosition(column: Int, row: Int) -> CGPoint {
         let cardPositionMultiplier = GV.deviceConstants.cardPositionMultiplier
@@ -3241,6 +3268,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         if restart {
             if gameNumberChoosed {
                 self.gameNumber = gameNumber
+                try! realm.write({ 
+                    GV.player!.levelID = levelIndex
+                })
                 prepareNextGame(false) // start with choosed gamenumber
             } else {
                 prepareNextGame(true)
@@ -3291,7 +3321,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         timeCount += countUpAdder
         let countUpText = GV.language.getText(.TCTime, values: timeCount.dayHourMinSec)
-        showTimeLabel.text = countUpText
+        showTimeLabel1.text = countUpText
+        if multiPlayer {
+            showTimeLabel2.text = countUpText
+        } else {
+            showTimeLabel2.hidden = true
+        }
     }
     
     func checkCountMovingSprites() {
@@ -3329,6 +3364,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             opponent.score = Int(message[0])!
             opponent.hasFinished = true // save in update!!!
             alertOpponentHasGameFinished()
+        case .StopCompetition:
+            opponent.hasFinished = true // save in update!!!
+            alertStopCompetetion()
         default:
             return
         }
@@ -3364,6 +3402,26 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             GV.mainViewController!.showAlert(alert, delay: 20)
         })
 
+    }
+    
+    func alertStopCompetetion() {
+        let alert = UIAlertController(title: GV.language.getText(.TCOpponentStoppedTheGame,
+            values: self.opponent.name),
+          message: "",
+          preferredStyle: .Alert)
+        
+        let OKAction = UIAlertAction(title: GV.language.getText(.TCOK), style: .Default,
+                                     handler: {(paramAction:UIAlertAction!) in
+                                        dispatch_async(dispatch_get_main_queue()) {
+                                            
+                                        }
+        })
+        alert.addAction(OKAction)
+        
+        dispatch_async(dispatch_get_main_queue(), {
+            GV.mainViewController!.showAlert(alert, delay: 20)
+        })
+        
     }
     
     func calculateWinner()->(bonus:Int, myScore:Int, IWon: Bool){
