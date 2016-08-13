@@ -13,28 +13,44 @@ import MultipeerConnectivity
 class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, PeerToPeerServiceManagerDelegate { //,  JGXLineDelegate { //MyGameScene {
 
     struct PairStatus {
+        var color: MyColors
         var pair: FromToColumnRow
         var startTime: NSDate
-        var duration: Double
+        var changeTime: NSDate
         var founded: Founded
         var fixed: Bool
         var points: [CGPoint]
-        init(pair: FromToColumnRow, founded: Founded, startTime: NSDate, points: [CGPoint]) {
+        init() {
+            self.color = .None
+            self.pair = FromToColumnRow()
+            self.startTime = NSDate()
+            self.changeTime = NSDate()
+            self.founded = Founded()
+            self.fixed = false
+            self.points = [CGPoint]()
+        }
+        init(color: MyColors, pair: FromToColumnRow, founded: Founded, startTime: NSDate, points: [CGPoint]) {
+            self.color = color
             self.pair = pair
             self.founded = founded
             self.startTime = startTime
-            self.duration = 0
+            self.changeTime = startTime
             self.fixed = false
             self.points = points
         }
-        
-        mutating func setEndDuration() {
-            duration = NSDate().timeIntervalSinceDate(self.startTime)
+        mutating func setValue(color: MyColors, pair: FromToColumnRow, founded: Founded, startTime: NSDate , points: [CGPoint]) {
+            self.color = color
+            self.pair = pair
+            self.founded = founded
+            self.startTime = startTime
+            self.changeTime = startTime
+            self.fixed = false
+            self.points = points
+        }
+        mutating func setValue(color: MyColors) {
+            self.color = color
         }
         
-        func getActDuration() -> NSTimeInterval{
-            return NSDate().timeIntervalSinceDate(startTime)
-        }
     }
     struct GameArrayPositions {
         var used: Bool
@@ -106,7 +122,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
 
     enum MyColors: Int {
-        case Red = 0, Green
+        case None = 0, Red, Green
     }
     
     enum SpriteGeneratingType: Int {
@@ -344,8 +360,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var lineRV: JGXLine?
     var lineBH: JGXLine?
     
-    var lastGreenPair: PairStatus?
-    var lastRedPair: PairStatus?
+//    var lastGreenPair: PairStatus?
+//    var lastRedPair: PairStatus?
+    var lastPair = PairStatus() {
+        didSet {
+            if oldValue.color != lastPair.color {
+                lastPair.startTime = NSDate()
+                lastPair.changeTime = lastPair.startTime
+            }
+        }
+    }
     
     var lastDrawHelpLinesParameters = DrawHelpLinesParameters()
 
@@ -1629,6 +1653,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func drawHelpLinesSpec() {
         let points = lastDrawHelpLinesParameters.points
         let lineWidth = lastDrawHelpLinesParameters.lineWidth
+//         lineWidthMultiplier = lineWidthMultiplierSpecial
+
         let twoArrows = lastDrawHelpLinesParameters.twoArrows
         let color = lastDrawHelpLinesParameters.color
         let arrowLength = spriteSize.width * 0.30
@@ -1809,6 +1835,25 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             restartGame = false
             newGame(false)
         }
+        
+        checkMultiplayer()
+        checkColoredLines()
+        
+    }
+    
+    func checkColoredLines() {
+        if lastPair.color == MyColors.Green { // Timer for check Green Line
+            if NSDate().timeIntervalSinceDate(lastPair.startTime) > 0.5 && !lastPair.fixed {
+                lastPair.fixed = true
+                lineWidthMultiplier = lineWidthMultiplierSpecial
+                drawHelpLinesSpec() // draw thick Line
+            }
+        }
+        
+
+    }
+    
+    func checkMultiplayer() {
         if multiPlayer {
             opponentLabel.text = GV.language.getText(.TCOpponent, values: opponent.name)
             opponentLabel.hidden = false
@@ -1831,9 +1876,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             opponentLabel.hidden = true
             opponentScoreLabel.hidden = true
             showLevelScore(false, opponentScore: opponent.score)
-
+            
         }
-        
     }
     
     func animateFinishGame() {
@@ -2661,12 +2705,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         //            return
         //        }
         //let countTouches = touches.count
-        lineWidthMultiplier = lineWidthMultiplierNormal
         
 //        stopTimer(&showTippAtTimer)
         oldFromToColumnRow = FromToColumnRow()
-        lastGreenPair = nil
-        lastRedPair = nil
+//        lastGreenPair = nil
+//        lastRedPair = nil
+        lastPair.color = .None
+        lineWidthMultiplier = lineWidthMultiplierNormal
         touchesBeganAt = NSDate()
         let firstTouch = touches.first
         let touchLocation = firstTouch!.locationInNode(self)
@@ -2749,7 +2794,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     addChild(cardPlaceButton!)
                 }
             }  else if movedFromNode == aktNode && tremblingSprites.count > 0 { // stop trembling
-                
+                lastPair.color = .None
                 stopTrembling()
                 lastNextPoint = nil
             } else if movedFromNode != aktNode {
@@ -2769,34 +2814,40 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     actFromToColumnRow.toColumnRow.row = foundedPoint!.row
                     let color = calculateLineColor(foundedPoint!, movedFrom: movedFrom)
                     switch color {
-                    case .Green:
-                        if lastGreenPair == nil || lastGreenPair!.pair !=  actFromToColumnRow || lastRedPair != nil {
-                            if lastRedPair != nil && lastGreenPair!.fixed && lastGreenPair!.pair ==  actFromToColumnRow && lastGreenPair!.points.count == myPoints.count {
-                                lineWidthMultiplier = lineWidthMultiplierSpecial
-                                drawHelpLinesSpec()
-                                lastRedPair = nil
+                    case .Green :
+                        if lastPair.color == .None || lastPair.color == .Red {
+                            lastPair.setValue(.Green, pair: actFromToColumnRow, founded: foundedPoint!, startTime: NSDate(), points: myPoints)
+                        } else if lastPair.color == .Green && lastPair.pair ==  actFromToColumnRow && lastPair.points.count == myPoints.count {
+                            // nothing to do hier - update sets to fixed after 3.0 sec
+                        } else { // other green pair found
+                            lineWidthMultiplier = lineWidthMultiplierNormal
+                            if lastPair.fixed {
+                                if lastPair.changeTime == lastPair.startTime { // first time changed
+                                    lastPair.changeTime = NSDate()
+                                } else {
+                                    if NSDate().timeIntervalSinceDate(lastPair.changeTime) > 0.5 {
+                                        lastPair.setValue(.Green, pair: actFromToColumnRow, founded: foundedPoint!, startTime: NSDate(), points: myPoints)                                }
+                                }
                             } else {
-                                lineWidthMultiplier = lineWidthMultiplierNormal
-                                drawHelpLinesSpec()
-                                lastGreenPair = PairStatus(pair: actFromToColumnRow, founded: foundedPoint!, startTime: NSDate(), points: myPoints)
-                                lastRedPair = nil
-                                greenLineTimer = startTimer(&greenLineTimer, sleepTime: 0.5, selector: checkGreenLineSelector, repeats: false) // set linewidth on Special after 0.5 second
+//                                lastPair.setValue(.Red, pair: actFromToColumnRow, founded: foundedPoint!, startTime: NSDate(), points: myPoints)
                             }
-                        } else {
-                            lastGreenPair!.points = myPoints
                         }
+                        
                     case .Red:
+                        lastPair.setValue(.Red)
                         lineWidthMultiplier = lineWidthMultiplierNormal
                         drawHelpLinesSpec()
-                        if lastGreenPair != nil {
-                            if !lastGreenPair!.fixed {
-                                stopTimer(&greenLineTimer)
+                        if lastPair.fixed {
+                            if lastPair.changeTime == lastPair.startTime {
+                                lastPair.changeTime = NSDate()
+                            } else {
+                                if NSDate().timeIntervalSinceDate(lastPair.changeTime) > 0.5 {
+                                    lastPair.setValue(.Green, pair: actFromToColumnRow, founded: foundedPoint!, startTime: NSDate(), points: myPoints)                                }
                             }
-                            if lastGreenPair!.duration == 0 || lastRedPair == nil { // first time Red
-                                lastGreenPair!.setEndDuration() // get duration of Green
-                                lastRedPair = PairStatus(pair: actFromToColumnRow, founded: foundedPoint!, startTime: NSDate(), points: myPoints)
-                            }
+                        } else {
+                            lastPair.setValue(.Red, pair: actFromToColumnRow, founded: foundedPoint!, startTime: NSDate(), points: myPoints)
                         }
+                    default: break
 
                     }
                 }
@@ -2812,20 +2863,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     
-    func setGreenLineSize() {
-//        print("setGreenLineSize")
-        lineWidthMultiplier = lineWidthMultiplierSpecial
-        drawHelpLinesSpec()
-        if lastGreenPair != nil {
-            lastGreenPair!.fixed = true
-        }
-        stopTimer(&greenLineTimer)
-    }
 
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        lineWidthMultiplier = lineWidthMultiplierNormal
-        stopTimer(&greenLineTimer)
+//        lineWidthMultiplier = lineWidthMultiplierNormal
+//        stopTimer(&greenLineTimer)
         stopTrembling()
         let firstTouch = touches.first
         let touchLocation = firstTouch!.locationInNode(self)
@@ -2884,20 +2926,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 actFromToColumnRow.toColumnRow.row = foundedPoint!.row
                 
                 var color = calculateLineColor(foundedPoint!, movedFrom: movedFrom)
-                if color == .Red && lastGreenPair != nil {
-                    if lastRedPair != nil {
-                        lastRedPair!.setEndDuration()
-////                        if lastRedPair!.duration < 1.0 && lastGreenPair!.duration > 1.0 {
-                        if lastGreenPair!.fixed && lastRedPair!.duration < 1.0 {
-                            actFromToColumnRow.toColumnRow.column = lastGreenPair!.pair.toColumnRow.column
-                            actFromToColumnRow.toColumnRow.row = lastGreenPair!.pair.toColumnRow.row
-                            myPoints = lastGreenPair!.points // set Back to last green line
-                            color = .Green
-//                            print("==============correctur made! lastRedPair!.duration: ", lastRedPair!.duration.nDecimals(3), "==========")
-                        }
-                    }
-                }
                 
+                
+                if lastPair.fixed {
+                    actFromToColumnRow.toColumnRow.column = lastPair.pair.toColumnRow.column
+                    actFromToColumnRow.toColumnRow.row = lastPair.pair.toColumnRow.row
+                    myPoints = lastPair.points // set Back to last green line
+                    color = .Green
+                }
+                lastPair = PairStatus()
                 push(sprite, status: .MovingStarted)
                 
                 
@@ -3479,7 +3516,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                                             self.levelIndex = Int(message[1])!
                                             self.gameNumber = Int(message[2])!
                                             self.restartGame = true
-                                            print("sendAnswer YES to messageNe: \(messageNr)")
                                             GV.peerToPeerService!.sendAnswer(messageNr, answer: [self.answerYes])
                                         }
         })
