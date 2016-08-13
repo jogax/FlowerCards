@@ -47,13 +47,14 @@
 		2025F1221D5B246E00561FBF /* RecordIDModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1211D5B246E00561FBF /* RecordIDModel.swift */; };
 		2025F1241D5B253900561FBF /* CardGameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1231D5B253900561FBF /* CardGameScene.swift */; };
 		2025F1261D5B256A00561FBF /* JGXLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1251D5B256A00561FBF /* JGXLine.swift */; };
-		2025F12C1D5B25C300561FBF /* Mirror.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F1271D5B25C300561FBF /* Mirror.m4a */; };
+		2025F12C1D5B25C300561FBF /* MirrorX.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F1271D5B25C300561FBF /* MirrorX.m4a */; };
 		2025F12D1D5B25C300561FBF /* Lost.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F1281D5B25C300561FBF /* Lost.m4a */; };
 		2025F12E1D5B25C300561FBF /* Mirror1.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F1291D5B25C300561FBF /* Mirror1.m4a */; };
 		2025F12F1D5B25C300561FBF /* Mirror2.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F12A1D5B25C300561FBF /* Mirror2.m4a */; };
 		2025F1301D5B25C300561FBF /* Mirror3.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F12B1D5B25C300561FBF /* Mirror3.m4a */; };
 		2025F1321D5B26A200561FBF /* MySKPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1311D5B26A200561FBF /* MySKPanel.swift */; };
 		2025F1341D5B27C200561FBF /* ChooseGamePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */; };
+		20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20389B541D5F7EB400ADD133 /* Mirror5.m4a */; };
 		20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20720A751D5B55E600389C0C /* Mirror4.m4a */; };
 		20720A781D5B71FF00389C0C /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 20720A771D5B71FF00389C0C /* Podfile */; };
 		20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1051D5B445300963590 /* MyMusic.m4a */; };
@@ -124,13 +125,14 @@
 		2025F1211D5B246E00561FBF /* RecordIDModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordIDModel.swift; sourceTree = "<group>"; };
 		2025F1231D5B253900561FBF /* CardGameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardGameScene.swift; sourceTree = "<group>"; };
 		2025F1251D5B256A00561FBF /* JGXLine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JGXLine.swift; sourceTree = "<group>"; };
-		2025F1271D5B25C300561FBF /* Mirror.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror.m4a; sourceTree = "<group>"; };
+		2025F1271D5B25C300561FBF /* MirrorX.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = MirrorX.m4a; sourceTree = "<group>"; };
 		2025F1281D5B25C300561FBF /* Lost.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Lost.m4a; sourceTree = "<group>"; };
 		2025F1291D5B25C300561FBF /* Mirror1.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror1.m4a; sourceTree = "<group>"; };
 		2025F12A1D5B25C300561FBF /* Mirror2.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror2.m4a; sourceTree = "<group>"; };
 		2025F12B1D5B25C300561FBF /* Mirror3.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror3.m4a; sourceTree = "<group>"; };
 		2025F1311D5B26A200561FBF /* MySKPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKPanel.swift; sourceTree = "<group>"; };
 		2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseGamePanel.swift; sourceTree = "<group>"; };
+		20389B541D5F7EB400ADD133 /* Mirror5.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror5.m4a; sourceTree = "<group>"; };
 		20720A751D5B55E600389C0C /* Mirror4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror4.m4a; sourceTree = "<group>"; };
 		20720A771D5B71FF00389C0C /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Podfile; path = FlowerCards/Podfile; sourceTree = "<group>"; };
 		20B1F1051D5B445300963590 /* MyMusic.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = MyMusic.m4a; sourceTree = "<group>"; };
@@ -227,7 +229,8 @@
 				2025F12A1D5B25C300561FBF /* Mirror2.m4a */,
 				2025F12B1D5B25C300561FBF /* Mirror3.m4a */,
 				20720A751D5B55E600389C0C /* Mirror4.m4a */,
-				2025F1271D5B25C300561FBF /* Mirror.m4a */,
+				20389B541D5F7EB400ADD133 /* Mirror5.m4a */,
+				2025F1271D5B25C300561FBF /* MirrorX.m4a */,
 				20B1F1051D5B445300963590 /* MyMusic.m4a */,
 				20B1F10D1D5B45DB00963590 /* NoSound.m4a */,
 				20B1F1091D5B454700963590 /* OK.m4a */,
@@ -339,6 +342,7 @@
 				2025F0CC1D5B18F300561FBF /* LaunchScreen.storyboard in Resources */,
 				2025F12E1D5B25C300561FBF /* Mirror1.m4a in Resources */,
 				2025F12D1D5B25C300561FBF /* Lost.m4a in Resources */,
+				20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */,
 				20720A781D5B71FF00389C0C /* Podfile in Resources */,
 				20B1F1081D5B44F900963590 /* cardBackground.png in Resources */,
 				2025F0C91D5B18F300561FBF /* Assets.xcassets in Resources */,
@@ -350,7 +354,7 @@
 				20B1F1101D5B483000963590 /* Winner.m4a in Resources */,
 				20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */,
 				2025F12F1D5B25C300561FBF /* Mirror2.m4a in Resources */,
-				2025F12C1D5B25C300561FBF /* Mirror.m4a in Resources */,
+				2025F12C1D5B25C300561FBF /* MirrorX.m4a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

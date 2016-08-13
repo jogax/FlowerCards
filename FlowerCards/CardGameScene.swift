@@ -278,7 +278,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var lastMirrored = ""
     var musicPlayer: AVAudioPlayer?
     var soundPlayer: AVAudioPlayer?
-    var soundPlayerArray = [AVAudioPlayer?](count: 4, repeatedValue: nil)
+    var soundPlayerArray = [AVAudioPlayer?](count: 5, repeatedValue: nil)
     var myView = SKView()
     var levelIndex = GV.player!.levelID
     var stack:Stack<SavedSprite> = Stack()
@@ -1353,6 +1353,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                             pointArray.append(foundedPoint!.point)
                         } else {
                             pointArray.append(mirroredLine4.line.toPoint)
+                            let mirroredLine5 = mirroredLine4.createMirroredLine()
+                            (founded, foundedPoint) = findEndPoint(movedFrom, fromPoint: mirroredLine5.line.fromPoint, toPoint: mirroredLine5.line.toPoint, lineWidth: lineSize, showLines: showLines)
+                            //                    linesArray.append(myLine)
+                            //                    if showLines {self.addChild(myLine)}
+                            if founded {
+                                pointArray.append(foundedPoint!.point)
+                            } else {
+                                pointArray.append(mirroredLine5.line.toPoint)
+                            }
                         }
 
                     }
@@ -2956,8 +2965,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 actionArray.append(actionEmpty)
                 actionArray.append(SKAction.moveTo(myPoints[1], duration: Double((myPoints[1] - myPoints[0]).length() * speed)))
                 
-                let soundArray = ["Mirror1", "Mirror2", "Mirror3", "Mirror4"]
-                for pointsIndex in 2...5 {
+                let soundArray = ["Mirror1", "Mirror2", "Mirror3", "Mirror4", "Mirror5"]
+                for pointsIndex in 2...6 {
                     if myPoints.count > pointsIndex {
                         if color == .Green {
                             actionArray.append(SKAction.runBlock({
