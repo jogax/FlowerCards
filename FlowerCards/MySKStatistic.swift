@@ -114,26 +114,22 @@ class MySKStatistic: MySKTable {
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         let touchLocation = touches.first!.locationInNode(self)
-        switch checkTouches(touches, withEvent: event) {
-        case MyEvents.GoBackEvent:
+        let (_, row) = checkTouches(touches, withEvent: event)
+        switch row {
+        case 0:
             let fadeInAction = SKAction.fadeInWithDuration(0.5)
             myParent.runAction(fadeInAction)
             removeFromParent()
             callBack(false, 0, 0)
-        case .NoEvent:
-            let touchesEndedAtNode = nodeAtPoint(touchLocation)
-            if touchesBeganAtNode != nil && touchesEndedAtNode is SKSpriteNode && touchesEndedAtNode.name != myName {
-                let (column, row) = getColumnRowOfElement(touchesBeganAtNode!.name!)
-                if column == myColumnWidths.count - 1 {
-                    showDetailedPlayerStatistic(row - 1)
-                }
-           }
-
+        case 2..<10000:
+            addDetailedPlayerStatistic(row - 2)
+        default:
+            break
         }
         
     }
     
-    func showDetailedPlayerStatistic(row: Int) {
+    func addDetailedPlayerStatistic(row: Int) {
         let playerID = nameTable[row].ID
         _ = MySKDetailedStatistic(playerID: playerID, parent: self, callBack: backFromMySKDetailedStatistic)
         

@@ -56,6 +56,7 @@ class MySKTable: SKSpriteNode {
     var myTargetPosition = CGPointZero
     var headLines: [String]
     var scrolling = false
+    var verticalPosition: CGFloat = 0
     
     let goBackImageName = "GoBackImage"
     
@@ -105,6 +106,7 @@ class MySKTable: SKSpriteNode {
             columnXPositions.append(columnMidX)
             columnMidX += mySize.width * columnWidths[column] / 100
         }
+        verticalPosition = (self.size.height - heightOfLabelRow) / 2 - heightOfMyHeadRow
         self.userInteractionEnabled = true
         //        fontSize = CGFloat(0)
         showMyImagesAndHeader(DrawImages.getGoBackImage(CGSizeMake(myImageSize, myImageSize)), position: 10, name: goBackImageName)
@@ -169,7 +171,6 @@ class MySKTable: SKSpriteNode {
             label.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Left
             label.verticalAlignmentMode = SKLabelVerticalAlignmentMode.Center
             label.name = name
-            let verticalPosition = (self.size.height - heightOfLabelRow) / 2 - heightOfMyHeadRow
             if orientation.count > 0 {
                 
             }
@@ -390,13 +391,14 @@ class MySKTable: SKSpriteNode {
         return UIImage()
     }
     
-    func checkTouches(touches: Set<UITouch>, withEvent event: UIEvent?)->MyEvents {
+    func checkTouches(touches: Set<UITouch>, withEvent event: UIEvent?)->(MyEvents, Int) {
         let touchLocation = touches.first!.locationInNode(self)
         let touchesEndedAtNode = nodeAtPoint(touchLocation)
+        let row = -Int((touchLocation.y - self.size.height / 2) / heightOfLabelRow)
         if touchesEndedAtNode is SKSpriteNode && (touchesEndedAtNode as! SKSpriteNode).name == goBackImageName {
-            return .GoBackEvent
+            return (.GoBackEvent,row)
         }
-        return .NoEvent
+        return (.NoEvent, row)
         
         
     }

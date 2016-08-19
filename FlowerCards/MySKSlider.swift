@@ -95,7 +95,8 @@ class MySKSlider: MySKTable, AVAudioPlayerDelegate {
             timer!.invalidate()
             timer = nil
         }
-        switch checkTouches(touches, withEvent: event) {
+        let (touch, _) = checkTouches(touches, withEvent: event)
+        switch touch {
         case MyEvents.GoBackEvent:
             let fadeInAction = SKAction.fadeInWithDuration(0.5)
             myParent.runAction(fadeInAction)

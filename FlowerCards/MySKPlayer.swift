@@ -196,8 +196,8 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         let touchLocation = touches.first!.locationInNode(self)
         let touchesEndedAtNode = nodeAtPoint(touchLocation)
-        
-        switch checkTouches(touches, withEvent: event) {
+        let (touch, _) = checkTouches(touches, withEvent: event)
+        switch touch {
         case MyEvents.GoBackEvent:
             GV.player = realm.objects(PlayerModel).filter("isActPlayer = true").first
             let fadeInAction = SKAction.fadeInWithDuration(0.5)

@@ -7,15 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		201F08981D60BCE300E35DA5 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E41D5B208900561FBF /* Realm.framework */; };
+		201F08991D60BCE300E35DA5 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E41D5B208900561FBF /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		201F089A1D60BD4E00E35DA5 /* sprites.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 2025F11B1D5B23C500561FBF /* sprites.atlas */; };
+		201F089C1D60C41300E35DA5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2025F0C81D5B18F300561FBF /* Assets.xcassets */; };
 		2025F0BE1D5B18F300561FBF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0BD1D5B18F300561FBF /* AppDelegate.swift */; };
 		2025F0C71D5B18F300561FBF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2025F0C51D5B18F300561FBF /* Main.storyboard */; };
-		2025F0C91D5B18F300561FBF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2025F0C81D5B18F300561FBF /* Assets.xcassets */; };
 		2025F0CC1D5B18F300561FBF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2025F0CA1D5B18F300561FBF /* LaunchScreen.storyboard */; };
 		2025F0D51D5B1A1E00561FBF /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0D31D5B1A1E00561FBF /* GameViewController.swift */; };
 		2025F0D61D5B1A1E00561FBF /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0D41D5B1A1E00561FBF /* Extensions.swift */; };
-		2025F0D81D5B1D2200561FBF /* Pods in Resources */ = {isa = PBXBuildFile; fileRef = 2025F0D71D5B1D2200561FBF /* Pods */; };
-		2025F0E61D5B208900561FBF /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E41D5B208900561FBF /* Realm.framework */; };
-		2025F0E71D5B208900561FBF /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E41D5B208900561FBF /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2025F0E81D5B208900561FBF /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E51D5B208900561FBF /* RealmSwift.framework */; };
 		2025F0E91D5B208900561FBF /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E51D5B208900561FBF /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2025F0F01D5B219C00561FBF /* MySKButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0EB1D5B219C00561FBF /* MySKButton.swift */; };
@@ -42,7 +42,6 @@
 		2025F1161D5B236E00561FBF /* hu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1111D5B236E00561FBF /* hu.swift */; };
 		2025F1191D5B23BB00561FBF /* StatisticModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1171D5B23BB00561FBF /* StatisticModel.swift */; };
 		2025F11A1D5B23BB00561FBF /* Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1181D5B23BB00561FBF /* Stack.swift */; };
-		2025F11C1D5B23C500561FBF /* sprites.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 2025F11B1D5B23C500561FBF /* sprites.atlas */; };
 		2025F11E1D5B23F600561FBF /* DrawImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F11D1D5B23F600561FBF /* DrawImages.swift */; };
 		2025F1221D5B246E00561FBF /* RecordIDModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1211D5B246E00561FBF /* RecordIDModel.swift */; };
 		2025F1241D5B253900561FBF /* CardGameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1231D5B253900561FBF /* CardGameScene.swift */; };
@@ -73,8 +72,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				201F08991D60BCE300E35DA5 /* Realm.framework in Embed Frameworks */,
 				2025F0E91D5B208900561FBF /* RealmSwift.framework in Embed Frameworks */,
-				2025F0E71D5B208900561FBF /* Realm.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -150,7 +149,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2025F0E61D5B208900561FBF /* Realm.framework in Frameworks */,
+				201F08981D60BCE300E35DA5 /* Realm.framework in Frameworks */,
 				27FC725BB5FD5284C6E90A56 /* Pods_FlowerCards.framework in Frameworks */,
 				2025F0E81D5B208900561FBF /* RealmSwift.framework in Frameworks */,
 			);
@@ -184,6 +183,7 @@
 				2025F1021D5B226E00561FBF /* GamePredefinitionModel.swift */,
 				2025F1031D5B226E00561FBF /* GamePredefinitions.swift */,
 				2025F1041D5B226E00561FBF /* GameModel.swift */,
+				2025F1231D5B253900561FBF /* CardGameScene.swift */,
 				2025F1051D5B226E00561FBF /* PeerToPeerServiceManager.swift */,
 				2025F0F51D5B21AC00561FBF /* MyStructs.swift */,
 				2025F0F61D5B21AC00561FBF /* MySKPlayer.swift */,
@@ -200,7 +200,6 @@
 				2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */,
 				2025F1311D5B26A200561FBF /* MySKPanel.swift */,
 				2025F1251D5B256A00561FBF /* JGXLine.swift */,
-				2025F1231D5B253900561FBF /* CardGameScene.swift */,
 				2025F1211D5B246E00561FBF /* RecordIDModel.swift */,
 				2025F11D1D5B23F600561FBF /* DrawImages.swift */,
 				2025F11B1D5B23C500561FBF /* sprites.atlas */,
@@ -287,6 +286,7 @@
 				0CCC029B3BF36829731D03AF /* Embed Pods Frameworks */,
 				756EF9E3547834ADC75C523D /* Copy Pods Resources */,
 				2025F0EA1D5B208900561FBF /* Embed Frameworks */,
+				201F089B1D60BFA100E35DA5 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -336,24 +336,23 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				201F089C1D60C41300E35DA5 /* Assets.xcassets in Resources */,
+				201F089A1D60BD4E00E35DA5 /* sprites.atlas in Resources */,
 				20B1F10E1D5B45DB00963590 /* NoSound.m4a in Resources */,
 				20B1F10C1D5B458E00963590 /* Container.m4a in Resources */,
 				20B1F10A1D5B454700963590 /* OK.m4a in Resources */,
 				2025F0CC1D5B18F300561FBF /* LaunchScreen.storyboard in Resources */,
-				2025F12E1D5B25C300561FBF /* Mirror1.m4a in Resources */,
 				2025F12D1D5B25C300561FBF /* Lost.m4a in Resources */,
-				20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */,
 				20720A781D5B71FF00389C0C /* Podfile in Resources */,
 				20B1F1081D5B44F900963590 /* cardBackground.png in Resources */,
-				2025F0C91D5B18F300561FBF /* Assets.xcassets in Resources */,
-				2025F0D81D5B1D2200561FBF /* Pods in Resources */,
-				2025F11C1D5B23C500561FBF /* sprites.atlas in Resources */,
 				2025F0C71D5B18F300561FBF /* Main.storyboard in Resources */,
-				2025F1301D5B25C300561FBF /* Mirror3.m4a in Resources */,
 				20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */,
-				20B1F1101D5B483000963590 /* Winner.m4a in Resources */,
-				20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */,
+				2025F12E1D5B25C300561FBF /* Mirror1.m4a in Resources */,
 				2025F12F1D5B25C300561FBF /* Mirror2.m4a in Resources */,
+				2025F1301D5B25C300561FBF /* Mirror3.m4a in Resources */,
+				20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */,
+				20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */,
+				20B1F1101D5B483000963590 /* Winner.m4a in Resources */,
 				2025F12C1D5B25C300561FBF /* MirrorX.m4a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -375,6 +374,19 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FlowerCards/Pods-FlowerCards-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		201F089B1D60BFA100E35DA5 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh\"";
 		};
 		756EF9E3547834ADC75C523D /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -582,7 +594,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jozsef Romhanyi (XRT2GPQ2HX)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",

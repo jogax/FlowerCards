@@ -2739,6 +2739,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                        (nodes[nodesIndex] as! MySKNode).type == .EmptyCardType
                     {
                         movedFromNode = (nodes[nodesIndex] as! MySKNode)
+                        if movedFromNode.type == .SpriteType {
+                            self.addChild(showValue(movedFromNode))
+                        }
                         if showFingerNode {
                             let fingerNode = SKSpriteNode(imageNamed: "finger.png")
                             fingerNode.name = "finger"
@@ -2765,6 +2768,21 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     
+    func showValue(card: MySKNode)->SKLabelNode {
+        let score = SKLabelNode()
+        let delta = CGPointMake(50, 50)
+        score.position = card.position + delta
+        score.text = String(card.countScore)
+        score.fontColor = UIColor.whiteColor()
+        score.fontName = "Helvetica Bold"
+        score.fontSize = 30
+        score.zPosition = 1000
+        let showAction = SKAction.sequence([SKAction.fadeInWithDuration(0.5), SKAction.fadeOutWithDuration(1.5), SKAction.removeFromParent()])
+        let scoreActions = SKAction.group([showAction])
+        score.runAction(scoreActions)
+        return score
+        
+    }
 
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         //        if inFirstGenerateSprites {

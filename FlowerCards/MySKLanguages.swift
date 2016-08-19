@@ -68,7 +68,8 @@ class MySKLanguages: MySKTable {
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         let touchLocation = touches.first!.locationInNode(self)
         let touchesEndedAtNode = nodeAtPoint(touchLocation)
-        switch checkTouches(touches, withEvent: event) {
+        let (touch, _) = checkTouches(touches, withEvent: event)
+        switch touch {
             case MyEvents.GoBackEvent:
                 let fadeInAction = SKAction.fadeInWithDuration(0.5)
                 myParent.runAction(fadeInAction)                
