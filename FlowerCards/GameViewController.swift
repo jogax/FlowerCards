@@ -15,10 +15,10 @@ var Pi = CGFloat(M_PI)
 let DegreesToRadians = Pi / 180
 let RadiansToDegrees = 180 / Pi
 let countGames = 10000
-let appName = "flowers"
+let appName = "FlowerCards"
 
 
-class GameViewController: UIViewController, SettingsDelegate, UIApplicationDelegate {
+class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationDelegate {
     var aktName = ""
 //    var aktModus = GameModusFlowers
     var skView: SKView?
@@ -141,8 +141,6 @@ class GameViewController: UIViewController, SettingsDelegate, UIApplicationDeleg
         }
         
         GV.language.setLanguage(GV.player!.aktLanguageKey)
-//        GV.soundVolume = Float(GV.actGameParam.soundVolume)
-//        GV.musicVolume = Float(GV.actGameParam.musicVolume)
         
         let myName = GV.player!.name
         let deviceName = UIDevice.currentDevice().name
@@ -156,44 +154,9 @@ class GameViewController: UIViewController, SettingsDelegate, UIApplicationDeleg
             let scene = CardGameScene(size: CGSizeMake(view.frame.width, view.frame.height))
             GV.language.addCallback(scene.changeLanguage, callbackName: "CardGameCallBack")
             scene.scaleMode = .ResizeFill
-//            scene.parentViewController = self
-            scene.settingsDelegate = self
             skView!.presentScene(scene)
             cardsScene = scene
-//        } else {
-//            let scene = FlowerGameScene(size: CGSizeMake(view.frame.width, view.frame.height))
-//            GV.language.addCallback(scene.changeLanguage)
-//            scene.scaleMode = .ResizeFill
-//            scene.parentViewController = self
-//            scene.settingsDelegate = self
-//            skView!.presentScene(scene)
-//            flowersScene = scene
-//        }
-        
-        
-
     }
-    
-    func settingsDelegateFunc() {
-        aktName = GV.player!.name
-//        aktModus = GV.actGameParam.gameModus
-        self.performSegueWithIdentifier("SettingsSegue", sender: nil)
-    }
-
-    @IBAction func unwindToVC(segue: UIStoryboardSegue) {
-//        if aktName != GV.player!.name || aktModus != GV.actGameParam.gameModus {
-//            startScene()
-//        } else {
-            if let scene = cardsScene {
-                scene.playMusic("MyMusic", volume: GV.player!.musicVolume, loops: 0)
-                scene.startDoCountUpTimer()
-//            } else if let scene = flowersScene {
-//                scene.playMusic("MyMusic", volume: GV.player!.musicVolume, loops: 0)
-//                scene.startTimer()
-//            }
-        }
-    }
-    
     func printFonts() {
         let fontFamilyNames = UIFont.familyNames()
         for familyName in fontFamilyNames {
@@ -203,7 +166,6 @@ class GameViewController: UIViewController, SettingsDelegate, UIApplicationDeleg
             print("Font Names = [\(names)]")
         }
     }
-
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.

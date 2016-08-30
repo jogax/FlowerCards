@@ -96,7 +96,12 @@ enum TextConstants: Int {
     TCVictory,
     TCStart,
     TCStopCompetition,
-    TCOpponentStoppedTheGame
+    TCOpponentStoppedTheGame,
+    TCAreYouSureToDelete,
+    TCHelpURL,
+    TCJ,
+    TCD,
+    TCK
 }
 
     let LanguageEN = "en" // index 0

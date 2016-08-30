@@ -90,7 +90,7 @@ class MySKPanel: SKSpriteNode {
     
     func changeLanguage()->Bool{
         let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
-        playerLabel.text = GV.language.getText(.TCPlayer) + ": \(name)"
+        playerLabel.text = GV.language.getText(.TCPlayer, values: name)
         nameLabel.text = GV.language.getText(.TCName)
         soundLabel.text = GV.language.getText(.TCSoundVolume)
         musicLabel.text = GV.language.getText(.TCMusicVolume)
@@ -104,7 +104,7 @@ class MySKPanel: SKSpriteNode {
     
     func makeSettings() {
         let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
-        createLabels(playerLabel, text: GV.language.getText(.TCPlayer) + ": \(name)", lineNr: 1, horAlignment: SKLabelHorizontalAlignmentMode.Center, name: noTouchFunc)
+        createLabels(playerLabel, text: GV.language.getText(.TCPlayer, values: name), lineNr: 1, horAlignment: SKLabelHorizontalAlignmentMode.Center, name: noTouchFunc)
         playerLabel.fontColor = UIColor.blackColor()
         createLabels(nameLabel, text: GV.language.getText(.TCName), lineNr: 2, horAlignment: .Left, name: setPlayerFunc)
         createLabels(soundLabel, text: GV.language.getText(.TCSoundVolume), lineNr: 3, horAlignment: .Left, name: setSoundFunc )
@@ -209,14 +209,14 @@ class MySKPanel: SKSpriteNode {
         }
         GV.peerToPeerService!.changeIdentifier(GV.player!.name)
         let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
-        playerLabel.text = GV.language.getText(.TCPlayer) + ": \(name)"
+        playerLabel.text = GV.language.getText(.TCPlayer, values: name)
         self.userInteractionEnabled = true
     }
     
     func callIfMySKLanguagesEnds() {
         self.userInteractionEnabled = true
         let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
-        playerLabel.text = GV.language.getText(.TCPlayer) + ": \(name)"
+        playerLabel.text = GV.language.getText(.TCPlayer, values: name)
         nameLabel.text = GV.language.getText(.TCName)
         soundLabel.text = GV.language.getText(.TCSoundVolume)
         musicLabel.text = GV.language.getText(.TCMusicVolume)
@@ -231,7 +231,7 @@ class MySKPanel: SKSpriteNode {
         }
         self.userInteractionEnabled = true
         let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
-        playerLabel.text = GV.language.getText(.TCPlayer) + ": \(name)"
+        playerLabel.text = GV.language.getText(.TCPlayer, values: name)
         nameLabel.text = GV.language.getText(.TCName)
         soundLabel.text = GV.language.getText(.TCSoundVolume)
         musicLabel.text = GV.language.getText(.TCMusicVolume)
@@ -244,13 +244,15 @@ class MySKPanel: SKSpriteNode {
         
         switch GV.deviceConstants.type {
         case .iPadPro12_9:
-            fontSize = CGFloat(20)
+            fontSize = CGFloat(30)
+        case .iPadPro9_7:
+            fontSize = CGFloat(26)
         case .iPad2:
-            fontSize = CGFloat(20)
+            fontSize = CGFloat(25)
         case .iPadMini:
-            fontSize = CGFloat(20)
+            fontSize = CGFloat(25)
         case .iPhone6Plus:
-            fontSize = CGFloat(15)
+            fontSize = CGFloat(20)
         case .iPhone6:
             fontSize = CGFloat(15)
         case .iPhone5:

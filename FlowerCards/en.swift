@@ -102,4 +102,10 @@ let enDictionary: [TextConstants: String] = [
     .TCStart:           "Start",
     .TCStopCompetition: "Stop competiton",
     .TCOpponentStoppedTheGame: "% has stopped the competition!",
+    .TCAreYouSureToDelete: "Are you sure to delete %?\r\n" +
+                        "All his data will be killed!",
+    .TCHelpURL:         "http://jogax812.wixsite.com/jogaxplay/hen",
+    .TCJ:               "J",
+    .TCD:               "Q",
+    .TCK:               "K",
 ]

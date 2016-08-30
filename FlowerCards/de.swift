@@ -102,6 +102,13 @@ let deDictionary: [TextConstants: String] = [
     .TCStart:           "Start",
     .TCStopCompetition: "Stop Wettbewerb",
     .TCOpponentStoppedTheGame: "% hat das Spiel stopped",
+    .TCAreYouSureToDelete: "Willst Du wirklich den Spieler % löschen?\r\n" +
+                        "Alle seine Statistikdaten werden mitgelöscht!",
+    .TCHelpURL:         "http://jogax812.wixsite.com/jogaxplay/hde",
+    .TCJ:               "J",
+    .TCD:               "Q",
+    .TCK:               "K",
+
 ]
 
 

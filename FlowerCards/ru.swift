@@ -102,5 +102,11 @@ let ruDictionary: [TextConstants: String] = [
     .TCStart:           "Старт",
     .TCStopCompetition: "Стоп cоревнование",
     .TCOpponentStoppedTheGame: "% остановил игру",
+    .TCAreYouSureToDelete: "Действитель удалить игрока %?\r\n" +
+                           "Все его данные будут удалены!",
+    .TCHelpURL:         "http://jogax812.wixsite.com/jogaxplay/hru",
+    .TCJ:               "В",
+    .TCD:               "Д",
+    .TCK:               "К",
 
 ]

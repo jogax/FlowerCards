@@ -26,7 +26,7 @@ struct GV {
 //    static let notificationMadeMove = "MadeMove"
 //    static let notificationJoystickMoved = "joystickMoved"
 //    static let notificationColorChanged = "colorChanged"
-    static let freeGameCount = 250
+    static let freeGameCount = 1000
     static var peerToPeerService: PeerToPeerServiceManager?
 
     static var dX: CGFloat = 0
@@ -170,7 +170,7 @@ struct GameParamStruct {
 
 
 enum DeviceTypes: Int {
-    case iPadPro12_9 = 0, iPad2, iPadMini, iPhone6Plus, iPhone6, iPhone5, iPhone4, none
+    case iPadPro12_9 = 0, iPadPro9_7, iPad2, iPadMini, iPhone6Plus, iPhone6, iPhone5, iPhone4, none
 }
 
 
@@ -191,6 +191,13 @@ struct DeviceConstants {
                 fontSizeMultiplier = 0.10
                 imageSizeMultiplier = 1.0
                 type = .iPadPro12_9
+            case "iPad6,3":
+                sizeMultiplier = 1.6
+                buttonSizeMultiplier = 1.2
+                cardPositionMultiplier = 1.0
+                fontSizeMultiplier = 0.20
+                imageSizeMultiplier = 1.3
+                type = .iPadPro9_7
             case "iPad 2", "iPad 3", "iPad 4", "iPad Air", "iPad Air 2":
                 sizeMultiplier = 1.6
                 buttonSizeMultiplier = 1.2

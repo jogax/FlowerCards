@@ -192,6 +192,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     let doCountUpSelector = "showTime"
     let checkGreenLineSelector = "setGreenLineSize"
     let myLineName = "myLine"
+    let fingerName = "finger"
     
     
     let emptySpriteTxt = "emptySprite"
@@ -265,6 +266,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var countCheckCounts = 0
     var freeUndoCounter = 0
     var freeTippCounter = 0
+    var showValueDelta: CGFloat = 0
     
     
     
@@ -321,6 +323,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var movedFromNode: MySKNode!
     var settingsButton: MySKButton?
     var undoButton: MySKButton?
+    var helpButton: MySKButton?
     var restartButton: MySKButton?
     var exchangeButton: MySKButton?
     var nextLevelButton: MySKButton?
@@ -389,7 +392,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     let images = DrawImages()
     
     var panel: MySKPanel?
-    var countUpAdder = 0
+//    var countUpAdder = 0
+    
+    var doTimeCount: Bool = false
     
 //    var actGame: GameModel?
     var actGame: GameModel?
@@ -450,7 +455,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     override func didMoveToView(view: SKView) {
         
         if !settingsSceneStarted {
-            
+//            let modelURL = NSBundle.mainBundle().URLForResource("FlowerCards", withExtension: "momd")!
+
             myView = view
             
             GV.peerToPeerService!.delegate = self
@@ -562,7 +568,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         prepareContainers()
         
-        //        self.addChild(labelBackground)
+        labelBackground.color = UIColor.whiteColor()
+        labelBackground.alpha = 0.5
+        labelBackground.position = CGPointMake(self.size.width / 2, self.size.height * 0.955)
+        labelBackground.size = CGSizeMake(self.size.width * 0.95, self.size.height * 0.05)
+        
+        self.addChild(labelBackground)
         
         let tippsTexture = SKTexture(image: images.getTipp())
         tippsButton = MySKButton(texture: tippsTexture, frame: CGRectMake(buttonXPosNormalized * 7.5, buttonYPos, buttonSize, buttonSize))
@@ -577,18 +588,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         showCardFromStack = nil
         
-//        let cardPlaceTexture = SKTexture(imageNamed: "emptycard")
-//        cardPlaceButton = MySKButton(texture: cardPlaceTexture, frame: CGRectMake(buttonXPosNormalized * 6.0, buttonYPos, cardSize.width, cardSize.height), makePicture: false)
-//        cardPlaceButton!.name = "cardPlace"
-//        addChild(cardPlaceButton!)
-//        cardPlaceButton!.alpha = 0.3
-//        cardPlaceButtonAddedToParent = true
-
-
-        
         
         bgImage = setBGImageNode()
-        //print("ImageSize: \(bgImage?.size)")
         bgAdder = 0.1
         
         bgImage!.anchorPoint = CGPointZero
@@ -611,6 +612,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         undoButton!.name = "undo"
         addChild(undoButton!)
         
+        let helpTexture = atlas.textureNamed("help")
+        helpButton = MySKButton(texture: helpTexture, frame: CGRectMake(buttonXPosNormalized * 6.0, buttonYPos, buttonSize, buttonSize))
+        helpButton!.name = "help"
+        addChild(helpButton!)
         
         
         backgroundColor = UIColor.whiteColor() //SKColor.whiteColor()
@@ -639,7 +644,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         createLabels(gameNumberLabel, text: GV.language.getText(.TCGameNumber) + " \(gameNumber + 1)", column: 2, row: 1)
         createLabels(levelLabel, text: GV.language.getText(TextConstants.TCLevel) + ": \(levelIndex + 1)", column: 4, row: 1)
 
-        createLabels(playerLabel, text: GV.language.getText(TextConstants.TCPlayer) + ": \(name)", column: 1, row: 2)
+        createLabels(playerLabel, text: GV.language.getText(TextConstants.TCPlayer, values: name), column: 1, row: 2)
         createLabels(opponentLabel, text: GV.language.getText(.TCOpponent), column: 1, row: 3)
         
         createLabels(showTimeLabel1, text: "", column: 2, row: 2)
@@ -770,7 +775,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func changeLanguage()->Bool {
         let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
-        playerLabel.text = GV.language.getText(.TCPlayer) + ": \(name)"
+        playerLabel.text = GV.language.getText(.TCPlayer, values: name)
         levelLabel.text = GV.language.getText(.TCLevel) + ": \(levelIndex + 1)"
         gameNumberLabel.text = GV.language.getText(.TCGameNumber) + "\(gameNumber + 1)"
 
@@ -790,6 +795,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
 
     func setBGImageNode()->SKSpriteNode {
+//        return SKSpriteNode()
         return SKSpriteNode(imageNamed: "cardBackground.png")
     }
 
@@ -917,7 +923,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
         if generatingType == .First {
             countUp = NSTimer.scheduledTimerWithTimeInterval(doCountUpSleepTime, target: self, selector: Selector(doCountUpSelector), userInfo: nil, repeats: true)
-            countUpAdder = 1
+            doTimeCount = true
+//            countUpAdder = 1
         }
         stopped = false
     }
@@ -969,9 +976,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     
-//    func showTipp() {
-//        getTipps()
-//    }
     
     func deleteEmptySprite(column: Int, row: Int) {
         let searchName = "\(emptySpriteTxt)-\(column)-\(row)"
@@ -1040,8 +1044,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func startTippTimer(){
-//        stopTimer(&showTippAtTimer)
-//        showTippAtTimer = NSTimer.scheduledTimerWithTimeInterval(showTippSleepTime, target: self, selector: Selector(showTippSelector), userInfo: nil, repeats: true)
     }
     
     func getTipps() {
@@ -2418,8 +2420,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 alert.addAction(competitionAction)
                 
             }
+            
+            let countGamesOfActLevel = realm.objects(GameModel).filter("playerID = %d and levelID = %d and played = yes", GV.player!.ID, levelIndex).count
 
-            if levelIndex < GV.levelsForPlay.levelParam.count - 1 {
+            if levelIndex < GV.levelsForPlay.levelParam.count - 1 && countGamesOfActLevel > 10 {
                 let complexerAction = UIAlertAction(title: GV.language.getText(TextConstants.TCNextLevel), style: .Default,
                     handler: {(paramAction:UIAlertAction!) in
     //                    print("newGame from set Next Level")
@@ -2429,12 +2433,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 alert.addAction(complexerAction)
             }
         }
-        if !congratulations {
+//        if !congratulations {
             let cancelAction = UIAlertAction(title: GV.language.getText(TextConstants.TCCancel), style: .Default,
                 handler: {(paramAction:UIAlertAction!) in
             })
             alert.addAction(cancelAction)
-        }
+//        }
         return alert
     }
     
@@ -2744,10 +2748,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         }
                         if showFingerNode {
                             let fingerNode = SKSpriteNode(imageNamed: "finger.png")
-                            fingerNode.name = "finger"
+                            fingerNode.name = fingerName
                             fingerNode.position = touchLocation
                             fingerNode.size = CGSizeMake(25,25)
-                            fingerNode.zPosition = 50
+                            fingerNode.zPosition = 100
                             addChild(fingerNode)
                         }
                     }
@@ -2770,7 +2774,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func showValue(card: MySKNode)->SKLabelNode {
         let score = SKLabelNode()
-        let delta = CGPointMake(50, 50)
+        let delta = CGPointMake(showValueDelta, showValueDelta)
         score.position = card.position + delta
         score.text = String(card.countScore)
         score.fontColor = UIColor.whiteColor()
@@ -2882,7 +2886,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             if showFingerNode {
                 
-                if let fingerNode = self.childNodeWithName("finger")! as? SKSpriteNode {
+                if let fingerNode = self.childNodeWithName(fingerName)! as? SKSpriteNode {
                     fingerNode.position = touchLocation
                 }
                 
@@ -2919,11 +2923,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             }
             
             if showFingerNode {
-                
-                if let fingerNode = self.childNodeWithName("finger")! as? SKSpriteNode {
-                    fingerNode.removeFromParent()
+                if let node = self.childNodeWithName(fingerName) {
+                  node.removeFromParent()
                 }
-                
             }
             if aktNode != nil && aktNode!.type == .ButtonType && startNode.type == .ButtonType && aktNode!.name == movedFromNode.name {
                 //            if aktNode != nil && mySKNode.type == .ButtonType && startNode.type == .ButtonType  {
@@ -2938,6 +2940,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     case "settings": settingsButtonPressed()
                     case "undo": undoButtonPressed()
                     case "restart": restartButtonPressed()
+                    case "help": helpButtonPressed()
                     default: specialButtonPressed(mySKNode.name!)
                 }
                 return
@@ -3318,9 +3321,19 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     
+    func helpButtonPressed() {
+        doTimeCount = false
+        let url = GV.language.getText(.TCHelpURL)
+        if let url = NSURL(string: url) {
+            UIApplication.sharedApplication().openURL(url)
+        }
+        doTimeCount = true
+    }
+    
     func settingsButtonPressed() {
         playMusic("NoSound", volume: GV.player!.musicVolume, loops: 0)
-        countUpAdder = 0
+        doTimeCount = false
+//        countUpAdder = 0
         inSettings = true
         panel = MySKPanel(view: view!, frame: CGRectMake(self.frame.midX, self.frame.midY, self.frame.width * 0.5, self.frame.height * 0.5), type: .Settings, parent: self, callBack: comeBackFromSettings)
         panel = nil
@@ -3343,8 +3356,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         } else {
             playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
             let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
-            playerLabel.text = GV.language.getText(TextConstants.TCPlayer) + ": \(name)"
-            countUpAdder = 1
+            playerLabel.text = GV.language.getText(TextConstants.TCPlayer, values: name)
+            doTimeCount = true
+//            countUpAdder = 1
         }
     }
     
@@ -3360,10 +3374,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
 
     
-    func startDoCountUpTimer() {
-        startTimer(&countUp, sleepTime: doCountUpSleepTime, selector: doCountUpSelector, repeats: true)
-        countUpAdder = 1
-    }
+//    func startDoCountUpTimer() {
+//        startTimer(&countUp, sleepTime: doCountUpSleepTime, selector: doCountUpSelector, repeats: true)
+//        countUpAdder = 1
+//    }
     
     func stopTimer(inout timer: NSTimer?) {
         if timer != nil {
@@ -3383,13 +3397,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func showTime() {
         
-        timeCount += countUpAdder
-        let countUpText = GV.language.getText(.TCTime, values: timeCount.dayHourMinSec)
-        showTimeLabel1.text = countUpText
-        if multiPlayer {
-            showTimeLabel2.text = countUpText
-        } else {
-            showTimeLabel2.hidden = true
+        if doTimeCount {
+            timeCount += 1 // countUpAdder
+            let countUpText = GV.language.getText(.TCTime, values: timeCount.dayHourMinSec)
+            showTimeLabel1.text = countUpText
+            if multiPlayer {
+                showTimeLabel2.text = countUpText
+            } else {
+                showTimeLabel2.hidden = true
+            }
         }
     }
     
@@ -3572,30 +3588,42 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             labelFontSize = 20
             labelYPosProcent = 92
             labelHeight = 20
+            showValueDelta = 80
+        case .iPadPro9_7:
+            labelFontSize = 17
+            labelYPosProcent = 90
+            labelHeight = 18
+            showValueDelta = 60
         case .iPad2:
             labelFontSize = 17
             labelYPosProcent = 90
             labelHeight = 18
+            showValueDelta = 60
         case .iPadMini:
             labelFontSize = 17
             labelYPosProcent = 90
             labelHeight = 18
+            showValueDelta = 50
         case .iPhone6Plus:
             labelFontSize = 14
             labelYPosProcent = 88
             labelHeight = 15
+            showValueDelta = 50
         case .iPhone6:
             labelFontSize = 12
             labelYPosProcent = 88
             labelHeight = 13
+            showValueDelta = 50
         case .iPhone5:
             labelFontSize = 10
             labelYPosProcent = 87
             labelHeight = 12
+            showValueDelta = 50
         case .iPhone4:
             labelFontSize = 10
             labelYPosProcent = 87
             labelHeight = 10
+            showValueDelta = 50
         default:
             break
         }

@@ -82,7 +82,7 @@ class MySKNode: SKSpriteNode {
     var BGPictureAdded = false
     
     let cardLib: [Int:String] = [
-        0:"A", 1:"2", 2:"3", 3:"4", 4:"5", 5:"6", 6:"7", 7:"8", 8:"9", 9:"10", 10: "J", 11: "Q", 12: "K", NoColor: ""]
+        0:"A", 1:"2", 2:"3", 3:"4", 4:"5", 5:"6", 6:"7", 7:"8", 8:"9", 9:"10", 10: GV.language.getText(.TCJ), 11: GV.language.getText(.TCD), 12: GV.language.getText(.TCK), NoColor: ""]
     
     let fontSizeMultiplier: CGFloat = 0.35
     let offsetMultiplier = CGPointMake(-0.48, 0.48)

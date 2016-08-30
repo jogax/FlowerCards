@@ -26,7 +26,7 @@ class ChooseGamePanel: SKSpriteNode {
     let dot = "."
     let myFontName = "TimesNewRomanBold"
     let newLine = "\r\n"
-    let gamesPerGroup = 25
+    let gamesPerGroup = 100
     var deleteIndex: Int = 0
     var touchStartTime: NSDate?
 
@@ -175,7 +175,7 @@ class ChooseGamePanel: SKSpriteNode {
                     gameNumbers.append(game.gameNumber)
                 }
             }
-            let groupText = [String(minGameNrInGroup), "...", String(maxGameNrInGroup), "\(gamesPerGroup - gameNumbers.count) / \(gamesPerGroup)"]
+            let groupText = [String(minGameNrInGroup), "...", String(maxGameNrInGroup)]
             groupButtons.append(
                 createGroupButton(
                     CGPointMake((CGFloat(groupIndexHor) + 1) * gDistance - size.width / 2 - width / 2, size.height * (0.04 - CGFloat(groupIndexVert) * 0.23)),
@@ -276,7 +276,7 @@ class ChooseGamePanel: SKSpriteNode {
         button.addChild(createLabel(CGPointMake(width * 0.5, width * 1.1), text: labelText[0], name: button.name!, fontSize: width * 0.3))
         button.addChild(createLabel(CGPointMake(width * 0.5, width * 0.95), text: labelText[1], name: button.name!, fontSize: width * 0.3))
         button.addChild(createLabel(CGPointMake(width * 0.5, width * 0.6), text: labelText[2], name: button.name!, fontSize: width * 0.3))
-        button.addChild(createLabel(CGPointMake(width * 0.5, width * 0.3), text: labelText[3], name: button.name!, fontSize: width * 0.25))
+//        button.addChild(createLabel(CGPointMake(width * 0.5, width * 0.3), text: labelText[3], name: button.name!, fontSize: width * 0.25))
         return button
     }
     
@@ -455,6 +455,8 @@ class ChooseGamePanel: SKSpriteNode {
         
         switch GV.deviceConstants.type {
         case .iPadPro12_9:
+            fontSize = CGFloat(20)
+        case .iPadPro9_7:
             fontSize = CGFloat(20)
         case .iPad2:
             fontSize = CGFloat(20)

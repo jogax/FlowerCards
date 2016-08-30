@@ -865,7 +865,34 @@ class DrawImages {
         }
         return UIImage()
     }
-    
+
+    static func getHelpImage(size: CGSize) -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(size, false, 1)
+        let ctx = UIGraphicsGetCurrentContext()
+        let w = size.width / 100
+        let h = size.height / 100
+        
+        CGContextSetStrokeColorWithColor(ctx, UIColor.blueColor().CGColor)
+        CGContextSetLineJoin (ctx, .Round)
+        CGContextSetLineCap (ctx, .Round)
+        
+        CGContextSetLineWidth(ctx, w * 5)
+        let points = [
+            CGPointMake(w * 20, h * 10),
+            CGPointMake(w * 95, h * 50),
+            CGPointMake(w * 20, h * 90)
+        ]
+        CGContextAddLines(ctx, points, points.count)
+        CGContextStrokePath(ctx)
+        
+        
+        
+        if let image = UIGraphicsGetImageFromCurrentImageContext() {
+            return image
+        }
+        return UIImage()
+    }
+
     static func getStartImage(size: CGSize) -> UIImage {
         UIGraphicsBeginImageContextWithOptions(size, false, 1)
         let ctx = UIGraphicsGetCurrentContext()

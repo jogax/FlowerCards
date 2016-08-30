@@ -90,6 +90,8 @@ class MySKLanguages: MySKTable {
         switch GV.deviceConstants.type {
         case .iPadPro12_9:
             fontSize = CGFloat(20)
+        case .iPadPro9_7:
+            fontSize = CGFloat(20)
         case .iPad2:
             fontSize = CGFloat(20)
         case .iPadMini:

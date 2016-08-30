@@ -285,6 +285,7 @@ class MySKTable: SKSpriteNode {
         myHeight = heightOfLabelRow * CGFloat(rows) + heightOfMyHeadRow
 
         self.size = CGSizeMake(self.size.width, myHeight)
+        verticalPosition = (self.size.height - heightOfLabelRow) / 2 - heightOfMyHeadRow
         self.texture = SKTexture(image: drawTableImage(size, columnWidths: columnWidths, columns: columns, rows: rows))
 //        let myTargetPosition = CGPointMake(parentView!.frame.size.width / 2, parentView!.frame.size.height / 2)
         let pSize = myParent.parent!.scene!.size
@@ -417,6 +418,10 @@ class MySKTable: SKSpriteNode {
             heightOfLabelRow = CGFloat(40)
             fontSize = CGFloat(30)
             myImageSize = CGFloat(30)
+        case .iPadPro9_7:
+            heightOfLabelRow = CGFloat(40)
+            fontSize = CGFloat(30)
+            myImageSize = CGFloat(25)
         case .iPad2:
             heightOfLabelRow = CGFloat(40)
             fontSize = CGFloat(30)

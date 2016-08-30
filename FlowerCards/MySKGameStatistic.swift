@@ -119,7 +119,7 @@ class MySKGameStatistic: MySKTable {
             removeFromParent()
             callBack(false, 0, 0)
         case 2..<10000:
-            callBack(true, gameNumbers[row]!, levelID)
+            callBack(true, gameNumbers[row - 1]!, levelID)
         default:
             break
         }
@@ -134,6 +134,8 @@ class MySKGameStatistic: MySKTable {
     override func setMyDeviceSpecialConstants() {
         switch GV.deviceConstants.type {
         case .iPadPro12_9:
+            fontSize = CGFloat(20)
+        case .iPadPro9_7:
             fontSize = CGFloat(20)
         case .iPad2:
             fontSize = CGFloat(20)

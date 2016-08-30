@@ -102,4 +102,10 @@ let huDictionary: [TextConstants: String] = [
     .TCStart:           "Start",
     .TCStopCompetition: "Verseny leállítása",
     .TCOpponentStoppedTheGame: "% leállította a játékot",
+    .TCAreYouSureToDelete: "Biztosan törölni akarod %-t?\r\n" +
+                        "Minden adata törölve lesz!",
+    .TCHelpURL:         "http://jogax812.wixsite.com/jogaxplay/hhu",
+    .TCJ:               "J",
+    .TCD:               "Q",
+    .TCK:               "K",
 ]

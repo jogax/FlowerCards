@@ -31,7 +31,7 @@ class MySKSlider: MySKTable, AVAudioPlayerDelegate {
     
     init (parent: SKSpriteNode, callBack: ()->(), soundType: SoundType) {
         let headLines: [String] = [
-            GV.language.getText(.TCPlayer) + ": \(GV.player!.name)",
+            GV.language.getText(.TCPlayer, values: GV.player!.name),
             soundType == .Music ? GV.language.getText(.TCMusicVolume) : GV.language.getText(.TCSoundVolume),
 //            "Testline 3",
 //            "Testline 4",
@@ -128,12 +128,15 @@ class MySKSlider: MySKTable, AVAudioPlayerDelegate {
         case .iPadPro12_9:
             fontSize = CGFloat(20)
             heightOfLabelRow = 40
-        case .iPad2:
+        case .iPadPro9_7:
+            fontSize = CGFloat(20)
+            heightOfLabelRow = 30
+       case .iPad2:
             fontSize = CGFloat(20)
             heightOfLabelRow = 30
         case .iPadMini:
             fontSize = CGFloat(20)
-            heightOfLabelRow = 40
+            heightOfLabelRow = 30
         case .iPhone6Plus:
             fontSize = CGFloat(15)
             heightOfLabelRow = 35

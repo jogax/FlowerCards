@@ -112,14 +112,18 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(textField: UITextField) {
-        try! realm.write({
-            nameTable[nameTableIndex].name = nameInputField.text!
-        })
+        if textField.text != "" {
+            try! realm.write({
+                nameTable[nameTableIndex].name = nameInputField.text!
+            })
+            addNewPlayerWhenRequired()
+        } else {
+            changeActPlayer()
+        }
+        showPlayers()
         nameInputField.hidden = true
         nameInputField.removeFromSuperview()
-        sleep(0.5)
-        addNewPlayerWhenRequired()
-        showPlayers()
+        nameTableIndex = nameTable.count - 2
         self.userInteractionEnabled = true
     }
     
@@ -141,7 +145,7 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
     func showPlayers() {
         reDrawWhenChanged(myColumnWidths, rows: realm.objects(PlayerModel).count)
         for index in 0..<nameTable.count {
-            let name = nameTable[index].name == GV.language.getText(.TCAnonym) ? "+" : nameTable[index].name
+            let name = nameTable[index].name == GV.language.getText(.TCAnonym) ? "+        " : nameTable[index].name
             var elements: [MultiVar] = [MultiVar(string: name)]
             if !(name == "+") {
                 elements.append(MultiVar(image: modifyImage))
@@ -196,36 +200,54 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         let touchLocation = touches.first!.locationInNode(self)
         let touchesEndedAtNode = nodeAtPoint(touchLocation)
-        let (touch, _) = checkTouches(touches, withEvent: event)
-        switch touch {
-        case MyEvents.GoBackEvent:
+        let (_, touchRow) = checkTouches(touches, withEvent: event)
+        switch touchRow {
+        case 0:
             GV.player = realm.objects(PlayerModel).filter("isActPlayer = true").first
             let fadeInAction = SKAction.fadeInWithDuration(0.5)
             myParent.runAction(fadeInAction)
             removeFromParent()
             callBack()
-        case .NoEvent:
+        case 1..<100:
 
-            if touchesBeganAtNode != nil && touchesEndedAtNode is SKLabelNode || (touchesEndedAtNode is SKSpriteNode && touchesEndedAtNode.name != myName) {
+            if (touchesEndedAtNode.name == myName || touchesEndedAtNode is SKLabelNode) && touchRow == nameTable.count {
+                let newPlayerID = addNewPlayerWhenRequired()
+                nameTableIndex = nameTable.count - 1
+                getPlayerName(indexOfPlayerID(newPlayerID)!)
+            } else if touchesEndedAtNode.name == myName || touchesEndedAtNode is SKLabelNode {
+                nameTableIndex = touchRow - 1
+                changeActPlayer()
+            } else if touchesBeganAtNode != nil && touchesEndedAtNode is SKLabelNode ||
+                    (touchesEndedAtNode is SKSpriteNode && touchesEndedAtNode.name != myName) {
                 let (column, row) = getColumnRowOfElement(touchesBeganAtNode!.name!)
                 nameTableIndex = row
-               if row == nameTable.count - 1 { // add new Player
-                    let newPlayerID = addNewPlayerWhenRequired()
-                    getPlayerName(indexOfPlayerID(newPlayerID)!)
-
-                } else {
-                    switch column {
+                switch column {
                     case 0: // select a Player
                         changeActPlayer()
                     case 1: // modify the player
                         let playerToModify = realm.objects(PlayerModel).filter("ID = \(nameTable[nameTableIndex].ID)").first
                         getPlayerName(indexOfPlayerID(playerToModify!.ID)!)
                     case 2: // delete the player
-                        deletePlayer()
+                        let playerName = realm.objects(PlayerModel).filter("ID = \(nameTable[nameTableIndex].ID)").first!.name
+                        let alert = UIAlertController(title: GV.language.getText(.TCAreYouSureToDelete, values: playerName),
+                                                      message: "",
+                                                      preferredStyle: .Alert)
+                        
+                        let OKAction = UIAlertAction(title: GV.language.getText(.TCOK), style: .Default,
+                                                       handler: {(paramAction:UIAlertAction!) in
+                                                        self.deletePlayer()
+                        })
+                        alert.addAction(OKAction)
+                        let cancelAction = UIAlertAction(title: GV.language.getText(.TCCancel), style: .Default,
+                                                     handler: {(paramAction:UIAlertAction!) in
+                        })
+                        alert.addAction(cancelAction)
+                        GV.mainViewController!.showAlert(alert)
+                    
                     default: break
-                    }
-                 }
+                }
             }
+        default: break
         }
         
     }
@@ -277,6 +299,9 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
     override func setMyDeviceSpecialConstants() {
         switch GV.deviceConstants.type {
         case .iPadPro12_9:
+            fontSize = CGFloat(20)
+            heightOfLabelRow = 40
+        case .iPadPro9_7:
             fontSize = CGFloat(20)
             heightOfLabelRow = 40
         case .iPad2:
