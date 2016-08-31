@@ -233,6 +233,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var labelFontSize = CGFloat(0)
     var labelYPosProcent = CGFloat(0)
     var labelHeight = CGFloat(0)
+    var labelBGSize = CGVectorMake(0,0)
+    var labelBGPos = CGVectorMake(0,0)
+    var screwMultiplier = CGVectorMake(0, 0)
     
     var tremblingSprites: [MySKNode] = []
     var random: MyRandom?
@@ -294,15 +297,28 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     let countUpPosKorr = CGPointMake(GV.onIpad ? 0.98 : 0.98, GV.onIpad ? 0.95 : 0.94)
     var countColorsProContainer = [Int]()
     var labelBackground = SKSpriteNode()
+    
     var levelLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var gameNumberLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    var showTimeLabel1 = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    var showTimeLabel2 = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    var playerLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    var cardCountLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    var showScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    var opponentLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    
+    var playerKopfLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var timeKopfLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var scoreKopfLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var cardCountKopfLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    
+    var playerNameLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var playerTimeLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var playerScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var playerCardCountLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+
+    var opponentNameLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var opponentTimeLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var opponentScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var opponentCardCountLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    
+    var cardCountLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+//    var showScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+//    var opponentScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     
     
 //    var gameScore = GV.player!.gameScore
@@ -569,9 +585,28 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         prepareContainers()
         
         labelBackground.color = UIColor.whiteColor()
-        labelBackground.alpha = 0.5
-        labelBackground.position = CGPointMake(self.size.width / 2, self.size.height * 0.955)
-        labelBackground.size = CGSizeMake(self.size.width * 0.95, self.size.height * 0.05)
+        labelBackground.alpha = 0.7
+        labelBackground.position = CGPointMake(self.size.width * labelBGPos.dx, self.size.height * labelBGPos.dy)
+        labelBackground.size = CGSizeMake(self.size.width * labelBGSize.dx, self.size.height * labelBGSize.dy)
+        
+        let screw1 = SKSpriteNode(imageNamed: "screw.png")
+        let screw2 = SKSpriteNode(imageNamed: "screw.png")
+        let screw3 = SKSpriteNode(imageNamed: "screw.png")
+        let screw4 = SKSpriteNode(imageNamed: "screw.png")
+        let screwWidth = self.size.width * 0.025
+        screw1.position = CGPointMake(-labelBackground.size.width * screwMultiplier.dx, labelBackground.size.height * screwMultiplier.dy)
+        screw1.size = CGSizeMake(screwWidth, screwWidth)
+        screw2.position = CGPointMake(labelBackground.size.width * screwMultiplier.dx, labelBackground.size.height * screwMultiplier.dy)
+        screw2.size = CGSizeMake(screwWidth, screwWidth)
+        screw3.position = CGPointMake(-labelBackground.size.width * screwMultiplier.dx, -labelBackground.size.height * screwMultiplier.dy)
+        screw3.size = CGSizeMake(screwWidth, screwWidth)
+        screw4.position = CGPointMake(labelBackground.size.width * screwMultiplier.dx, -labelBackground.size.height * screwMultiplier.dy)
+        screw4.size = CGSizeMake(screwWidth, screwWidth)
+        
+        labelBackground.addChild(screw1)
+        labelBackground.addChild(screw2)
+        labelBackground.addChild(screw3)
+        labelBackground.addChild(screw4)
         
         self.addChild(labelBackground)
         
@@ -630,33 +665,34 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         cardCount = Int(CGFloat(countContainers * countCardsProContainer!))
         let cardCountText: String = String(cardStack.count(.MySKNodeType))
         let tippCountText: String = "\(tippArray.count)"
-        let showScoreText: String = GV.language.getText(.TCGameScore, values: "\(levelScore)")
+//        let showScoreText: String = GV.language.getText(.TCGameScore, values: "\(levelScore)")
         let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
         
-//        let labelsBackground = SKSpriteNode()
-//        labelsBackground.color = UIColor.whiteColor()
-//        labelsBackground.alpha = 0.3
-//        labelsBackground.size = CGSizeMake(self.size.width, self.size.height * 0.1)
-//        labelsBackground.position = CGPointMake(self.size.width / 2, self.frame.minY + labelsBackground.size.height / 2)
-//        self.addChild(labelsBackground)
-//        labelsBackground.zPosition = zPosition + 1
         
         createLabels(gameNumberLabel, text: GV.language.getText(.TCGameNumber) + " \(gameNumber + 1)", column: 2, row: 1)
         createLabels(levelLabel, text: GV.language.getText(TextConstants.TCLevel) + ": \(levelIndex + 1)", column: 4, row: 1)
+        
+        createLabels(playerKopfLabel, text: GV.language.getText(TextConstants.TCPlayer), column: 1, row: 2)
+        createLabels(timeKopfLabel, text: GV.language.getText(.TCTime), column: 2, row: 2)
+        createLabels(scoreKopfLabel, text: GV.language.getText(.TCScoreHead), column: 3, row: 2)
+        createLabels(cardCountKopfLabel, text: GV.language.getText(.TCCardHead), column: 4, row: 2)
 
-        createLabels(playerLabel, text: GV.language.getText(TextConstants.TCPlayer, values: name), column: 1, row: 2)
-        createLabels(opponentLabel, text: GV.language.getText(.TCOpponent), column: 1, row: 3)
-        
-        createLabels(showTimeLabel1, text: "", column: 2, row: 2)
-        createLabels(showTimeLabel2, text: "", column: 2, row: 3)
-        
-        
-        createLabels(showScoreLabel, text: showScoreText, column: 3, row: 2)
-        createLabels(opponentScoreLabel, text: "", column: 3, row: 3)
-        
-        opponentLabel.hidden = true
-        opponentScoreLabel.hidden = true
-        
+        createLabels(playerNameLabel, text: name, column: 1, row: 3)
+        createLabels(playerTimeLabel, text: "0", column: 2, row: 3)
+        createLabels(playerScoreLabel, text: String(levelScore), column: 3, row: 3)
+        createLabels(playerCardCountLabel, text: String(cardCount), column: 4, row: 3)
+
+        if multiPlayer {
+            createLabels(opponentNameLabel, text: opponent.name, column: 1, row: 4)
+            createLabels(opponentTimeLabel, text: "0", column: 2, row: 4)
+            createLabels(opponentScoreLabel, text: String(opponent.score), column: 3, row: 4)
+            createLabels(opponentCardCountLabel, text: String(opponent.cardCount), column: 4, row: 4)
+        } else {
+            opponentNameLabel.hidden = true
+            opponentTimeLabel.hidden = true
+            opponentScoreLabel.hidden = true
+            opponentCardCountLabel.hidden = true
+        }
         createLabels(cardCountLabel, text: cardCountText, column: 1, row: 5)
         createLabels(tippCountLabel, text: tippCountText, column: 2, row: 5)
 
@@ -712,12 +748,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     
     
-    func showLevelScore(showOpponent: Bool = false, opponentScore: Int = 0) {
-        switch showOpponent {
-        case false:
-            showScoreLabel.text = GV.language.getText(.TCGameScore, values: "\(levelScore)", "\(cardCount)")
-        case true:
-            opponentScoreLabel.text = GV.language.getText(.TCGameScore, values: "\(opponent.score)", "\(opponent.cardCount)")
+    func showLevelScore() {
+        playerScoreLabel.text = String(levelScore)
+        playerCardCountLabel.text = String(cardCount)
+        if multiPlayer {
+            opponentScoreLabel.text = String(opponent.score)
+            opponentCardCountLabel.text = String(opponent.cardCount)
         }
     }
     
@@ -775,7 +811,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func changeLanguage()->Bool {
         let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
-        playerLabel.text = GV.language.getText(.TCPlayer, values: name)
+        playerKopfLabel.text = GV.language.getText(.TCPlayer, values: name)
         levelLabel.text = GV.language.getText(.TCLevel) + ": \(levelIndex + 1)"
         gameNumberLabel.text = GV.language.getText(.TCGameNumber) + "\(gameNumber + 1)"
 
@@ -1866,10 +1902,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func checkMultiplayer() {
         if multiPlayer {
-            opponentLabel.text = GV.language.getText(.TCOpponent, values: opponent.name)
-            opponentLabel.hidden = false
+            opponentNameLabel.text = opponent.name
+            opponentNameLabel.hidden = false
             opponentScoreLabel.hidden = false
-            showLevelScore(true, opponentScore: opponent.score)
+            opponentTimeLabel.hidden = false
+            opponentCardCountLabel.hidden = false
+            showLevelScore()
         }
         
         if startGetNextPlayArt {
@@ -1884,9 +1922,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             animateFinishGame()
             saveStatisticAndGame(statistic)
             multiPlayer = false
-            opponentLabel.hidden = true
+            opponentNameLabel.hidden = true
+            opponentTimeLabel.hidden = true
             opponentScoreLabel.hidden = true
-            showLevelScore(false, opponentScore: opponent.score)
+            opponentCardCountLabel.hidden = true
+            showLevelScore()
             
         }
     }
@@ -3356,9 +3396,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         } else {
             playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
             let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
-            playerLabel.text = GV.language.getText(TextConstants.TCPlayer, values: name)
+            playerNameLabel.text = name
             doTimeCount = true
-//            countUpAdder = 1
         }
     }
     
@@ -3399,12 +3438,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         if doTimeCount {
             timeCount += 1 // countUpAdder
-            let countUpText = GV.language.getText(.TCTime, values: timeCount.dayHourMinSec)
-            showTimeLabel1.text = countUpText
+            playerTimeLabel.text = timeCount.dayHourMinSec
             if multiPlayer {
-                showTimeLabel2.text = countUpText
+                opponentTimeLabel.text = timeCount.dayHourMinSec
             } else {
-                showTimeLabel2.hidden = true
+                opponentTimeLabel.hidden = true
             }
         }
     }
@@ -3589,41 +3627,65 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             labelYPosProcent = 92
             labelHeight = 20
             showValueDelta = 80
+            screwMultiplier = CGVectorMake(0.48, 0.35)
+            labelBGPos = CGVectorMake(0.5, 0.958)
+            labelBGSize = CGVectorMake(0.95, 0.06)
         case .iPadPro9_7:
             labelFontSize = 17
             labelYPosProcent = 90
             labelHeight = 18
             showValueDelta = 60
+            screwMultiplier = CGVectorMake(0.48, 0.35)
+            labelBGPos = CGVectorMake(0.5, 0.945)
+            labelBGSize = CGVectorMake(0.95, 0.07)
         case .iPad2:
             labelFontSize = 17
             labelYPosProcent = 90
             labelHeight = 18
             showValueDelta = 60
+            screwMultiplier = CGVectorMake(0.48, 0.35)
+            labelBGPos = CGVectorMake(0.5, 0.945)
+            labelBGSize = CGVectorMake(0.95, 0.07)
         case .iPadMini:
             labelFontSize = 17
             labelYPosProcent = 90
             labelHeight = 18
             showValueDelta = 50
+            screwMultiplier = CGVectorMake(0.48, 0.35)
+            labelBGPos = CGVectorMake(0.5, 0.945)
+            labelBGSize = CGVectorMake(0.95, 0.08)
         case .iPhone6Plus:
             labelFontSize = 14
             labelYPosProcent = 88
             labelHeight = 15
             showValueDelta = 50
+            screwMultiplier = CGVectorMake(0.48, 0.35)
+            labelBGPos = CGVectorMake(0.5, 0.933)
+            labelBGSize = CGVectorMake(0.95, 0.08)
         case .iPhone6:
             labelFontSize = 12
             labelYPosProcent = 88
             labelHeight = 13
             showValueDelta = 50
+            screwMultiplier = CGVectorMake(0.48, 0.35)
+            labelBGPos = CGVectorMake(0.5, 0.945)
+            labelBGSize = CGVectorMake(0.95, 0.07)
         case .iPhone5:
             labelFontSize = 10
             labelYPosProcent = 87
             labelHeight = 12
             showValueDelta = 50
+            screwMultiplier = CGVectorMake(0.48, 0.35)
+            labelBGPos = CGVectorMake(0.5, 0.945)
+            labelBGSize = CGVectorMake(0.95, 0.07)
         case .iPhone4:
             labelFontSize = 10
             labelYPosProcent = 87
             labelHeight = 10
             showValueDelta = 50
+            screwMultiplier = CGVectorMake(0.48, 0.35)
+            labelBGPos = CGVectorMake(0.5, 0.945)
+            labelBGSize = CGVectorMake(0.95, 0.07)
         default:
             break
         }

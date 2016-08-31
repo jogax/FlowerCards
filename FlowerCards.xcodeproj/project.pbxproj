@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		201E36BC1D75E25800AD7F25 /* screw.png in Resources */ = {isa = PBXBuildFile; fileRef = 201E36BB1D75E25800AD7F25 /* screw.png */; };
 		201F08981D60BCE300E35DA5 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E41D5B208900561FBF /* Realm.framework */; };
 		201F08991D60BCE300E35DA5 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E41D5B208900561FBF /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		201F089A1D60BD4E00E35DA5 /* sprites.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 2025F11B1D5B23C500561FBF /* sprites.atlas */; };
@@ -83,6 +84,7 @@
 
 /* Begin PBXFileReference section */
 		0912CB345E0E83ECC2EC999C /* Pods_FlowerCards.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_FlowerCards.framework; path = "/Users/JozsefRomhanyi/Documents/MySwiftProjects/FlowerCards/build/Debug-iphoneos/Pods_FlowerCards.framework"; sourceTree = "<absolute>"; };
+		201E36BB1D75E25800AD7F25 /* screw.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = screw.png; sourceTree = "<group>"; };
 		2025F0BA1D5B18F300561FBF /* FlowerCards.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlowerCards.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2025F0BD1D5B18F300561FBF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2025F0C61D5B18F300561FBF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -186,6 +188,7 @@
 				2025F1031D5B226E00561FBF /* GamePredefinitions.swift */,
 				2025F1041D5B226E00561FBF /* GameModel.swift */,
 				2025F1231D5B253900561FBF /* CardGameScene.swift */,
+				201E36BB1D75E25800AD7F25 /* screw.png */,
 				2025F1051D5B226E00561FBF /* PeerToPeerServiceManager.swift */,
 				2025F0F51D5B21AC00561FBF /* MyStructs.swift */,
 				2025F0F61D5B21AC00561FBF /* MySKPlayer.swift */,
@@ -352,6 +355,7 @@
 				2025F0C71D5B18F300561FBF /* Main.storyboard in Resources */,
 				20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */,
 				2025F12E1D5B25C300561FBF /* Mirror1.m4a in Resources */,
+				201E36BC1D75E25800AD7F25 /* screw.png in Resources */,
 				2025F12F1D5B25C300561FBF /* Mirror2.m4a in Resources */,
 				2025F1301D5B25C300561FBF /* Mirror3.m4a in Resources */,
 				20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */,

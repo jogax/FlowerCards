@@ -11,7 +11,8 @@ let enDictionary: [TextConstants: String] = [
     .TCAktLanguage:      "en",
     .TCLevel:            "Level%",
     .TCLevelScore:       "Levelscore%",
-    .TCGameScore:        "Score: % / % Cards",
+    .TCScoreHead:        "Score:",
+    .TCCardHead:         "Cards:",
     .TCScore:            "Score",
     .TCTime:             "used time: %",
     .TCActScore:         "Score of last Game: ",
@@ -104,7 +105,7 @@ let enDictionary: [TextConstants: String] = [
     .TCOpponentStoppedTheGame: "% has stopped the competition!",
     .TCAreYouSureToDelete: "Are you sure to delete %?\r\n" +
                         "All his data will be killed!",
-    .TCHelpURL:         "http://jogax812.wixsite.com/jogaxplay/hen",
+    .TCHelpURL:         "http://jogaxplay.hu/portl/en",
     .TCJ:               "J",
     .TCD:               "Q",
     .TCK:               "K",

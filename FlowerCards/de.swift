@@ -11,7 +11,8 @@ let deDictionary: [TextConstants: String] = [
     .TCAktLanguage:      "de",
     .TCLevel:            "Ebene%",
     .TCLevelScore:       "Summe%",
-    .TCGameScore:        "Punkte: % / % Karte(n)",
+    .TCScoreHead:        "Punkte:",
+    .TCCardHead:         "Karten:",
     .TCScore:            "Ergebnis",
     .TCTime:             "Zeit: %",
     .TCActScore:         "Ergebnis des letzten Spiels: ",
@@ -104,7 +105,7 @@ let deDictionary: [TextConstants: String] = [
     .TCOpponentStoppedTheGame: "% hat das Spiel stopped",
     .TCAreYouSureToDelete: "Willst Du wirklich den Spieler % löschen?\r\n" +
                         "Alle seine Statistikdaten werden mitgelöscht!",
-    .TCHelpURL:         "http://jogax812.wixsite.com/jogaxplay/hde",
+    .TCHelpURL:         "http://jogaxplay.hu/portl/de",
     .TCJ:               "J",
     .TCD:               "Q",
     .TCK:               "K",

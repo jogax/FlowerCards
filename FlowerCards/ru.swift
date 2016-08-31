@@ -11,7 +11,8 @@ let ruDictionary: [TextConstants: String] = [
     .TCAktLanguage:      "ru",
     .TCLevel:            "Уровень%",
     .TCLevelScore:       "Очки%",
-    .TCGameScore:        "Очки: % / % карт",
+    .TCCardHead:         "Карты:",
+    .TCScoreHead:        "Очки:",
     .TCScore:            "Очки",
     .TCTime:             "Время: %",
     .TCActScore:         "Очки последней игры: ",
@@ -104,7 +105,7 @@ let ruDictionary: [TextConstants: String] = [
     .TCOpponentStoppedTheGame: "% остановил игру",
     .TCAreYouSureToDelete: "Действитель удалить игрока %?\r\n" +
                            "Все его данные будут удалены!",
-    .TCHelpURL:         "http://jogax812.wixsite.com/jogaxplay/hru",
+    .TCHelpURL:         "http://jogaxplay.hu/portl/ru",
     .TCJ:               "В",
     .TCD:               "Д",
     .TCK:               "К",

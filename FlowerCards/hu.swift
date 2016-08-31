@@ -11,7 +11,8 @@ let huDictionary: [TextConstants: String] = [
     .TCAktLanguage:      "hu",
     .TCLevel:            "Szint%",
     .TCLevelScore:       "Pontszám%",
-    .TCGameScore:        "Pontszám: % / % kártya",
+    .TCScoreHead:        "Ponszám:",
+    .TCCardHead:         "Kártyák:",
     .TCScore:            "Pontszám",
     .TCTime:             "Idő: %",
     .TCActScore:         "Az utolsó játék pontszáma: ",
@@ -104,7 +105,7 @@ let huDictionary: [TextConstants: String] = [
     .TCOpponentStoppedTheGame: "% leállította a játékot",
     .TCAreYouSureToDelete: "Biztosan törölni akarod %-t?\r\n" +
                         "Minden adata törölve lesz!",
-    .TCHelpURL:         "http://jogax812.wixsite.com/jogaxplay/hhu",
+    .TCHelpURL:         "http://jogaxplay.hu/portl/hu",
     .TCJ:               "J",
     .TCD:               "Q",
     .TCK:               "K",
