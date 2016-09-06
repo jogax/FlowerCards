@@ -113,7 +113,6 @@ class MySKStatistic: MySKTable {
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        let touchLocation = touches.first!.locationInNode(self)
         let (_, row) = checkTouches(touches, withEvent: event)
         switch row {
         case 0:

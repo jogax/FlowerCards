@@ -273,16 +273,6 @@ extension MCPeerID {
         }
     }
 
-//    var index: Int? {
-//        get {
-//            return objc_getAssociatedObject(self, &AssociatedKeys.index) as? Int
-//        }
-//        set {
-//            if let newValue = newValue {
-//                objc_setAssociatedObject(self, &AssociatedKeys.index, newValue as Int, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-//            }
-//        }
-//    }
     
 }
 
@@ -290,7 +280,6 @@ protocol PeerToPeerServiceManagerDelegate {
     
     func connectedDevicesChanged(manager : PeerToPeerServiceManager, connectedDevices: [String])
     func messageReceived(fromPeerIndex : Int, command: PeerToPeerCommands, message: [String], messageNr: Int)
-//    func connectionLost(fromPeerIndex : Int, command: PeerToPeerCommands, message: [String], messageNr: Int)
     
 }
 

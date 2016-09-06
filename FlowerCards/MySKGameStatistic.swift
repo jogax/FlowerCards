@@ -30,8 +30,8 @@ class MySKGameStatistic: MySKTable {
         self.levelID = levelID
         let playerName = realm.objects(PlayerModel).filter("ID = %d", playerID).first!.name
         self.callBack = callBack
-        let headLines = GV.language.getText(.TCPlayerStatisticHeader, values: playerName, String(levelID))
-        gamesOfThisLevel = realm.objects(GameModel).filter("playerID = %d and levelID = %d and played = true", playerID, levelID).sorted("gameNumber")
+        let headLines = GV.language.getText(.TCPlayerStatisticLevel, values: playerName, String(levelID + 1))
+        gamesOfThisLevel = realm.objects(GameModel).filter("playerID = %d and levelID = %d and played = true and playerScore > 0", playerID, levelID).sorted("gameNumber")
         super.init(columnWidths: myGameColumnWidths, rows:gamesOfThisLevel.count + 1, headLines: [headLines], parent: parent, width: parent.parent!.frame.width * 0.9)
         self.showVerticalLines = true
         self.name = myName
@@ -62,14 +62,14 @@ class MySKGameStatistic: MySKTable {
             var victory = DrawImages.getOKImage(CGSizeMake(20, 20))
             let startImage = DrawImages.getStartImage(CGSizeMake(20, 20))
             if game.multiPlay {
-                gameArt = GV.language.getText(.TCCompetition)
+                gameArt = GV.language.getText(.TCCompetitionShort)
                 opponent = game.opponentName
                 score += " / " + String(game.opponentScore)
                 if game.playerScore < game.opponentScore {
                     victory = DrawImages.getNOKImage(CGSizeMake(20, 20))
                 }
             }
-            let elements: [MultiVar] = [MultiVar(string: "#\(game.gameNumber)"),
+            let elements: [MultiVar] = [MultiVar(string: "#\(game.gameNumber + 1)"),
                                         MultiVar(string: gameArt),
                                         MultiVar(string: opponent),
                                         MultiVar(string: score),
@@ -78,7 +78,7 @@ class MySKGameStatistic: MySKTable {
                                         MultiVar(image: startImage),
                                         ]
             showRowOfTable(elements, row: row, selected: true)
-            gameNumbers[row] = game.gameNumber - 1
+            gameNumbers[row] = game.gameNumber
             row += 1
         }
         
@@ -110,7 +110,6 @@ class MySKGameStatistic: MySKTable {
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        let touchLocation = touches.first!.locationInNode(self)
         let (_, row) = checkTouches(touches, withEvent: event)
         switch row {
         case 0:

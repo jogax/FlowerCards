@@ -31,7 +31,7 @@ enum TextConstants: Int {
     TCTimeout,
     TCGameOver,
     TCCongratulations,
-    TCName,
+    TCChooseName,
     TCVolume,
     TCCountHelpLines,
     TCLanguage,
@@ -75,14 +75,15 @@ enum TextConstants: Int {
     TCAnonym,
     TCStatistic,
     TCPlayerStatisticHeader,
+    TCPlayerStatisticLevel,
     TCStatisticOfGame,
     TCBestScoreOfGame,
     TCYourScore,
     TCYouAreTheBest,
     TCGameNumber,
     TCChooseGameNumber,
-    TCPlayerStatistic,
-    TCGameStatistic,
+//    TCPlayerStatistic,
+//    TCGameStatistic,
     TCCompetition,
     TCGame,
     TCChoosePartner,
@@ -102,7 +103,14 @@ enum TextConstants: Int {
     TCHelpURL,
     TCJ,
     TCD,
-    TCK
+    TCK,
+    TCWhoIs,
+    TCName,
+    TCPlayerType,
+    TCOpponentType,
+    TCBestPlayerType,
+    TCCompetitionShort
+
 }
 
     let LanguageEN = "en" // index 0

@@ -86,12 +86,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     struct Opponent {
+        enum FinishType: Int {
+            case None = 0, Finished, Interrupted
+        }
         var peerIndex: Int = 0
         var ID = 0
         var name: String = ""
         var score: Int = 0
         var cardCount: Int = 0
-        var hasFinished: Bool = false
+        var finish: FinishType = .None
     }
     
     struct Founded {
@@ -123,6 +126,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
     enum MyColors: Int {
         case None = 0, Red, Green
+    }
+    
+    enum PlayerType: Int {
+        case SinglePlayer = 0, MultiPlayer, BestPlayer
     }
     
     enum SpriteGeneratingType: Int {
@@ -217,8 +224,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var lastCollisionsTime = NSDate()
     var cardArray: [[GenerateCard]] = []
 //    var valueTab = [Int]()
-    let spriteCountPosKorr = CGPointMake(GV.onIpad ? 0.05 : 0.05, GV.onIpad ? 0.96 : 0.96)
-    let tippCountPosKorr = CGPointMake(GV.onIpad ? 0.05 : 0.05, GV.onIpad ? 0.94 : 0.94)
     var countPackages = 0
     let nextLevel = true
     let previousLevel = false
@@ -291,26 +296,26 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var gameArray = [[GameArrayPositions]]()
     var containers = [MySKNode]()
     var colorTab = [ColorTabLine]()
-    let containersPosCorr = CGPointMake(GV.onIpad ? 0.98 : 0.98, GV.onIpad ? 0.85 : 0.85)
-    var levelPosKorr = CGPointMake(GV.onIpad ? 0.7 : 0.7, GV.onIpad ? 0.97 : 0.97)
-    let playerPosKorr = CGPointMake(0.7 * GV.deviceConstants.sizeMultiplier, 0.5 * GV.deviceConstants.sizeMultiplier)
-    let countUpPosKorr = CGPointMake(GV.onIpad ? 0.98 : 0.98, GV.onIpad ? 0.95 : 0.94)
+    var containersPosCorr = CGPointZero
     var countColorsProContainer = [Int]()
     var labelBackground = SKSpriteNode()
     
     var levelLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var gameNumberLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     
-    var playerKopfLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    var timeKopfLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    var scoreKopfLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    var cardCountKopfLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var whoIsHeaderLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var playerHeaderLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var timeHeaderLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var scoreHeaderLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var cardCountHeaderLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     
+    var whoIsLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var playerNameLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var playerTimeLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var playerScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var playerCardCountLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
 
+    var opponentTypeLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var opponentNameLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var opponentTimeLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var opponentScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
@@ -325,7 +330,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var levelScore: Int = 0 {
         didSet {
             showLevelScore()
-            if multiPlayer {
+            if playerType == .MultiPlayer {
                 GV.peerToPeerService!.sendInfo(.MyScoreHasChanged, message: [String(levelScore), String(cardCount)], toPeerIndex: opponent.peerIndex)
             }
         }
@@ -346,7 +351,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var targetScore = 0
     var cardCount = 0 {
         didSet {
-            if multiPlayer {
+            if playerType == .MultiPlayer {
                 GV.peerToPeerService!.sendInfo(.MyScoreHasChanged, message: [String(levelScore), String(cardCount)], toPeerIndex: opponent.peerIndex)
             }
         }
@@ -370,7 +375,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var gameDifficulty: Int = 0
     var spriteTabRect = CGRectZero
     
-    //    let deviceIndex = GV.onIpad ? 0 : 1
     var buttonField: SKSpriteNode?
     //var levelArray = [Level]()
     var countLostGames = 0
@@ -415,7 +419,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //    var actGame: GameModel?
     var actGame: GameModel?
     
-    var multiPlayer = false
+    var playerType: PlayerType = .SinglePlayer
     var opponent = Opponent()
     var startGetNextPlayArt = false
     var restartGame: Bool = false
@@ -524,9 +528,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         timeCount = 0
         if newGame {
             gameNumber = -1
-            let allGames = realm.objects(GameModel).filter("levelID = %d", levelIndex) //search all games on this level
+            let allGames = realm.objects(GameModel).filter("levelID = %d and played = true", levelIndex) //search all games on this level
             for game in allGames {
-                if realm.objects(GameModel).filter("gameNumber = %d and levelID = %d and playerID = %d", game.gameNumber, levelIndex, GV.player!.ID).count == 0 {
+                if realm.objects(GameModel).filter("gameNumber = %d and levelID = %d and playerID = %d and played = true", game.gameNumber, levelIndex, GV.player!.ID).count == 0 {
                     gameNumber = game.gameNumber  // founded a game not played by actPlayer
                     createGameRecord(gameNumber)
                     break
@@ -534,13 +538,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             }
             
             if gameNumber == -1 {
-                if allGames.count > 0 {
-                    gameNumber = randomGameNumber()
-                    if gameNumber == realm.objects(GamePredefinitionModel).count {  // all Plays played
-                        // search plays with score = 0
-                    }
-                } else {
-                    gameNumber = 0
+                gameNumber = randomGameNumber()
+                if gameNumber == realm.objects(GamePredefinitionModel).count {  // all Plays played
+                    // search plays with score = 0
                 }
                 createGameRecord(gameNumber)
             }
@@ -670,28 +670,52 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         
         createLabels(gameNumberLabel, text: GV.language.getText(.TCGameNumber) + " \(gameNumber + 1)", column: 2, row: 1)
-        createLabels(levelLabel, text: GV.language.getText(TextConstants.TCLevel) + ": \(levelIndex + 1)", column: 4, row: 1)
+        createLabels(levelLabel, text: GV.language.getText(.TCLevel) + ": \(levelIndex + 1)", column: 4, row: 1)
         
-        createLabels(playerKopfLabel, text: GV.language.getText(TextConstants.TCPlayer), column: 1, row: 2)
-        createLabels(timeKopfLabel, text: GV.language.getText(.TCTime), column: 2, row: 2)
-        createLabels(scoreKopfLabel, text: GV.language.getText(.TCScoreHead), column: 3, row: 2)
-        createLabels(cardCountKopfLabel, text: GV.language.getText(.TCCardHead), column: 4, row: 2)
+        createLabels(whoIsHeaderLabel, text: GV.language.getText(.TCWhoIs), column: 1, row: 2)
+        createLabels(playerHeaderLabel, text: GV.language.getText(.TCName), column: 2, row: 2)
+        createLabels(timeHeaderLabel, text: GV.language.getText(.TCTime), column: 3, row: 2)
+        createLabels(scoreHeaderLabel, text: GV.language.getText(.TCScoreHead), column: 4, row: 2)
+        createLabels(cardCountHeaderLabel, text: GV.language.getText(.TCCardHead), column: 5, row: 2)
 
-        createLabels(playerNameLabel, text: name, column: 1, row: 3)
-        createLabels(playerTimeLabel, text: "0", column: 2, row: 3)
-        createLabels(playerScoreLabel, text: String(levelScore), column: 3, row: 3)
-        createLabels(playerCardCountLabel, text: String(cardCount), column: 4, row: 3)
+        createLabels(whoIsLabel, text: GV.language.getText(.TCPlayerType), column: 1, row: 3)
+        createLabels(playerNameLabel, text: name, column: 2, row: 3)
+        createLabels(playerTimeLabel, text: "0", column: 3, row: 3)
+        createLabels(playerScoreLabel, text: String(levelScore), column: 4, row: 3)
+        createLabels(playerCardCountLabel, text: String(cardCount), column: 5, row: 3)
 
-        if multiPlayer {
-            createLabels(opponentNameLabel, text: opponent.name, column: 1, row: 4)
-            createLabels(opponentTimeLabel, text: "0", column: 2, row: 4)
-            createLabels(opponentScoreLabel, text: String(opponent.score), column: 3, row: 4)
-            createLabels(opponentCardCountLabel, text: String(opponent.cardCount), column: 4, row: 4)
+        if playerType == .MultiPlayer {
+            createLabels(opponentTypeLabel, text: GV.language.getText(.TCOpponentType), column: 1, row: 4)
+            createLabels(opponentNameLabel, text: opponent.name, column: 2, row: 4)
+            createLabels(opponentTimeLabel, text: "0", column: 3, row: 4)
+            createLabels(opponentScoreLabel, text: String(opponent.score), column: 4, row: 4)
+            createLabels(opponentCardCountLabel, text: String(opponent.cardCount), column: 5, row: 4)
         } else {
-            opponentNameLabel.hidden = true
-            opponentTimeLabel.hidden = true
-            opponentScoreLabel.hidden = true
-            opponentCardCountLabel.hidden = true
+            let gamesWithSameNumber = realm.objects(GameModel).filter("gameNumber = %d and levelID = %d and played = true", gameNumber, levelIndex )
+            if gamesWithSameNumber.count == 0 { // this game is played 1st time
+                playerType = .SinglePlayer
+                opponentTypeLabel.hidden = true
+                opponentNameLabel.hidden = true
+                opponentTimeLabel.hidden = true
+                opponentScoreLabel.hidden = true
+                opponentCardCountLabel.hidden = true
+            } else {
+                playerType = .BestPlayer
+                let maxScore = gamesWithSameNumber.max("playerScore") as Int?
+                let bestPlay = gamesWithSameNumber.filter("playerScore = %d", maxScore!).first!
+                let bestPlayerName = realm.objects(PlayerModel).filter("ID = %d", bestPlay.playerID).first!.name
+                let bestTime = bestPlay.time
+                createLabels(opponentTypeLabel, text: GV.language.getText(.TCBestPlayerType), column: 1, row: 4)
+                createLabels(opponentNameLabel, text: bestPlayerName, column: 2, row: 4)
+                createLabels(opponentTimeLabel, text: bestTime.dayHourMinSec, column: 3, row: 4)
+                createLabels(opponentScoreLabel, text: String(maxScore!), column: 4, row: 4)
+                createLabels(opponentCardCountLabel, text: String(0), column: 5, row: 4)
+                opponentTypeLabel.hidden = false
+                opponentNameLabel.hidden = false
+                opponentTimeLabel.hidden = false
+                opponentScoreLabel.hidden = false
+                opponentCardCountLabel.hidden = false
+            }
         }
         createLabels(cardCountLabel, text: cardCountText, column: 1, row: 5)
         createLabels(tippCountLabel, text: tippCountText, column: 2, row: 5)
@@ -718,15 +742,18 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         if row < 5 {
             switch column {
             case 1:
-                xPos = self.position.x + self.size.width * 0.1
+                xPos = self.position.x + self.size.width * 0.065
                 horAlignment = .Left
             case 2:
-                xPos = self.position.x + self.size.width * 0.4
+                xPos = self.position.x + self.size.width * 0.30
+                horAlignment = .Left
             case 3:
-                xPos = self.position.x + self.size.width * 0.59
+                xPos = self.position.x + self.size.width * 0.50
             case 4:
-                xPos = self.position.x + self.size.width * 0.8
+                xPos = self.position.x + self.size.width * 0.65
             case 5:
+                xPos = self.position.x + self.size.width * 0.82
+            case 6:
                 xPos = self.cardPackage!.position.x
             default: break
             }
@@ -751,7 +778,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func showLevelScore() {
         playerScoreLabel.text = String(levelScore)
         playerCardCountLabel.text = String(cardCount)
-        if multiPlayer {
+        if playerType == .MultiPlayer {
             opponentScoreLabel.text = String(opponent.score)
             opponentCardCountLabel.text = String(opponent.cardCount)
         }
@@ -811,7 +838,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func changeLanguage()->Bool {
         let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
-        playerKopfLabel.text = GV.language.getText(.TCPlayer, values: name)
+        
+        whoIsHeaderLabel.text = GV.language.getText(.TCWhoIs)
+        playerHeaderLabel.text = GV.language.getText(.TCName)
+        timeHeaderLabel.text = GV.language.getText(.TCTime)
+        scoreHeaderLabel.text = GV.language.getText(.TCScoreHead)
+        cardCountHeaderLabel.text = GV.language.getText(.TCCardHead)
+        
+        playerNameLabel.text = name
+        whoIsLabel.text = GV.language.getText(.TCPlayerType)
+
         levelLabel.text = GV.language.getText(.TCLevel) + ": \(levelIndex + 1)"
         gameNumberLabel.text = GV.language.getText(.TCGameNumber) + "\(gameNumber + 1)"
 
@@ -1901,8 +1937,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func checkMultiplayer() {
-        if multiPlayer {
+        if playerType == .MultiPlayer {
             opponentNameLabel.text = opponent.name
+            opponentTypeLabel.hidden = false
             opponentNameLabel.hidden = false
             opponentScoreLabel.hidden = false
             opponentTimeLabel.hidden = false
@@ -1916,18 +1953,21 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             GV.mainViewController!.showAlert(alert)
         }
         
-        if opponent.hasFinished {
-            opponent.hasFinished = false
-            let statistic = realm.objects(StatisticModel).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).first!
+        if opponent.finish == .Finished || opponent.finish == .Interrupted {
             animateFinishGame()
-            saveStatisticAndGame(statistic)
-            multiPlayer = false
+            if opponent.finish == .Finished {
+                let statistic = realm.objects(StatisticModel).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).first!
+                saveStatisticAndGame(statistic)
+            }
+            opponent.finish = .None
+            playerType = .SinglePlayer
+            doTimeCount = false
+            opponentTypeLabel.hidden = true
             opponentNameLabel.hidden = true
             opponentTimeLabel.hidden = true
             opponentScoreLabel.hidden = true
             opponentCardCountLabel.hidden = true
             showLevelScore()
-            
         }
     }
     
@@ -2171,7 +2211,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             stopTimer(&countUp)
             playMusic("Winner", volume: GV.player!.musicVolume, loops: 0)
-            if multiPlayer {
+            if playerType == .MultiPlayer {
                 GV.peerToPeerService?.sendInfo(.GameIsFinished, message: [String(levelScore)], toPeerIndex: opponent.peerIndex)
             }
             
@@ -2190,7 +2230,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             let statistic = realm.objects(StatisticModel).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).first!
             saveStatisticAndGame(statistic)
-            if multiPlayer {
+            if playerType == .MultiPlayer {
                 alertIHaveGameFinished()
             } else {
                 let alert = getNextPlayArt(true, statistic: statistic)
@@ -2229,7 +2269,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         actGame!.time = timeCount
         actGame!.playerScore = levelScore
         actGame!.played = true
-        if multiPlayer {
+        if playerType == .MultiPlayer {
             actGame!.multiPlay = true
             actGame!.opponentName = opponent.name
             actGame!.opponentScore = opponent.score
@@ -2282,7 +2322,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         var answer = GV.peerToPeerService!.sendMessage(.IWantToPlayWithYou, message: [myName, String(levelIndex), String(gameNumber)], toPeerIndex: index)
         switch answer[0] {
         case answerYes:
-            self.multiPlayer = true
+            self.playerType = .MultiPlayer
             self.gameNumber = gameNumber
             self.opponent.name = identity
             self.opponent.score = 0
@@ -2290,7 +2330,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         case answerNo, GV.IAmBusy, GV.timeOut:
             alertOpponentDoesNotWantPlay()
             self.opponent = Opponent()
-            self.multiPlayer = false
+            self.playerType = .SinglePlayer
         default:
             break
         }
@@ -2350,6 +2390,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             lastNextPoint = nil
         }
+        
+        realm.beginWrite()
+        realm.delete(realm.objects(GameModel).filter("played = false"))
+        try! realm.commitWrite()
+        
         stopCreateTippsInBackground = true
         for _ in 0..<self.children.count {
             let childNode = children[self.children.count - 1]
@@ -2380,8 +2425,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         if congratulations {
             
-            if multiPlayer {
-            }
             let actGames = realm.objects(GameModel).filter("levelID = %d and gameNumber = %d", levelIndex, actGame!.gameNumber)
             
             let bestGameScore: Int = actGames.max("playerScore")!
@@ -2411,7 +2454,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             message: statisticsTxt,
             preferredStyle: .Alert)
         
-        if multiPlayer {
+        if playerType == .MultiPlayer {
             let stopAction = UIAlertAction(title: GV.language.getText(.TCStopCompetition), style: .Default,
                                             handler: {(paramAction:UIAlertAction!) in
                                                 self.stopCompetition()
@@ -2483,8 +2526,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func stopCompetition() {
-        GV.peerToPeerService?.sendInfo(.StopCompetition, message: [])
-        opponent.hasFinished = true
+        GV.peerToPeerService!.sendInfo(.StopCompetition, message: [])
+        opponent.finish = .Interrupted
+        checkMultiplayer()
     }
 
 
@@ -3439,10 +3483,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         if doTimeCount {
             timeCount += 1 // countUpAdder
             playerTimeLabel.text = timeCount.dayHourMinSec
-            if multiPlayer {
+            if playerType == .MultiPlayer {
                 opponentTimeLabel.text = timeCount.dayHourMinSec
-            } else {
-                opponentTimeLabel.hidden = true
             }
         }
     }
@@ -3476,15 +3518,21 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 alertStartMultiPlay(fromPeerIndex, message: message, messageNr: messageNr)
             }
         case .MyScoreHasChanged:
-            opponent.score = Int(message[0])!
-            opponent.cardCount = Int(message[1])!
+            if playerType == .MultiPlayer {
+                opponent.score = Int(message[0])!
+                opponent.cardCount = Int(message[1])!
+            }
         case .GameIsFinished:
-            opponent.score = Int(message[0])!
-            opponent.hasFinished = true // save in update!!!
-            alertOpponentHasGameFinished()
+            if playerType == .MultiPlayer {
+                opponent.score = Int(message[0])!
+                opponent.finish = .Finished // save in update!!!
+                alertOpponentHasGameFinished()
+            }
         case .StopCompetition:
-            opponent.hasFinished = true // save in update!!!
-            alertStopCompetetion()
+            if playerType == .MultiPlayer {
+                opponent.finish = .Interrupted
+                alertStopCompetetion()
+            }
         default:
             return
         }
@@ -3587,7 +3635,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let OKAction = UIAlertAction(title: GV.language.getText(.TCOK), style: .Default,
                                      handler: {(paramAction:UIAlertAction!) in
                                         dispatch_async(dispatch_get_main_queue()) {
-                                            self.multiPlayer = true
+                                            self.playerType = .MultiPlayer
                                             self.opponent.name = message[0]
                                             self.opponent.peerIndex = fromPeerIndex
                                             self.opponent.score = 0
@@ -3630,6 +3678,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             screwMultiplier = CGVectorMake(0.48, 0.35)
             labelBGPos = CGVectorMake(0.5, 0.958)
             labelBGSize = CGVectorMake(0.95, 0.06)
+            containersPosCorr = CGPointMake(0.98, 0.85)
         case .iPadPro9_7:
             labelFontSize = 17
             labelYPosProcent = 90
@@ -3638,6 +3687,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             screwMultiplier = CGVectorMake(0.48, 0.35)
             labelBGPos = CGVectorMake(0.5, 0.945)
             labelBGSize = CGVectorMake(0.95, 0.07)
+            containersPosCorr = CGPointMake(0.98, 0.85)
         case .iPad2:
             labelFontSize = 17
             labelYPosProcent = 90
@@ -3646,6 +3696,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             screwMultiplier = CGVectorMake(0.48, 0.35)
             labelBGPos = CGVectorMake(0.5, 0.945)
             labelBGSize = CGVectorMake(0.95, 0.07)
+            containersPosCorr = CGPointMake(0.98, 0.85)
         case .iPadMini:
             labelFontSize = 17
             labelYPosProcent = 90
@@ -3654,38 +3705,43 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             screwMultiplier = CGVectorMake(0.48, 0.35)
             labelBGPos = CGVectorMake(0.5, 0.945)
             labelBGSize = CGVectorMake(0.95, 0.08)
+            containersPosCorr = CGPointMake(0.98, 0.85)
         case .iPhone6Plus:
             labelFontSize = 14
             labelYPosProcent = 88
             labelHeight = 15
             showValueDelta = 50
             screwMultiplier = CGVectorMake(0.48, 0.35)
-            labelBGPos = CGVectorMake(0.5, 0.933)
-            labelBGSize = CGVectorMake(0.95, 0.08)
+            labelBGPos = CGVectorMake(0.5, 0.936)
+            labelBGSize = CGVectorMake(0.95, 0.083)
+            containersPosCorr = CGPointMake(0.98, 0.83)
         case .iPhone6:
             labelFontSize = 12
             labelYPosProcent = 88
             labelHeight = 13
             showValueDelta = 50
             screwMultiplier = CGVectorMake(0.48, 0.35)
-            labelBGPos = CGVectorMake(0.5, 0.945)
-            labelBGSize = CGVectorMake(0.95, 0.07)
+            labelBGPos = CGVectorMake(0.5, 0.927)
+            labelBGSize = CGVectorMake(0.95, 0.080)
+            containersPosCorr = CGPointMake(0.98, 0.82)
         case .iPhone5:
             labelFontSize = 10
             labelYPosProcent = 87
             labelHeight = 12
             showValueDelta = 50
             screwMultiplier = CGVectorMake(0.48, 0.35)
-            labelBGPos = CGVectorMake(0.5, 0.945)
-            labelBGSize = CGVectorMake(0.95, 0.07)
+            labelBGPos = CGVectorMake(0.5, 0.925)
+            labelBGSize = CGVectorMake(0.95, 0.081)
+            containersPosCorr = CGPointMake(0.98, 0.81)
         case .iPhone4:
             labelFontSize = 10
             labelYPosProcent = 87
             labelHeight = 10
             showValueDelta = 50
             screwMultiplier = CGVectorMake(0.48, 0.35)
-            labelBGPos = CGVectorMake(0.5, 0.945)
-            labelBGSize = CGVectorMake(0.95, 0.07)
+            labelBGPos = CGVectorMake(0.5, 0.925)
+            labelBGSize = CGVectorMake(0.95, 0.081)
+            containersPosCorr = CGPointMake(0.98, 0.80)
         default:
             break
         }
