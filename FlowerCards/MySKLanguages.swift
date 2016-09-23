@@ -17,22 +17,22 @@ class MySKLanguages: MySKTable {
     var positionMultiplier = GV.deviceConstants.cardPositionMultiplier * 0.6
     var countLanguages = 0
     let myColumnWidths: [CGFloat] = [100]  // in %
-    let deleteImage = DrawImages.getDeleteImage(CGSizeMake(30,30))
-    let modifyImage = DrawImages.getModifyImage(CGSizeMake(30,30))
-    let OKImage = DrawImages.getOKImage(CGSizeMake(30,30))
+    let deleteImage = DrawImages.getDeleteImage(CGSize(width: 30,height: 30))
+    let modifyImage = DrawImages.getModifyImage(CGSize(width: 30,height: 30))
+    let OKImage = DrawImages.getOKImage(CGSize(width: 30,height: 30))
     //    let statisticImage = DrawImages.getStatisticImage(CGSizeMake(30,30))
     let myName = "MySKLanguages"
     
     
     
-    init(parent: SKSpriteNode, callBack: ()->()) {
+    init(parent: SKSpriteNode, callBack: @escaping ()->()) {
         countLanguages = GV.language.count()
         self.parentNode = parent
         self.callBack = callBack
 //        let size = CGSizeMake(parent.frame.width * 0.9, heightOfTableRow + CGFloat(countLanguages) * heightOfTableRow)
         
         
-        super.init(columnWidths: myColumnWidths, rows:countLanguages, headLines: [GV.language.getText(.TCChooseLanguage)], parent: parent)
+        super.init(columnWidths: myColumnWidths, rows:countLanguages, headLines: [GV.language.getText(.tcChooseLanguage)], parent: parent)
         self.name = myName
 
         showMe(showLanguages)
@@ -44,7 +44,7 @@ class MySKLanguages: MySKTable {
     }
     
     func showLanguages() {
-        changeHeadLines([GV.language.getText(.TCChooseLanguage)])
+        changeHeadLines([GV.language.getText(.tcChooseLanguage)])
         reDraw()
         for index in 0..<countLanguages {
             let (languageName, selected) = GV.language.getLanguageNames(LanguageCodes(rawValue:index)!)
@@ -53,34 +53,34 @@ class MySKLanguages: MySKTable {
     }
     
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        let touchLocation = touches.first!.locationInNode(self)
-        touchesBeganAtNode = nodeAtPoint(touchLocation)
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touchLocation = touches.first!.location(in: self)
+        touchesBeganAtNode = atPoint(touchLocation)
         if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != myName)) {
             touchesBeganAtNode = nil
         }
     }
     
-    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        _ = touches.first!.locationInNode(self)
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        _ = touches.first!.location(in: self)
     }
     
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        let touchLocation = touches.first!.locationInNode(self)
-        let touchesEndedAtNode = nodeAtPoint(touchLocation)
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touchLocation = touches.first!.location(in: self)
+        let touchesEndedAtNode = atPoint(touchLocation)
         let (touch, _) = checkTouches(touches, withEvent: event)
         switch touch {
-            case MyEvents.GoBackEvent:
-                let fadeInAction = SKAction.fadeInWithDuration(0.5)
-                myParent.runAction(fadeInAction)                
+            case MyEvents.goBackEvent:
+                let fadeInAction = SKAction.fadeIn(withDuration: 0.5)
+                myParent.run(fadeInAction)                
                 removeFromParent()
                 callBack()
-            case .NoEvent:
+            case .noEvent:
                 if touchesBeganAtNode != nil && touchesEndedAtNode is SKLabelNode || (touchesEndedAtNode is SKSpriteNode && touchesEndedAtNode.name != myName) {
                     let (_, row) = getColumnRowOfElement(touchesBeganAtNode!.name!)
                     GV.language.setLanguage(LanguageCodes(rawValue: row)!)
                     try! realm.write({
-                        GV.player!.aktLanguageKey = GV.language.getText(.TCAktLanguage)
+                        GV.player!.aktLanguageKey = GV.language.getText(.tcAktLanguage)
                     })
                     showLanguages()
                 }        

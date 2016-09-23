@@ -12,7 +12,7 @@ import RealmSwift
 class GamePredefinitionModel: Object {
     
     dynamic var gameNumber = 0 // gameNumber
-    dynamic var seedData: NSData? = NSData()
+    dynamic var seedData: Data? = Data()
     
     override  static func primaryKey() -> String {
         return "gameNumber"

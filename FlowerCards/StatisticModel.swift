@@ -24,7 +24,7 @@ class StatisticModel: Object {
     dynamic var victorys = 0
     dynamic var defeats = 0
     dynamic var levelScore = 0
-    dynamic var created = NSDate()
+    dynamic var created = Date()
     
     override  class func primaryKey() -> String {
         return "ID"

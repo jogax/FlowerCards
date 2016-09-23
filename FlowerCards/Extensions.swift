@@ -11,18 +11,18 @@ import UIKit
 
 public extension UIDevice {
     enum UIDeviceTypes: Int {
-        case NoDevice = 0, IPodTouch5, IPodTouch6, IPhone4, IPhone4s, IPhone5, IPhone5c, IPhone5s, IPhone6, IPhone6Plus, IPhone6s, IPhone6sPlus, IPad2,
-        IPad3, IPad4, IPadAir, IPadAir2, IPadMini, IPadMini2, IPadMini3, IPadMini4, IPadPro, AppleTV, Simulator}
+        case noDevice = 0, iPodTouch5, iPodTouch6, iPhone4, iPhone4s, iPhone5, iPhone5c, iPhone5s, iPhone6, iPhone6Plus, iPhone6s, iPhone6sPlus, iPad2,
+        iPad3, iPad4, iPadAir, iPadAir2, iPadMini, iPadMini2, iPadMini3, iPadMini4, iPadPro, appleTV, simulator}
     
     var modelName: String {
-        let bounds = UIScreen.mainScreen().bounds
+        let bounds = UIScreen.main.bounds
         let width = bounds.width
         let height = bounds.height
         var systemInfo = utsname()
         uname(&systemInfo)
         let machineMirror = Mirror(reflecting: systemInfo.machine)
         let identifier = machineMirror.children.reduce("") { identifier, element in
-            guard let value = element.value as? Int8 where value != 0 else { return identifier }
+            guard let value = element.value as? Int8 , value != 0 else { return identifier }
             return identifier + String(UnicodeScalar(UInt8(value)))
         }
         
@@ -68,14 +68,18 @@ public extension UIDevice {
 
 extension Double {
     var twoDecimals: Double {
-        return Double(round(100*self)/100)
+        return nDecimals(2)
     }
     var threeDecimals: Double {
-        return Double(round(1000*self)/1000)
+        return nDecimals(3)
     }
-    func nDecimals(n: Int)->Double {
+    func nDecimals(_ n: Int)->Double {
         let multiplier: Double = pow(10.0,Double(n))
-        return Double(round(multiplier*self)/Double(n*1000))        
+        let divisior: Double = 1.0 / multiplier
+        var v: Double = self
+        v = v * multiplier
+        
+        return v.rounded() * divisior
     }
     
 }
@@ -104,7 +108,7 @@ extension Int {
         let secondsString = (seconds < 10 ? "0" : "") + String(seconds)
         return daysString + hoursString + minutesString + secondsString
     }
-    func isMemberOf(values: Int...)->Bool {
+    func isMemberOf(_ values: Int...)->Bool {
         for index in 0..<values.count {
             if self == values[index] {
                 return true
@@ -113,11 +117,11 @@ extension Int {
         return false
     }
     
-    func between(min: Int, max: Int)->Bool {
+    func between(_ min: Int, max: Int)->Bool {
         return self >= min && self <= max
     }
     
-    func rightJustified(length: Int)->String {
+    func rightJustified(_ length: Int)->String {
         var numberString = String(self)
         var countLeadingBlanks = length - numberString.length
         while countLeadingBlanks > 0 {
@@ -142,7 +146,7 @@ extension Int {
 }
 
 extension CGFloat {
-    func between(min: CGFloat, max: CGFloat)->Bool {
+    func between(_ min: CGFloat, max: CGFloat)->Bool {
         return self >= min && self <= max
     }
     
@@ -157,8 +161,8 @@ extension CGFloat {
 }
 
 extension String {
-    func replace(what: String, values: [String])->String {
-        let toArray = self.componentsSeparatedByString(what)
+    func replace(_ what: String, values: [String])->String {
+        let toArray = self.components(separatedBy: what)
         var endString = ""
         var vIndex = 0
         for index in 0..<toArray.count {
@@ -168,7 +172,7 @@ extension String {
         return endString
     }
     
-    func isMemberOf(values: String...)->Bool {
+    func isMemberOf(_ values: String...)->Bool {
         for index in 0..<values.count {
             if self == values[index] {
                 return true
@@ -181,17 +185,17 @@ extension String {
         return characters.count
     }
     
-    func dataFromHexadecimalString() -> NSData? {
+    func dataFromHexadecimalString() -> Data? {
         let data = NSMutableData(capacity: characters.count / 2)
         
-        let regex = try! NSRegularExpression(pattern: "[0-9a-f]{1,2}", options: .CaseInsensitive)
-        regex.enumerateMatchesInString(self, options: [], range: NSMakeRange(0, characters.count)) { match, flags, stop in
-            let byteString = (self as NSString).substringWithRange(match!.range)
+        let regex = try! NSRegularExpression(pattern: "[0-9a-f]{1,2}", options: .caseInsensitive)
+        regex.enumerateMatches(in: self, options: [], range: NSMakeRange(0, characters.count)) { match, flags, stop in
+            let byteString = (self as NSString).substring(with: match!.range)
             let num = UInt8(byteString.withCString { strtoul($0, nil, 16) })
-            data?.appendBytes([num], length: 1)
+            data?.append([num], length: 1)
         }
         
-        return data
+        return data as Data?
     }
     
     func isNumeric()->Bool {
@@ -212,7 +216,7 @@ extension UIColor {
 }
 
 extension UIImage {
-    public func imageRotatedByDegrees(degrees: CGFloat, flip: Bool) -> UIImage {
+    public func imageRotatedByDegrees(_ degrees: CGFloat, flip: Bool) -> UIImage {
         //        let radiansToDegrees: (CGFloat) -> CGFloat = {
         //            return $0 * (180.0 / CGFloat(M_PI))
         //        }
@@ -221,8 +225,8 @@ extension UIImage {
         }
         
         // calculate the size of the rotated view's containing box for our drawing space
-        let rotatedViewBox = UIView(frame: CGRect(origin: CGPointZero, size: size))
-        let t = CGAffineTransformMakeRotation(degreesToRadians(degrees));
+        let rotatedViewBox = UIView(frame: CGRect(origin: CGPoint.zero, size: size))
+        let t = CGAffineTransform(rotationAngle: degreesToRadians(degrees));
         rotatedViewBox.transform = t
         let rotatedSize = rotatedViewBox.frame.size
         
@@ -231,10 +235,10 @@ extension UIImage {
         let bitmap = UIGraphicsGetCurrentContext()
         
         // Move the origin to the middle of the image so we will rotate and scale around the center.
-        CGContextTranslateCTM(bitmap, rotatedSize.width / 2.0, rotatedSize.height / 2.0);
+        bitmap?.translateBy(x: rotatedSize.width / 2.0, y: rotatedSize.height / 2.0);
         
         //   // Rotate the image context
-        CGContextRotateCTM(bitmap, degreesToRadians(degrees));
+        bitmap?.rotate(by: degreesToRadians(degrees));
         
         // Now, draw the rotated/scaled image into the context
         var yFlip: CGFloat
@@ -245,56 +249,77 @@ extension UIImage {
             yFlip = CGFloat(1.0)
         }
         
-        CGContextScaleCTM(bitmap, yFlip, -1.0)
-        CGContextDrawImage(bitmap, CGRectMake(-size.width / 2, -size.height / 2, size.width, size.height), CGImage)
+        bitmap?.scaleBy(x: yFlip, y: -1.0)
+        bitmap!.draw(self as! CGImage, in: CGRect(x: -size.width / 2, y: -size.height / 2, width: size.width, height: size.height))
         
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
-        return newImage
+        return newImage!
     }
 }
 
-extension NSData {
+extension Data {
     
+//    var hexString: String? {
+//        let buf = UnsafePointer<UInt8>(bytes)
+//        let charA = UInt8(UnicodeScalar("a").value)
+//        let char0 = UInt8(UnicodeScalar("0").value)
+//        
+//        func itoh(_ value: UInt8) -> UInt8 {
+//            return (value > 9) ? (charA + value - 10) : (char0 + value)
+//        }
+//        
+//        let ptr = UnsafeMutablePointer<UInt8>(allocatingCapacity: count * 2)
+//        
+//        for i in 0 ..< count {
+//            ptr[i*2] = itoh((buf[i] >> 4) & 0xF)
+//            ptr[i*2+1] = itoh(buf[i] & 0xF)
+//        }
+//        
+//        return String(bytesNoCopy: ptr, length: count*2, encoding: String.Encoding.utf8, freeWhenDone: true)
+//    }
+
     var hexString: String? {
-        let buf = UnsafePointer<UInt8>(bytes)
+        
+        let buf = self
         let charA = UInt8(UnicodeScalar("a").value)
         let char0 = UInt8(UnicodeScalar("0").value)
         
-        func itoh(value: UInt8) -> UInt8 {
+        func itoh(_ value: UInt8) -> UInt8 {
             return (value > 9) ? (charA + value - 10) : (char0 + value)
         }
         
-        let ptr = UnsafeMutablePointer<UInt8>.alloc(length * 2)
+        var str = [UInt8]()
         
-        for i in 0 ..< length {
-            ptr[i*2] = itoh((buf[i] >> 4) & 0xF)
-            ptr[i*2+1] = itoh(buf[i] & 0xF)
+        for i in 0 ..< count {
+            str.append(itoh((buf[i] >> 4) & 0xF))
+            str.append(itoh(buf[i] & 0xF))
         }
         
-        return String(bytesNoCopy: ptr, length: length*2, encoding: NSUTF8StringEncoding, freeWhenDone: true)
+        return NSString(bytes: str, length: str.count, encoding: String.Encoding.utf8.rawValue) as String?
+        
     }
-    
+
 }
 
 extension UIViewController {
-    func showAlert(alert:UIAlertController, delay: Double = 0) {
+    func showAlert(_ alert:UIAlertController, delay: Double = 0) {
         if (presentedViewController != nil) {
-            dismissViewControllerAnimated(true, completion: {
-                self.presentViewController(alert, animated: true, completion: {
+            dismiss(animated: true, completion: {
+                self.present(alert, animated: true, completion: {
                 })
 
             })
         } else {
-            self.presentViewController(alert, animated: true, completion: {
+            self.present(alert, animated: true, completion: {
             })
 
         }
         if delay > 0 {
-            let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay * Double(NSEC_PER_SEC)))
-            dispatch_after(time, dispatch_get_main_queue()) { () -> Void in
-                self.dismissViewControllerAnimated(true, completion: nil)
+            let time = DispatchTime.now() + Double(Int64(delay * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+            DispatchQueue.main.asyncAfter(deadline: time) { () -> Void in
+                self.dismiss(animated: true, completion: nil)
             }
         }
     

@@ -18,20 +18,20 @@ class MySKGameStatistic: MySKTable {
     let playerID: Int
     let levelID: Int
     let gamesOfThisLevel: Results<GameModel>
-    var lastLocation = CGPointZero
+    var lastLocation = CGPoint.zero
     var gameNumbers = [Int: Int]() // column : gameNumber
     
     
     
     
     
-    init(playerID: Int, levelID: Int, parent: SKSpriteNode, callBack: (Bool, Int, Int)->()) {
+    init(playerID: Int, levelID: Int, parent: SKSpriteNode, callBack: @escaping (Bool, Int, Int)->()) {
         self.playerID = playerID
         self.levelID = levelID
-        let playerName = realm.objects(PlayerModel).filter("ID = %d", playerID).first!.name
+        let playerName = realm.objects(PlayerModel.self).filter("ID = %d", playerID).first!.name
         self.callBack = callBack
-        let headLines = GV.language.getText(.TCPlayerStatisticLevel, values: playerName, String(levelID + 1))
-        gamesOfThisLevel = realm.objects(GameModel).filter("playerID = %d and levelID = %d and played = true and playerScore > 0", playerID, levelID).sorted("gameNumber")
+        let headLines = GV.language.getText(.tcPlayerStatisticLevel, values: playerName, String(levelID + 1))
+        gamesOfThisLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and playerScore > 0", playerID, levelID).sorted(byProperty: "gameNumber")
         super.init(columnWidths: myGameColumnWidths, rows:gamesOfThisLevel.count + 1, headLines: [headLines], parent: parent, width: parent.parent!.frame.width * 0.9)
         self.showVerticalLines = true
         self.name = myName
@@ -45,28 +45,28 @@ class MySKGameStatistic: MySKTable {
     }
     
     func showStatistic() {
-        let elements: [MultiVar] = [MultiVar(string: GV.language.getText(.TCGame)),
-                                    MultiVar(string: GV.language.getText(.TCGameArt)),
-                                    MultiVar(string: GV.language.getText(.TCOpponent)),
-                                    MultiVar(string: GV.language.getText(.TCScore)),
-                                    MultiVar(string: GV.language.getText(.TCAllTime)),
-                                    MultiVar(string: GV.language.getText(.TCVictory)),
-                                    MultiVar(string: GV.language.getText(.TCStart)),
+        let elements: [MultiVar] = [MultiVar(string: GV.language.getText(.tcGame)),
+                                    MultiVar(string: GV.language.getText(.tcGameArt)),
+                                    MultiVar(string: GV.language.getText(.tcOpponent)),
+                                    MultiVar(string: GV.language.getText(.tcScore)),
+                                    MultiVar(string: GV.language.getText(.tcAllTime)),
+                                    MultiVar(string: GV.language.getText(.tcVictory)),
+                                    MultiVar(string: GV.language.getText(.tcStart)),
                                     ]
         showRowOfTable(elements, row: 0, selected: true)
         var row = 1
         for game in gamesOfThisLevel {
-            var gameArt = GV.language.getText(.TCGame) // simple Game
+            var gameArt = GV.language.getText(.tcGame) // simple Game
             var opponent = ""
             var score = String(game.playerScore)
-            var victory = DrawImages.getOKImage(CGSizeMake(20, 20))
-            let startImage = DrawImages.getStartImage(CGSizeMake(20, 20))
+            var victory = DrawImages.getOKImage(CGSize(width: 20, height: 20))
+            let startImage = DrawImages.getStartImage(CGSize(width: 20, height: 20))
             if game.multiPlay {
-                gameArt = GV.language.getText(.TCCompetitionShort)
+                gameArt = GV.language.getText(.tcCompetitionShort)
                 opponent = game.opponentName
                 score += " / " + String(game.opponentScore)
                 if game.playerScore < game.opponentScore {
-                    victory = DrawImages.getNOKImage(CGSizeMake(20, 20))
+                    victory = DrawImages.getNOKImage(CGSize(width: 20, height: 20))
                 }
             }
             let elements: [MultiVar] = [MultiVar(string: "#\(game.gameNumber + 1)"),
@@ -84,37 +84,37 @@ class MySKGameStatistic: MySKTable {
         
     }
     
-    func convertNameWhenRequired(name: String)->String {
-        if name == GV.language.getText(.TCAnonym) {
-            return GV.language.getText(.TCGuest)
+    func convertNameWhenRequired(_ name: String)->String {
+        if name == GV.language.getText(.tcAnonym) {
+            return GV.language.getText(.tcGuest)
         }
         return name
     }
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        let touchLocation = touches.first!.locationInNode(self)
-        touchesBeganAtNode = nodeAtPoint(touchLocation)
-        lastLocation = touches.first!.locationInView(GV.mainViewController!.view)
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touchLocation = touches.first!.location(in: self)
+        touchesBeganAtNode = atPoint(touchLocation)
+        lastLocation = touches.first!.location(in: GV.mainViewController!.view)
         if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != myName)) {
             touchesBeganAtNode = nil
         }
     }
     
-    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
 //p         let adder:CGFloat = 100
         
-        let actLocation = touches.first!.locationInView(GV.mainViewController!.view)
+        let actLocation = touches.first!.location(in: GV.mainViewController!.view)
         let delta:CGFloat = lastLocation.y - actLocation.y
         lastLocation = actLocation
         scrollView(delta)
     }
     
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let (_, row) = checkTouches(touches, withEvent: event)
         switch row {
         case 0:
-            let fadeInAction = SKAction.fadeInWithDuration(0.5)
-            myParent.runAction(fadeInAction)
+            let fadeInAction = SKAction.fadeIn(withDuration: 0.5)
+            myParent.run(fadeInAction)
             removeFromParent()
             callBack(false, 0, 0)
         case 2..<10000:
@@ -125,7 +125,7 @@ class MySKGameStatistic: MySKTable {
         
     }
     
-    func showDetailedPlayerStatistic(row: Int) {
+    func showDetailedPlayerStatistic(_ row: Int) {
         //        let countLevelLines = Int(LevelsForPlayWithCards().count() + 1)
         
     }

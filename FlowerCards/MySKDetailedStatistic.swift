@@ -22,12 +22,12 @@ class MySKDetailedStatistic: MySKTable {
     
     
     
-    init(playerID: Int, parent: SKSpriteNode, callBack: (Bool, Int, Int)->()) {
+    init(playerID: Int, parent: SKSpriteNode, callBack: @escaping (Bool, Int, Int)->()) {
         self.playerID = playerID
-        let playerName = realm.objects(PlayerModel).filter("ID = %d", playerID).first!.name
+        let playerName = realm.objects(PlayerModel.self).filter("ID = %d", playerID).first!.name
         self.parentNode = parent
         self.callBack = callBack
-        let headLines = GV.language.getText(.TCPlayerStatisticHeader, values: playerName)
+        let headLines = GV.language.getText(.tcPlayerStatisticHeader, values: playerName)
         super.init(columnWidths: myDetailedColumnWidths, rows:countLines + 1, headLines: [headLines], parent: parent, width: parent.parent!.frame.width * 0.9)
         self.showVerticalLines = true
         self.name = myName
@@ -41,59 +41,59 @@ class MySKDetailedStatistic: MySKTable {
     }
     
     func showStatistic() {
-        let elements: [MultiVar] = [MultiVar(string: GV.language.getText(.TCLevel)),
-                                    MultiVar(string: GV.language.getText(.TCCountPlays)),
-                                    MultiVar(string: GV.language.getText(.TCCountCompetitions)),
-                                    MultiVar(string: GV.language.getText(.TCCountVictorys)),
-                                    MultiVar(string: GV.language.getText(.TCAllTime)),
+        let elements: [MultiVar] = [MultiVar(string: GV.language.getText(.tcLevel)),
+                                    MultiVar(string: GV.language.getText(.tcCountPlays)),
+                                    MultiVar(string: GV.language.getText(.tcCountCompetitions)),
+                                    MultiVar(string: GV.language.getText(.tcCountVictorys)),
+                                    MultiVar(string: GV.language.getText(.tcAllTime)),
                                     ]
         showRowOfTable(elements, row: 0, selected: true)
         for levelID in 0..<countLines {
             var statistic: StatisticModel?
-            statistic = realm.objects(StatisticModel).filter("playerID = %d and levelID = %d", playerID, levelID).first
+            statistic = realm.objects(StatisticModel.self).filter("playerID = %d and levelID = %d", playerID, levelID).first
             if statistic == nil {
                 statistic = StatisticModel()
             }
-            let formatter = NSNumberFormatter()
-            formatter.numberStyle = NSNumberFormatterStyle.NoStyle // .DecimalStyle
+            let formatter = NumberFormatter()
+            formatter.numberStyle = NumberFormatter.Style.none // .DecimalStyle
 //            let bestScoreString = formatter.stringFromNumber(statistic!.bestScore)
             let elements: [MultiVar] = [MultiVar(string: String(levelID + 1)),
                                         MultiVar(string: "\(statistic!.countPlays)"),
                                         MultiVar(string: "\(statistic!.countMultiPlays)"),
                                         MultiVar(string: "\(statistic!.victorys) / \(statistic!.defeats)"),
                                         MultiVar(string: "\(statistic!.allTime.dayHourMinSec)"),
-                                        MultiVar(image: DrawImages.getGoForwardImage(CGSizeMake(20, 20))),
+                                        MultiVar(image: DrawImages.getGoForwardImage(CGSize(width: 20, height: 20))),
             ]
             showRowOfTable(elements, row: levelID + 1, selected: true)
             }
 
     }
     
-    func convertNameWhenRequired(name: String)->String {
-        if name == GV.language.getText(.TCAnonym) {
-            return GV.language.getText(.TCGuest)
+    func convertNameWhenRequired(_ name: String)->String {
+        if name == GV.language.getText(.tcAnonym) {
+            return GV.language.getText(.tcGuest)
         }
         return name
     }
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        let touchLocation = touches.first!.locationInNode(self)
-        touchesBeganAtNode = nodeAtPoint(touchLocation)
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touchLocation = touches.first!.location(in: self)
+        touchesBeganAtNode = atPoint(touchLocation)
         if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != myName)) {
             touchesBeganAtNode = nil
         }
     }
     
-    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        _ = touches.first!.locationInNode(self)
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        _ = touches.first!.location(in: self)
     }
     
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let (_, row) = checkTouches(touches, withEvent: event)
         switch row {
         case 0:
-            let fadeInAction = SKAction.fadeInWithDuration(0.5)
-            myParent.runAction(fadeInAction)
+            let fadeInAction = SKAction.fadeIn(withDuration: 0.5)
+            myParent.run(fadeInAction)
             removeFromParent()
             callBack(false, 0, 0)
         case 2..<10000:
@@ -105,11 +105,11 @@ class MySKDetailedStatistic: MySKTable {
     }
     
     
-    func showDetailedPlayerStatistic(row: Int) {
+    func showDetailedPlayerStatistic(_ row: Int) {
         _ = MySKGameStatistic(playerID: playerID, levelID: row, parent: self, callBack: callBackFromGameStatistic)
     }
  
-    func callBackFromGameStatistic(startGame: Bool = false, gameNumber: Int = 0, levelIndex: Int = 0) {
+    func callBackFromGameStatistic(_ startGame: Bool = false, gameNumber: Int = 0, levelIndex: Int = 0) {
         if startGame {
             callBack(startGame, gameNumber, levelIndex)
         }

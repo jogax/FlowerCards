@@ -8,11 +8,11 @@
 
 
 enum StackType: Int {
-    case SaveSpriteType = 0, MySKNodeType
+    case saveSpriteType = 0, mySKNodeType
 }
 class Stack<T> {
-    private var savedSpriteStack: Array<SavedSprite>
-    private var cardStack: Array<MySKNode>
+    fileprivate var savedSpriteStack: Array<SavedSprite>
+    fileprivate var cardStack: Array<MySKNode>
     var lastRandomIndex = -1
     
     init() {
@@ -20,22 +20,22 @@ class Stack<T> {
         cardStack = Array<MySKNode>()
     }
     
-    func push (value: SavedSprite) {
+    func push (_ value: SavedSprite) {
         savedSpriteStack.append(value)
     }
     
-    func push (value: MySKNode) {
+    func push (_ value: MySKNode) {
         cardStack.append(value)
     }
 
-    func pushLast (value: MySKNode) {
-        cardStack.insert(value, atIndex: 0)
+    func pushLast (_ value: MySKNode) {
+        cardStack.insert(value, at: 0)
     }
 
-    func count(type: StackType)->Int {
+    func count(_ type: StackType)->Int {
         switch type {
-            case .MySKNodeType: return cardStack.count
-            case .SaveSpriteType: return savedSpriteStack.count
+            case .mySKNodeType: return cardStack.count
+            case .saveSpriteType: return savedSpriteStack.count
         }
     }
     
@@ -69,14 +69,14 @@ class Stack<T> {
         }
     }
     
-    func random(random: MyRandom?)->MySKNode? {
+    func random(_ random: MyRandom?)->MySKNode? {
         lastRandomIndex = random!.getRandomInt(0, max: cardStack.count - 1)
         return cardStack[lastRandomIndex]
     }
     
     func removeAtLastRandomIndex() {
         if lastRandomIndex >= 0 {
-            cardStack.removeAtIndex(lastRandomIndex)
+            cardStack.remove(at: lastRandomIndex)
             lastRandomIndex = -1
         }
     }
@@ -84,15 +84,15 @@ class Stack<T> {
     func countChangesInStack() -> Int {
         var counter = 0
         for index in 0..<savedSpriteStack.count {
-            if !(savedSpriteStack[index].status == .Added || savedSpriteStack[index].status == .AddedFromCardStack) {counter += 1}
+            if !(savedSpriteStack[index].status == .added || savedSpriteStack[index].status == .addedFromCardStack) {counter += 1}
         }
         return counter
     }
     
-    func removeAll(type: StackType) {
+    func removeAll(_ type: StackType) {
         switch type {
-            case .MySKNodeType: cardStack.removeAll(keepCapacity: false)
-            case .SaveSpriteType: savedSpriteStack.removeAll(keepCapacity: false)
+            case .mySKNodeType: cardStack.removeAll(keepingCapacity: false)
+            case .saveSpriteType: savedSpriteStack.removeAll(keepingCapacity: false)
         }
     }
 }

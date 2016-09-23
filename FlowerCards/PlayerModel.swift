@@ -18,7 +18,7 @@ class PlayerModel: Object {
     dynamic var aktLanguageKey = GV.language.getAktLanguageKey()
     dynamic var soundVolume: Float = 0
     dynamic var musicVolume: Float = 0
-    dynamic var created = NSDate()
+    dynamic var created = Date()
 
     override  class func primaryKey() -> String {
         return "ID"

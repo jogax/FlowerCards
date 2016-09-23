@@ -10,106 +10,106 @@ import UIKit
 
 enum TextConstants: Int {
     case
-    TCAktLanguage = 0,
-    TCLevel,
-    TCLevelScore,
-    TCScoreHead,
-    TCCardHead,
-    TCScore,
-    TCTargetScore,
-    TCTime,
-    TCGameLost,
-    TCGameLost3,
-    TCTargetNotReached,
-    TCSpriteCount,
-    TCCardCount,
-    TCReturn,
-    TCOK,
-    TCGameComplete,
-    TCNoMessage,
-    TCGameAgain,
-    TCTimeout,
-    TCGameOver,
-    TCCongratulations,
-    TCChooseName,
-    TCVolume,
-    TCCountHelpLines,
-    TCLanguage,
-    TCEnglish,
-    TCGerman,
-    TCHungarian,
-    TCRussian,
-    TCCancel,
-    TCDone,
-    TCModify,
-    TCDelete,
-    TCNewName,
-    TCChooseLanguage,
-    TCPlayer,
-    TCGameModus,
-    TCSoundVolume,
-    TCMusicVolume,
-    TCStandardGame,
-    TCCardGame,
-    TCPreviousLevel,
-    TCNextLevel,
-    TCNewGame,
-    TCRestart,
-    TCChooseGame,
-    TCTippCount,
-    TCStatistics,
-    TCActScore,
-    TCBestScore,
-    TCActTime,
-    TCAllTimeForLevel,
-    TCAllTime,
-    TCBestTimeForLevel,
-    TCBestTime,
-    TCCountPlaysForLevel,
-    TCCountPlays,
-    TCCountCompetitions,
-    TCCountVictorys,
-    TCGameCompleteWithBestScore,
-    TCGameCompleteWithBestTime,
-    TCGuest,
-    TCAnonym,
-    TCStatistic,
-    TCPlayerStatisticHeader,
-    TCPlayerStatisticLevel,
-    TCStatisticOfGame,
-    TCBestScoreOfGame,
-    TCYourScore,
-    TCYouAreTheBest,
-    TCGameNumber,
-    TCChooseGameNumber,
+    tcAktLanguage = 0,
+    tcLevel,
+    tcLevelScore,
+    tcScoreHead,
+    tcCardHead,
+    tcScore,
+    tcTargetScore,
+    tcTime,
+    tcGameLost,
+    tcGameLost3,
+    tcTargetNotReached,
+    tcSpriteCount,
+    tcCardCount,
+    tcReturn,
+    tcok,
+    tcGameComplete,
+    tcNoMessage,
+    tcGameAgain,
+    tcTimeout,
+    tcGameOver,
+    tcCongratulations,
+    tcChooseName,
+    tcVolume,
+    tcCountHelpLines,
+    tcLanguage,
+    tcEnglish,
+    tcGerman,
+    tcHungarian,
+    tcRussian,
+    tcCancel,
+    tcDone,
+    tcModify,
+    tcDelete,
+    tcNewName,
+    tcChooseLanguage,
+    tcPlayer,
+    tcGameModus,
+    tcSoundVolume,
+    tcMusicVolume,
+    tcStandardGame,
+    tcCardGame,
+    tcPreviousLevel,
+    tcNextLevel,
+    tcNewGame,
+    tcRestart,
+    tcChooseGame,
+    tcTippCount,
+    tcStatistics,
+    tcActScore,
+    tcBestScore,
+    tcActTime,
+    tcAllTimeForLevel,
+    tcAllTime,
+    tcBestTimeForLevel,
+    tcBestTime,
+    tcCountPlaysForLevel,
+    tcCountPlays,
+    tcCountCompetitions,
+    tcCountVictorys,
+    tcGameCompleteWithBestScore,
+    tcGameCompleteWithBestTime,
+    tcGuest,
+    tcAnonym,
+    tcStatistic,
+    tcPlayerStatisticHeader,
+    tcPlayerStatisticLevel,
+    tcStatisticOfGame,
+    tcBestScoreOfGame,
+    tcYourScore,
+    tcYouAreTheBest,
+    tcGameNumber,
+    tcChooseGameNumber,
 //    TCPlayerStatistic,
 //    TCGameStatistic,
-    TCCompetition,
-    TCGame,
-    TCChoosePartner,
-    TCWantToPlayWithYou,
-    TCOpponent,
-    TCOpponentHasFinished,
-    TCYouHaveFinished,
-    TCHeWon,
-    TCYouWon,
-    TCOpponentNotPlay,
-    TCGameArt,
-    TCVictory,
-    TCStart,
-    TCStopCompetition,
-    TCOpponentStoppedTheGame,
-    TCAreYouSureToDelete,
-    TCHelpURL,
-    TCJ,
-    TCD,
-    TCK,
-    TCWhoIs,
-    TCName,
-    TCPlayerType,
-    TCOpponentType,
-    TCBestPlayerType,
-    TCCompetitionShort
+    tcCompetition,
+    tcGame,
+    tcChoosePartner,
+    tcWantToPlayWithYou,
+    tcOpponent,
+    tcOpponentHasFinished,
+    tcYouHaveFinished,
+    tcHeWon,
+    tcYouWon,
+    tcOpponentNotPlay,
+    tcGameArt,
+    tcVictory,
+    tcStart,
+    tcStopCompetition,
+    tcOpponentStoppedTheGame,
+    tcAreYouSureToDelete,
+    tcHelpURL,
+    tcj,
+    tcd,
+    tck,
+    tcWhoIs,
+    tcName,
+    tcPlayerType,
+    tcOpponentType,
+    tcBestPlayerType,
+    tcCompetitionShort
 
 }
 
@@ -119,7 +119,7 @@ enum TextConstants: Int {
     let LanguageRU = "ru" // index 3
 
 enum LanguageCodes: Int {
-    case ENCode = 0, DECode, HUCode, RUCode
+    case enCode = 0, deCode, huCode, ruCode
 }
 
 
@@ -138,7 +138,7 @@ class Language {
     struct Callback {
         var function: ()->Bool
         var name: String
-        init(function:()->Bool, name: String) {
+        init(function:@escaping ()->Bool, name: String) {
             self.function = function
             self.name = name
         }
@@ -150,48 +150,48 @@ class Language {
         aktLanguage = languages[getPreferredLanguage()]!
     }
     
-    func setLanguage(languageKey: String) {        
+    func setLanguage(_ languageKey: String) {        
         aktLanguage = languages[languageKey]!
         for index in 0..<callbacks.count {
-            callbacks[index].function()
+            _ = callbacks[index].function()
         }
     }
     
-    func setLanguage(languageCode: LanguageCodes) {
+    func setLanguage(_ languageCode: LanguageCodes) {
         aktLanguage = languages[languageNames[languageCode.rawValue]]!
         for index in 0..<callbacks.count {
-            callbacks[index].function()
+            _ = callbacks[index].function()
         }
     }
     
-    func getText (textIndex: TextConstants, values: String ...) -> String {
+    func getText (_ textIndex: TextConstants, values: String ...) -> String {
         return aktLanguage[textIndex]!.replace("%", values: values)
     }
 
     func getAktLanguageKey() -> String {
-        return aktLanguage[.TCAktLanguage]!
+        return aktLanguage[.tcAktLanguage]!
     }
     
-    func isAktLanguage(language:String)->Bool {
-        return language == aktLanguage[.TCAktLanguage]
+    func isAktLanguage(_ language:String)->Bool {
+        return language == aktLanguage[.tcAktLanguage]
     }
     
-    func addCallback(callback: ()->Bool, callbackName: String) {
+    func addCallback(_ callback: @escaping ()->Bool, callbackName: String) {
         callbacks.append(Callback(function: callback, name: callbackName))
     }
     
-    func removeCallback(callbackName: String) {
+    func removeCallback(_ callbackName: String) {
         for index in 0..<callbacks.count {
             if callbacks[index].name == callbackName {
-                callbacks.removeAtIndex(index)
+                callbacks.remove(at: index)
                 return
             }
         }
     }
     
     func getPreferredLanguage()->String {
-        let deviceLanguage = NSLocale.preferredLanguages()[0]
-        let languageKey = deviceLanguage[deviceLanguage.startIndex..<deviceLanguage.startIndex.advancedBy(2)]
+        let deviceLanguage = Locale.preferredLanguages[0]
+        let languageKey = deviceLanguage[deviceLanguage.startIndex..<deviceLanguage.characters.index(deviceLanguage.startIndex, offsetBy: 2)]
         return languageKey
     }
     
@@ -199,12 +199,12 @@ class Language {
         return languages.count
     }
     
-    func getLanguageNames(index:LanguageCodes)->(String, Bool) {
+    func getLanguageNames(_ index:LanguageCodes)->(String, Bool) {
         switch index {
-            case .ENCode: return (aktLanguage[.TCEnglish]!, aktLanguage[.TCAktLanguage] == LanguageEN)
-            case .DECode: return (aktLanguage[.TCGerman]!, aktLanguage[.TCAktLanguage] == LanguageDE)
-            case .HUCode: return (aktLanguage[.TCHungarian]!, aktLanguage[.TCAktLanguage] == LanguageHU)
-            case .RUCode: return (aktLanguage[.TCRussian]!, aktLanguage[.TCAktLanguage] == LanguageRU)
+            case .enCode: return (aktLanguage[.tcEnglish]!, aktLanguage[.tcAktLanguage] == LanguageEN)
+            case .deCode: return (aktLanguage[.tcGerman]!, aktLanguage[.tcAktLanguage] == LanguageDE)
+            case .huCode: return (aktLanguage[.tcHungarian]!, aktLanguage[.tcAktLanguage] == LanguageHU)
+            case .ruCode: return (aktLanguage[.tcRussian]!, aktLanguage[.tcAktLanguage] == LanguageRU)
         }
     }
     

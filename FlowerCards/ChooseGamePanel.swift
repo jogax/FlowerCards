@@ -28,11 +28,11 @@ class ChooseGamePanel: SKSpriteNode {
     let newLine = "\r\n"
     let gamesPerGroup = 100
     var deleteIndex: Int = 0
-    var touchStartTime: NSDate?
+    var touchStartTime: Date?
 
     
     var view: UIView
-    var sizeMultiplier = CGSizeMake(0, 0)
+    var sizeMultiplier = CGSize(width: 0, height: 0)
     var fontSize:CGFloat = 0
     var callBack: (Int)->()
     var parentScene: SKScene?
@@ -43,10 +43,10 @@ class ChooseGamePanel: SKSpriteNode {
     var levelLabel: SKLabelNode?
     var showGames = false
     var gamesBackground = SKShapeNode()
-    var gamesBackgroundStartPosition = CGPointZero
-    var gamesBackgroundLastPosition = CGPointZero
-    var touchLastLocation = CGPointZero
-    var touchStartLocation = CGPointZero
+    var gamesBackgroundStartPosition = CGPoint.zero
+    var gamesBackgroundLastPosition = CGPoint.zero
+    var touchLastLocation = CGPoint.zero
+    var touchStartLocation = CGPoint.zero
     
     
     
@@ -56,10 +56,10 @@ class ChooseGamePanel: SKSpriteNode {
     
     struct touchMoving {
         var position: CGPoint
-        var time: NSDate
+        var time: Date
         var movedBy: CGVector
         var movingSpeed: CGVector
-        init(position: CGPoint = CGPointZero, time:NSDate = NSDate(), movedBy: CGVector = CGVectorMake(0, 0), movingSpeed:CGVector = CGVectorMake(0,0)) {
+        init(position: CGPoint = CGPoint.zero, time:Date = Date(), movedBy: CGVector = CGVector(dx: 0, dy: 0), movingSpeed:CGVector = CGVector(dx: 0,dy: 0)) {
             self.position = position
             self.time = time
             self.movedBy = movedBy
@@ -68,7 +68,7 @@ class ChooseGamePanel: SKSpriteNode {
     }
     
     var moving = [touchMoving]()
-    init(view: UIView, frame: CGRect, parent: SKScene, callBack: (Int)->()) {
+    init(view: UIView, frame: CGRect, parent: SKScene, callBack: @escaping (Int)->()) {
         let size = parent.size // 1.5 //CGSizeMake(parent.size.width / 2, parent.s)
         //        let texture: SKTexture = SKTexture(imageNamed: "panel")
         let texture: SKTexture = SKTexture()
@@ -78,35 +78,35 @@ class ChooseGamePanel: SKSpriteNode {
         self.callBack = callBack
         self.view = view
         self.parentScene = parent
-        super.init(texture: texture, color: UIColor.clearColor(), size: size)
+        super.init(texture: texture, color: UIColor.clear, size: size)
         
         let countLevels = LevelsForPlayWithCards().count()
         self.texture = SKTexture(image: getPanelImage(size))
         setMyDeviceConstants()
-        let startPosition = CGPointMake(parent.size.width, parent.size.height / 2)
-        let zielPosition = CGPointMake(parent.size.width / 2, parent.size.height / 2)
+        let startPosition = CGPoint(x: parent.size.width, y: parent.size.height / 2)
+        let zielPosition = CGPoint(x: parent.size.width / 2, y: parent.size.height / 2)
         self.size = size
         self.position = startPosition
-        self.color = UIColor.yellowColor()
+        self.color = UIColor.yellow
         self.zPosition = 100
         self.alpha = 1.0
         self.name = "ChooseGamePanel"
-        self.userInteractionEnabled = true
-        parentScene!.userInteractionEnabled = false
+        self.isUserInteractionEnabled = true
+        parentScene!.isUserInteractionEnabled = false
         parentScene!.addChild(self)
         
         addSwipe()
-        let backGroundShape = SKShapeNode(rect: CGRectMake(0,0, self.size.width, self.size.height * 0.3))
-        backGroundShape.position = CGPointMake(-self.size.width / 2 , self.size.height * 0.3)
-        backGroundShape.fillColor = UIColor.whiteColor() //(red: 0xcc/0xff, green: 0xff/0xff, blue: 0xe5/0xff, alpha: 1.0)
+        let backGroundShape = SKShapeNode(rect: CGRect(x: 0,y: 0, width: self.size.width, height: self.size.height * 0.3))
+        backGroundShape.position = CGPoint(x: -self.size.width / 2 , y: self.size.height * 0.3)
+        backGroundShape.fillColor = UIColor.white //(red: 0xcc/0xff, green: 0xff/0xff, blue: 0xe5/0xff, alpha: 1.0)
         backGroundShape.zPosition = self.zPosition + 10
         backGroundShape.name = backGroundShapeName
         self.addChild(backGroundShape)
         
-        let backGroundSize = CGRectMake(0, 0, self.size.width, self.size.height * 1.5 ) //CGFloat(countGroups) / countHor * (buttonSize.height + gDistance) + gDistance)
+        let backGroundSize = CGRect(x: 0, y: 0, width: self.size.width, height: self.size.height * 1.5 ) //CGFloat(countGroups) / countHor * (buttonSize.height + gDistance) + gDistance)
         gamesBackground = SKShapeNode(rect: backGroundSize)
-        gamesBackground.fillColor = UIColor.whiteColor() // red: 0xe5/0xff, green: 0xff/0xff, blue: 0xcc/0xff, alpha: 1.0)
-        gamesBackground.position = CGPointMake(-self.size.width / 2 , -backGroundSize.height * 0.8)
+        gamesBackground.fillColor = UIColor.white // red: 0xe5/0xff, green: 0xff/0xff, blue: 0xcc/0xff, alpha: 1.0)
+        gamesBackground.position = CGPoint(x: -self.size.width / 2 , y: -backGroundSize.height * 0.8)
         gamesBackground.zPosition = 10
         gamesBackground.name = gamesBackGroundName
         gamesBackgroundStartPosition = gamesBackground.position
@@ -121,7 +121,7 @@ class ChooseGamePanel: SKSpriteNode {
         for levelIndex in 0..<countLevels {
             levelButtons.append(
                 createRadioButton(
-                    CGPointMake((CGFloat(levelIndex) + 1) * rDistance - size.width / 2, size.height * 0.34),
+                    CGPoint(x: (CGFloat(levelIndex) + 1) * rDistance - size.width / 2, y: size.height * 0.34),
                     radius: radius,
                     labelText: String(levelIndex + 1)
                 )
@@ -132,18 +132,18 @@ class ChooseGamePanel: SKSpriteNode {
         
         
         levelLabel = SKLabelNode()
-        levelLabel!.position = CGPointMake(0, size.height * 0.43)
-        levelLabel!.fontColor = UIColor.blackColor()
+        levelLabel!.position = CGPoint(x: 0, y: size.height * 0.43)
+        levelLabel!.fontColor = UIColor.black
         levelLabel!.fontName = myFontName
-        levelLabel!.text = GV.language.getText(.TCLevel, values: ": " + String(GV.player!.levelID + 1))
+        levelLabel!.text = GV.language.getText(.tcLevel, values: ": " + String(GV.player!.levelID + 1))
         levelLabel!.zPosition = self.zPosition + 10
-        levelLabel!.horizontalAlignmentMode = .Center
+        levelLabel!.horizontalAlignmentMode = .center
         self.addChild(levelLabel!)
         deleteIndex = children.count
         showGroups()
 
-        let moveAction = SKAction.moveTo(zielPosition, duration: 0.5)
-        self.runAction(moveAction)
+        let moveAction = SKAction.move(to: zielPosition, duration: 0.5)
+        self.run(moveAction)
         
     }
     
@@ -168,7 +168,7 @@ class ChooseGamePanel: SKSpriteNode {
             let minGameNrInGroup = groupIndex * gamesPerGroup + 1
             let maxGameNrInGroup = minGameNrInGroup + gamesPerGroup - 1
             let filter = "levelID = %d and gameNumber >= %d and gameNumber <= %d and played = true"
-            let gamesInGroup = realm.objects(GameModel).filter(filter, GV.player!.levelID, minGameNrInGroup - 1, maxGameNrInGroup - 1)
+            let gamesInGroup = realm.objects(GameModel.self).filter(filter, GV.player!.levelID, minGameNrInGroup - 1, maxGameNrInGroup - 1)
             gameNumbers.removeAll()
             for game in gamesInGroup {
                 if !gameNumbers.contains(game.gameNumber) {
@@ -176,15 +176,18 @@ class ChooseGamePanel: SKSpriteNode {
                 }
             }
             let groupText = [String(minGameNrInGroup), "...", String(maxGameNrInGroup)]
-            groupButtons.append(
-                createGroupButton(
-                    CGPointMake((CGFloat(groupIndexHor) + 1) * gDistance - size.width / 2 - width / 2, size.height * (0.04 - CGFloat(groupIndexVert) * 0.23)),
-                    width: width,
-                    buttonIndex: groupIndex,
-                    labelText: groupText,
-                    freeGroup: groupIndex < countFreeGroups
-                )
+            let myX = (CGFloat(groupIndexHor) + 1) * gDistance - size.width / 2 - width / 2
+            let myY = size.height * (0.04 - CGFloat(groupIndexVert) * 0.23)
+            let myPoint = CGPoint(x: myX, y: myY)
+            let button = createGroupButton(
+                myPoint,
+                width: width,
+                buttonIndex: groupIndex,
+                labelText: groupText,
+                freeGroup: groupIndex < countFreeGroups
             )
+
+            groupButtons.append(button)
 //            while self.childNodeWithName(groupButtons[groupIndex].name!) != nil {
 //                self.childNodeWithName(groupButtons[groupIndex].name!)!.removeFromParent()
 //            }
@@ -193,7 +196,7 @@ class ChooseGamePanel: SKSpriteNode {
         }
     }
     
-    func showGamesInGroup(group: Int) {
+    func showGamesInGroup(_ group: Int) {
         showGames = true
         var gameButtons = [SKShapeNode]()
 //        let countGroups = GV.freeGameCount / gamesPerGroup //Predefinitions.gameArray.count / gamesPerGroup
@@ -218,7 +221,7 @@ class ChooseGamePanel: SKSpriteNode {
             let gameIndexHor = index % Int(countHor)
             let gameIndexVert: Int = index / Int(countHor)
             let filter = "levelID = %d and gameNumber == %d and played = true"
-            let gamesWithNumber = realm.objects(GameModel).filter(filter, GV.player!.levelID, gameNumber).sorted("playerScore", ascending: false)
+            let gamesWithNumber = realm.objects(GameModel.self).filter(filter, GV.player!.levelID, gameNumber).sorted(byProperty: "playerScore", ascending: false)
             var gameText = ["#" + String(gameNumber + 1)]
             for index in 0..<gamesWithNumber.count {
                 let playerID = gamesWithNumber[index].playerID
@@ -227,15 +230,22 @@ class ChooseGamePanel: SKSpriteNode {
                     let gamesCountForPlayer = gamesWithNumber.filter("playerID = %d", playerID).count
                     let score = gamesWithNumber[index].playerScore
                     let time = gamesWithNumber[index].time
-                    let playerName = realm.objects(PlayerModel).filter("ID = %d", playerID).first!.name
-                    gameText.append(playerName + "(" + String(gamesCountForPlayer) + "): " + String(score) + " / " + String(time.dayHourMinSec))
+                    let playerName = realm.objects(PlayerModel.self).filter("ID = %d", playerID).first!.name
+                    var appendString = playerName
+                    appendString += "("
+                    appendString += String(gamesCountForPlayer)
+                    appendString += "): "
+                    appendString += String(score)
+                    appendString += " / "
+                    appendString += String(time.dayHourMinSec)
+                    gameText.append(appendString)
                 }
             }
             gameButtons.append(
                 createGameButton(
-                    CGPointMake(
-                        startPosition.x + gameIndexHor.toCGFloat() * (buttonSize.width + gDistance),
-                        startPosition.y - gameIndexVert.toCGFloat() * (buttonSize.height + gDistance)
+                    CGPoint(
+                        x: startPosition.x + gameIndexHor.toCGFloat() * (buttonSize.width + gDistance),
+                        y: startPosition.y - gameIndexVert.toCGFloat() * (buttonSize.height + gDistance)
                     ),
                     size: buttonSize,
                     buttonIndex: gameNumber,
@@ -257,9 +267,9 @@ class ChooseGamePanel: SKSpriteNode {
         }
     }
     
-    func createGroupButton(position: CGPoint, width: CGFloat, buttonIndex: Int, labelText: [String], freeGroup: Bool = false)->SKShapeNode {
+    func createGroupButton(_ position: CGPoint, width: CGFloat, buttonIndex: Int, labelText: [String], freeGroup: Bool = false)->SKShapeNode {
         
-        let button = SKShapeNode(rect: CGRectMake(0, 0, width, width * 1.5), cornerRadius: width / 10)
+        let button = SKShapeNode(rect: CGRect(x: 0, y: 0, width: width, height: width * 1.5), cornerRadius: width / 10)
         
         button.position = position
         
@@ -268,35 +278,35 @@ class ChooseGamePanel: SKSpriteNode {
         } else {
             button.fillColor = UIColor(red: 250/255, green: 160/255, blue: 122/255, alpha: 1.0)
         }
-        button.strokeColor = UIColor.blackColor()
+        button.strokeColor = UIColor.black
         button.lineWidth = 3
         button.zPosition = self.zPosition + 10
         
         button.name = groupName + dot + String(buttonIndex)
-        button.addChild(createLabel(CGPointMake(width * 0.5, width * 1.1), text: labelText[0], name: button.name!, fontSize: width * 0.3))
-        button.addChild(createLabel(CGPointMake(width * 0.5, width * 0.95), text: labelText[1], name: button.name!, fontSize: width * 0.3))
-        button.addChild(createLabel(CGPointMake(width * 0.5, width * 0.6), text: labelText[2], name: button.name!, fontSize: width * 0.3))
+        button.addChild(createLabel(CGPoint(x: width * 0.5, y: width * 1.1), text: labelText[0], name: button.name!, fontSize: width * 0.3))
+        button.addChild(createLabel(CGPoint(x: width * 0.5, y: width * 0.95), text: labelText[1], name: button.name!, fontSize: width * 0.3))
+        button.addChild(createLabel(CGPoint(x: width * 0.5, y: width * 0.6), text: labelText[2], name: button.name!, fontSize: width * 0.3))
 //        button.addChild(createLabel(CGPointMake(width * 0.5, width * 0.3), text: labelText[3], name: button.name!, fontSize: width * 0.25))
         return button
     }
     
-    func createGameButton(position: CGPoint, size: CGSize, buttonIndex: Int, labelText: [String])->SKShapeNode {
+    func createGameButton(_ position: CGPoint, size: CGSize, buttonIndex: Int, labelText: [String])->SKShapeNode {
         
-        let button = SKShapeNode(rect: CGRectMake(0, 0, size.width, size.height), cornerRadius: size.width / 10)
+        let button = SKShapeNode(rect: CGRect(x: 0, y: 0, width: size.width, height: size.height), cornerRadius: size.width / 10)
         gamesBackground.position = gamesBackgroundStartPosition
         
         button.position = position
-        button.strokeColor = UIColor.blackColor()
+        button.strokeColor = UIColor.black
         button.lineWidth = 3
         button.zPosition = gamesBackground.zPosition + 1
         button.fillColor = UIColor(red: 127/255, green: 255/255, blue: 0/255, alpha: 1.0)
 
         
         button.name = gameName + dot + String(buttonIndex)
-        button.addChild(createLabel(CGPointMake(size.width * 0.5, size.height * 0.85), text: labelText[0], name: button.name!, fontSize: size.width * 0.12))
+        button.addChild(createLabel(CGPoint(x: size.width * 0.5, y: size.height * 0.85), text: labelText[0], name: button.name!, fontSize: size.width * 0.12))
         for textIndex in 1..<labelText.count {
             button.addChild(createLabel(
-                CGPointMake(size.width * 0.5, size.height * (0.85 - CGFloat(textIndex) * 0.10)),
+                CGPoint(x: size.width * 0.5, y: size.height * (0.85 - CGFloat(textIndex) * 0.10)),
                 text: labelText[textIndex],
                 name: button.name!,
                 fontSize: size.width * 0.08))
@@ -304,49 +314,49 @@ class ChooseGamePanel: SKSpriteNode {
         return button
     }
     
-    func createLabel(position: CGPoint, text: String, name: String, fontSize: CGFloat)->SKLabelNode {
+    func createLabel(_ position: CGPoint, text: String, name: String, fontSize: CGFloat)->SKLabelNode {
         let label = SKLabelNode()
         
         label.position = position
         label.text = text
-        label.color = UIColor.blackColor()
+        label.color = UIColor.black
         label.fontSize = fontSize
         label.fontName = myFontName
-        label.fontColor = UIColor.blackColor()
+        label.fontColor = UIColor.black
         label.name = name
         return label
     }
     
-    func createRadioButton(position: CGPoint, radius: CGFloat, labelText: String)->SKShapeNode {
+    func createRadioButton(_ position: CGPoint, radius: CGFloat, labelText: String)->SKShapeNode {
         let button = SKShapeNode(circleOfRadius: radius)
         
         button.position = position
-        button.fillColor = UIColor.whiteColor()
+        button.fillColor = UIColor.white
         if Int(labelText) == GV.player!.levelID + 1 {
-            button.fillColor = UIColor.blackColor()
+            button.fillColor = UIColor.black
         }
         
-        button.strokeColor = UIColor.blackColor()
+        button.strokeColor = UIColor.black
         button.zPosition = self.zPosition + 10
         button.name = levelName + dot + labelText
         let label = SKLabelNode()
-        label.position = CGPointMake(0, radius * 1.1)
+        label.position = CGPoint(x: 0, y: radius * 1.1)
         label.text = labelText
-        label.color = UIColor.blackColor()
+        label.color = UIColor.black
         label.fontSize = 2 * radius
         label.fontName = myFontName
-        label.fontColor = UIColor.blackColor()
+        label.fontColor = UIColor.black
         label.name = button.name
         button.addChild(label)
         return button
     }
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        let touchLocation = touches.first!.locationInNode(self)
-        let node = nodeAtPoint(touchLocation)
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touchLocation = touches.first!.location(in: self)
+        let node = atPoint(touchLocation)
         touchLastLocation = touchLocation
         touchStartLocation = touchLocation
-        touchStartTime = NSDate()
+        touchStartTime = Date()
         touchesBeganWithNode = node
         if showGames {
             moving.removeAll()
@@ -355,44 +365,44 @@ class ChooseGamePanel: SKSpriteNode {
         
     }
     
-    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        let touchLocation = touches.first!.locationInNode(self)
-        let node = nodeAtPoint(touchLocation)
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touchLocation = touches.first!.location(in: self)
+        let node = atPoint(touchLocation)
         if showGames {
-            if node.name != nil && (node.name! == gamesBackGroundName || node.name!.componentsSeparatedByString(dot)[0] == gameName) {
+            if node.name != nil && (node.name! == gamesBackGroundName || node.name!.components(separatedBy: dot)[0] == gameName) {
                 let distanceToMove = touchLocation.y - touchLastLocation.y
                 if CGFloat(gamesBackground.position.y + distanceToMove).between(gamesBackgroundStartPosition.y, max: gamesBackgroundLastPosition.y) {
                     gamesBackground.position.y += distanceToMove
                     touchLastLocation = touchLocation
                 }
             }
-            let newDelta = CGVectorMake(moving.last!.position.x - touchLocation.x, moving.last!.position.y - touchLocation.y)
+            let newDelta = CGVector(dx: moving.last!.position.x - touchLocation.x, dy: moving.last!.position.y - touchLocation.y)
             if moving.last!.movedBy.dy.isPositiv() != newDelta.dy.isPositiv() {
                 let tempMovingLast = moving.last!
                 moving.removeAll()
                 moving.append(tempMovingLast)
-                moving[0].movingSpeed = CGVectorMake(0, 0)
-                moving[0].movedBy = CGVectorMake(0, 0)
-                let actTime = NSDate()
-                let timeDelta = CGFloat(actTime.timeIntervalSinceDate(moving.last!.time))
-                let speed = CGVectorMake(newDelta.dx / timeDelta, newDelta.dy / timeDelta)
+                moving[0].movingSpeed = CGVector(dx: 0, dy: 0)
+                moving[0].movedBy = CGVector(dx: 0, dy: 0)
+                let actTime = Date()
+                let timeDelta = CGFloat(actTime.timeIntervalSince(moving.last!.time))
+                let speed = CGVector(dx: newDelta.dx / timeDelta, dy: newDelta.dy / timeDelta)
                 moving.append(touchMoving(position: touchLocation, time: actTime, movedBy: newDelta, movingSpeed: speed))
             } else {
-                let actTime = NSDate()
-                let timeDelta = CGFloat(actTime.timeIntervalSinceDate(moving.last!.time))
-                let speed = CGVectorMake(newDelta.dx / timeDelta, newDelta.dy / timeDelta)
+                let actTime = Date()
+                let timeDelta = CGFloat(actTime.timeIntervalSince(moving.last!.time))
+                let speed = CGVector(dx: newDelta.dx / timeDelta, dy: newDelta.dy / timeDelta)
                 moving.append(touchMoving(position: touchLocation, time: actTime, movedBy: newDelta, movingSpeed: speed))
             }
         }
     }
     
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        let touchLocation = touches.first!.locationInNode(self)
-        let node = nodeAtPoint(touchLocation)
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touchLocation = touches.first!.location(in: self)
+        let node = atPoint(touchLocation)
         if showGames {
             if abs(moving.last!.position.y - moving.first!.position.y) > 20 {
                 
-                let touchDuration = CGFloat(NSDate().timeIntervalSinceDate(moving.first!.time))
+                let touchDuration = CGFloat(Date().timeIntervalSince(moving.first!.time))
                 let touchDistance = touchLocation.y - moving.first!.position.y
                 var distanceToMove = touchDistance / touchDuration
                 
@@ -404,8 +414,8 @@ class ChooseGamePanel: SKSpriteNode {
                 }
                
                 if CGFloat(gamesBackground.position.y + distanceToMove).between(gamesBackgroundStartPosition.y, max: gamesBackgroundLastPosition.y) {
-                    let moveAction = SKAction.moveBy(CGVector(dx: 0, dy: distanceToMove), duration: 0.3)
-                    gamesBackground.runAction(moveAction)
+                    let moveAction = SKAction.move(by: CGVector(dx: 0, dy: distanceToMove), duration: 0.3)
+                    gamesBackground.run(moveAction)
                 } else {
                     
                 }
@@ -415,7 +425,7 @@ class ChooseGamePanel: SKSpriteNode {
 
      
         if node.name != nil {
-            let components = node.name!.componentsSeparatedByString(dot)
+            let components = node.name!.components(separatedBy: dot)
             if touchLastLocation.y - touchStartLocation.y < 12 {
                 switch components[0] {
                     case levelName:
@@ -430,22 +440,22 @@ class ChooseGamePanel: SKSpriteNode {
         }
      }
     
-    func setLevel(number: Int) {
+    func setLevel(_ number: Int) {
         let oldLevel = GV.player!.levelID
-        levelButtons[oldLevel].fillColor = UIColor.whiteColor()
-        levelButtons[number - 1].fillColor = UIColor.blackColor()
+        levelButtons[oldLevel].fillColor = UIColor.white
+        levelButtons[number - 1].fillColor = UIColor.black
         try! realm.write({
             GV.player!.levelID = number - 1
         })
-        levelLabel!.text = GV.language.getText(.TCLevel, values: ": " + String(number))
+        levelLabel!.text = GV.language.getText(.tcLevel, values: ": " + String(number))
         showGroups()
     }
     
-    func goToGroup(number: Int) {
+    func goToGroup(_ number: Int) {
         showGamesInGroup(number)
     }
     
-    func goToGame(gameNumber: Int) {
+    func goToGame(_ gameNumber: Int) {
         self.removeAllChildren()
         self.removeFromParent()
         callBack(gameNumber)
@@ -476,7 +486,7 @@ class ChooseGamePanel: SKSpriteNode {
         
     }
     
-    func getPanelImage (size: CGSize) -> UIImage {
+    func getPanelImage (_ size: CGSize) -> UIImage {
         let opaque = false
         let scale: CGFloat = 1
         
@@ -485,18 +495,19 @@ class ChooseGamePanel: SKSpriteNode {
         //        CGContextSetStrokeColorWithColor(ctx, UIColor.blackColor().CGColor)
         
         //        CGContextBeginPath(ctx)
-        let roundRect = UIBezierPath(roundedRect: CGRectMake(0, 0, size.width, size.height), byRoundingCorners:.AllCorners, cornerRadii: CGSizeMake(0, 0)).CGPath
-        CGContextAddPath(ctx, roundRect)
-        CGContextSetFillColorWithColor(ctx, UIColor.whiteColor().CGColor);
-        CGContextFillPath(ctx)
+        let roundRect = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: size.width, height: size.height), byRoundingCorners:.allCorners, cornerRadii: CGSize(width: 0, height: 0)).cgPath
+        ctx?.addPath(roundRect)
+        ctx?.setFillColor(UIColor.white.cgColor);
+        ctx?.fillPath()
         
         
         let points = [
-            CGPointMake(size.width * 0.08, size.height * 0.20),
-            CGPointMake(size.width * 0.92, size.height * 0.20)
+            CGPoint(x: size.width * 0.08, y: size.height * 0.20),
+            CGPoint(x: size.width * 0.92, y: size.height * 0.20)
         ]
-        CGContextAddLines(ctx, points, points.count)
-        CGContextStrokePath(ctx)
+//        CGContextAddLines(ctx, points, points.count)
+        ctx?.addLines(between: points)
+        ctx?.strokePath()
         
         
         
@@ -506,10 +517,10 @@ class ChooseGamePanel: SKSpriteNode {
         
         
         
-        CGContextClosePath(ctx)
+        ctx?.closePath()
         let image = UIGraphicsGetImageFromCurrentImageContext()
         
-        return image
+        return image!
     }
     
     func addSwipe() {
@@ -523,20 +534,20 @@ class ChooseGamePanel: SKSpriteNode {
 //        }
     }
     
-    func handleSwipe(sender: UISwipeGestureRecognizer) {
+    func handleSwipe(_ sender: UISwipeGestureRecognizer) {
         switch sender.direction {
-        case UISwipeGestureRecognizerDirection.Right:
+        case UISwipeGestureRecognizerDirection.right:
             print("Swiped right")
-        case UISwipeGestureRecognizerDirection.Down:
-            _ = NSDate().timeIntervalSinceDate(touchStartTime!)
-            let moveAction = SKAction.moveBy(CGVector(dx: 0, dy: -1000), duration: 0.3)
-            gamesBackground.runAction(moveAction)
-        case UISwipeGestureRecognizerDirection.Left:
+        case UISwipeGestureRecognizerDirection.down:
+            _ = Date().timeIntervalSince(touchStartTime!)
+            let moveAction = SKAction.move(by: CGVector(dx: 0, dy: -1000), duration: 0.3)
+            gamesBackground.run(moveAction)
+        case UISwipeGestureRecognizerDirection.left:
             print("Swiped left")
-        case UISwipeGestureRecognizerDirection.Up:
-            _ = NSDate().timeIntervalSinceDate(touchStartTime!)
-            let moveAction = SKAction.moveBy(CGVector(dx: 0, dy: 1000), duration: 0.3)
-            gamesBackground.runAction(moveAction)
+        case UISwipeGestureRecognizerDirection.up:
+            _ = Date().timeIntervalSince(touchStartTime!)
+            let moveAction = SKAction.move(by: CGVector(dx: 0, dy: 1000), duration: 0.3)
+            gamesBackground.run(moveAction)
         default:
             break
         }

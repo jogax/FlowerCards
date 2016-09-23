@@ -21,7 +21,7 @@ import AVFoundation
 //
 struct GV {
     static var vBounds = CGRect(x: 0, y: 0, width: 0, height: 0)
-    static var notificationCenter = NSNotificationCenter.defaultCenter()
+    static var notificationCenter = NotificationCenter.default
 //    static let notificationGameControllChanged = "gameModusChanged"
 //    static let notificationMadeMove = "MadeMove"
 //    static let notificationJoystickMoved = "joystickMoved"
@@ -30,12 +30,12 @@ struct GV {
     static var peerToPeerService: PeerToPeerServiceManager?
 
     static var dX: CGFloat = 0
-    static var speed: CGSize = CGSizeZero
-    static var touchPoint = CGPointZero
+    static var speed: CGSize = CGSize.zero
+    static var touchPoint = CGPoint.zero
     static var gameSize = 5
     static var gameNr = 0
     static var gameSizeMultiplier: CGFloat = 1.0
-    static let onIpad = UIDevice.currentDevice().model.hasSuffix("iPad")
+    static let onIpad = UIDevice.current.model.hasSuffix("iPad")
     static var ipadKorrektur: CGFloat = 0
     static var levelsForPlay = LevelsForPlayWithCards()
     static var mainViewController: UIViewController?
@@ -44,7 +44,7 @@ struct GV {
 //    static var soundVolume: Float = 0
 //    static var musicVolume: Float = 0
 //    static var globalParam = GlobalParamData()
-    static var dummyName = GV.language.getText(.TCGuest)
+    static var dummyName = GV.language.getText(.tcGuest)
     static var initName = false
     static let oneGrad:CGFloat = CGFloat(M_PI) / 180
     static let timeOut = "TimeOut"
@@ -53,49 +53,49 @@ struct GV {
 //    static let dataStore = DataStore()
 //    static let cloudStore = CloudData()
     
-    static let deviceType = UIDevice.currentDevice().modelName
+    static let deviceType = UIDevice.current.modelName
     
     
     
-    static let deviceConstants = DeviceConstants(deviceType: UIDevice.currentDevice().modelName)
+    static let deviceConstants = DeviceConstants(deviceType: UIDevice.current.modelName)
 
     static var countPlayers: Int = 1
 
     static var player: PlayerModel?
     
-    static func pointOfCircle(radius: CGFloat, center: CGPoint, angle: CGFloat) -> CGPoint {
+    static func pointOfCircle(_ radius: CGFloat, center: CGPoint, angle: CGFloat) -> CGPoint {
         let pointOfCircle = CGPoint (x: center.x + radius * cos(angle), y: center.y + radius * sin(angle))
         return pointOfCircle
     }
     
     enum RealmRecordType: Int {
-        case GameModel, PlayerModel, OpponentModel, StatisticModel
+        case gameModel, playerModel, opponentModel, statisticModel
     }
     
-    static func createNewRecordID(recordType: RealmRecordType)->Int {
+    static func createNewRecordID(_ recordType: RealmRecordType)->Int {
         var recordID: RecordIDModel
         var ID = 0
-        let inWrite = realm.inWriteTransaction
+        let inWrite = realm.isInWriteTransaction
         if !inWrite {
             realm.beginWrite()
         }
-        if realm.objects(RecordIDModel).count == 0 {
+        if realm.objects(RecordIDModel.self).count == 0 {
             recordID = RecordIDModel()
             realm.add(recordID)
         } else  {
-            recordID = realm.objects(RecordIDModel).first!
+            recordID = realm.objects(RecordIDModel.self).first!
         }
         switch recordType {
-        case .GameModel:
+        case .gameModel:
             ID = recordID.gameModelID
             recordID.gameModelID += 1
-        case .PlayerModel:
+        case .playerModel:
             ID = recordID.playerModelID
             recordID.playerModelID += 1
-        case .OpponentModel:
+        case .opponentModel:
             ID = recordID.opponentModelID
             recordID.opponentModelID += 1
-        case .StatisticModel:
+        case .statisticModel:
             ID = recordID.statisticModelID
             recordID.statisticModelID += 1
         }
@@ -105,13 +105,13 @@ struct GV {
         return ID
     }
     
-    static func createNewPlayer(isActPlayer: Bool...)->Int {
+    static func createNewPlayer(_ isActPlayer: Bool...)->Int {
 //        let newID = GV.playerID.getNewID()!
-        let newID = GV.createNewRecordID(.PlayerModel)
+        let newID = GV.createNewRecordID(.playerModel)
 //        if newID != 0 {
             let newPlayer = PlayerModel()
             newPlayer.aktLanguageKey = GV.language.getPreferredLanguage()
-            newPlayer.name = GV.language.getText(.TCAnonym)
+            newPlayer.name = GV.language.getText(.tcAnonym)
             newPlayer.isActPlayer = isActPlayer.count == 0 ? false : isActPlayer[0]
             newPlayer.ID = newID
             try! realm.write({
@@ -121,7 +121,7 @@ struct GV {
         return newID
     }
     
-    static func randomNumber(max: Int)->Int
+    static func randomNumber(_ max: Int)->Int
     {
         let randomNumber = Int(arc4random_uniform(UInt32(max)))
         return randomNumber
@@ -320,16 +320,16 @@ func != (left: FromToColumnRow, right: FromToColumnRow)->Bool {
 }
 
 
-infix operator ~> {}
-private let queue = dispatch_queue_create("serial-worker", DISPATCH_QUEUE_SERIAL)
+infix operator ~>
+private let queue = DispatchQueue(label: "serial-worker", attributes: [])
 
-func ~> (backgroundClosure: () -> (),
-    mainClosure: () -> ())
+func ~> (backgroundClosure: @escaping () -> (),
+    mainClosure: @escaping () -> ())
     
 {
-    dispatch_async(queue) {
+    queue.async {
         backgroundClosure()
-        dispatch_async(dispatch_get_main_queue(), mainClosure)
+        DispatchQueue.main.async(execute: mainClosure)
         
     }
 }
@@ -410,7 +410,7 @@ struct Container {
 }
 
 enum SpriteStatus: Int, CustomStringConvertible {
-    case Added = 0, AddedFromCardStack, AddedFromShowCard, MovingStarted, Unification, Mirrored, FallingMovingSprite, FallingSprite, HitcounterChanged, FirstCardAdded, Removed, StopCycle, Nothing
+    case added = 0, addedFromCardStack, addedFromShowCard, movingStarted, unification, mirrored, fallingMovingSprite, fallingSprite, hitcounterChanged, firstCardAdded, removed, stopCycle, nothing
     
     var statusName: String {
         let statusNames = [
@@ -438,50 +438,50 @@ enum SpriteStatus: Int, CustomStringConvertible {
 }
 
 enum PeerToPeerCommands: Int {
-    case ErrorValue = 0,
-    MyNameIs,
+    case errorValue = 0,
+    myNameIs,
             //          
             //      parameters: 1 - myName
-    MyNameIsChanged,
+    myNameIsChanged,
     //
     //      parameters: 1 - myName
     //                  2 - oldName
     //                  2 - deviceName
-    IWantToPlayWithYou, //sendMessage
+    iWantToPlayWithYou, //sendMessage
             //
             //      parameters: 1 - myName
             //                  2 - levelID
             //                  3 - gameNumber to play
             //      answer: "OK" - play starts
             //              "Cancel" - opponent will not play
-    MyScoreHasChanged, // sendInfo
+    myScoreHasChanged, // sendInfo
             //
             //      parameters: 1 - Score
             //                  2 - Count Cards
-    GameIsFinished, //sendInfo
+    gameIsFinished, //sendInfo
             //
             //      parameters: 1: Score
-    DidEnterBackGround, // sendInfo
+    didEnterBackGround, // sendInfo
             //
             //      parameter:  
-    StopCompetition, // sendInfo
+    stopCompetition, // sendInfo
             //
             //      parameter:
-    MaxValue
+    maxValue
     
     var commandName: String {
         return String(self.rawValue)
     }
     
-    static func decodeCommand(commandName: String)->PeerToPeerCommands {
+    static func decodeCommand(_ commandName: String)->PeerToPeerCommands {
         if let command = Int(commandName) {
-            if command < PeerToPeerCommands.MaxValue.rawValue && command > PeerToPeerCommands.ErrorValue.rawValue {
+            if command < PeerToPeerCommands.maxValue.rawValue && command > PeerToPeerCommands.errorValue.rawValue {
                 return PeerToPeerCommands(rawValue: command)!
             } else {
-                return ErrorValue
+                return errorValue
             }
         } else {
-            return ErrorValue
+            return errorValue
         }
     }
     
@@ -491,14 +491,14 @@ enum PeerToPeerCommands: Int {
 
 
 struct SavedSprite {
-    var status: SpriteStatus = .Added
-    var type: MySKNodeType = .SpriteType
+    var status: SpriteStatus = .added
+    var type: MySKNodeType = .spriteType
     var name: String = ""
     //    var type: MySKNodeType
-    var startPosition: CGPoint = CGPointMake(0, 0)
-    var endPosition: CGPoint = CGPointMake(0, 0)
+    var startPosition: CGPoint = CGPoint(x: 0, y: 0)
+    var endPosition: CGPoint = CGPoint(x: 0, y: 0)
     var colorIndex: Int = 0
-    var size: CGSize = CGSizeMake(0, 0)
+    var size: CGSize = CGSize(width: 0, height: 0)
     var hitCounter: Int = 0
     var countScore: Int = 0 // Score of Game 
     var minValue: Int = NoValue
@@ -510,7 +510,7 @@ struct SavedSprite {
 
 
 enum LinePosition: Int, CustomStringConvertible {
-    case UpperHorizontal = 0, RightVertical, BottomHorizontal, LeftVertical
+    case upperHorizontal = 0, rightVertical, bottomHorizontal, leftVertical
     var linePositionName: String {
         let linePositionNames = [
             "UH",
@@ -527,57 +527,29 @@ enum LinePosition: Int, CustomStringConvertible {
     
 }
 
-func sleep(sleepTime: Double) {
+func sleep(_ sleepTime: Double) {
     var count = 0
-    let actTime = NSDate()
-    while NSDate().timeIntervalSinceDate(actTime) < sleepTime {
+    let actTime = Date()
+    while Date().timeIntervalSince(actTime) < sleepTime {
         count += 1
     }
 }
 
-func stringArrayToNSData(array: [String]) -> NSData {
+func stringArrayToNSData(_ array: [String]) -> Data {
     let data = NSMutableData()
     let terminator = [0]
     for string in array {
-        if let encodedString = string.dataUsingEncoding(NSUTF8StringEncoding) {
-            data.appendData(encodedString)
-            data.appendBytes(terminator, length: 1)
+        if let encodedString = string.data(using: String.Encoding.utf8) {
+            data.append(encodedString)
+            data.append(terminator, length: 1)
         }
         else {
             NSLog("Cannot encode string \"\(string)\"")
         }
     }
-    return data
+    return data as Data
 }
 
-func nsDataToStringArray(data: NSData) -> [String] {
-    var decodedStrings = [String]()
-    
-    var stringTerminatorPositions = [Int]()
-    
-    var currentPosition = 0
-    data.enumerateByteRangesUsingBlock() {
-        buffer, range, stop in
-        
-        let bytes = UnsafePointer<UInt8>(buffer)
-        for i in 0..<range.length {
-            if bytes[i] == 0 {
-                stringTerminatorPositions.append(currentPosition)
-            }
-            currentPosition += 1
-        }
-    }
-    
-    var stringStartPosition = 0
-    for stringTerminatorPosition in stringTerminatorPositions {
-        let encodedString = data.subdataWithRange(NSMakeRange(stringStartPosition, stringTerminatorPosition - stringStartPosition))
-        let decodedString =  NSString(data: encodedString, encoding: NSUTF8StringEncoding) as! String
-        decodedStrings.append(decodedString)
-        stringStartPosition = stringTerminatorPosition + 1
-    }
-    
-    return decodedStrings
-}
 
 
 let atlas = SKTextureAtlas(named: "sprites")

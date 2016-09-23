@@ -8,7 +8,7 @@
 
 import SpriteKit
 enum PanelTypes: Int {
-    case Settings = 0, Menu
+    case settings = 0, menu
 }
 class MySKPanel: SKSpriteNode {
     var view: UIView
@@ -31,7 +31,7 @@ class MySKPanel: SKSpriteNode {
     let setLanguageFunc = "setLanguage"
     let setPlayerStatisticFunc = "setPlayerStatistics"
     let setReturnFunc = "setReturn"
-    var sizeMultiplier = CGSizeMake(0, 0)
+    var sizeMultiplier = CGSize(width: 0, height: 0)
     var fontSize:CGFloat = 0
     var callBack: (Bool, Bool, Int, Int)->()
     var parentScene: SKScene?
@@ -50,7 +50,7 @@ class MySKPanel: SKSpriteNode {
     var playerChanged = false
     var touchesBeganWithNode: SKNode?
     var shadow: SKSpriteNode?
-    init(view: UIView, frame: CGRect, type: PanelTypes, parent: SKScene, callBack: (Bool, Bool, Int, Int)->()) {
+    init(view: UIView, frame: CGRect, type: PanelTypes, parent: SKScene, callBack: @escaping (Bool, Bool, Int, Int)->()) {
         let size = parent.size / 2 //CGSizeMake(parent.size.width / 2, parent.s)
 //        let texture: SKTexture = SKTexture(imageNamed: "panel")
         let texture: SKTexture = SKTexture()
@@ -61,26 +61,26 @@ class MySKPanel: SKSpriteNode {
         self.view = view
         self.type = type
         self.parentScene = parent
-        super.init(texture: texture, color: UIColor.clearColor(), size: size)
+        super.init(texture: texture, color: UIColor.clear, size: size)
         GV.language.addCallback(changeLanguage, callbackName: callbackName)
         
 
         self.texture = SKTexture(image: getPanelImage(size))
         setMyDeviceConstants()
-        let startPosition = CGPointMake(parent.size.width, parent.size.height / 2)
-        let zielPosition = CGPointMake(parent.size.width / 2, parent.size.height / 2)
+        let startPosition = CGPoint(x: parent.size.width, y: parent.size.height / 2)
+        let zielPosition = CGPoint(x: parent.size.width / 2, y: parent.size.height / 2)
         self.size = size
         self.position = startPosition
-        self.color = UIColor.yellowColor()
+        self.color = UIColor.yellow
         self.zPosition = 100
         self.alpha = 1.0
         self.name = "MySKPanel"
-        self.userInteractionEnabled = true
-        parentScene!.userInteractionEnabled = false
+        self.isUserInteractionEnabled = true
+        parentScene!.isUserInteractionEnabled = false
         makeSettings()
         parentScene!.addChild(self)
-        let moveAction = SKAction.moveTo(zielPosition, duration: 0.5)
-        self.runAction(moveAction)
+        let moveAction = SKAction.move(to: zielPosition, duration: 0.5)
+        self.run(moveAction)
 
     }
 
@@ -89,47 +89,47 @@ class MySKPanel: SKSpriteNode {
     }
     
     func changeLanguage()->Bool{
-        let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
-        playerLabel.text = GV.language.getText(.TCPlayer, values: name)
-        nameLabel.text = GV.language.getText(.TCChooseName)
-        soundLabel.text = GV.language.getText(.TCSoundVolume)
-        musicLabel.text = GV.language.getText(.TCMusicVolume)
-        languageLabel.text = GV.language.getText(.TCLanguage)
-        playerStatisticLabel.text = GV.language.getText(.TCStatistic)
-        returnLabel.text = GV.language.getText(.TCReturn)
+        let name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
+        playerLabel.text = GV.language.getText(.tcPlayer, values: name)
+        nameLabel.text = GV.language.getText(.tcChooseName)
+        soundLabel.text = GV.language.getText(.tcSoundVolume)
+        musicLabel.text = GV.language.getText(.tcMusicVolume)
+        languageLabel.text = GV.language.getText(.tcLanguage)
+        playerStatisticLabel.text = GV.language.getText(.tcStatistic)
+        returnLabel.text = GV.language.getText(.tcReturn)
         return false
     }
     
     
     
     func makeSettings() {
-        let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
-        createLabels(playerLabel, text: GV.language.getText(.TCPlayer, values: name), lineNr: 1, horAlignment: SKLabelHorizontalAlignmentMode.Center, name: noTouchFunc)
-        playerLabel.fontColor = UIColor.blackColor()
-        createLabels(nameLabel, text: GV.language.getText(.TCChooseName), lineNr: 2, horAlignment: .Left, name: setPlayerFunc)
-        createLabels(soundLabel, text: GV.language.getText(.TCSoundVolume), lineNr: 3, horAlignment: .Left, name: setSoundFunc )
-        createLabels(musicLabel, text: GV.language.getText(.TCMusicVolume), lineNr: 4, horAlignment: .Left, name: setMusicFunc )
-        createLabels(languageLabel, text: GV.language.getText(.TCLanguage), lineNr: 5, horAlignment: .Left, name: setLanguageFunc )
-        createLabels(playerStatisticLabel, text: GV.language.getText(.TCStatistic), lineNr: 6, horAlignment: .Left, name: setPlayerStatisticFunc )
-        createLabels(returnLabel, text: GV.language.getText(.TCReturn), lineNr: 7, horAlignment: .Left, name: setReturnFunc )
+        let name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
+        createLabels(playerLabel, text: GV.language.getText(.tcPlayer, values: name), lineNr: 1, horAlignment: SKLabelHorizontalAlignmentMode.center, name: noTouchFunc)
+        playerLabel.fontColor = UIColor.black
+        createLabels(nameLabel, text: GV.language.getText(.tcChooseName), lineNr: 2, horAlignment: .left, name: setPlayerFunc)
+        createLabels(soundLabel, text: GV.language.getText(.tcSoundVolume), lineNr: 3, horAlignment: .left, name: setSoundFunc )
+        createLabels(musicLabel, text: GV.language.getText(.tcMusicVolume), lineNr: 4, horAlignment: .left, name: setMusicFunc )
+        createLabels(languageLabel, text: GV.language.getText(.tcLanguage), lineNr: 5, horAlignment: .left, name: setLanguageFunc )
+        createLabels(playerStatisticLabel, text: GV.language.getText(.tcStatistic), lineNr: 6, horAlignment: .left, name: setPlayerStatisticFunc )
+        createLabels(returnLabel, text: GV.language.getText(.tcReturn), lineNr: 7, horAlignment: .left, name: setReturnFunc )
     }
-    func createLabels(label: SKLabelNode, text: String, lineNr: Int, horAlignment: SKLabelHorizontalAlignmentMode, name:String) {
+    func createLabels(_ label: SKLabelNode, text: String, lineNr: Int, horAlignment: SKLabelHorizontalAlignmentMode, name:String) {
         label.text = text
         label.name = name
         
-        label.position = CGPointMake(-CGFloat(size.width / 2) + sizeMultiplier.width ,  CGFloat(5 - lineNr) * sizeMultiplier.height )
+        label.position = CGPoint(x: -CGFloat(size.width / 2) + sizeMultiplier.width ,  y: CGFloat(5 - lineNr) * sizeMultiplier.height )
         label.fontName = "AvenirNext"
 //        print (self.frame, label.frame)
-        label.fontColor = SKColor.blueColor()
+        label.fontColor = SKColor.blue
         label.zPosition = self.zPosition + 10
-        label.horizontalAlignmentMode = .Left
+        label.horizontalAlignmentMode = .left
         label.fontSize = fontSize
         self.addChild(label)
     }
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        let touchLocation = touches.first!.locationInNode(self)
-        let node = nodeAtPoint(touchLocation)
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touchLocation = touches.first!.location(in: self)
+        let node = atPoint(touchLocation)
         touchesBeganWithNode = node
 //        print(node.name)
         if node is SKLabelNode && node.name!.isMemberOf (setPlayerFunc, setSoundFunc, setMusicFunc, setLanguageFunc, setPlayerStatisticFunc,setReturnFunc) {
@@ -138,16 +138,16 @@ class MySKPanel: SKSpriteNode {
 
     }
     
-    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
     }
     
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        let touchLocation = touches.first!.locationInNode(self)
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touchLocation = touches.first!.location(in: self)
         if touchesBeganWithNode is SKLabelNode {
             if touchesBeganWithNode!.name != noTouchFunc {
                 (touchesBeganWithNode as! SKLabelNode).fontSize -= 2
             }
-            let node = nodeAtPoint(touchLocation)
+            let node = atPoint(touchLocation)
             if node is SKLabelNode && touchesBeganWithNode == node {
                 if node.name!.isMemberOf (setPlayerFunc, setSoundFunc, setMusicFunc, setLanguageFunc, setPlayerStatisticFunc,  setReturnFunc) {
     //                (node   as! SKLabelNode).fontSize -= 2
@@ -170,32 +170,32 @@ class MySKPanel: SKSpriteNode {
     }
     
     func setPlayer() {
-        userInteractionEnabled = false
+        isUserInteractionEnabled = false
         oldPlayerID = GV.player!.ID
         let _ = MySKPlayer(parent: self, view: parentScene!.view!, callBack: callIfMySKPlayerEnds)
     }
     func setSoundVolume() {
-        _ = MySKSlider(parent: self, callBack: callIfMySKSliderEnds, soundType: .Sound)
+        _ = MySKSlider(parent: self, callBack: callIfMySKSliderEnds, soundType: .sound)
         
     }
     func setMusicVolume() {
-        _ = MySKSlider(parent: self, callBack: callIfMySKSliderEnds, soundType: .Music)
+        _ = MySKSlider(parent: self, callBack: callIfMySKSliderEnds, soundType: .music)
     }
     func setLanguage() {
-        userInteractionEnabled = false
+        isUserInteractionEnabled = false
         let _ = MySKLanguages(parent: self, callBack: callIfMySKLanguagesEnds)
     }
     
     func setPlayerStatistic() {
-        userInteractionEnabled = false
+        isUserInteractionEnabled = false
         let _ = MySKStatistic(parent: self, callBack: callIfMySKStatisticEnds)
     }
     
-    func goBack(restartGame: Bool, gameNumberChoosed: Bool = false, gameNumber: Int = 0, levelIndex: Int = 0) {
+    func goBack(_ restartGame: Bool, gameNumberChoosed: Bool = false, gameNumber: Int = 0, levelIndex: Int = 0) {
         GV.language.removeCallback(callbackName)
         shadow?.removeFromParent()
         self.removeFromParent()
-        parentScene!.userInteractionEnabled = true
+        parentScene!.isUserInteractionEnabled = true
         callBack(restartGame, gameNumberChoosed, gameNumber, levelIndex)
     }
     
@@ -208,36 +208,36 @@ class MySKPanel: SKSpriteNode {
             playerChanged = true
         }
         GV.peerToPeerService!.changeIdentifier(GV.player!.name)
-        let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
-        playerLabel.text = GV.language.getText(.TCPlayer, values: name)
-        self.userInteractionEnabled = true
+        let name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
+        playerLabel.text = GV.language.getText(.tcPlayer, values: name)
+        self.isUserInteractionEnabled = true
     }
     
     func callIfMySKLanguagesEnds() {
-        self.userInteractionEnabled = true
-        let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
-        playerLabel.text = GV.language.getText(.TCPlayer, values: name)
-        nameLabel.text = GV.language.getText(.TCChooseName)
-        soundLabel.text = GV.language.getText(.TCSoundVolume)
-        musicLabel.text = GV.language.getText(.TCMusicVolume)
-        languageLabel.text = GV.language.getText(.TCLanguage)
-        playerStatisticLabel.text = GV.language.getText(.TCStatistic)
-        returnLabel.text = GV.language.getText(.TCReturn)
+        self.isUserInteractionEnabled = true
+        let name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
+        playerLabel.text = GV.language.getText(.tcPlayer, values: name)
+        nameLabel.text = GV.language.getText(.tcChooseName)
+        soundLabel.text = GV.language.getText(.tcSoundVolume)
+        musicLabel.text = GV.language.getText(.tcMusicVolume)
+        languageLabel.text = GV.language.getText(.tcLanguage)
+        playerStatisticLabel.text = GV.language.getText(.tcStatistic)
+        returnLabel.text = GV.language.getText(.tcReturn)
     }
     
-    func callIfMySKStatisticEnds(startGame: Bool, gameNumber: Int, levelIndex: Int) {
+    func callIfMySKStatisticEnds(_ startGame: Bool, gameNumber: Int, levelIndex: Int) {
         if startGame {
             goBack(true, gameNumberChoosed: true, gameNumber: gameNumber, levelIndex: levelIndex)
         }
-        self.userInteractionEnabled = true
-        let name = GV.player!.name == GV.language.getText(.TCAnonym) ? GV.language.getText(.TCGuest) : GV.player!.name
-        playerLabel.text = GV.language.getText(.TCPlayer, values: name)
-        nameLabel.text = GV.language.getText(.TCChooseName)
-        soundLabel.text = GV.language.getText(.TCSoundVolume)
-        musicLabel.text = GV.language.getText(.TCMusicVolume)
-        languageLabel.text = GV.language.getText(.TCLanguage)
-        playerStatisticLabel.text = GV.language.getText(.TCStatistic)
-        returnLabel.text = GV.language.getText(.TCReturn)
+        self.isUserInteractionEnabled = true
+        let name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
+        playerLabel.text = GV.language.getText(.tcPlayer, values: name)
+        nameLabel.text = GV.language.getText(.tcChooseName)
+        soundLabel.text = GV.language.getText(.tcSoundVolume)
+        musicLabel.text = GV.language.getText(.tcMusicVolume)
+        languageLabel.text = GV.language.getText(.tcLanguage)
+        playerStatisticLabel.text = GV.language.getText(.tcStatistic)
+        returnLabel.text = GV.language.getText(.tcReturn)
     }
     
     func setMyDeviceConstants() {
@@ -265,7 +265,7 @@ class MySKPanel: SKSpriteNode {
         
     }
     
-    func getPanelImage (size: CGSize) -> UIImage {
+    func getPanelImage (_ size: CGSize) -> UIImage {
         let opaque = false
         let scale: CGFloat = 1
 
@@ -274,27 +274,28 @@ class MySKPanel: SKSpriteNode {
         //        CGContextSetStrokeColorWithColor(ctx, UIColor.blackColor().CGColor)
         
         //        CGContextBeginPath(ctx)
-        let roundRect = UIBezierPath(roundedRect: CGRectMake(0, 0, size.width, size.height), byRoundingCorners:.AllCorners, cornerRadii: CGSizeMake(size.width / 20, size.height / 20)).CGPath
-        CGContextAddPath(ctx, roundRect)
-        CGContextSetFillColorWithColor(ctx, UIColor.whiteColor().CGColor);
-        CGContextFillPath(ctx)
+        let roundRect = UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: size.width, height: size.height), byRoundingCorners:.allCorners, cornerRadii: CGSize(width: size.width / 20, height: size.height / 20)).cgPath
+        ctx!.addPath(roundRect)
+        ctx!.setFillColor(UIColor.white.cgColor);
+        ctx!.fillPath()
         
         let points = [
-            CGPointMake(size.width * 0.1, size.height * 0.12),
-            CGPointMake(size.width * 0.9, size.height * 0.12)
+            CGPoint(x: size.width * 0.1, y: size.height * 0.12),
+            CGPoint(x: size.width * 0.9, y: size.height * 0.12)
         ]
-        CGContextAddLines(ctx, points, points.count)
-        CGContextStrokePath(ctx)
+//        CGContextAddLines(ctx, points, points.count)
+        ctx!.addLines(between: points)
+        ctx!.strokePath()
         
 //        CGContextSetShadow(ctx, CGSizeMake(10,10), 1.0)
         //        CGContextStrokePath(ctx)
         
         
         
-        CGContextClosePath(ctx)
+        ctx!.closePath()
         let image = UIGraphicsGetImageFromCurrentImageContext()
         
-        return image
+        return image!
     }
     
 

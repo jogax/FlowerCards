@@ -20,7 +20,7 @@ class GameModel: Object {
     dynamic var multiPlay = false
     dynamic var opponentName = ""
     dynamic var opponentScore = 0
-    dynamic var created = NSDate()
+    dynamic var created = Date()
     
     
     override  class func primaryKey() -> String {

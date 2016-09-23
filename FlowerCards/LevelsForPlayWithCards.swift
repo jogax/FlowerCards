@@ -26,7 +26,7 @@ class LevelsForPlayWithCards {
     var CardPlay = false
     var level: Int
     var aktLevel: LevelParam
-    private var levelContent = [
+    fileprivate var levelContent = [
         1: "1,4,4,40,60,40, 2.0, 30.0",
         2: "1,5,5,40,60,35, 2.5, 30.0",
         3: "1,6,6,40,60,32, 2.5, 30.0",
@@ -43,7 +43,7 @@ class LevelsForPlayWithCards {
         //let sizeMultiplier: CGFloat = 1.0 //UIDevice.currentDevice().modelConstants[GV.deviceType] //GV.onIpad ? 1.0 : 0.6
         for index in 1..<levelContent.count + 1 {
             let paramString = levelContent[index]
-            let paramArr = paramString!.componentsSeparatedByString(",")
+            let paramArr = paramString!.components(separatedBy: ",")
             var aktLevelParam: LevelParam = LevelParam()
             aktLevelParam.countContainers = 4
             aktLevelParam.countPackages = Int(paramArr[0])!
@@ -59,7 +59,7 @@ class LevelsForPlayWithCards {
         aktLevel = levelParam[0]
     }
     
-    func setAktLevel(level: Int) {
+    func setAktLevel(_ level: Int) {
         if !level.between(0, max: levelContent.count - 1) {
             self.level = 0
         } else {

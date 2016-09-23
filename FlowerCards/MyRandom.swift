@@ -32,10 +32,10 @@ class MyRandom {
     init(gameNumber: Int) {
         
 //        let (seedDataStruct, exists) = GV.dataStore.readSeedDataRecord(seedIndex)
-        if let gameData = realm.objects(GamePredefinitionModel).filter("gameNumber = %d", gameNumber).first {
+        if let gameData = realm.objects(GamePredefinitionModel.self).filter("gameNumber = %d", gameNumber).first {
             game = gameData
-            random = GKARC4RandomSource(seed: gameData.seedData!)
-            random.dropValuesWithCount(2048)
+            random = GKARC4RandomSource(seed: gameData.seedData! as Data)
+            random.dropValues(2048)
         } else {
             random = GKARC4RandomSource()
 //            let foundedGame = realm.objects(GameModel).filter("gameNumber = %d", gameNumber).first!
@@ -51,8 +51,8 @@ class MyRandom {
         }
     }
     
-    func getRandomInt(min: Int, max: Int) -> Int {
-         return min + random.nextIntWithUpperBound((max + 1 - min))
+    func getRandomInt(_ min: Int, max: Int) -> Int {
+         return min + random.nextInt(upperBound: (max + 1 - min))
     }
 
     

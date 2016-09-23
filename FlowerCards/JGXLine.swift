@@ -15,7 +15,7 @@ class JGXLine {
     // for vertical lines x = a
     
     enum LineType: Int {
-        case Normal = 0, Vertical, Horizontal
+        case normal = 0, vertical, horizontal
     }
 
     struct Line {
@@ -31,16 +31,16 @@ class JGXLine {
             toPoint = to
             let offset = toPoint - fromPoint
             if from.x == to.x {
-                lineType = .Vertical
+                lineType = .vertical
                 b = 0
                 a = fromPoint.x
             } else if from.y == to.y {
-                lineType = .Horizontal
+                lineType = .horizontal
                 b = 0
                 a = 0
             }
             else {
-                lineType = .Normal
+                lineType = .normal
                 b = (offset.y) / (offset.x)
                 a = fromPoint.y - b * fromPoint.x
             }
@@ -52,7 +52,7 @@ class JGXLine {
     var duration: Double = 0
     
     var frameLines = [Line]()
-    var mirrorAxis: LineType = .Horizontal
+    var mirrorAxis: LineType = .horizontal
 
     let frame: CGRect
     let lineSize: CGFloat
@@ -68,27 +68,27 @@ class JGXLine {
         self.lineSize = lineSize
 //        self.delegate = delegate
         
-        var lineOnFrame = Line( from:   CGPointMake(inFrame.origin.x + lineSize / 2, inFrame.origin.y + lineSize / 2),
-                                to:     CGPointMake(inFrame.origin.x + lineSize / 2, inFrame.origin.y + inFrame.height - lineSize / 2))
+        var lineOnFrame = Line( from:   CGPoint(x: inFrame.origin.x + lineSize / 2, y: inFrame.origin.y + lineSize / 2),
+                                to:     CGPoint(x: inFrame.origin.x + lineSize / 2, y: inFrame.origin.y + inFrame.height - lineSize / 2))
         frameLines.append(lineOnFrame)
-        lineOnFrame = Line(     from:   CGPointMake(inFrame.origin.x + lineSize / 2, inFrame.origin.y + inFrame.height - lineSize / 2),
-                                to:     CGPointMake(inFrame.origin.x + inFrame.width - lineSize / 2, inFrame.origin.y + inFrame.height - lineSize / 2))
+        lineOnFrame = Line(     from:   CGPoint(x: inFrame.origin.x + lineSize / 2, y: inFrame.origin.y + inFrame.height - lineSize / 2),
+                                to:     CGPoint(x: inFrame.origin.x + inFrame.width - lineSize / 2, y: inFrame.origin.y + inFrame.height - lineSize / 2))
         frameLines.append(lineOnFrame)
-        lineOnFrame = Line(     from:   CGPointMake(inFrame.origin.x + inFrame.width - lineSize / 2, inFrame.origin.y + inFrame.height - lineSize / 2),
-                                to:     CGPointMake(inFrame.origin.x + inFrame.width - lineSize / 2, inFrame.origin.y + lineSize / 2))
+        lineOnFrame = Line(     from:   CGPoint(x: inFrame.origin.x + inFrame.width - lineSize / 2, y: inFrame.origin.y + inFrame.height - lineSize / 2),
+                                to:     CGPoint(x: inFrame.origin.x + inFrame.width - lineSize / 2, y: inFrame.origin.y + lineSize / 2))
         frameLines.append(lineOnFrame)
-        lineOnFrame = Line(     from:   CGPointMake(inFrame.origin.x + inFrame.width - lineSize / 2, inFrame.origin.y + lineSize / 2),
-                                to:     CGPointMake(inFrame.origin.x + lineSize / 2, inFrame.origin.y + lineSize / 2))
+        lineOnFrame = Line(     from:   CGPoint(x: inFrame.origin.x + inFrame.width - lineSize / 2, y: inFrame.origin.y + lineSize / 2),
+                                to:     CGPoint(x: inFrame.origin.x + lineSize / 2, y: inFrame.origin.y + lineSize / 2))
         frameLines.append(lineOnFrame)
         for index in 0..<frameLines.count {
             let (hasIntersection, intersectionPoint) =  findIntersectionWithFrame(index)
             if hasIntersection {
                 line.toPoint = intersectionPoint
                 switch frameLines[index].lineType {
-                case .Vertical:
-                    mirrorAxis = .Horizontal
+                case .vertical:
+                    mirrorAxis = .horizontal
                 default:
-                    mirrorAxis = .Vertical
+                    mirrorAxis = .vertical
                 }
             } 
         }
@@ -100,7 +100,7 @@ class JGXLine {
 
     }
     
-    func findIntersectionWithFrame(index: Int)->(Bool,CGPoint) {
+    func findIntersectionWithFrame(_ index: Int)->(Bool,CGPoint) {
         // to find the intersection point, use the next 2 equations:
         // y = a1 + b1 * x
         // y = a2 + b2 * x
@@ -109,30 +109,30 @@ class JGXLine {
         // x = (a1 - a2) / (b2 - b1)
         // y = a1 + b1 * (a1 - a2) / (b2 - b1)
 
-        var intersectionPoint = CGPointZero
+        var intersectionPoint = CGPoint.zero
         var hasIntersection = false
 
         let checkLine = frameLines[index]
         
         
         switch (self.line.lineType, checkLine.lineType) {
-            case (.Vertical, .Vertical):
+            case (.vertical, .vertical):
                 hasIntersection = false
             
-            case (.Vertical, .Horizontal):
+            case (.vertical, .horizontal):
                 if self.line.fromPoint.y > self.line.toPoint.y && index == indexBH || self.line.fromPoint.y < self.line.toPoint.y && index == indexUH {
                     hasIntersection = true
-                    intersectionPoint = CGPointMake(self.line.fromPoint.x, checkLine.fromPoint.y)
+                    intersectionPoint = CGPoint(x: self.line.fromPoint.x, y: checkLine.fromPoint.y)
                 }
-            case (.Horizontal, .Horizontal):
+            case (.horizontal, .horizontal):
                 hasIntersection = false
             
-            case (.Horizontal, .Vertical):
+            case (.horizontal, .vertical):
                 if self.line.fromPoint.x > self.line.toPoint.x && index == indexLV || self.line.fromPoint.x < self.line.toPoint.x && index == indexRV {
                     hasIntersection = true
-                    intersectionPoint = CGPointMake(self.line.fromPoint.y, checkLine.fromPoint.x)
+                    intersectionPoint = CGPoint(x: self.line.fromPoint.y, y: checkLine.fromPoint.x)
                 }
-            case (.Normal, .Vertical):
+            case (.normal, .vertical):
                 // for Vertical line x is fix
                 // y = a + bx
                 intersectionPoint.x = checkLine.fromPoint.x
@@ -142,7 +142,7 @@ class JGXLine {
                 if distanceFromPoint > distanceToPoint  && intersectionPoint.y >= self.frame.origin.y && intersectionPoint.y <= self.frame.origin.y + self.frame.height {
                     hasIntersection = true
                 }
-            case (.Normal, .Horizontal):
+            case (.normal, .horizontal):
                 // for Horizontall line y is fix
                 // x = (y - a) / b
                 intersectionPoint.y = checkLine.fromPoint.y
@@ -166,9 +166,9 @@ class JGXLine {
         let offset = self.line.toPoint - self.line.fromPoint
         var mirroredPoint = self.line.fromPoint
         switch mirrorAxis {
-        case .Vertical:
+        case .vertical:
             mirroredPoint.x = self.line.toPoint.x + offset.x
-        case .Horizontal:
+        case .horizontal:
             mirroredPoint.y = self.line.toPoint.y + offset.y
         default:
             mirroredPoint.y = self.line.toPoint.y + offset.y

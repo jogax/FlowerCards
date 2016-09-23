@@ -44,12 +44,12 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
         // Do any additional setup after loading the view, typically from a nib.
      }
     
-    func applicationWillEnterForeground(application: UIApplication) {
+    func applicationWillEnterForeground(_ application: UIApplication) {
         _ = 0
     }
     
     func importGamePredefinitions() {
-        let actCount = realm.objects(GamePredefinitionModel).count
+        let actCount = realm.objects(GamePredefinitionModel.self).count
         if actCount < GamePredefinitions.gameArray.count {
             for gameNumber in actCount..<GamePredefinitions.gameArray.count {
                 let game = GamePredefinitionModel()
@@ -66,18 +66,18 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
     }
     
     func copyDefaultRealmFileIfNotExistsYet() {
-        let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)
+        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         let documentDirectory = paths[0] 
-        let defaultFilePath = documentDirectory.stringByAppendingString("/default.realm")
+        let defaultFilePath = documentDirectory + "/default.realm"
         
-        let manager = NSFileManager.defaultManager()
-        if (manager.fileExistsAtPath(defaultFilePath)) {
+        let manager = FileManager.default
+        if (manager.fileExists(atPath: defaultFilePath)) {
             print("DB exists, nothing to do")
         } else {
             print("not exists at path: \(documentDirectory), will be copied")
-            let myOrigRealmFile = NSBundle.mainBundle().pathForResource("MyDB", ofType: "realm")
+            let myOrigRealmFile = Bundle.main.path(forResource: "MyDB", ofType: "realm")
 //            try! manager.moveItemAtPath(myOrigRealmFile!, toPath: defaultFilePath)
-            try! manager.copyItemAtPath(myOrigRealmFile!, toPath: defaultFilePath)
+            try! manager.copyItem(atPath: myOrigRealmFile!, toPath: defaultFilePath)
 //            try! manager.removeItemAtPath(myOrigRealmFile!)
         }
         realm = try! Realm()
@@ -100,7 +100,7 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
 //        }
 //    }
 //    
-    func exportGames(countGames: Int) {
+    func exportGames(_ countGames: Int) {
         for gameNumber in 0..<countGames {
             let random = GKARC4RandomSource()
             let myNSData = random.seed
@@ -121,16 +121,16 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
 
 
         
-        if realm.objects(PlayerModel).count == 0 {
-              GV.createNewPlayer(true)
+        if realm.objects(PlayerModel.self).count == 0 {
+              _ = GV.createNewPlayer(true)
         }
         
         
-        GV.player = realm.objects(PlayerModel).filter("isActPlayer = TRUE").first!
+        GV.player = realm.objects(PlayerModel.self).filter("isActPlayer = TRUE").first!
  
-        if realm.objects(StatisticModel).filter("playerID = %d", GV.player!.ID).count == 0 {
+        if realm.objects(StatisticModel.self).filter("playerID = %d", GV.player!.ID).count == 0 {
             let statistic = StatisticModel()
-            statistic.ID = GV.createNewRecordID(.StatisticModel)
+            statistic.ID = GV.createNewRecordID(.statisticModel)
             statistic.playerID = GV.player!.ID
             statistic.levelID = GV.player!.levelID
             try! realm.write({
@@ -143,7 +143,7 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
         GV.language.setLanguage(GV.player!.aktLanguageKey)
         
         let myName = GV.player!.name
-        let deviceName = UIDevice.currentDevice().name
+        let deviceName = UIDevice.current.name
         GV.peerToPeerService = PeerToPeerServiceManager(peerType: appName, identifier: myName, deviceName: deviceName)  // Start connection
 
         skView!.showsFPS = true
@@ -151,18 +151,18 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
         skView!.ignoresSiblingOrder = true
         
 //        if GV.actGameParam.gameModus == GameModusCards {
-            let scene = CardGameScene(size: CGSizeMake(view.frame.width, view.frame.height))
+            let scene = CardGameScene(size: CGSize(width: view.frame.width, height: view.frame.height))
             GV.language.addCallback(scene.changeLanguage, callbackName: "CardGameCallBack")
-            scene.scaleMode = .ResizeFill
+            scene.scaleMode = .resizeFill
             skView!.presentScene(scene)
             cardsScene = scene
     }
     func printFonts() {
-        let fontFamilyNames = UIFont.familyNames()
+        let fontFamilyNames = UIFont.familyNames
         for familyName in fontFamilyNames {
             print("------------------------------")
             print("Font Family Name = [\(familyName)]")
-            let names = UIFont.fontNamesForFamilyName(familyName)
+            let names = UIFont.fontNames(forFamilyName: familyName)
             print("Font Names = [\(names)]")
         }
     }

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		201E36BC1D75E25800AD7F25 /* screw.png in Resources */ = {isa = PBXBuildFile; fileRef = 201E36BB1D75E25800AD7F25 /* screw.png */; };
 		201F08981D60BCE300E35DA5 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E41D5B208900561FBF /* Realm.framework */; };
 		201F08991D60BCE300E35DA5 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E41D5B208900561FBF /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		201F089A1D60BD4E00E35DA5 /* sprites.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 2025F11B1D5B23C500561FBF /* sprites.atlas */; };
@@ -56,6 +55,7 @@
 		2025F1341D5B27C200561FBF /* ChooseGamePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */; };
 		20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20389B541D5F7EB400ADD133 /* Mirror5.m4a */; };
 		203F82F81D7478B30025D1FF /* finger.png in Resources */ = {isa = PBXBuildFile; fileRef = 203F82F71D7478B30025D1FF /* finger.png */; };
+		205CBF361D93FCAE00E05B28 /* screw.png in Resources */ = {isa = PBXBuildFile; fileRef = 205CBF351D93FCAE00E05B28 /* screw.png */; };
 		20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20720A751D5B55E600389C0C /* Mirror4.m4a */; };
 		20720A781D5B71FF00389C0C /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 20720A771D5B71FF00389C0C /* Podfile */; };
 		20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1051D5B445300963590 /* MyMusic.m4a */; };
@@ -84,7 +84,6 @@
 
 /* Begin PBXFileReference section */
 		0912CB345E0E83ECC2EC999C /* Pods_FlowerCards.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_FlowerCards.framework; path = "/Users/JozsefRomhanyi/Documents/MySwiftProjects/FlowerCards/build/Debug-iphoneos/Pods_FlowerCards.framework"; sourceTree = "<absolute>"; };
-		201E36BB1D75E25800AD7F25 /* screw.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = screw.png; sourceTree = "<group>"; };
 		2025F0BA1D5B18F300561FBF /* FlowerCards.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlowerCards.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2025F0BD1D5B18F300561FBF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2025F0C61D5B18F300561FBF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -136,6 +135,7 @@
 		2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseGamePanel.swift; sourceTree = "<group>"; };
 		20389B541D5F7EB400ADD133 /* Mirror5.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror5.m4a; sourceTree = "<group>"; };
 		203F82F71D7478B30025D1FF /* finger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = finger.png; sourceTree = "<group>"; };
+		205CBF351D93FCAE00E05B28 /* screw.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = screw.png; path = sprites.atlas/screw.png; sourceTree = "<group>"; };
 		20720A751D5B55E600389C0C /* Mirror4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror4.m4a; sourceTree = "<group>"; };
 		20720A771D5B71FF00389C0C /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Podfile; path = FlowerCards/Podfile; sourceTree = "<group>"; };
 		20B1F1051D5B445300963590 /* MyMusic.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = MyMusic.m4a; sourceTree = "<group>"; };
@@ -188,7 +188,7 @@
 				2025F1031D5B226E00561FBF /* GamePredefinitions.swift */,
 				2025F1041D5B226E00561FBF /* GameModel.swift */,
 				2025F1231D5B253900561FBF /* CardGameScene.swift */,
-				201E36BB1D75E25800AD7F25 /* screw.png */,
+				205CBF351D93FCAE00E05B28 /* screw.png */,
 				2025F1051D5B226E00561FBF /* PeerToPeerServiceManager.swift */,
 				2025F0F51D5B21AC00561FBF /* MyStructs.swift */,
 				2025F0F61D5B21AC00561FBF /* MySKPlayer.swift */,
@@ -316,6 +316,7 @@
 					2025F0B91D5B18F300561FBF = {
 						CreatedOnToolsVersion = 7.3.1;
 						DevelopmentTeam = WT499VC842;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -343,6 +344,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				201F089C1D60C41300E35DA5 /* Assets.xcassets in Resources */,
+				205CBF361D93FCAE00E05B28 /* screw.png in Resources */,
 				201F089A1D60BD4E00E35DA5 /* sprites.atlas in Resources */,
 				20B1F10E1D5B45DB00963590 /* NoSound.m4a in Resources */,
 				20B1F10C1D5B458E00963590 /* Container.m4a in Resources */,
@@ -355,7 +357,6 @@
 				2025F0C71D5B18F300561FBF /* Main.storyboard in Resources */,
 				20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */,
 				2025F12E1D5B25C300561FBF /* Mirror1.m4a in Resources */,
-				201E36BC1D75E25800AD7F25 /* screw.png in Resources */,
 				2025F12F1D5B25C300561FBF /* Mirror2.m4a in Resources */,
 				2025F1301D5B25C300561FBF /* Mirror3.m4a in Resources */,
 				20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */,
@@ -593,6 +594,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.FlowerCards;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -612,6 +614,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.FlowerCards;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

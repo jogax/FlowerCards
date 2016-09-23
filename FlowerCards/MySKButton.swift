@@ -22,19 +22,19 @@ class MySKButton: MySKNode {
         } else {
             buttonTexture = atlas.textureNamed("emptyCard")
         }
-        super.init(texture: buttonTexture, type:.ButtonType, value: NoValue)
+        super.init(texture: buttonTexture, type:.buttonType, value: NoValue)
         self.position = frame.origin
         self.size = frame.size
-            let buttonPicture = MySKNode(texture: texture, type: .ButtonType, value: NoValue)
+            let buttonPicture = MySKNode(texture: texture, type: .buttonType, value: NoValue)
             buttonPicture.size = size * 0.95
             buttonPicture.zPosition = 1
             buttonPicture.name = buttonName
             addChild(buttonPicture)
             if makePicture {
-                let shadow = MySKNode(texture: texture, type: .ButtonType, value: NoValue)
-                shadow.blendMode = SKBlendMode.Alpha
+                let shadow = MySKNode(texture: texture, type: .buttonType, value: NoValue)
+                shadow.blendMode = SKBlendMode.alpha
                 shadow.colorBlendFactor = 0.5;
-                shadow.color = SKColor.redColor()
+                shadow.color = SKColor.red
                 shadow.alpha = 0.25
                 shadow.size = size
 //                shadow.anchorPoint = self.anchorPoint + CGPointMake(-0.09, 0.04)
@@ -51,15 +51,15 @@ class MySKButton: MySKNode {
         
         }
     
-    func changeButtonPicture(texture: SKTexture) {
-        (self.childNodeWithName(buttonName)! as! MySKNode).texture = texture
+    func changeButtonPicture(_ texture: SKTexture) {
+        (self.childNode(withName: buttonName)! as! MySKNode).texture = texture
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func activateButton(activate: Bool) {
+    func activateButton(_ activate: Bool) {
         if activate {
             self.alpha = 1.0
         } else {
@@ -67,7 +67,7 @@ class MySKButton: MySKNode {
         }
     }
     
-    func showProgress(actValue: Int, maxValue:Int) {
+    func showProgress(_ actValue: Int, maxValue:Int) {
         
 //        let pathToDraw:CGMutablePathRef = CGPathCreateMutable()
 //        let myProgress:SKShapeNode = SKShapeNode(path:pathToDraw)

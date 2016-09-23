@@ -7,11 +7,11 @@
 //
 
 enum MySKNodeType: Int {
-    case SpriteType = 0, ContainerType, ButtonType, EmptyCardType, ShowCardType
+    case spriteType = 0, containerType, buttonType, emptyCardType, showCardType
 }
 
 enum TremblingType: Int {
-    case NoTrembling = 0, ChangeSize, ChangeSizeOnce, ChangePos, ChangeDirection
+    case noTrembling = 0, changeSize, changeSizeOnce, changePos, changeDirection
 }
 let NoValue = -1
 let NoColor = 1000
@@ -24,10 +24,10 @@ class MySKNode: SKSpriteNode {
     
     override var size: CGSize {
         didSet {
-            if oldValue != CGSizeMake(0,0) && (type != .ButtonType) {
+            if oldValue != CGSize(width: 0,height: 0) && (type != .buttonType) {
                 minValueLabel.fontSize = size.width * fontSizeMultiplier
                 maxValueLabel.fontSize = size.width * fontSizeMultiplier
-                let positionOffset = CGPointMake(self.size.width * offsetMultiplier.x,  self.size.height * offsetMultiplier.y)
+                let positionOffset = CGPoint(x: self.size.width * offsetMultiplier.x,  y: self.size.height * offsetMultiplier.y)
                 minValueLabel.position = positionOffset
                 maxValueLabel.position = positionOffset
                 if BGPictureAdded {
@@ -40,7 +40,7 @@ class MySKNode: SKSpriteNode {
     var column = 0
     var row = 0
     var colorIndex = 0
-    var startPosition = CGPointZero
+    var startPosition = CGPoint.zero
     var minValue: Int
     var maxValue: Int
     var countScore: Int {
@@ -51,15 +51,15 @@ class MySKNode: SKSpriteNode {
     }
     var mirrored: Int
     let device = GV.deviceType
-    let modelConstantLocal = UIDevice.currentDevice().modelName
+    let modelConstantLocal = UIDevice.current.modelName
 
-    var origSize = CGSizeMake(0, 0)
+    var origSize = CGSize(width: 0, height: 0)
 
     var trembling: CGFloat = 0
-    var tremblingType: TremblingType = .NoTrembling {
+    var tremblingType: TremblingType = .noTrembling {
         didSet {
             if oldValue != tremblingType {
-                if tremblingType == .NoTrembling {
+                if tremblingType == .noTrembling {
                     self.size = self.origSize
                     trembling = 0
                 } else {
@@ -82,11 +82,11 @@ class MySKNode: SKSpriteNode {
     var BGPictureAdded = false
     
     let cardLib: [Int:String] = [
-        0:"A", 1:"2", 2:"3", 3:"4", 4:"5", 5:"6", 6:"7", 7:"8", 8:"9", 9:"10", 10: GV.language.getText(.TCJ), 11: GV.language.getText(.TCD), 12: GV.language.getText(.TCK), NoColor: ""]
+        0:"A", 1:"2", 2:"3", 3:"4", 4:"5", 5:"6", 6:"7", 7:"8", 8:"9", 9:"10", 10: GV.language.getText(.tcj), 11: GV.language.getText(.tcd), 12: GV.language.getText(.tck), NoColor: ""]
     
     let fontSizeMultiplier: CGFloat = 0.35
-    let offsetMultiplier = CGPointMake(-0.48, 0.48)
-    let BGOffsetMultiplier = CGPointMake(-0.10, 0.25)
+    let offsetMultiplier = CGPoint(x: -0.48, y: 0.48)
+    let BGOffsetMultiplier = CGPoint(x: -0.10, y: 0.25)
     
 
     init(texture: SKTexture, type:MySKNodeType, value: Int) {
@@ -101,24 +101,24 @@ class MySKNode: SKSpriteNode {
         }
         
         switch type {
-        case .ContainerType, .EmptyCardType, .ShowCardType:
+        case .containerType, .emptyCardType, .showCardType:
             hitCounter = 0
-        case .ButtonType:
+        case .buttonType:
             hitCounter = 0
-        case .SpriteType:
+        case .spriteType:
             hitCounter = 1
         }
         
         
 
-        super.init(texture: texture, color: UIColor.clearColor(), size: texture.size())
-        if type == .ButtonType {
-            hitLabel.verticalAlignmentMode = SKLabelVerticalAlignmentMode.Center
+        super.init(texture: texture, color: UIColor.clear, size: texture.size())
+        if type == .buttonType {
+            hitLabel.verticalAlignmentMode = SKLabelVerticalAlignmentMode.center
             hitLabel.fontSize = 20;
             hitLabel.zPosition = self.zPosition + 1
         } else {
             
-            hitLabel.position = CGPointMake(self.position.x, self.position.y + self.size.width * 0.08)
+            hitLabel.position = CGPoint(x: self.position.x, y: self.position.y + self.size.width * 0.08)
             hitLabel.fontSize = 15;
             hitLabel.text = "\(hitCounter)"
             
@@ -138,8 +138,8 @@ class MySKNode: SKSpriteNode {
         if isCard {
             if minValue == NoColor {
                 switch type {
-                    case .ContainerType: alpha = 0.5
-                    case .EmptyCardType: alpha = 0.1
+                    case .containerType: alpha = 0.5
+                    case .emptyCardType: alpha = 0.1
                     default: alpha = 1.0
                 }
             }
@@ -150,12 +150,12 @@ class MySKNode: SKSpriteNode {
 
     }
     
-    func setLabel(label: SKLabelNode, fontSize: CGFloat) {
+    func setLabel(_ label: SKLabelNode, fontSize: CGFloat) {
         label.fontName = "ArielItalic"
-        label.fontColor = SKColor.blackColor()
-        label.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Left
-        label.verticalAlignmentMode = SKLabelVerticalAlignmentMode.Top
-        label.userInteractionEnabled = false
+        label.fontColor = SKColor.black
+        label.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.left
+        label.verticalAlignmentMode = SKLabelVerticalAlignmentMode.top
+        label.isUserInteractionEnabled = false
     }
     
     func reload() {
@@ -166,16 +166,16 @@ class MySKNode: SKSpriteNode {
                 self.alpha = 1.0
             } else {
                 switch type {
-                    case .ContainerType: alpha = 0.5
-                    case .EmptyCardType: alpha = 0.1
+                    case .containerType: alpha = 0.5
+                    case .emptyCardType: alpha = 0.1
                     default: alpha = 1.0
                 }
             }
-            let BGPicturePosition = CGPointMake(self.size.width * BGOffsetMultiplier.x, self.size.height * BGOffsetMultiplier.y)
+            let BGPicturePosition = CGPoint(x: self.size.width * BGOffsetMultiplier.x, y: self.size.height * BGOffsetMultiplier.y)
             let bgPictureName = "BGPicture"
             if minValue != maxValue {
                 if !BGPictureAdded {
-                    if self.childNodeWithName(bgPictureName) == nil {
+                    if self.childNode(withName: bgPictureName) == nil {
                         self.addChild(BGPicture)
                         BGPicture.addChild(maxValueLabel)
                         BGPicture.name = bgPictureName
@@ -187,17 +187,17 @@ class MySKNode: SKSpriteNode {
                     BGPicture.size = size
                     self.zPosition = 0
                     BGPicture.zPosition = self.zPosition - 1
-                    BGPicture.userInteractionEnabled = false
+                    BGPicture.isUserInteractionEnabled = false
                     //maxValueLabel.position = positionOffset //CGPointMake(-20, 35)
                     maxValueLabel.zPosition = self.zPosition + 1
                     //minValueLabel.zPosition = maxValueLabel.zPosition + 1
                 }
             } else {
-                if BGPictureAdded || self.childNodeWithName(bgPictureName) != nil {
+                if BGPictureAdded || self.childNode(withName: bgPictureName) != nil {
                     maxValueLabel.removeFromParent()
                     BGPicture.removeFromParent()
                     BGPictureAdded = false
-                    if type == .ContainerType && minValue == NoValue {
+                    if type == .containerType && minValue == NoValue {
                         self.alpha = 0.5
                     }
                 } else {
@@ -212,7 +212,7 @@ class MySKNode: SKSpriteNode {
 
     }
 
-    func setLabelText(label: SKLabelNode, value: Int) {
+    func setLabelText(_ label: SKLabelNode, value: Int) {
         guard let text = cardLib[minValue == NoColor ? NoColor : value % MaxCardValue] else {
             return
         }

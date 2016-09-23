@@ -20,8 +20,8 @@ class MySKStatistic: MySKTable {
     
     
     
-    init(parent: SKSpriteNode, callBack: (Bool, Int, Int)->()) {
-        nameTable = Array(realm.objects(PlayerModel).sorted("created", ascending: true))
+    init(parent: SKSpriteNode, callBack: @escaping (Bool, Int, Int)->()) {
+        nameTable = Array(realm.objects(PlayerModel.self).sorted(byProperty: "created", ascending: true))
         var countLines = nameTable.count
         if countLines == 1 {
             countLines += 1
@@ -59,16 +59,16 @@ class MySKStatistic: MySKTable {
     }
     
     func showPlayerStatistic() {
-        let elements: [MultiVar] = [MultiVar(string: GV.language.getText(.TCPlayer)),
-                                    MultiVar(string: GV.language.getText(.TCCountPlays)),
-                                    MultiVar(string: GV.language.getText(.TCCountCompetitions)),
-                                    MultiVar(string: GV.language.getText(.TCCountVictorys)),
-                                    MultiVar(string: GV.language.getText(.TCAllTime)),
+        let elements: [MultiVar] = [MultiVar(string: GV.language.getText(.tcPlayer)),
+                                    MultiVar(string: GV.language.getText(.tcCountPlays)),
+                                    MultiVar(string: GV.language.getText(.tcCountCompetitions)),
+                                    MultiVar(string: GV.language.getText(.tcCountVictorys)),
+                                    MultiVar(string: GV.language.getText(.tcAllTime)),
                                    ]
         showRowOfTable(elements, row: 0, selected: true)
         for row in 0..<nameTable.count {
-            if nameTable[row].name != GV.language.getText(.TCAnonym) || row == 0 {
-                let statisticTable = realm.objects(StatisticModel).filter("playerID = %d", nameTable[row].ID)
+            if nameTable[row].name != GV.language.getText(.tcAnonym) || row == 0 {
+                let statisticTable = realm.objects(StatisticModel.self).filter("playerID = %d", nameTable[row].ID)
                 var allTime = 0
                 var countPlays = 0
                 var countMultiPlays = 0
@@ -86,38 +86,38 @@ class MySKStatistic: MySKTable {
                                             MultiVar(string: "\(countMultiPlays)"),
                                             MultiVar(string: "\(countVictorys) / \(countDefeats)"),
                                             MultiVar(string: allTime.dayHourMinSec),
-                                            MultiVar(image: DrawImages.getGoForwardImage(CGSizeMake(20, 20)))
+                                            MultiVar(image: DrawImages.getGoForwardImage(CGSize(width: 20, height: 20)))
                 ]
                 showRowOfTable(elements, row: row + 1, selected: true)
             }
         }
     }
     
-    func convertNameWhenRequired(name: String)->String {
-        if name == GV.language.getText(.TCAnonym) {
-            return GV.language.getText(.TCGuest)
+    func convertNameWhenRequired(_ name: String)->String {
+        if name == GV.language.getText(.tcAnonym) {
+            return GV.language.getText(.tcGuest)
         }
         return name
     }
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        let touchLocation = touches.first!.locationInNode(self)
-        touchesBeganAtNode = nodeAtPoint(touchLocation)
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touchLocation = touches.first!.location(in: self)
+        touchesBeganAtNode = atPoint(touchLocation)
         if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != myName)) {
             touchesBeganAtNode = nil
         }
     }
     
-    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        _ = touches.first!.locationInNode(self)
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        _ = touches.first!.location(in: self)
     }
     
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let (_, row) = checkTouches(touches, withEvent: event)
         switch row {
         case 0:
-            let fadeInAction = SKAction.fadeInWithDuration(0.5)
-            myParent.runAction(fadeInAction)
+            let fadeInAction = SKAction.fadeIn(withDuration: 0.5)
+            myParent.run(fadeInAction)
             removeFromParent()
             callBack(false, 0, 0)
         case 2..<10000:
@@ -128,13 +128,13 @@ class MySKStatistic: MySKTable {
         
     }
     
-    func addDetailedPlayerStatistic(row: Int) {
+    func addDetailedPlayerStatistic(_ row: Int) {
         let playerID = nameTable[row].ID
         _ = MySKDetailedStatistic(playerID: playerID, parent: self, callBack: backFromMySKDetailedStatistic)
         
     }
     
-    func backFromMySKDetailedStatistic(startGame: Bool, gameNumber: Int, levelIndex: Int) {
+    func backFromMySKDetailedStatistic(_ startGame: Bool, gameNumber: Int, levelIndex: Int) {
         callBack(startGame, gameNumber, levelIndex)
     }
     override func setMyDeviceSpecialConstants() {
