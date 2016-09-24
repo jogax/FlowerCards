@@ -28,7 +28,7 @@ class DrawImages {
     
     init() {
         self.pfeillinksImage = drawPfeillinks(CGRect(x: 0, y: 0, width: 100, height: 100))
-        self.pfeilrechtsImage = pfeillinksImage.imageRotatedByDegrees(180.0, flip: false)
+//        self.pfeilrechtsImage = pfeillinksImage.imageRotatedByDegrees(180.0, flip: false)
         self.settingsImage = drawSettings(CGRect(x: 0, y: 0, width: 100, height: 100))
         self.undoImage = drawUndo(CGRect(x: 0, y: 0, width: 100, height: 100))
         self.restartImage = drawRestart(CGRect(x: 0, y: 0, width: 100, height: 100))
