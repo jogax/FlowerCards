@@ -483,7 +483,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
             print(documentsPath)
             
-            spriteTabRect.origin = CGPoint(x: self.frame.midX, y: self.frame.midY * 0.85)
+            spriteTabRect.origin = CGPoint(x: self.frame.midX, y: self.frame.midY * 0.80)
             spriteTabRect.size = CGSize(width: self.frame.size.width * 0.80, height: self.frame.size.height * 0.80)
             
             let width:CGFloat = 64.0
@@ -1061,8 +1061,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func makeEmptyCard(_ column:Int, row: Int) {
         let searchName = "\(emptySpriteTxt)-\(column)-\(row)"
         if self.childNode(withName: searchName) == nil {
-//            let xPosition = spriteTabRect.origin.x - spriteTabRect.size.width / 2 + CGFloat(column) * tableCellSize + tableCellSize / 2
-//            let yPosition = spriteTabRect.origin.y - spriteTabRect.size.height / 2 + tableCellSize * 1.10 / 2 + CGFloat(row) * tableCellSize * 1.10
             let emptySprite = MySKNode(texture: getTexture(NoColor), type: .emptyCardType, value: NoColor)
             emptySprite.position = gameArray[column][row].position
             emptySprite.size = CGSize(width: spriteSize.width, height: spriteSize.height)
@@ -3307,6 +3305,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         )
         return point
     }
+    
     func calculateColumnRowFromPosition(_ position: CGPoint)->ColumnRow {
         var columnRow  = ColumnRow()
         let offsetToFirstPosition = position - gameArray[0][0].position
@@ -3319,46 +3318,37 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func makeLineAroundGameboard(_ linePosition: LinePosition) {
-        //        var point1: CGPoint
-        //        var point2: CGPoint
-        var myWallRect: CGRect
+        var myWallP1: CGPoint
+        var myWallP2: CGPoint
         
-        //var width: CGFloat = 4
-        //var length: CGFloat = 0
-        let yKorrBottom: CGFloat = size.height * 0.0
+        let lineSize: CGFloat = size.width / 100
         switch linePosition {
-        case .bottomHorizontal:  myWallRect = CGRect(x: position.x, y: position.y + yKorrBottom, width: size.width, height: 3)
-        case .rightVertical:    myWallRect = CGRect(x: position.x + size.width, y: position.y + yKorrBottom,  width: 3, height: size.height)
-        case .upperHorizontal: myWallRect = CGRect(x: position.x, y: position.y + size.height,  width: size.width, height: 3)
-        case .leftVertical:     myWallRect = CGRect(x: position.x, y: position.y + yKorrBottom,  width: 3, height: size.height)
-            //default:                myWallRect = CGRectZero
-        }
-        
-        let myWall = SKNode()
+        case .bottomHorizontal:
+            myWallP1 = CGPoint(x: position.x, y: position.y)
+            myWallP2 = CGPoint(x: size.width, y: myWallP1.y)
+        case .rightVertical:
+            myWallP1 = CGPoint(x: position.x + size.width, y: position.y)
+            myWallP2 = CGPoint(x: myWallP1.x, y: size.height)
+        case .upperHorizontal:
+            myWallP1 = CGPoint(x: position.x, y: position.y + size.height)
+            myWallP2 = CGPoint(x: size.width, y: myWallP1.y)
+        case .leftVertical:
+            myWallP1 = CGPoint(x: position.x, y: position.y)
+            myWallP2 = CGPoint(x: myWallP1.x, y: size.height)
+         }
         
         let pathToDraw:CGMutablePath = CGMutablePath()
-        let myWallLine:SKShapeNode = SKShapeNode(path:pathToDraw)
-        myWallLine.lineWidth = 3
         
+        let myWallLine:SKShapeNode = SKShapeNode()
+        myWallLine.lineWidth = lineSize
         myWallLine.name = linePosition.linePositionName
-//        CGPathMoveToPoint(pathToDraw, nil, myWallRect.origin.x, myWallRect.origin.y)
-        pathToDraw.move(to: myWallRect.origin)
-//        CGPathAddLineToPoint(pathToDraw, nil, myWallRect.origin.x + myWallRect.width, myWallRect.origin.y + myWallRect.height)
-        pathToDraw.addLine(to: CGPoint(x: myWallRect.origin.x + myWallRect.width, y: myWallRect.origin.y + myWallRect.height))
+        pathToDraw.move(to: myWallP1)
+        pathToDraw.addLine(to: myWallP2)
         
         myWallLine.path = pathToDraw
         
-        myWallLine.strokeColor = SKColor(red: 1, green: 1, blue: 1, alpha: 1.0) // GV.colorSets[GV.colorSetIndex][colorIndex + 1]
+        myWallLine.strokeColor = UIColor.green
         
-        myWall.name = linePosition.linePositionName
-        myWall.physicsBody = SKPhysicsBody(edgeLoopFrom: myWallRect)
-        myWall.physicsBody?.isDynamic = true
-        myWall.physicsBody?.categoryBitMask = PhysicsCategory.WallAround
-        myWall.physicsBody?.contactTestBitMask = PhysicsCategory.MovingSprite
-        myWall.physicsBody?.collisionBitMask = PhysicsCategory.None
-        myWall.physicsBody?.usesPreciseCollisionDetection = true
-        
-        self.addChild(myWall)
         self.addChild(myWallLine)
     }
     
