@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		201F08981D60BCE300E35DA5 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E41D5B208900561FBF /* Realm.framework */; };
-		201F08991D60BCE300E35DA5 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E41D5B208900561FBF /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		201F089A1D60BD4E00E35DA5 /* sprites.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 2025F11B1D5B23C500561FBF /* sprites.atlas */; };
 		201F089C1D60C41300E35DA5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2025F0C81D5B18F300561FBF /* Assets.xcassets */; };
 		2025F0BE1D5B18F300561FBF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0BD1D5B18F300561FBF /* AppDelegate.swift */; };
@@ -16,8 +14,6 @@
 		2025F0CC1D5B18F300561FBF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2025F0CA1D5B18F300561FBF /* LaunchScreen.storyboard */; };
 		2025F0D51D5B1A1E00561FBF /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0D31D5B1A1E00561FBF /* GameViewController.swift */; };
 		2025F0D61D5B1A1E00561FBF /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0D41D5B1A1E00561FBF /* Extensions.swift */; };
-		2025F0E81D5B208900561FBF /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E51D5B208900561FBF /* RealmSwift.framework */; };
-		2025F0E91D5B208900561FBF /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2025F0E51D5B208900561FBF /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2025F0F01D5B219C00561FBF /* MySKButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0EB1D5B219C00561FBF /* MySKButton.swift */; };
 		2025F0F11D5B219C00561FBF /* MySKLanguages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0EC1D5B219C00561FBF /* MySKLanguages.swift */; };
 		2025F0F21D5B219C00561FBF /* MySKSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0ED1D5B219C00561FBF /* MySKSlider.swift */; };
@@ -53,13 +49,10 @@
 		2025F1301D5B25C300561FBF /* Mirror3.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F12B1D5B25C300561FBF /* Mirror3.m4a */; };
 		2025F1321D5B26A200561FBF /* MySKPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1311D5B26A200561FBF /* MySKPanel.swift */; };
 		2025F1341D5B27C200561FBF /* ChooseGamePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */; };
-		2026C1A41D96B2E4001446B8 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2026C1A21D96B2E4001446B8 /* Realm.framework */; };
-		2026C1A51D96B2E4001446B8 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2026C1A31D96B2E4001446B8 /* RealmSwift.framework */; };
 		20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20389B541D5F7EB400ADD133 /* Mirror5.m4a */; };
 		203F82F81D7478B30025D1FF /* finger.png in Resources */ = {isa = PBXBuildFile; fileRef = 203F82F71D7478B30025D1FF /* finger.png */; };
 		205CBF361D93FCAE00E05B28 /* screw.png in Resources */ = {isa = PBXBuildFile; fileRef = 205CBF351D93FCAE00E05B28 /* screw.png */; };
 		20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20720A751D5B55E600389C0C /* Mirror4.m4a */; };
-		20720A781D5B71FF00389C0C /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 20720A771D5B71FF00389C0C /* Podfile */; };
 		20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1051D5B445300963590 /* MyMusic.m4a */; };
 		20B1F1081D5B44F900963590 /* cardBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1071D5B44F900963590 /* cardBackground.png */; };
 		20B1F10A1D5B454700963590 /* OK.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1091D5B454700963590 /* OK.m4a */; };
@@ -76,8 +69,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				201F08991D60BCE300E35DA5 /* Realm.framework in Embed Frameworks */,
-				2025F0E91D5B208900561FBF /* RealmSwift.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -85,6 +76,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		023075A28316F3DE636CB655 /* Pods-FlowerCards.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FlowerCards.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FlowerCards/Pods-FlowerCards.debug.xcconfig"; sourceTree = "<group>"; };
 		0912CB345E0E83ECC2EC999C /* Pods_FlowerCards.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_FlowerCards.framework; path = "/Users/JozsefRomhanyi/Documents/MySwiftProjects/FlowerCards/build/Debug-iphoneos/Pods_FlowerCards.framework"; sourceTree = "<absolute>"; };
 		2025F0BA1D5B18F300561FBF /* FlowerCards.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlowerCards.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2025F0BD1D5B18F300561FBF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -94,11 +86,6 @@
 		2025F0CD1D5B18F300561FBF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2025F0D31D5B1A1E00561FBF /* GameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		2025F0D41D5B1A1E00561FBF /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
-		2025F0D71D5B1D2200561FBF /* Pods */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Pods; sourceTree = "<group>"; };
-		2025F0DE1D5B1F7200561FBF /* Realm */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Realm; path = Pods/Realm; sourceTree = "<group>"; };
-		2025F0E01D5B1F7600561FBF /* RealmSwift */ = {isa = PBXFileReference; lastKnownFileType = folder; name = RealmSwift; path = Pods/RealmSwift; sourceTree = "<group>"; };
-		2025F0E41D5B208900561FBF /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = "<group>"; };
-		2025F0E51D5B208900561FBF /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = "<group>"; };
 		2025F0EB1D5B219C00561FBF /* MySKButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKButton.swift; sourceTree = "<group>"; };
 		2025F0EC1D5B219C00561FBF /* MySKLanguages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKLanguages.swift; sourceTree = "<group>"; };
 		2025F0ED1D5B219C00561FBF /* MySKSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKSlider.swift; sourceTree = "<group>"; };
@@ -135,21 +122,17 @@
 		2025F12B1D5B25C300561FBF /* Mirror3.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror3.m4a; sourceTree = "<group>"; };
 		2025F1311D5B26A200561FBF /* MySKPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKPanel.swift; sourceTree = "<group>"; };
 		2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseGamePanel.swift; sourceTree = "<group>"; };
-		2026C1A21D96B2E4001446B8 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = "<group>"; };
-		2026C1A31D96B2E4001446B8 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = "<group>"; };
 		20389B541D5F7EB400ADD133 /* Mirror5.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror5.m4a; sourceTree = "<group>"; };
 		203F82F71D7478B30025D1FF /* finger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = finger.png; sourceTree = "<group>"; };
 		205CBF351D93FCAE00E05B28 /* screw.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = screw.png; path = sprites.atlas/screw.png; sourceTree = "<group>"; };
 		20720A751D5B55E600389C0C /* Mirror4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror4.m4a; sourceTree = "<group>"; };
-		20720A771D5B71FF00389C0C /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Podfile; path = FlowerCards/Podfile; sourceTree = "<group>"; };
 		20B1F1051D5B445300963590 /* MyMusic.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = MyMusic.m4a; sourceTree = "<group>"; };
 		20B1F1071D5B44F900963590 /* cardBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cardBackground.png; sourceTree = "<group>"; };
 		20B1F1091D5B454700963590 /* OK.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = OK.m4a; sourceTree = "<group>"; };
 		20B1F10B1D5B458E00963590 /* Container.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Container.m4a; sourceTree = "<group>"; };
 		20B1F10D1D5B45DB00963590 /* NoSound.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = NoSound.m4a; sourceTree = "<group>"; };
 		20B1F10F1D5B483000963590 /* Winner.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Winner.m4a; sourceTree = "<group>"; };
-		3740D4C15C5D8B354301D359 /* Pods-FlowerCards.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FlowerCards.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FlowerCards/Pods-FlowerCards.debug.xcconfig"; sourceTree = "<group>"; };
-		5EB57CF9449DCB84ABC15571 /* Pods-FlowerCards.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FlowerCards.release.xcconfig"; path = "Pods/Target Support Files/Pods-FlowerCards/Pods-FlowerCards.release.xcconfig"; sourceTree = "<group>"; };
+		C050FEAA6A498B1EC1BC8302 /* Pods-FlowerCards.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FlowerCards.release.xcconfig"; path = "Pods/Target Support Files/Pods-FlowerCards/Pods-FlowerCards.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,11 +140,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2026C1A41D96B2E4001446B8 /* Realm.framework in Frameworks */,
-				2026C1A51D96B2E4001446B8 /* RealmSwift.framework in Frameworks */,
-				201F08981D60BCE300E35DA5 /* Realm.framework in Frameworks */,
 				27FC725BB5FD5284C6E90A56 /* Pods_FlowerCards.framework in Frameworks */,
-				2025F0E81D5B208900561FBF /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -173,8 +152,8 @@
 			children = (
 				2025F0BC1D5B18F300561FBF /* FlowerCards */,
 				2025F0BB1D5B18F300561FBF /* Products */,
-				4DC3695124F59546A5902E5E /* Pods */,
 				40E43C69DAF1E087E8038AB9 /* Frameworks */,
+				9C61685BE5AB956F46BE15D8 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -265,23 +244,15 @@
 		40E43C69DAF1E087E8038AB9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				2026C1A21D96B2E4001446B8 /* Realm.framework */,
-				2026C1A31D96B2E4001446B8 /* RealmSwift.framework */,
-				2025F0E41D5B208900561FBF /* Realm.framework */,
-				2025F0E51D5B208900561FBF /* RealmSwift.framework */,
-				2025F0E01D5B1F7600561FBF /* RealmSwift */,
-				2025F0DE1D5B1F7200561FBF /* Realm */,
-				2025F0D71D5B1D2200561FBF /* Pods */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		4DC3695124F59546A5902E5E /* Pods */ = {
+		9C61685BE5AB956F46BE15D8 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				20720A771D5B71FF00389C0C /* Podfile */,
-				3740D4C15C5D8B354301D359 /* Pods-FlowerCards.debug.xcconfig */,
-				5EB57CF9449DCB84ABC15571 /* Pods-FlowerCards.release.xcconfig */,
+				023075A28316F3DE636CB655 /* Pods-FlowerCards.debug.xcconfig */,
+				C050FEAA6A498B1EC1BC8302 /* Pods-FlowerCards.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -300,7 +271,6 @@
 				0CCC029B3BF36829731D03AF /* Embed Pods Frameworks */,
 				756EF9E3547834ADC75C523D /* Copy Pods Resources */,
 				2025F0EA1D5B208900561FBF /* Embed Frameworks */,
-				201F089B1D60BFA100E35DA5 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -361,7 +331,6 @@
 				2025F0CC1D5B18F300561FBF /* LaunchScreen.storyboard in Resources */,
 				203F82F81D7478B30025D1FF /* finger.png in Resources */,
 				2025F12D1D5B25C300561FBF /* Lost.m4a in Resources */,
-				20720A781D5B71FF00389C0C /* Podfile in Resources */,
 				20B1F1081D5B44F900963590 /* cardBackground.png in Resources */,
 				2025F0C71D5B18F300561FBF /* Main.storyboard in Resources */,
 				20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */,
@@ -392,19 +361,6 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FlowerCards/Pods-FlowerCards-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
-		};
-		201F089B1D60BFA100E35DA5 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh\"";
 		};
 		756EF9E3547834ADC75C523D /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -589,7 +545,7 @@
 		};
 		2025F0D11D5B18F300561FBF /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3740D4C15C5D8B354301D359 /* Pods-FlowerCards.debug.xcconfig */;
+			baseConfigurationReference = 023075A28316F3DE636CB655 /* Pods-FlowerCards.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -609,7 +565,7 @@
 		};
 		2025F0D21D5B18F300561FBF /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5EB57CF9449DCB84ABC15571 /* Pods-FlowerCards.release.xcconfig */;
+			baseConfigurationReference = C050FEAA6A498B1EC1BC8302 /* Pods-FlowerCards.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
