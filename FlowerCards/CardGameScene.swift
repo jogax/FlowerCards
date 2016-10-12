@@ -51,6 +51,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             self.color = color
         }
         
+        
     }
     struct GameArrayPositions {
         var used: Bool
@@ -182,6 +183,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             color = .red
         }
     }
+    
+    func calculateLen(points: [CGPoint]) -> CGFloat{
+        var len: CGFloat = 0
+        for index in 0..<points.count - 1 {
+            len += (points[index] - points[index + 1]).length()
+        }
+        return len
+    }
+
     
     let answerYes = "YES"
     let answerNo = "NO"
@@ -471,6 +481,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     let qualityOfServiceClass = DispatchQoS.QoSClass.background
     let backgroundQueue = DispatchQueue.global(qos: DispatchQoS.QoSClass.background)
     let playMusicForever = -1
+    let fixationTime = 0.1
     
     override func didMove(to view: SKView) {
         
@@ -1446,6 +1457,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             let color = calculateLineColor(foundedPoint!, movedFrom:  movedFrom)
             drawHelpLines(pointArray, lineWidth: lineSize, twoArrows: false, color: color)
         }
+        
         return (foundedPoint, pointArray)
     }
     
@@ -1932,7 +1944,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func checkColoredLines() {
         if lastPair.color == MyColors.green { // Timer for check Green Line
-            if Date().timeIntervalSince(lastPair.startTime) > 0.5 && !lastPair.fixed {
+            if Date().timeIntervalSince(lastPair.startTime) > fixationTime && !lastPair.fixed {
                 lastPair.fixed = true
                 lineWidthMultiplier = lineWidthMultiplierSpecial
                 drawHelpLinesSpec() // draw thick Line
@@ -2374,15 +2386,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         return 0
     }
     
-    func chooseGameNumber () {
-        let _ = ChooseGamePanel(
-            view: view!,
-            frame: CGRect(x: self.frame.midX, y: self.frame.midY, width: self.frame.width * 0.5, height: self.frame.height * 0.5),
-            parent: self,
-            callBack: callBackFromMySKTextField
-        )
-    }
-    
+//    func chooseGameNumber () {
+//        let _ = ChooseGamePanel(
+//            view: view!,
+//            frame: CGRect(x: self.frame.midX, y: self.frame.midY, width: self.frame.width * 0.5, height: self.frame.height * 0.5),
+//            parent: self,
+//            callBack: callBackFromMySKTextField
+//        )
+//    }
+//    
     func callBackFromMySKTextField(_ gameNumber: Int) {
         self.gameNumber = gameNumber
         self.isUserInteractionEnabled = true
@@ -2481,13 +2493,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             })
             alert.addAction(newGameAction)
             
-            let chooseGameAction = UIAlertAction(title: GV.language.getText(.tcChooseGameNumber), style: .default,
-                                              handler: {(paramAction:UIAlertAction!) in
-                                                self.chooseGameNumber()
-                                                //self.gameArrayChanged = true
-                                                
-            })
-            alert.addAction(chooseGameAction)
+//            let chooseGameAction = UIAlertAction(title: GV.language.getText(.tcChooseGameNumber), style: .default,
+//                                              handler: {(paramAction:UIAlertAction!) in
+//                                                self.chooseGameNumber()
+//                                                //self.gameArrayChanged = true
+//                                                
+//            })
+//            alert.addAction(chooseGameAction)
             
             if levelIndex > 0 {
                 let easierAction = UIAlertAction(title: GV.language.getText(.tcPreviousLevel), style: .default,
@@ -2940,13 +2952,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                             lastPair.setValue(.green, pair: actFromToColumnRow, founded: foundedPoint!, startTime: Date(), points: myPoints)
                         } else if lastPair.color == .green && lastPair.pair ==  actFromToColumnRow && lastPair.points.count == myPoints.count {
                             // nothing to do hier - update sets to fixed after 3.0 sec
+                        } else if lastPair.points.count <= myPoints.count { // other longer green pair found
+                            lastPair.setValue(.green, pair: actFromToColumnRow, founded: foundedPoint!, startTime: Date(), points: myPoints)
                         } else { // other green pair found
                             lineWidthMultiplier = lineWidthMultiplierNormal
                             if lastPair.fixed {
                                 if lastPair.changeTime == lastPair.startTime { // first time changed
                                     lastPair.changeTime = Date()
                                 } else {
-                                    if Date().timeIntervalSince(lastPair.changeTime) > 0.5 {
+                                    if Date().timeIntervalSince(lastPair.changeTime) > fixationTime {
                                         lastPair.setValue(.green, pair: actFromToColumnRow, founded: foundedPoint!, startTime: Date(), points: myPoints)                                }
                                 }
                             } else {
@@ -3054,6 +3068,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     myPoints = lastPair.points // set Back to last green line
                     color = .green
                 }
+                
                 lastPair = PairStatus()
                 push(sprite!, status: .movingStarted)
                 

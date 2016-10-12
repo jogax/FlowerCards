@@ -78,7 +78,7 @@ let enDictionary: [TextConstants: String] = [
     .tcYourScore:           "Your score %",
     .tcYouAreTheBest:    "You are the Best with score %",
     .tcGameNumber:       "Game number: %",
-    .tcChooseGameNumber: "Choose a game",
+//    .tcChooseGameNumber: "Choose a game",
 //    .TCPlayerStatistic:  "Player statistic",
 //    .TCGameStatistic:    "Game statistic",
     .tcCompetition:      "Competition",

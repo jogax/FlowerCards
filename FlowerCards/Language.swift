@@ -81,7 +81,7 @@ enum TextConstants: Int {
     tcYourScore,
     tcYouAreTheBest,
     tcGameNumber,
-    tcChooseGameNumber,
+//    tcChooseGameNumber,
 //    TCPlayerStatistic,
 //    TCGameStatistic,
     tcCompetition,
