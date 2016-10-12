@@ -408,6 +408,7 @@ class MySKTable: SKSpriteNode {
     func scrollView(_ delta: CGFloat) {
         self.position.y += delta
     }
+    
     func setMyDeviceSpecialConstants() {
         
     }

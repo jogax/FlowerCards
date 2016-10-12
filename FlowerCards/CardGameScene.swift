@@ -186,8 +186,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func calculateLen(points: [CGPoint]) -> CGFloat{
         var len: CGFloat = 0
-        for index in 0..<points.count - 1 {
-            len += (points[index] - points[index + 1]).length()
+        if points.count > 1 {
+            for index in 0..<points.count - 1 {
+                len += (points[index] - points[index + 1]).length()
+            }
         }
         return len
     }
@@ -3645,6 +3647,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                                         }
         })
         alert.addAction(OKAction)
+        playerType = .singlePlayer
         GV.mainViewController!.showAlert(alert, delay: 20)
         
     }

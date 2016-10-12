@@ -50,11 +50,8 @@
 		2025F1321D5B26A200561FBF /* MySKPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1311D5B26A200561FBF /* MySKPanel.swift */; };
 		2025F1341D5B27C200561FBF /* ChooseGamePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */; };
 		20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20389B541D5F7EB400ADD133 /* Mirror5.m4a */; };
-		203F82F81D7478B30025D1FF /* finger.png in Resources */ = {isa = PBXBuildFile; fileRef = 203F82F71D7478B30025D1FF /* finger.png */; };
-		205CBF361D93FCAE00E05B28 /* screw.png in Resources */ = {isa = PBXBuildFile; fileRef = 205CBF351D93FCAE00E05B28 /* screw.png */; };
 		20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20720A751D5B55E600389C0C /* Mirror4.m4a */; };
 		20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1051D5B445300963590 /* MyMusic.m4a */; };
-		20B1F1081D5B44F900963590 /* cardBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1071D5B44F900963590 /* cardBackground.png */; };
 		20B1F10A1D5B454700963590 /* OK.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1091D5B454700963590 /* OK.m4a */; };
 		20B1F10C1D5B458E00963590 /* Container.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F10B1D5B458E00963590 /* Container.m4a */; };
 		20B1F10E1D5B45DB00963590 /* NoSound.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F10D1D5B45DB00963590 /* NoSound.m4a */; };
@@ -123,11 +120,8 @@
 		2025F1311D5B26A200561FBF /* MySKPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKPanel.swift; sourceTree = "<group>"; };
 		2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseGamePanel.swift; sourceTree = "<group>"; };
 		20389B541D5F7EB400ADD133 /* Mirror5.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror5.m4a; sourceTree = "<group>"; };
-		203F82F71D7478B30025D1FF /* finger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = finger.png; sourceTree = "<group>"; };
-		205CBF351D93FCAE00E05B28 /* screw.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = screw.png; path = sprites.atlas/screw.png; sourceTree = "<group>"; };
 		20720A751D5B55E600389C0C /* Mirror4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror4.m4a; sourceTree = "<group>"; };
 		20B1F1051D5B445300963590 /* MyMusic.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = MyMusic.m4a; sourceTree = "<group>"; };
-		20B1F1071D5B44F900963590 /* cardBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cardBackground.png; sourceTree = "<group>"; };
 		20B1F1091D5B454700963590 /* OK.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = OK.m4a; sourceTree = "<group>"; };
 		20B1F10B1D5B458E00963590 /* Container.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Container.m4a; sourceTree = "<group>"; };
 		20B1F10D1D5B45DB00963590 /* NoSound.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = NoSound.m4a; sourceTree = "<group>"; };
@@ -173,7 +167,6 @@
 				2025F1031D5B226E00561FBF /* GamePredefinitions.swift */,
 				2025F1041D5B226E00561FBF /* GameModel.swift */,
 				2025F1231D5B253900561FBF /* CardGameScene.swift */,
-				205CBF351D93FCAE00E05B28 /* screw.png */,
 				2025F1051D5B226E00561FBF /* PeerToPeerServiceManager.swift */,
 				2025F0F51D5B21AC00561FBF /* MyStructs.swift */,
 				2025F0F61D5B21AC00561FBF /* MySKPlayer.swift */,
@@ -200,8 +193,6 @@
 				2025F0D41D5B1A1E00561FBF /* Extensions.swift */,
 				2025F0C51D5B18F300561FBF /* Main.storyboard */,
 				2025F0C81D5B18F300561FBF /* Assets.xcassets */,
-				203F82F71D7478B30025D1FF /* finger.png */,
-				20B1F1071D5B44F900963590 /* cardBackground.png */,
 				2025F0CA1D5B18F300561FBF /* LaunchScreen.storyboard */,
 				2025F0CD1D5B18F300561FBF /* Info.plist */,
 				20720A791D5B72BB00389C0C /* Music */,
@@ -323,15 +314,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				201F089C1D60C41300E35DA5 /* Assets.xcassets in Resources */,
-				205CBF361D93FCAE00E05B28 /* screw.png in Resources */,
 				201F089A1D60BD4E00E35DA5 /* sprites.atlas in Resources */,
 				20B1F10E1D5B45DB00963590 /* NoSound.m4a in Resources */,
 				20B1F10C1D5B458E00963590 /* Container.m4a in Resources */,
 				20B1F10A1D5B454700963590 /* OK.m4a in Resources */,
 				2025F0CC1D5B18F300561FBF /* LaunchScreen.storyboard in Resources */,
-				203F82F81D7478B30025D1FF /* finger.png in Resources */,
 				2025F12D1D5B25C300561FBF /* Lost.m4a in Resources */,
-				20B1F1081D5B44F900963590 /* cardBackground.png in Resources */,
 				2025F0C71D5B18F300561FBF /* Main.storyboard in Resources */,
 				20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */,
 				2025F12E1D5B25C300561FBF /* Mirror1.m4a in Resources */,
