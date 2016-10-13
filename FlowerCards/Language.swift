@@ -94,6 +94,7 @@ enum TextConstants: Int {
     tcHeWon,
     tcYouWon,
     tcOpponentNotPlay,
+    tcOpponentLevelIsLower,
     tcGameArt,
     tcVictory,
     tcStart,

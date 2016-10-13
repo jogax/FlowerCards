@@ -100,6 +100,7 @@ let enDictionary: [TextConstants: String] = [
                         "your score : %\r\n" +
                         "% score: %\r\n ",
     .tcOpponentNotPlay: "% does not want to play with you!",
+    .tcOpponentLevelIsLower: "% has not yet reached your level",
     .tcGameArt:         "Type",
     .tcVictory:         "Victory",
     .tcStart:           "Start",

@@ -393,14 +393,24 @@ class MySKTable: SKSpriteNode {
         return UIImage()
     }
     
-    func checkTouches(_ touches: Set<UITouch>, withEvent event: UIEvent?)->(MyEvents, Int) {
+    func checkTouches(_ touches: Set<UITouch>, withEvent event: UIEvent?)->(MyEvents, Int, Int) {
         let touchLocation = touches.first!.location(in: self)
         let touchesEndedAtNode = atPoint(touchLocation)
         let row = -Int((touchLocation.y - self.size.height / 2) / heightOfLabelRow)
-        if touchesEndedAtNode is SKSpriteNode && (touchesEndedAtNode as! SKSpriteNode).name == goBackImageName {
-            return (.goBackEvent,row)
+        var column = -1
+        for index in 0..<columnXPositions.count - 1 {
+            if columnXPositions[index] > touchLocation.x  {
+                column = index - 1
+                break
+            }
         }
-        return (.noEvent, row)
+        if column == -1 {
+            column = columnXPositions.count - 1
+        }
+        if touchesEndedAtNode is SKSpriteNode && (touchesEndedAtNode as! SKSpriteNode).name == goBackImageName {
+            return (.goBackEvent,row, column)
+        }
+        return (.noEvent, row, column)
         
         
     }

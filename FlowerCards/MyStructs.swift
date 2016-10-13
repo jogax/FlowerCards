@@ -385,15 +385,15 @@ extension CGPoint {
     }
 }
 
-struct PhysicsCategory {
-    static let None         : UInt32 = 0
-    static let All          : UInt32 = UInt32.max
-    static let Sprite       : UInt32 = 0b1      // 1
-    static let Container    : UInt32 = 0b10       // 2
-    static let MovingSprite : UInt32 = 0b100     // 4
-    static let WallAround   : UInt32 = 0b1000     // 8
-}
-
+//struct PhysicsCategory {
+//    static let None         : UInt32 = 0
+//    static let All          : UInt32 = UInt32.max
+//    static let Sprite       : UInt32 = 0b1      // 1
+//    static let Container    : UInt32 = 0b10       // 2
+//    static let MovingSprite : UInt32 = 0b100     // 4
+//    static let WallAround   : UInt32 = 0b1000     // 8
+//}
+//
 struct MyNodeTypes {
     static let none:            UInt32 = 0
     static let MyGameScene:     UInt32 = 0b1        // 1
@@ -453,6 +453,7 @@ enum PeerToPeerCommands: Int {
             //                  2 - levelID
             //                  3 - gameNumber to play
             //      answer: "OK" - play starts
+            //              "LevelTooHigh" - for opponent is this level vorbidden
             //              "Cancel" - opponent will not play
     myScoreHasChanged, // sendInfo
             //

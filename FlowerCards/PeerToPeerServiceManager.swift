@@ -241,7 +241,7 @@ extension PeerToPeerServiceManager : MCSessionDelegate {
                     self.delegate!.messageReceived(fromPeerIndex, command: command, message: parameterString, messageNr: messageNr!)
                 } else { // answer to my Message
                     messageArray[messageNr!]!.answers = parameterString
-                    print("used time: \(Date().timeIntervalSince(messageArray[messageNr!]!.timeStamp)), \(parameterString)")
+//                    print("used time: \(Date().timeIntervalSince(messageArray[messageNr!]!.timeStamp)), \(parameterString)")
                     messageArray[messageNr!]!.closed = true
                 }
             }

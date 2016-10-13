@@ -31,7 +31,7 @@ class MySKGameStatistic: MySKTable {
         let playerName = realm.objects(PlayerModel.self).filter("ID = %d", playerID).first!.name
         self.callBack = callBack
         let headLines = GV.language.getText(.tcPlayerStatisticLevel, values: playerName, String(levelID + 1))
-        gamesOfThisLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and playerScore > 0", playerID, levelID).sorted(byProperty: "gameNumber")
+        gamesOfThisLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true", playerID, levelID).sorted(byProperty: "gameNumber")
         super.init(columnWidths: myGameColumnWidths, rows:gamesOfThisLevel.count + 1, headLines: [headLines], parent: parent, width: parent.parent!.frame.width * 0.9)
         self.showVerticalLines = true
         self.name = myName
@@ -106,11 +106,13 @@ class MySKGameStatistic: MySKTable {
         let actLocation = touches.first!.location(in: GV.mainViewController!.view)
         let delta:CGFloat = lastLocation.y - actLocation.y
         lastLocation = actLocation
-        scrollView(delta)
+        if gamesOfThisLevel.count > 10 {
+            scrollView(delta)
+        }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let (_, row) = checkTouches(touches, withEvent: event)
+        let (_, row, column) = checkTouches(touches, withEvent: event)
         switch row {
         case 0:
             let fadeInAction = SKAction.fadeIn(withDuration: 0.5)
@@ -118,7 +120,9 @@ class MySKGameStatistic: MySKTable {
             removeFromParent()
             callBack(false, 0, 0)
         case 2..<10000:
-            callBack(true, gameNumbers[row - 1]!, levelID)
+            if column == 6 {
+                callBack(true, gameNumbers[row - 1]!, levelID)
+            }
         default:
             break
         }

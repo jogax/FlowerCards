@@ -197,6 +197,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     let answerYes = "YES"
     let answerNo = "NO"
+    let answerLevelNotOK = "LevelNotOK"
     
     let showTippSleepTime = 30.0
     let doCountUpSleepTime = 1.0
@@ -303,6 +304,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var soundPlayerArray = [AVAudioPlayer?](repeating: nil, count: 5)
     var myView = SKView()
     var levelIndex = GV.player!.levelID
+    var maxLevelIndex = 0
     var stack:Stack<SavedSprite> = Stack()
     //var gameArray = [[Bool]]() // true if Cell used
     var gameArray = [[GameArrayPositions]]()
@@ -504,6 +506,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             sizeMultiplier = CGSize(width: GV.deviceConstants.sizeMultiplier, height: GV.deviceConstants.sizeMultiplier * height / width)
             buttonSizeMultiplier = CGSize(width: GV.deviceConstants.buttonSizeMultiplier, height: GV.deviceConstants.buttonSizeMultiplier * height / width)
             levelIndex = GV.player!.levelID
+            
+
             GV.levelsForPlay.setAktLevel(levelIndex)
             
             buttonSize = (myView.frame.width / 15) * buttonSizeMultiplier.width
@@ -732,6 +736,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
         createLabels(cardCountLabel, text: cardCountText, column: 1, row: 5)
         createLabels(tippCountLabel, text: tippCountText, column: 2, row: 5)
+        
+        let mySortedPlays = realm.objects(GameModel.self).filter("playerID = %d and played = true", GV.player!.ID).sorted(byProperty: "levelID")
+        if mySortedPlays.count > 0 {
+            maxLevelIndex = mySortedPlays.last!.levelID
+        } else {
+            maxLevelIndex = 0
+        }
 
     }
     
@@ -2348,7 +2359,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             self.opponent.score = 0
             self.restartGame = true
         case answerNo, GV.IAmBusy, GV.timeOut:
-            alertOpponentDoesNotWantPlay()
+            alertOpponentDoesNotWantPlay(alert: .tcOpponentNotPlay)
+            self.opponent = Opponent()
+            self.playerType = .singlePlayer
+        case answerLevelNotOK:
+            alertOpponentDoesNotWantPlay(alert: .tcOpponentLevelIsLower, opponentName: identity)
             self.opponent = Opponent()
             self.playerType = .singlePlayer
         default:
@@ -2356,8 +2371,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     
-    func alertOpponentDoesNotWantPlay() {
-        let alert = UIAlertController(title: GV.language.getText(.tcOpponentNotPlay, values: String(opponent.name)),
+    func alertOpponentDoesNotWantPlay(alert: TextConstants, opponentName: String = "") {
+        let alert = UIAlertController(title: GV.language.getText(alert, values: String(opponentName)),
             message: "",
             preferredStyle: .alert)
         
@@ -2368,10 +2383,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         alert.addAction(OKAction)
 
         
-        GV.mainViewController!.showAlert(alert, delay: 5)
+        GV.mainViewController!.showAlert(alert, delay: 10)
         
     }
-
     
     func randomGameNumber()->Int {
         var freeGameNumbers = [Int]()
@@ -2495,14 +2509,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             })
             alert.addAction(newGameAction)
             
-//            let chooseGameAction = UIAlertAction(title: GV.language.getText(.tcChooseGameNumber), style: .default,
-//                                              handler: {(paramAction:UIAlertAction!) in
-//                                                self.chooseGameNumber()
-//                                                //self.gameArrayChanged = true
-//                                                
-//            })
-//            alert.addAction(chooseGameAction)
-            
             if levelIndex > 0 {
                 let easierAction = UIAlertAction(title: GV.language.getText(.tcPreviousLevel), style: .default,
                     handler: {(paramAction:UIAlertAction!) in
@@ -2607,11 +2613,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //            containers[index].size.height = containerSize.height
             
             containers[index].colorIndex = NoValue
-            containers[index].physicsBody = SKPhysicsBody(circleOfRadius: containers[index].size.width / 3) // 1
-            containers[index].physicsBody?.isDynamic = true // 2
-            containers[index].physicsBody?.categoryBitMask = PhysicsCategory.Container
-            containers[index].physicsBody?.contactTestBitMask = PhysicsCategory.MovingSprite
-            containers[index].physicsBody?.collisionBitMask = PhysicsCategory.None
+//            containers[index].physicsBody = SKPhysicsBody(circleOfRadius: containers[index].size.width / 3) // 1
+//            containers[index].physicsBody?.isDynamic = true // 2
+//            containers[index].physicsBody?.categoryBitMask = PhysicsCategory.Container
+//            containers[index].physicsBody?.contactTestBitMask = PhysicsCategory.MovingSprite
+//            containers[index].physicsBody?.collisionBitMask = PhysicsCategory.None
             countColorsProContainer.append(countCardsProContainer!)
             addChild(containers[index])
             containers[index].reload()
@@ -3539,6 +3545,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         case .iWantToPlayWithYou:
             if inSettings {
                 GV.peerToPeerService!.sendAnswer(messageNr, answer: [GV.IAmBusy])
+            } else if Int(message[1])! > maxLevelIndex { // want the opponent play a higher level ?
+                GV.peerToPeerService!.sendAnswer(messageNr, answer: [answerLevelNotOK])
             } else {
                 alertStartMultiPlay(fromPeerIndex, message: message, messageNr: messageNr)
             }

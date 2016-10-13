@@ -100,6 +100,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcYouWon:          "ты победил нa % - %! \r\n" +
                         "Поздравляю!!!",
     .tcOpponentNotPlay: "% не хочет с тобой играть!",
+    .tcOpponentLevelIsLower: "% ещё не достиг твой уровень",
     .tcGameArt:         "Tип",
     .tcVictory:         "Победa",
     .tcStart:           "Старт",

@@ -100,6 +100,7 @@ let huDictionary: [TextConstants: String] = [
                         "Pontjaid: %\r\n" +
                         "% pontjai: %\r\n ",
     .tcOpponentNotPlay: "% nem akar veled játszani!",
+    .tcOpponentLevelIsLower: "% még nem érte el a szintedet",
     .tcGameArt:         "Tipus",
     .tcVictory:         "Győzelem",
     .tcStart:           "Start",

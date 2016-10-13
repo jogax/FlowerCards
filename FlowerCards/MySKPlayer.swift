@@ -200,7 +200,7 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touchLocation = touches.first!.location(in: self)
         let touchesEndedAtNode = atPoint(touchLocation)
-        let (_, touchRow) = checkTouches(touches, withEvent: event)
+        let (_, touchRow, touchColumn) = checkTouches(touches, withEvent: event)
         switch touchRow {
         case 0:
             GV.player = realm.objects(PlayerModel.self).filter("isActPlayer = true").first

@@ -100,6 +100,7 @@ let deDictionary: [TextConstants: String] = [
                          "Deine Punkte : %\r\n" +
                          "% Punkte: %\r\n ",
     .tcOpponentNotPlay: "% will nicht spielen mit Dir!",
+    .tcOpponentLevelIsLower: "% hat noch nicht erreicht Deine Ebene!",
     .tcGameArt:         "Art",
     .tcVictory:         "Sieg",
     .tcStart:           "Start",

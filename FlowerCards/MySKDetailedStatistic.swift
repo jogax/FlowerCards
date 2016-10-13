@@ -89,7 +89,7 @@ class MySKDetailedStatistic: MySKTable {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let (_, row) = checkTouches(touches, withEvent: event)
+        let (_, row, column) = checkTouches(touches, withEvent: event)
         switch row {
         case 0:
             let fadeInAction = SKAction.fadeIn(withDuration: 0.5)
