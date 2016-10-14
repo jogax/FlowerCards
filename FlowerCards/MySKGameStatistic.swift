@@ -113,16 +113,14 @@ class MySKGameStatistic: MySKTable {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let (_, row, column) = checkTouches(touches, withEvent: event)
-        switch row {
-        case 0:
+        switch (row, column) {
+        case (0, 0):
             let fadeInAction = SKAction.fadeIn(withDuration: 0.5)
             myParent.run(fadeInAction)
             removeFromParent()
             callBack(false, 0, 0)
-        case 2..<10000:
-            if column == 6 {
-                callBack(true, gameNumbers[row - 1]!, levelID)
-            }
+        case (2..<10000, myGameColumnWidths.count - 1):
+            callBack(true, gameNumbers[row - 1]!, levelID)
         default:
             break
         }

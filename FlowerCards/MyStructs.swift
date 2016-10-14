@@ -186,7 +186,7 @@ struct DeviceConstants {
         switch deviceType {
             case "iPad Pro":
                 sizeMultiplier = 2.2
-                buttonSizeMultiplier = 0.9
+                buttonSizeMultiplier = 1.0
                 cardPositionMultiplier = 1.0
                 fontSizeMultiplier = 0.10
                 imageSizeMultiplier = 1.0
@@ -206,11 +206,11 @@ struct DeviceConstants {
                 imageSizeMultiplier = 1.3
                 type = .iPad2
             case "iPad Mini", "iPad Mini 2", "iPad Mini 3", "iPad Mini 4":
-                sizeMultiplier = 1.3
-                buttonSizeMultiplier = 1.3
-                cardPositionMultiplier = 1.5
-                fontSizeMultiplier = 0.10
-                imageSizeMultiplier = 1.0
+                sizeMultiplier = 1.6
+                buttonSizeMultiplier = 1.2
+                cardPositionMultiplier = 1.0
+                fontSizeMultiplier = 0.20
+                imageSizeMultiplier = 1.3
                 type = .iPadMini
             case "iPhone 6 Plus", "iPhone 6s Plus":
                 sizeMultiplier = 1.0

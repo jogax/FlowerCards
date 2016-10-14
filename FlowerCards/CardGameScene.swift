@@ -516,7 +516,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             self.name = "CardGameScene"
             
             prepareNextGame(true)
-//            restartButtonPressed()
             generateSprites(.first)
         } else {
             playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
@@ -987,7 +986,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             let actionMove = SKAction.move(to: zielPosition, duration: duration)
             
             let waitingAction = SKAction.wait(forDuration: waitForStart)
-            waitForStart += 0.2
+            waitForStart += 0.3
             
             let zPositionPlus = SKAction.run({
                 sprite.zPosition += 100
@@ -999,9 +998,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
             let actionHideEmptyCard = SKAction.run({
                 self.deleteEmptySprite(actColumn, row: actRow)
-//                sprite.zPosition = 0
-                
             })
+            
             sprite.run(SKAction.sequence([waitingAction, zPositionPlus, actionMove, zPositionMinus, actionHideEmptyCard]))
             if cardStack.count(.mySKNodeType) == 0 {
                 cardPackage!.changeButtonPicture(SKTexture(imageNamed: "emptycard"))
@@ -2402,15 +2400,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         return 0
     }
     
-//    func chooseGameNumber () {
-//        let _ = ChooseGamePanel(
-//            view: view!,
-//            frame: CGRect(x: self.frame.midX, y: self.frame.midY, width: self.frame.width * 0.5, height: self.frame.height * 0.5),
-//            parent: self,
-//            callBack: callBackFromMySKTextField
-//        )
-//    }
-//    
     func callBackFromMySKTextField(_ gameNumber: Int) {
         self.gameNumber = gameNumber
         self.isUserInteractionEnabled = true
@@ -2420,8 +2409,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func newGame(_ next: Bool) {
         stopped = true
         if next {
-            
-            
             lastNextPoint = nil
         }
         

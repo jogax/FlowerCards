@@ -394,11 +394,12 @@ class MySKTable: SKSpriteNode {
     }
     
     func checkTouches(_ touches: Set<UITouch>, withEvent event: UIEvent?)->(MyEvents, Int, Int) {
-        let touchLocation = touches.first!.location(in: self)
+        var touchLocation = touches.first!.location(in: self)
+        touchLocation.x += self.frame.minX / 2
         let touchesEndedAtNode = atPoint(touchLocation)
         let row = -Int((touchLocation.y - self.size.height / 2) / heightOfLabelRow)
         var column = -1
-        for index in 0..<columnXPositions.count - 1 {
+        for index in 0..<columnXPositions.count {
             if columnXPositions[index] > touchLocation.x  {
                 column = index - 1
                 break

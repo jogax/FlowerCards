@@ -48,7 +48,6 @@
 		2025F12F1D5B25C300561FBF /* Mirror2.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F12A1D5B25C300561FBF /* Mirror2.m4a */; };
 		2025F1301D5B25C300561FBF /* Mirror3.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F12B1D5B25C300561FBF /* Mirror3.m4a */; };
 		2025F1321D5B26A200561FBF /* MySKPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1311D5B26A200561FBF /* MySKPanel.swift */; };
-		2025F1341D5B27C200561FBF /* ChooseGamePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */; };
 		20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20389B541D5F7EB400ADD133 /* Mirror5.m4a */; };
 		20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20720A751D5B55E600389C0C /* Mirror4.m4a */; };
 		20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1051D5B445300963590 /* MyMusic.m4a */; };
@@ -118,7 +117,6 @@
 		2025F12A1D5B25C300561FBF /* Mirror2.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror2.m4a; sourceTree = "<group>"; };
 		2025F12B1D5B25C300561FBF /* Mirror3.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror3.m4a; sourceTree = "<group>"; };
 		2025F1311D5B26A200561FBF /* MySKPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKPanel.swift; sourceTree = "<group>"; };
-		2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseGamePanel.swift; sourceTree = "<group>"; };
 		20389B541D5F7EB400ADD133 /* Mirror5.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror5.m4a; sourceTree = "<group>"; };
 		20720A751D5B55E600389C0C /* Mirror4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror4.m4a; sourceTree = "<group>"; };
 		20B1F1051D5B445300963590 /* MyMusic.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = MyMusic.m4a; sourceTree = "<group>"; };
@@ -180,7 +178,6 @@
 				2025F0EE1D5B219C00561FBF /* MyRandom.swift */,
 				2025F0EF1D5B219C00561FBF /* MySKNode.swift */,
 				2025F0BD1D5B18F300561FBF /* AppDelegate.swift */,
-				2025F1331D5B27C200561FBF /* ChooseGamePanel.swift */,
 				2025F1311D5B26A200561FBF /* MySKPanel.swift */,
 				2025F1251D5B256A00561FBF /* JGXLine.swift */,
 				2025F1211D5B246E00561FBF /* RecordIDModel.swift */,
@@ -392,7 +389,6 @@
 				2025F0F31D5B219C00561FBF /* MyRandom.swift in Sources */,
 				2025F0FF1D5B21AC00561FBF /* MySKDetailedStatistic.swift in Sources */,
 				2025F0FE1D5B21AC00561FBF /* MySKStatistic.swift in Sources */,
-				2025F1341D5B27C200561FBF /* ChooseGamePanel.swift in Sources */,
 				2025F1321D5B26A200561FBF /* MySKPanel.swift in Sources */,
 				2025F1091D5B226E00561FBF /* GameModel.swift in Sources */,
 				2025F0F41D5B219C00561FBF /* MySKNode.swift in Sources */,
