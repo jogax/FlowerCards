@@ -245,15 +245,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var generatingTipps = false
     var tippArray = [Tipps]()
     var tippIndex = 0
+    
 //    var showTippAtTimer: NSTimer?
     var dummy = 0
     
     var labelFontSize = CGFloat(0)
-    var labelYPosProcent = CGFloat(0)
-    var labelHeight = CGFloat(0)
-    var labelBGSize = CGVector(dx: 0,dy: 0)
-    var labelBGPos = CGVector(dx: 0,dy: 0)
-    var screwMultiplier = CGVector(dx: 0, dy: 0)
     
     var tremblingSprites: [MySKNode] = []
     var random: MyRandom?
@@ -265,8 +261,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var countContainers = 0
     var targetScoreKorr: Int = 0
     var tableCellSize: CGFloat = 0
-    var sizeMultiplier: CGSize = CGSize(width: 1, height: 1)
-    var buttonSizeMultiplier: CGSize = CGSize(width: 1, height: 1)
+    var cardSizeMultiplier: CGSize = CGSize(width: 1, height: 1)
     var containerSize:CGSize = CGSize(width: 0, height: 0)
     var spriteSize:CGSize = CGSize(width: 0, height: 0)
     var minUsedCells = 0
@@ -287,7 +282,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var countCheckCounts = 0
     var freeUndoCounter = 0
     var freeTippCounter = 0
-    var showValueDelta: CGFloat = 0
     
     
     
@@ -310,9 +304,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var gameArray = [[GameArrayPositions]]()
     var containers = [MySKNode]()
     var colorTab = [ColorTabLine]()
-    var containersPosCorr = CGPoint.zero
     var countColorsProContainer = [Int]()
     var labelBackground = SKSpriteNode()
+    let labelRowCorr = CGFloat(0.1)
+    let countLabelRows = CGFloat(4.0)
     
     var levelLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var gameNumberLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
@@ -503,16 +498,20 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             let width:CGFloat = 64.0
             let height: CGFloat = 89.0
-            sizeMultiplier = CGSize(width: GV.deviceConstants.sizeMultiplier, height: GV.deviceConstants.sizeMultiplier * height / width)
-            buttonSizeMultiplier = CGSize(width: GV.deviceConstants.buttonSizeMultiplier, height: GV.deviceConstants.buttonSizeMultiplier * height / width)
+            let sizeMultiplierConstant = CGFloat(0.0024)
+
+            cardSizeMultiplier = CGSize(width: self.size.width * sizeMultiplierConstant,
+                                    height: self.size.width * sizeMultiplierConstant * height / width)
+
             levelIndex = GV.player!.levelID
             
 
             GV.levelsForPlay.setAktLevel(levelIndex)
             
-            buttonSize = (myView.frame.width / 15) * buttonSizeMultiplier.width
-            buttonYPos = myView.frame.height * 0.07
-            buttonXPosNormalized = myView.frame.width / 10
+            let buttonSizeMultiplierConstant = CGFloat(GV.onIpad ? 10 : 8)
+            buttonSize = self.size.width / buttonSizeMultiplierConstant
+            buttonYPos = self.size.height * 0.07
+            buttonXPosNormalized = self.size.width / 10
             self.name = "CardGameScene"
             
             prepareNextGame(true)
@@ -525,7 +524,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func prepareNextGame(_ newGame: Bool) {
         
-        setMyDeviceConstants()
+//        labelFontSize = GV.onIpad ? 20 : 15
+        labelFontSize = self.size.height / 50
+
+
         levelIndex = GV.player!.levelID
         GV.levelsForPlay.setAktLevel(levelIndex)
         specialPrepareFuncFirst()
@@ -598,18 +600,20 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
         
         
-        prepareContainers()
         
         labelBackground.color = UIColor.white
         labelBackground.alpha = 0.7
-        labelBackground.position = CGPoint(x: self.size.width * labelBGPos.dx, y: self.size.height * labelBGPos.dy)
-        labelBackground.size = CGSize(width: self.size.width * labelBGSize.dx, height: self.size.height * labelBGSize.dy)
+        let labelBGHeight = CGFloat(countLabelRows) * labelFontSize + labelRowCorr * 100
+        labelBackground.position = CGPoint(x: self.size.width / 2, y: self.size.height - labelBGHeight / 2 - 2)
+        labelBackground.size = CGSize(width: self.size.width * 0.95, height: labelBGHeight)
         
         let screw1 = SKSpriteNode(imageNamed: "screw.png")
         let screw2 = SKSpriteNode(imageNamed: "screw.png")
         let screw3 = SKSpriteNode(imageNamed: "screw.png")
         let screw4 = SKSpriteNode(imageNamed: "screw.png")
         let screwWidth = self.size.width * 0.025
+        let screwMultiplier = CGVector(dx: 0.48, dy: 0.35)
+
         screw1.position = CGPoint(x: -labelBackground.size.width * screwMultiplier.dx, y: labelBackground.size.height * screwMultiplier.dy)
         screw1.size = CGSize(width: screwWidth, height: screwWidth)
         screw2.position = CGPoint(x: labelBackground.size.width * screwMultiplier.dx, y: labelBackground.size.height * screwMultiplier.dy)
@@ -631,7 +635,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         tippsButton!.name = "tipps"
         addChild(tippsButton!)
         
-        let cardSize = CGSize(width: buttonSize * sizeMultiplier.width * 0.8, height: buttonSize * sizeMultiplier.height * 0.8)
+        let cardSize = CGSize(width: buttonSize, height: buttonSize * cardSizeMultiplier.height / cardSizeMultiplier.width)
         let cardPackageButtonTexture = SKTexture(image: images.getCardPackage())
         cardPackage = MySKButton(texture: cardPackageButtonTexture, frame: CGRect(x: buttonXPosNormalized * 4.0, y: buttonYPos, width: cardSize.width, height: cardSize.height), makePicture: false)
         cardPackage!.name = "cardPackege"
@@ -685,7 +689,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
         
         
-        createLabels(gameNumberLabel, text: GV.language.getText(.tcGameNumber) + " \(gameNumber + 1)", column: 2, row: 1)
+        createLabels(gameNumberLabel, text: GV.language.getText(.tcGameNumber) + " \(gameNumber + 1)", column: 1, row: 1)
         createLabels(levelLabel, text: GV.language.getText(.tcLevel) + ": \(levelIndex + 1)", column: 4, row: 1)
         
         createLabels(whoIsHeaderLabel, text: GV.language.getText(.tcWhoIs), column: 1, row: 2)
@@ -742,6 +746,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         } else {
             maxLevelIndex = 0
         }
+        prepareContainers()
+
 
     }
     
@@ -780,18 +786,22 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 xPos = self.cardPackage!.position.x
             default: break
             }
-            let yPos = CGFloat(self.size.height * labelYPosProcent / 100) + CGFloat((5 - row)) * labelHeight
+            let posAdder = CGFloat(row - 1) * labelFontSize * (1 + labelRowCorr)
+            var yPos = CGFloat(labelBackground.position.y - 120 * labelRowCorr)
+                yPos += labelBackground.size.height / 2
+                yPos -= labelFontSize / 2 + posAdder
             label.position = CGPoint(x: xPos, y: yPos)
             label.fontSize = labelFontSize;
             label.horizontalAlignmentMode = horAlignment
+            label.verticalAlignmentMode = .baseline
         } else {
             label.position = (column == 1 ? self.cardPackage!.position : self.tippsButton!.position)
             label.fontSize = labelFontSize * 1.5
             label.zPosition = 5
             label.horizontalAlignmentMode = .center
+            label.verticalAlignmentMode = .center
         }
         label.fontColor = SKColor.black
-        label.verticalAlignmentMode = .center
         label.color = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
         self.addChild(label)
     }
@@ -829,8 +839,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         countRows = GV.levelsForPlay.aktLevel.countRows
         minUsedCells = GV.levelsForPlay.aktLevel.minProzent * countColumns * countRows / 100
         maxUsedCells = GV.levelsForPlay.aktLevel.maxProzent * countColumns * countRows / 100
-        containerSize = CGSize(width: CGFloat(containerSizeOrig) * sizeMultiplier.width, height: CGFloat(containerSizeOrig) * sizeMultiplier.height)
-        spriteSize = CGSize(width: CGFloat(GV.levelsForPlay.aktLevel.spriteSize) * sizeMultiplier.width, height: CGFloat(GV.levelsForPlay.aktLevel.spriteSize) * sizeMultiplier.height )
+        containerSize = CGSize(width: CGFloat(containerSizeOrig) * cardSizeMultiplier.width, height: CGFloat(containerSizeOrig) * cardSizeMultiplier.height)
+        spriteSize = CGSize(width: CGFloat(GV.levelsForPlay.aktLevel.spriteSize) * cardSizeMultiplier.width, height: CGFloat(GV.levelsForPlay.aktLevel.spriteSize) * cardSizeMultiplier.height )
         scoreFactor = GV.levelsForPlay.aktLevel.scoreFactor
         scoreTime = GV.levelsForPlay.aktLevel.scoreTime
         //gameArrayPositions.removeAll(keepCapacity: false)
@@ -2591,20 +2601,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let xDelta = size.width / CGFloat(countContainers)
         for index in 0..<countContainers {
             let centerX = (size.width / CGFloat(countContainers)) * CGFloat(index) + xDelta / 2
-            let centerY = size.height * containersPosCorr.y
+            var centerY = labelBackground.position.y
+                centerY -= labelBackground.size.height / 2
+                centerY -= containerSize.height // / 2
+//                centerY -= containerSize.height / 4
             containers.append(MySKNode(texture: getTexture(NoColor), type: .containerType, value: NoColor))
             containers[index].name = "\(index)"
             containers[index].position = CGPoint(x: centerX, y: centerY)
             containers[index].size = CGSize(width: containerSize.width, height: containerSize.height)
-//            containers[index].size.width = containerSize.width
-//            containers[index].size.height = containerSize.height
             
             containers[index].colorIndex = NoValue
-//            containers[index].physicsBody = SKPhysicsBody(circleOfRadius: containers[index].size.width / 3) // 1
-//            containers[index].physicsBody?.isDynamic = true // 2
-//            containers[index].physicsBody?.categoryBitMask = PhysicsCategory.Container
-//            containers[index].physicsBody?.contactTestBitMask = PhysicsCategory.MovingSprite
-//            containers[index].physicsBody?.collisionBitMask = PhysicsCategory.None
             countColorsProContainer.append(countCardsProContainer!)
             addChild(containers[index])
             containers[index].reload()
@@ -2871,6 +2877,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func showValue(_ card: MySKNode)->SKLabelNode {
         let score = SKLabelNode()
+        let showValueDelta = self.size.width / 14
         let delta = CGPoint(x: showValueDelta, y: showValueDelta)
         score.position = card.position + delta
         score.text = String(card.countScore)
@@ -3300,7 +3307,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func calculateSpritePosition(_ column: Int, row: Int) -> CGPoint {
-        let cardPositionMultiplier = GV.deviceConstants.cardPositionMultiplier
+        let cardPositionMultiplier = self.size.width / (GV.onIpad ? 1000 : 300) // GV.deviceConstants.cardPositionMultiplier
         var x = spriteTabRect.origin.x
             x -= spriteTabRect.size.width / 2
             x += CGFloat(column) * tableCellSize
@@ -3687,90 +3694,5 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
     }
 
-    
-    func setMyDeviceConstants() {
-        
-        switch GV.deviceConstants.type {
-        case .iPadPro12_9:
-            labelFontSize = 20
-            labelYPosProcent = 92
-            labelHeight = 20
-            showValueDelta = 80
-            screwMultiplier = CGVector(dx: 0.48, dy: 0.35)
-            labelBGPos = CGVector(dx: 0.5, dy: 0.958)
-            labelBGSize = CGVector(dx: 0.95, dy: 0.06)
-            containersPosCorr = CGPoint(x: 0.98, y: 0.85)
-        case .iPadPro9_7:
-            labelFontSize = 17
-            labelYPosProcent = 90
-            labelHeight = 18
-            showValueDelta = 60
-            screwMultiplier = CGVector(dx: 0.48, dy: 0.35)
-            labelBGPos = CGVector(dx: 0.5, dy: 0.945)
-            labelBGSize = CGVector(dx: 0.95, dy: 0.07)
-            containersPosCorr = CGPoint(x: 0.98, y: 0.85)
-        case .iPad2:
-            labelFontSize = 17
-            labelYPosProcent = 90
-            labelHeight = 18
-            showValueDelta = 60
-            screwMultiplier = CGVector(dx: 0.48, dy: 0.35)
-            labelBGPos = CGVector(dx: 0.5, dy: 0.945)
-            labelBGSize = CGVector(dx: 0.95, dy: 0.07)
-            containersPosCorr = CGPoint(x: 0.98, y: 0.85)
-        case .iPadMini:
-            labelFontSize = 17
-            labelYPosProcent = 90
-            labelHeight = 18
-            showValueDelta = 50
-            screwMultiplier = CGVector(dx: 0.48, dy: 0.35)
-            labelBGPos = CGVector(dx: 0.5, dy: 0.945)
-            labelBGSize = CGVector(dx: 0.95, dy: 0.08)
-            containersPosCorr = CGPoint(x: 0.98, y: 0.85)
-        case .iPhone6Plus:
-            labelFontSize = 14
-            labelYPosProcent = 88
-            labelHeight = 15
-            showValueDelta = 50
-            screwMultiplier = CGVector(dx: 0.48, dy: 0.35)
-            labelBGPos = CGVector(dx: 0.5, dy: 0.936)
-            labelBGSize = CGVector(dx: 0.95, dy: 0.083)
-            containersPosCorr = CGPoint(x: 0.98, y: 0.83)
-        case .iPhone6:
-            labelFontSize = 12
-            labelYPosProcent = 88
-            labelHeight = 13
-            showValueDelta = 50
-            screwMultiplier = CGVector(dx: 0.48, dy: 0.35)
-            labelBGPos = CGVector(dx: 0.5, dy: 0.927)
-            labelBGSize = CGVector(dx: 0.95, dy: 0.080)
-            containersPosCorr = CGPoint(x: 0.98, y: 0.82)
-        case .iPhone5:
-            labelFontSize = 10
-            labelYPosProcent = 87
-            labelHeight = 12
-            showValueDelta = 50
-            screwMultiplier = CGVector(dx: 0.48, dy: 0.35)
-            labelBGPos = CGVector(dx: 0.5, dy: 0.925)
-            labelBGSize = CGVector(dx: 0.95, dy: 0.081)
-            containersPosCorr = CGPoint(x: 0.98, y: 0.81)
-        case .iPhone4:
-            labelFontSize = 10
-            labelYPosProcent = 87
-            labelHeight = 10
-            showValueDelta = 50
-            screwMultiplier = CGVector(dx: 0.48, dy: 0.35)
-            labelBGPos = CGVector(dx: 0.5, dy: 0.925)
-            labelBGSize = CGVector(dx: 0.95, dy: 0.081)
-            containersPosCorr = CGPoint(x: 0.98, y: 0.80)
-        default:
-            break
-        }
-        
-    }
-    
-
-
-    
 
 }

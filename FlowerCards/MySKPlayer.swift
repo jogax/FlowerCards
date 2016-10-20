@@ -17,10 +17,9 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
     var nameTable = [PlayerModel]()
     var nameTableIndex = 0
     var parentNode: SKSpriteNode
-    var positionMultiplier = GV.deviceConstants.cardPositionMultiplier * 0.6
     var countLines = 0
     let myColumnWidths: [CGFloat] = [70, 15, 15]  // in %
-    let imageSize = CGSize(width: 30 * GV.deviceConstants.imageSizeMultiplier,height: 30 * GV.deviceConstants.imageSizeMultiplier)
+    let sizeConstant = GV.mainViewController!.view.frame.width / (GV.onIpad ? 22 : 18)
     var deleteImage: UIImage
     var modifyImage: UIImage
     var OKImage: UIImage
@@ -35,6 +34,7 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
         countLines = nameTable.count// + (nameTable[0].name == GV.language.getText(.TCGuest) ? 0 : 1)
         self.parentNode = parent
         self.callBack = callBack
+        let imageSize = CGSize(width: sizeConstant, height: sizeConstant)
         self.deleteImage = DrawImages.getDeleteImage(imageSize)
         self.modifyImage = DrawImages.getModifyImage(imageSize)
         self.OKImage = DrawImages.getOKImage(imageSize)
@@ -297,33 +297,7 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
         return nil
     }
     override func setMyDeviceSpecialConstants() {
-        switch GV.deviceConstants.type {
-        case .iPadPro12_9:
-            fontSize = CGFloat(20)
-            heightOfLabelRow = 40
-        case .iPadPro9_7:
-            fontSize = CGFloat(20)
-            heightOfLabelRow = 40
-        case .iPad2:
-            fontSize = CGFloat(20)
-            heightOfLabelRow = 40
-        case .iPadMini:
-            fontSize = CGFloat(20)
-            heightOfLabelRow = 40
-        case .iPhone6Plus:
-            fontSize = CGFloat(15)
-            heightOfLabelRow = 35
-        case .iPhone6:
-            fontSize = CGFloat(15)
-            heightOfLabelRow = 35
-        case .iPhone5:
-            fontSize = CGFloat(13)
-            heightOfLabelRow = 30
-        case .iPhone4:
-            fontSize = CGFloat(12)
-            heightOfLabelRow = 30
-        default:
-            break
-        }
+        fontSize = GV.onIpad ? 20 : 15
+        heightOfLabelRow = GV.onIpad ? 40 : 35
     }
 }

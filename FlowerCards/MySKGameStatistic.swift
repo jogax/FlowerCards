@@ -106,9 +106,7 @@ class MySKGameStatistic: MySKTable {
         let actLocation = touches.first!.location(in: GV.mainViewController!.view)
         let delta:CGFloat = lastLocation.y - actLocation.y
         lastLocation = actLocation
-        if gamesOfThisLevel.count > 10 {
-            scrollView(delta)
-        }
+        scrollView(delta)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -133,26 +131,7 @@ class MySKGameStatistic: MySKTable {
     }
     
     override func setMyDeviceSpecialConstants() {
-        switch GV.deviceConstants.type {
-        case .iPadPro12_9:
-            fontSize = CGFloat(20)
-        case .iPadPro9_7:
-            fontSize = CGFloat(20)
-        case .iPad2:
-            fontSize = CGFloat(20)
-        case .iPadMini:
-            fontSize = CGFloat(20)
-        case .iPhone6Plus:
-            fontSize = CGFloat(15)
-        case .iPhone6:
-            fontSize = CGFloat(15)
-        case .iPhone5:
-            fontSize = CGFloat(13)
-        case .iPhone4:
-            fontSize = CGFloat(12)
-        default:
-            break
-        }
+        fontSize = GV.onIpad ? 20 : 15
     }
     
     

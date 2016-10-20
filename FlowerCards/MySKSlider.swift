@@ -124,34 +124,8 @@ class MySKSlider: MySKTable, AVAudioPlayerDelegate {
     }
     
     override func setMyDeviceSpecialConstants() {
-        switch GV.deviceConstants.type {
-        case .iPadPro12_9:
-            fontSize = CGFloat(20)
-            heightOfLabelRow = 40
-        case .iPadPro9_7:
-            fontSize = CGFloat(20)
-            heightOfLabelRow = 30
-       case .iPad2:
-            fontSize = CGFloat(20)
-            heightOfLabelRow = 30
-        case .iPadMini:
-            fontSize = CGFloat(20)
-            heightOfLabelRow = 30
-        case .iPhone6Plus:
-            fontSize = CGFloat(15)
-            heightOfLabelRow = 35
-        case .iPhone6:
-            fontSize = CGFloat(15)
-            heightOfLabelRow = 35
-        case .iPhone5:
-            fontSize = CGFloat(13)
-            heightOfLabelRow = 30
-        case .iPhone4:
-            fontSize = CGFloat(12)
-            heightOfLabelRow = 30
-        default:
-            break
-        }
+        fontSize = GV.onIpad ? 20 : 15
+        heightOfLabelRow =  GV.onIpad ? 40 : 35
     }
     
     func playSound(_ fileName: String, volume: Float, loops: Int) {

@@ -36,15 +36,16 @@ class MySKTable: SKSpriteNode {
         }
     }
     var heightOfMyHeadRow = CGFloat(0)
-    var heightOfLabelRow = CGFloat(0)
-    var fontSize = CGFloat(0)
-    var myImageSize = CGFloat(0)
+    var heightOfLabelRow = CGFloat(40)
+    var fontSize = CGFloat(30)
+    var myImageSize = CGFloat(GV.onIpad ? 30 : 20)
     var columns: Int
     var rows: Int
     var sizeOfElement: CGSize
     var touchesBeganAt: Date = Date()
     var touchesBeganAtNode: SKNode?
     var myParent: SKNode
+    var myParentScene: SKScene
     let separator = "-"
     var columnWidths: [CGFloat]
     var columnXPositions = [CGFloat]()
@@ -67,15 +68,15 @@ class MySKTable: SKSpriteNode {
         self.sizeOfElement = CGSize(width: parent.frame.size.width / CGFloat(self.columns), height: heightOfLabelRow)
         self.columnWidths = columnWidths
         self.myParent = parent
+        self.myParentScene = parent.parent!.scene!
         self.headLines = headLines.count == 0 ? [""] : headLines
         
         super.init(texture: SKTexture(), color: UIColor.clear, size: CGSize.zero)
-        setMyDeviceConstants()
         setMyDeviceSpecialConstants()
 
-        let pSize = parent.parent!.scene!.size
-        myStartPosition = CGPoint(x: pSize.width, y: pSize.height / 2)//(pSize.height - size.height) / 2 - 10)
-        myTargetPosition = CGPoint(x: pSize.width / 2, y: pSize.height / 2) //(pSize.height - size.height) / 2 - 10)
+        let pSize = myParentScene.size
+        myStartPosition = CGPoint(x: pSize.width, y: pSize.height / 2)
+        myTargetPosition = CGPoint(x: pSize.width / 2, y: pSize.height / 2)
         let headLineRows = CGFloat(headLines.count)
         
         heightOfMyHeadRow = (headLineRows == 0 ? 1 : headLineRows) * heightOfLabelRow
@@ -87,7 +88,7 @@ class MySKTable: SKSpriteNode {
         myHeight = heightOfLabelRow * CGFloat(rows) + heightOfMyHeadRow
         if myHeight > pSize.height {
             scrolling = true
-            let positionToMoveY = myParent.frame.minY - self.frame.minY
+            let positionToMoveY = (myParentScene.frame.height - myHeight) / 2
             self.myTargetPosition.y += positionToMoveY
         }
         
@@ -394,8 +395,7 @@ class MySKTable: SKSpriteNode {
     }
     
     func checkTouches(_ touches: Set<UITouch>, withEvent event: UIEvent?)->(MyEvents, Int, Int) {
-        var touchLocation = touches.first!.location(in: self)
-        touchLocation.x += self.frame.minX / 2
+        let touchLocation = touches.first!.location(in: self)
         let touchesEndedAtNode = atPoint(touchLocation)
         let row = -Int((touchLocation.y - self.size.height / 2) / heightOfLabelRow)
         var column = -1
@@ -417,53 +417,27 @@ class MySKTable: SKSpriteNode {
     }
     
     func scrollView(_ delta: CGFloat) {
-        self.position.y += delta
+        var adder = delta
+        if scrolling {
+            if delta >= 0 {
+                if self.position.y + delta > myHeight / 2 {
+                    adder = self.position.y - myHeight / 2
+                }
+            } else {
+                if self.position.y + delta + myHeight / 2 < myParentScene.frame.maxY {
+                    adder = myParentScene.frame.maxY - self.position.y - myHeight / 2
+                }
+            }
+            if abs(adder) > 1 {
+                self.position.y += adder
+            }
+        }
     }
     
     func setMyDeviceSpecialConstants() {
         
     }
     
-    func setMyDeviceConstants() {
-        
-        switch GV.deviceConstants.type {
-        case .iPadPro12_9:
-            heightOfLabelRow = CGFloat(40)
-            fontSize = CGFloat(30)
-            myImageSize = CGFloat(30)
-        case .iPadPro9_7:
-            heightOfLabelRow = CGFloat(40)
-            fontSize = CGFloat(30)
-            myImageSize = CGFloat(25)
-        case .iPad2:
-            heightOfLabelRow = CGFloat(40)
-            fontSize = CGFloat(30)
-            myImageSize = CGFloat(25)
-        case .iPadMini:
-            heightOfLabelRow = CGFloat(40)
-            fontSize = CGFloat(30)
-            myImageSize = CGFloat(30)
-        case .iPhone6Plus:
-            heightOfLabelRow = CGFloat(40)
-            fontSize = CGFloat(25)
-            myImageSize = CGFloat(23)
-        case .iPhone6:
-            heightOfLabelRow = CGFloat(40)
-            fontSize = CGFloat(25)
-            myImageSize = CGFloat(20)
-        case .iPhone5:
-            heightOfLabelRow = CGFloat(35)
-            fontSize = CGFloat(28)
-            myImageSize = CGFloat(15)
-        case .iPhone4:
-            heightOfLabelRow = CGFloat(35)
-            fontSize = CGFloat(20)
-            myImageSize = CGFloat(15)
-        default:
-            break
-        }
-        
-    }
     
 
    

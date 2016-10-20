@@ -51,7 +51,7 @@ class MySKPanel: SKSpriteNode {
     var touchesBeganWithNode: SKNode?
     var shadow: SKSpriteNode?
     init(view: UIView, frame: CGRect, type: PanelTypes, parent: SKScene, callBack: @escaping (Bool, Bool, Int, Int)->()) {
-        let size = parent.size / 2 //CGSizeMake(parent.size.width / 2, parent.s)
+        let size = parent.size * 0.75 // / 2 //CGSizeMake(parent.size.width / 2, parent.s)
 //        let texture: SKTexture = SKTexture(imageNamed: "panel")
         let texture: SKTexture = SKTexture()
         
@@ -241,28 +241,7 @@ class MySKPanel: SKSpriteNode {
     }
     
     func setMyDeviceConstants() {
-        
-        switch GV.deviceConstants.type {
-        case .iPadPro12_9:
-            fontSize = CGFloat(30)
-        case .iPadPro9_7:
-            fontSize = CGFloat(26)
-        case .iPad2:
-            fontSize = CGFloat(25)
-        case .iPadMini:
-            fontSize = CGFloat(25)
-        case .iPhone6Plus:
-            fontSize = CGFloat(20)
-        case .iPhone6:
-            fontSize = CGFloat(15)
-        case .iPhone5:
-            fontSize = CGFloat(13)
-        case .iPhone4:
-            fontSize = CGFloat(12)
-        default:
-            break
-        }
-        
+        fontSize = GV.onIpad ? 30 : 20       
     }
     
     func getPanelImage (_ size: CGSize) -> UIImage {

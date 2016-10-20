@@ -11,7 +11,7 @@ let huDictionary: [TextConstants: String] = [
     .tcAktLanguage:      "hu",
     .tcLevel:            "Szint%",
     .tcLevelScore:       "Pontszám%",
-    .tcScoreHead:        "Ponszám",
+    .tcScoreHead:        "Pontszám",
     .tcCardHead:         "Kártyák",
     .tcScore:            "Pontszám",
     .tcTime:             "Idő",
