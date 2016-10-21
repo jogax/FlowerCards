@@ -457,22 +457,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
     var gameArrayChanged = false {
         didSet {
-//            print("in gameArrayChanged: bevor stopCreateTippsInBackground var generatingTipps = ", generatingTipps)
-            stopCreateTippsInBackground = true
-//            print("in gameArrayChanged: after stopCreateTippsInBackground var generatingTipps = ", generatingTipps)
             startCreateTippsInBackground()
-
-//            switch (oldValue, gameArrayChanged, generatingTipps) {
-//                case (false, true, false):
-//                    startCreateTippsInBackground()
-//                case (true, true, true):
-//                    stopCreateTippsInBackground = true
-//                    startCreateTippsInBackground()
-//                case (true, true, false):
-//                    startCreateTippsInBackground()
-//
-//                default: break
-//            }
         }
     }
     
@@ -493,12 +478,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
             print(documentsPath)
             
-            spriteTabRect.origin = CGPoint(x: self.frame.midX, y: self.frame.midY * 0.80)
-            spriteTabRect.size = CGSize(width: self.frame.size.width * 0.80, height: self.frame.size.height * 0.80)
+//            spriteTabRect.origin = CGPoint(x: self.frame.midX, y: self.frame.midY * 0.80)
+//            spriteTabRect.size = CGSize(width: self.frame.size.width * 0.80, height: self.frame.size.height * 0.80)
             
             let width:CGFloat = 64.0
             let height: CGFloat = 89.0
-            let sizeMultiplierConstant = CGFloat(0.0024)
+            let sizeMultiplierConstant = CGFloat(0.0020)
 
             cardSizeMultiplier = CGSize(width: self.size.width * sizeMultiplierConstant,
                                     height: self.size.width * sizeMultiplierConstant * height / width)
@@ -545,26 +530,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         stack = Stack()
         timeCount = 0
         if newGame {
-            gameNumber = -1
-            let allGames = realm.objects(GameModel.self).filter("levelID = %d and played = true", levelIndex) //search all games on this level
-            for game in allGames {
-                if realm.objects(GameModel.self).filter("gameNumber = %d and levelID = %d and playerID = %d and played = true", game.gameNumber, levelIndex, GV.player!.ID).count == 0 {
-                    gameNumber = game.gameNumber  // founded a game not played by actPlayer
-                    createGameRecord(gameNumber)
-                    break
-                }
-            }
-            
-            if gameNumber == -1 {
-                gameNumber = randomGameNumber()
-                if gameNumber == realm.objects(GamePredefinitionModel.self).count {  // all Plays played
-                    // search plays with score = 0
-                }
-                createGameRecord(gameNumber)
-            }
-        } else {
-            createGameRecord(gameNumber)
+            gameNumber = randomGameNumber()
         }
+        createGameRecord(gameNumber)
+
         
         random = MyRandom(gameNumber: gameNumber)
         
@@ -575,31 +544,22 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         //undoCount = 3
         
         // fill gameArray
+
         for _ in 0..<countColumns {
             gameArray.append(Array(repeating: GameArrayPositions(), count: countRows))
         }
         
         // calvulate Sprite Positions
         
-        for column in 0..<countColumns {
-            for row in 0..<countRows {
-                gameArray[column][row].position = calculateSpritePosition(column, row: row)
-            }
-        }
-        
-        for column in 0..<countColumns {
-            for row in 0..<countRows {
-                let columnRow = calculateColumnRowFromPosition(gameArray[column][row].position)
-                if column != columnRow.column || row != columnRow.row {
-//                    print("column:", column, "row:",row, "calculated:", columnRow, column != columnRow.column || row != columnRow.row ? "Error" : "")
-                    dummy = 0
-                }
-            }
-        }
-
-
-        
-        
+//        for column in 0..<countColumns {
+//            for row in 0..<countRows {
+//                let columnRow = calculateColumnRowFromPosition(gameArray[column][row].position)
+//                if column != columnRow.column || row != columnRow.row {
+////                    print("column:", column, "row:",row, "calculated:", columnRow, column != columnRow.column || row != columnRow.row ? "Error" : "")
+//                    dummy = 0
+//                }
+//            }
+//        }
         
         labelBackground.color = UIColor.white
         labelBackground.alpha = 0.7
@@ -640,7 +600,18 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         cardPackage = MySKButton(texture: cardPackageButtonTexture, frame: CGRect(x: buttonXPosNormalized * 4.0, y: buttonYPos, width: cardSize.width, height: cardSize.height), makePicture: false)
         cardPackage!.name = "cardPackege"
         addChild(cardPackage!)
+
+        prepareContainers()
         
+        prepareCardArray()
+
+        for column in 0..<countColumns {
+            for row in 0..<countRows {
+                gameArray[column][row].position = calculateSpritePosition(column, row: row)
+            }
+        }
+        
+
         showCardFromStack = nil
         
         
@@ -746,7 +717,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         } else {
             maxLevelIndex = 0
         }
-        prepareContainers()
+        prepareCards()
 
 
     }
@@ -844,7 +815,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         scoreFactor = GV.levelsForPlay.aktLevel.scoreFactor
         scoreTime = GV.levelsForPlay.aktLevel.scoreTime
         //gameArrayPositions.removeAll(keepCapacity: false)
-        tableCellSize = spriteTabRect.width / CGFloat(countColumns)
         
         for _ in 0..<countContainers {
             var hilfsArray: [GenerateCard] = []
@@ -2529,7 +2499,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             let countGamesOfActLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = yes", GV.player!.ID, levelIndex).count
 
-            if levelIndex < GV.levelsForPlay.levelParam.count - 1 && countGamesOfActLevel > 10 {
+            if levelIndex < GV.levelsForPlay.levelParam.count - 1 && countGamesOfActLevel >= 0 {
                 let complexerAction = UIAlertAction(title: GV.language.getText(TextConstants.tcNextLevel), style: .default,
                     handler: {(paramAction:UIAlertAction!) in
     //                    print("newGame from set Next Level")
@@ -2580,7 +2550,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
     }
     
-    func prepareContainers() {
+    func prepareCards() {
        
         colorTab.removeAll(keepingCapacity: false)
         var spriteName = 10000
@@ -2596,8 +2566,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         createSpriteStack()
         fillEmptySprites()
+    }
 
-        
+    func prepareContainers() {
         let xDelta = size.width / CGFloat(countContainers)
         for index in 0..<countContainers {
             let centerX = (size.width / CGFloat(countContainers)) * CGFloat(index) + xDelta / 2
@@ -2617,7 +2588,40 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     
+    func prepareCardArray() {
+        let maxY = containers[0].frame.minY
+        let minY = cardPackage!.frame.maxY
+        let midY = minY + (maxY - minY) / 2
+        let minX = self.frame.minX
+        let maxX = self.frame.maxX
+        let midX = self.frame.midX
+        
+        spriteTabRect.origin = CGPoint(x: minX, y: minY)
+        spriteTabRect.size = CGSize(width: maxX - minX, height: maxY - minY)
+        
+        tableCellSize = spriteTabRect.width / CGFloat(countColumns)
+
+        
+        
+        
+    }
     
+    func calculateSpritePosition(_ column: Int, row: Int) -> CGPoint {
+        let gapX = (spriteTabRect.maxX - spriteTabRect.minX) / ((2 * CGFloat(countColumns)) + 1)
+        let gapY = (spriteTabRect.maxY - spriteTabRect.minY) / ((2 * CGFloat(countRows)) + 1)
+        
+        var x = spriteTabRect.origin.x
+            x += (2 * CGFloat(column) + 1.5) * gapX
+        var y = spriteTabRect.origin.y
+            y += (2 * CGFloat(row) + 1.5) * gapY
+
+        let point = CGPoint(
+            x: x,
+            y: y
+        )
+        return point
+    }
+
 
 
     func pull(_ createTipps: Bool) {
@@ -3306,22 +3310,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
     }
     
-    func calculateSpritePosition(_ column: Int, row: Int) -> CGPoint {
-        let cardPositionMultiplier = self.size.width / (GV.onIpad ? 1000 : 300) // GV.deviceConstants.cardPositionMultiplier
-        var x = spriteTabRect.origin.x
-            x -= spriteTabRect.size.width / 2
-            x += CGFloat(column) * tableCellSize
-            x += tableCellSize / 2
-        var y = spriteTabRect.origin.y
-            y -= spriteTabRect.size.height / 3.0
-            y += tableCellSize * cardPositionMultiplier / 2
-            y += CGFloat(row) * tableCellSize * cardPositionMultiplier
-        let point = CGPoint(
-            x: x,
-            y: y
-        )
-        return point
-    }
     
     func calculateColumnRowFromPosition(_ position: CGPoint)->ColumnRow {
         var columnRow  = ColumnRow()

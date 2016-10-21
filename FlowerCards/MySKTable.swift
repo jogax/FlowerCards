@@ -400,7 +400,7 @@ class MySKTable: SKSpriteNode {
         let row = -Int((touchLocation.y - self.size.height / 2) / heightOfLabelRow)
         var column = -1
         for index in 0..<columnXPositions.count {
-            if columnXPositions[index] > touchLocation.x  {
+            if columnXPositions[index] > touchLocation.x  + self.frame.minX / 2 {
                 column = index - 1
                 break
             }
