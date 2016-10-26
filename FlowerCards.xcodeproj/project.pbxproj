@@ -48,6 +48,10 @@
 		2025F12F1D5B25C300561FBF /* Mirror2.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F12A1D5B25C300561FBF /* Mirror2.m4a */; };
 		2025F1301D5B25C300561FBF /* Mirror3.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F12B1D5B25C300561FBF /* Mirror3.m4a */; };
 		2025F1321D5B26A200561FBF /* MySKPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1311D5B26A200561FBF /* MySKPanel.swift */; };
+		202A53FD1DBE4B75001152F8 /* News Pro Version EN.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 202A53FC1DBE4B75001152F8 /* News Pro Version EN.rtf */; };
+		202A53FF1DBE4C8E001152F8 /* News Pro Version DE.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 202A53FE1DBE4C8E001152F8 /* News Pro Version DE.rtf */; };
+		202A54011DBE4C9F001152F8 /* News Pro Version HU.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 202A54001DBE4C9F001152F8 /* News Pro Version HU.rtf */; };
+		202A54031DBE4CB1001152F8 /* News Pro Version RU.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 202A54021DBE4CB1001152F8 /* News Pro Version RU.rtf */; };
 		20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20389B541D5F7EB400ADD133 /* Mirror5.m4a */; };
 		20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20720A751D5B55E600389C0C /* Mirror4.m4a */; };
 		20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1051D5B445300963590 /* MyMusic.m4a */; };
@@ -117,6 +121,10 @@
 		2025F12A1D5B25C300561FBF /* Mirror2.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror2.m4a; sourceTree = "<group>"; };
 		2025F12B1D5B25C300561FBF /* Mirror3.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror3.m4a; sourceTree = "<group>"; };
 		2025F1311D5B26A200561FBF /* MySKPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKPanel.swift; sourceTree = "<group>"; };
+		202A53FC1DBE4B75001152F8 /* News Pro Version EN.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "News Pro Version EN.rtf"; sourceTree = "<group>"; };
+		202A53FE1DBE4C8E001152F8 /* News Pro Version DE.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "News Pro Version DE.rtf"; sourceTree = "<group>"; };
+		202A54001DBE4C9F001152F8 /* News Pro Version HU.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "News Pro Version HU.rtf"; sourceTree = "<group>"; };
+		202A54021DBE4CB1001152F8 /* News Pro Version RU.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "News Pro Version RU.rtf"; sourceTree = "<group>"; };
 		20389B541D5F7EB400ADD133 /* Mirror5.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror5.m4a; sourceTree = "<group>"; };
 		20720A751D5B55E600389C0C /* Mirror4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror4.m4a; sourceTree = "<group>"; };
 		20B1F1051D5B445300963590 /* MyMusic.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = MyMusic.m4a; sourceTree = "<group>"; };
@@ -221,10 +229,14 @@
 			isa = PBXGroup;
 			children = (
 				2025F10D1D5B236E00561FBF /* Language.swift */,
-				2025F10E1D5B236E00561FBF /* ru.swift */,
-				2025F10F1D5B236E00561FBF /* de.swift */,
 				2025F1101D5B236E00561FBF /* en.swift */,
+				2025F10F1D5B236E00561FBF /* de.swift */,
 				2025F1111D5B236E00561FBF /* hu.swift */,
+				2025F10E1D5B236E00561FBF /* ru.swift */,
+				202A53FC1DBE4B75001152F8 /* News Pro Version EN.rtf */,
+				202A53FE1DBE4C8E001152F8 /* News Pro Version DE.rtf */,
+				202A54001DBE4C9F001152F8 /* News Pro Version HU.rtf */,
+				202A54021DBE4CB1001152F8 /* News Pro Version RU.rtf */,
 			);
 			name = Language;
 			sourceTree = "<group>";
@@ -318,11 +330,15 @@
 				2025F0CC1D5B18F300561FBF /* LaunchScreen.storyboard in Resources */,
 				2025F12D1D5B25C300561FBF /* Lost.m4a in Resources */,
 				2025F0C71D5B18F300561FBF /* Main.storyboard in Resources */,
+				202A53FD1DBE4B75001152F8 /* News Pro Version EN.rtf in Resources */,
 				20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */,
 				2025F12E1D5B25C300561FBF /* Mirror1.m4a in Resources */,
 				2025F12F1D5B25C300561FBF /* Mirror2.m4a in Resources */,
+				202A54011DBE4C9F001152F8 /* News Pro Version HU.rtf in Resources */,
 				2025F1301D5B25C300561FBF /* Mirror3.m4a in Resources */,
 				20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */,
+				202A53FF1DBE4C8E001152F8 /* News Pro Version DE.rtf in Resources */,
+				202A54031DBE4CB1001152F8 /* News Pro Version RU.rtf in Resources */,
 				20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */,
 				20B1F1101D5B483000963590 /* Winner.m4a in Resources */,
 				2025F12C1D5B25C300561FBF /* MirrorX.m4a in Resources */,

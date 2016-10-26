@@ -43,10 +43,12 @@ class MySKNode: SKSpriteNode {
     var startPosition = CGPoint.zero
     var minValue: Int
     var maxValue: Int
+    var countPackages = 1
     var countScore: Int {
         get {
-            let midValue = Double(minValue + maxValue + 2) / Double(2)
-            return Int(midValue * Double((maxValue - minValue + 1)))
+            return(calculateScore())
+//            let midValue = Double(minValue + maxValue + 2) / Double(2)
+//            return Int(midValue * Double((maxValue - minValue + 1)))
         }
     }
     var mirrored: Int
@@ -78,6 +80,7 @@ class MySKNode: SKSpriteNode {
     var hitLabel = SKLabelNode()
     var maxValueLabel = SKLabelNode()
     var minValueLabel = SKLabelNode()
+    var packageLabel = SKLabelNode()
     var BGPicture = SKSpriteNode()
     var BGPictureAdded = false
     
@@ -173,7 +176,7 @@ class MySKNode: SKSpriteNode {
             }
             let BGPicturePosition = CGPoint(x: self.size.width * BGOffsetMultiplier.x, y: self.size.height * BGOffsetMultiplier.y)
             let bgPictureName = "BGPicture"
-            if minValue != maxValue {
+            if minValue != maxValue  || countPackages > 1 {
                 if !BGPictureAdded {
                     if self.childNode(withName: bgPictureName) == nil {
                         self.addChild(BGPicture)
@@ -222,7 +225,42 @@ class MySKNode: SKSpriteNode {
     func getMirroredScore() -> Int {
         return countScore * mirrored
     }
+    
+    func calculateScore()->Int {
+        var actValue: Int
+        switch countPackages {
+        case 1:
+            let midValue = Double(minValue + maxValue + 2) / Double(2)
+            actValue = Int(midValue * Double((maxValue - minValue + 1)))
+        case 2, 3:
+            var midValue = Double(minValue + LastCardValue + 2) / Double(2)
+            actValue = Int(midValue * Double((LastCardValue - minValue + 1)))
+            midValue = Double(maxValue + 2) / Double(2)
+            actValue += Int(midValue * Double((maxValue + 1)))
+            actValue += 91 * (countPackages - 1)
+        default: actValue = 0
+        }
+        return actValue
+    }
+    
+    func connectWith(otherSprite: MySKNode) {
+        if self.minValue == otherSprite.maxValue + 1 {
+            self.minValue = otherSprite.minValue
+        } else if self.maxValue == otherSprite.minValue - 1 {
+            self.maxValue = otherSprite.maxValue
+        } else if self.minValue == FirstCardValue && otherSprite.maxValue == LastCardValue {
+            self.minValue = otherSprite.minValue
+            countPackages += 1
+        } else if self.maxValue == LastCardValue && otherSprite.minValue == FirstCardValue {
+            self.maxValue = otherSprite.maxValue
+            countPackages += 1
+        } else if self.maxValue == NoColor {  // empty Container
+            self.maxValue = otherSprite.maxValue
+            self.minValue = otherSprite.minValue
+        }
         
+    }
+    
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

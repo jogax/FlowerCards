@@ -263,8 +263,6 @@ struct LevelParam {
     var minProzent: Int
     var maxProzent: Int
     var spriteSize: Int
-    var scoreFactor: Double
-    var scoreTime: Double
     
     init()
     {
@@ -276,8 +274,6 @@ struct LevelParam {
         self.minProzent = 0
         self.maxProzent = 0
         self.spriteSize = 0
-        self.scoreTime = 0
-        self.scoreFactor = 0
     }
     
 }
@@ -502,6 +498,7 @@ struct SavedSprite {
     var size: CGSize = CGSize(width: 0, height: 0)
     var hitCounter: Int = 0
     var countScore: Int = 0 // Score of Game 
+    var countPackages: Int = 0
     var minValue: Int = NoValue
     var maxValue: Int = NoValue
     var BGPictureAdded = false

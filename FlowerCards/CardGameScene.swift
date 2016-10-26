@@ -240,6 +240,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var countPackages = 0
     let nextLevel = true
     let previousLevel = false
+    let maxLevelForiPhone = GV.levelsForPlay.getLastLevelWithColumnCount(maxColumnCount: 7)
+
     var lastUpdateSec = 0
     var lastNextPoint: Founded?
     var generatingTipps = false
@@ -358,6 +360,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var exchangeButton: MySKButton?
     var nextLevelButton: MySKButton?
     var targetScore = 0
+    var maxCardCount = 0
+
     var cardCount = 0 {
         didSet {
             if playerType == .multiPlayer {
@@ -653,7 +657,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         makeLineAroundGameboard(.bottomHorizontal)
         makeLineAroundGameboard(.leftVertical)
         //        self.inFirstGenerateSprites = false
-        cardCount = Int(CGFloat(countContainers * countCardsProContainer!))
+        cardCount = Int(CGFloat(countContainers * countCardsProContainer! * countPackages))
         let cardCountText: String = String(cardStack.count(.mySKNodeType))
         let tippCountText: String = "\(tippArray.count)"
 //        let showScoreText: String = GV.language.getText(.TCGameScore, values: "\(levelScore)")
@@ -682,31 +686,31 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             createLabels(opponentScoreLabel, text: String(opponent.score), column: 4, row: 4)
             createLabels(opponentCardCountLabel, text: String(opponent.cardCount), column: 5, row: 4)
         } else {
-            let gamesWithSameNumber = realm.objects(GameModel.self).filter("gameNumber = %d and levelID = %d and played = true", gameNumber, levelIndex )
-            if gamesWithSameNumber.count == 0 { // this game is played 1st time
+//            let gamesWithSameNumber = realm.objects(GameModel.self).filter("gameNumber = %d and levelID = %d and played = true", gameNumber, levelIndex )
+//            if gamesWithSameNumber.count == 0 { // this game is played 1st time
                 playerType = .singlePlayer
                 opponentTypeLabel.isHidden = true
                 opponentNameLabel.isHidden = true
                 opponentTimeLabel.isHidden = true
                 opponentScoreLabel.isHidden = true
                 opponentCardCountLabel.isHidden = true
-            } else {
-                playerType = .bestPlayer
-                let maxScore = gamesWithSameNumber.max(ofProperty: "playerScore") as Int?
-                let bestPlay = gamesWithSameNumber.filter("playerScore = %d", maxScore!).first!
-                let bestPlayerName = realm.objects(PlayerModel.self).filter("ID = %d", bestPlay.playerID).first!.name
-                let bestTime = bestPlay.time
-                createLabels(opponentTypeLabel, text: GV.language.getText(.tcBestPlayerType), column: 1, row: 4)
-                createLabels(opponentNameLabel, text: bestPlayerName, column: 2, row: 4)
-                createLabels(opponentTimeLabel, text: bestTime.dayHourMinSec, column: 3, row: 4)
-                createLabels(opponentScoreLabel, text: String(maxScore!), column: 4, row: 4)
-                createLabels(opponentCardCountLabel, text: String(0), column: 5, row: 4)
-                opponentTypeLabel.isHidden = false
-                opponentNameLabel.isHidden = false
-                opponentTimeLabel.isHidden = false
-                opponentScoreLabel.isHidden = false
-                opponentCardCountLabel.isHidden = false
-            }
+//            } else {
+//                playerType = .bestPlayer
+//                let maxScore = gamesWithSameNumber.max(ofProperty: "playerScore") as Int?
+//                let bestPlay = gamesWithSameNumber.filter("playerScore = %d", maxScore!).first!
+//                let bestPlayerName = realm.objects(PlayerModel.self).filter("ID = %d", bestPlay.playerID).first!.name
+//                let bestTime = bestPlay.time
+//                createLabels(opponentTypeLabel, text: GV.language.getText(.tcBestPlayerType), column: 1, row: 4)
+//                createLabels(opponentNameLabel, text: bestPlayerName, column: 2, row: 4)
+//                createLabels(opponentTimeLabel, text: bestTime.dayHourMinSec, column: 3, row: 4)
+//                createLabels(opponentScoreLabel, text: String(maxScore!), column: 4, row: 4)
+//                createLabels(opponentCardCountLabel, text: String(0), column: 5, row: 4)
+//                opponentTypeLabel.isHidden = false
+//                opponentNameLabel.isHidden = false
+//                opponentTimeLabel.isHidden = false
+//                opponentScoreLabel.isHidden = false
+//                opponentCardCountLabel.isHidden = false
+//            }
         }
         createLabels(cardCountLabel, text: cardCountText, column: 1, row: 5)
         createLabels(tippCountLabel, text: tippCountText, column: 2, row: 5)
@@ -805,6 +809,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
         countContainers = GV.levelsForPlay.aktLevel.countContainers
         countPackages = GV.levelsForPlay.aktLevel.countPackages
+        maxCardCount = countPackages * countContainers * MaxCardValue
         countCardsProContainer = MaxCardValue //levelsForPlay.aktLevel.countSpritesProContainer
         countColumns = GV.levelsForPlay.aktLevel.countColumns
         countRows = GV.levelsForPlay.aktLevel.countRows
@@ -812,9 +817,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         maxUsedCells = GV.levelsForPlay.aktLevel.maxProzent * countColumns * countRows / 100
         containerSize = CGSize(width: CGFloat(containerSizeOrig) * cardSizeMultiplier.width, height: CGFloat(containerSizeOrig) * cardSizeMultiplier.height)
         spriteSize = CGSize(width: CGFloat(GV.levelsForPlay.aktLevel.spriteSize) * cardSizeMultiplier.width, height: CGFloat(GV.levelsForPlay.aktLevel.spriteSize) * cardSizeMultiplier.height )
-        scoreFactor = GV.levelsForPlay.aktLevel.scoreFactor
-        scoreTime = GV.levelsForPlay.aktLevel.scoreTime
-        //gameArrayPositions.removeAll(keepCapacity: false)
         
         for _ in 0..<countContainers {
             var hilfsArray: [GenerateCard] = []
@@ -1160,9 +1162,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                                 stopCreateTippsInBackground = false
                                 return false
                             }
-                            if (column1 != column2 || row1 != row2) && gameArray[column2][row2].colorIndex == gameArray[column1][row1].colorIndex &&
+                            if (column1 != column2 || row1 != row2) &&
+                                gameArray[column2][row2].colorIndex == gameArray[column1][row1].colorIndex &&
                                 (gameArray[column2][row2].minValue == gameArray[column1][row1].maxValue + 1 ||
-                                    gameArray[column2][row2].maxValue == gameArray[column1][row1].minValue - 1) {
+                                gameArray[column2][row2].maxValue == gameArray[column1][row1].minValue - 1 ||
+                                (gameArray[column2][row2].maxValue == LastCardValue && gameArray[column1][row1].minValue == FirstCardValue) ||
+                                (gameArray[column2][row2].minValue == FirstCardValue && gameArray[column1][row1].maxValue == LastCardValue))   {
                                         let aktPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: column2, row: row2))
                                         if !pairExists(pairsToCheck, aktPair: aktPair) {
                                             pairsToCheck.append(aktPair)
@@ -1171,13 +1176,20 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                             }
                         }
                     }
+                    var thisColorHasContainer = false
+                    for container in containers {
+                        if gameArray[column1][row1].colorIndex == container.colorIndex {
+                            thisColorHasContainer = true
+                        }
+                    }
                     for index in 0..<containers.count {
-                        if containers[index].minValue == NoColor && gameArray[column1][row1].maxValue == LastCardValue {
+                        if !thisColorHasContainer && containers[index].minValue == NoColor && gameArray[column1][row1].maxValue == LastCardValue {
                             let actContainerPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: index, row: NoValue))
                             pairsToCheck.append(actContainerPair)
                         }
                         if containers[index].colorIndex == gameArray[column1][row1].colorIndex &&
-                         containers[index].minValue == gameArray[column1][row1].maxValue + 1 {
+                            (containers[index].minValue == gameArray[column1][row1].maxValue + 1 ||
+                            (containers[index].minValue ==  FirstCardValue && gameArray[column1][row1].maxValue == LastCardValue))   {
                             let actContainerPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: index, row: NoValue))
                             pairsToCheck.append(actContainerPair)
                         }
@@ -1463,6 +1475,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             return color
         }
         
+        var actColorHasContainer = false
+        for container in containers {
+            if container.colorIndex == gameArray[movedFrom.column][movedFrom.row].colorIndex {
+                actColorHasContainer = true
+            }
+        }
+        
         if foundedPoint.foundContainer {
             foundedColorIndex = containers[foundedPoint.column].colorIndex
             foundedMaxValue = containers[foundedPoint.column].maxValue
@@ -1474,8 +1493,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
         if (gameArray[movedFrom.column][movedFrom.row].colorIndex == foundedColorIndex &&
             (gameArray[movedFrom.column][movedFrom.row].maxValue == foundedMinValue - 1 ||
-                gameArray[movedFrom.column][movedFrom.row].minValue == foundedMaxValue + 1)) ||
-            (foundedMinValue == NoColor && gameArray[movedFrom.column][movedFrom.row].maxValue == LastCardValue) {
+                gameArray[movedFrom.column][movedFrom.row].minValue == foundedMaxValue + 1 ||
+                (gameArray[movedFrom.column][movedFrom.row].maxValue == LastCardValue && foundedMinValue == FirstCardValue) ||
+                (gameArray[movedFrom.column][movedFrom.row].minValue == FirstCardValue && foundedMaxValue == LastCardValue))
+            ) ||
+            (foundedMinValue == NoColor && !actColorHasContainer) &&
+                (gameArray[movedFrom.column][movedFrom.row].maxValue == LastCardValue) {
                 color = .green
         }
         return color
@@ -2066,7 +2089,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             container.minValue == NoColor ||
             movingSprite.maxValue + 1 == container.minValue ||
             movingSprite.minValue - 1 == container.maxValue ||
-            (container.maxValue == LastCardValue && container.minValue == FirstCardValue && movingSprite.maxValue == LastCardValue)         )
+            (container.maxValue == LastCardValue && movingSprite.minValue == FirstCardValue && container.countPackages < countPackages) ||
+            (container.minValue == FirstCardValue && movingSprite.maxValue == LastCardValue && container.countPackages < countPackages)
+        )
 
         
         
@@ -2074,14 +2099,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             push(container, status: .hitcounterChanged)
             push(movingSprite, status: .removed)
 //            let adder = movingSprite.maxValue * (movingSprite.maxValue - movingSprite.minValue + 1)
-            if container.maxValue < movingSprite.minValue {
-                container.maxValue = movingSprite.maxValue
-            } else {
-                container.minValue = movingSprite.minValue
-                if container.maxValue == NoColor {
-                    container.maxValue = movingSprite.maxValue
-                }
-            }
+            container.connectWith(otherSprite: movingSprite)
+//            if container.maxValue < movingSprite.minValue {
+//                container.maxValue = movingSprite.maxValue
+//            } else {
+//                container.minValue = movingSprite.minValue
+//                if container.maxValue == NoColor {
+//                    container.maxValue = movingSprite.maxValue
+//                }
+//            }
 
             self.addChild(showCountScore("+\(movingSprite.countScore)", position: movingSprite.position))
             
@@ -2148,22 +2174,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let OK = movingSpriteColorIndex == spriteColorIndex &&
         (
             movingSprite.maxValue + 1 == sprite.minValue ||
-            movingSprite.minValue - 1 == sprite.maxValue //||
+            movingSprite.minValue - 1 == sprite.maxValue ||
+            (movingSprite.maxValue == LastCardValue && sprite.minValue == FirstCardValue) ||
+            (movingSprite.minValue == FirstCardValue && sprite.maxValue == LastCardValue)
         )
         if OK {
             push(sprite, status: .unification)
             push(movingSprite, status: .removed)
             
-            if sprite.maxValue < movingSprite.minValue {
-                sprite.maxValue = movingSprite.maxValue
-            } else {
-                sprite.minValue = movingSprite.minValue
-            }
+            sprite.connectWith(otherSprite: movingSprite)
             
-//            for adder in movingSprite.minValue + 1...movingSprite.maxValue + 1 {
-//                movingSprite.countScore += adder
-//                levelScore += adder
-//            }
             
             self.addChild(showCountScore("+\(movingSprite.countScore)", position: movingSprite.position))
             levelScore += movingSprite.countScore
@@ -2214,7 +2234,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let usedCellCount = checkGameArray()
 //        let containersOK = checkContainers()
         
-        let finishGame = GV.player!.name != "tester" ? cardCount == 0 : cardCount < 52
+        let finishGame = GV.player!.name != "tester" ? cardCount == 0 : cardCount < maxCardCount
         
         if finishGame { // Level completed, start a new game
             
@@ -2409,15 +2429,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         generateSprites(.first)
     }
 
-//    func timeFactor()->Double {
-//        
-//        let y: Double = scoreTime * 60 / (scoreFactor - 1)
-//        let x: Double = y * scoreFactor
-//        
-//        
-//        return Double(x / (y + Double(timeCount)))
-//    }
-
     func getNextPlayArt(_ congratulations: Bool, statistic: StatisticModel...)->UIAlertController {
         let playerName = GV.player!.name + "!"
         let statisticsTxt = ""
@@ -2498,8 +2509,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             }
             
             let countGamesOfActLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = yes", GV.player!.ID, levelIndex).count
+            
 
-            if levelIndex < GV.levelsForPlay.levelParam.count - 1 && countGamesOfActLevel >= 0 {
+            if levelIndex < (GV.onIpad ? GV.levelsForPlay.levelParam.count - 1 : maxLevelForiPhone) && countGamesOfActLevel >= 0 {
                 let complexerAction = UIAlertAction(title: GV.language.getText(TextConstants.tcNextLevel), style: .default,
                     handler: {(paramAction:UIAlertAction!) in
     //                    print("newGame from set Next Level")
@@ -2591,10 +2603,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func prepareCardArray() {
         let maxY = containers[0].frame.minY
         let minY = cardPackage!.frame.maxY
-        let midY = minY + (maxY - minY) / 2
+//        let midY = minY + (maxY - minY) / 2
         let minX = self.frame.minX
         let maxX = self.frame.maxX
-        let midX = self.frame.midX
+//        let midX = self.frame.midX
         
         spriteTabRect.origin = CGPoint(x: minX, y: minY)
         spriteTabRect.size = CGSize(width: maxX - minX, height: maxY - minY)
@@ -2625,7 +2637,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
 
     func pull(_ createTipps: Bool) {
-        let duration = 0.2
+        let duration = 0.5
         var actionMoveArray = [SKAction]()
         if let savedSprite:SavedSprite  = stack.pull() {
             var savedSpriteInCycle = savedSprite
@@ -2639,14 +2651,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 case .addedFromCardStack:
                     if stack.countChangesInStack() > 0 {
                         let spriteName = savedSpriteInCycle.name
-//                        let colorIndex = savedSpriteInCycle.colorIndex
                         let searchName = "\(spriteName)"
                         let cardToPush = self.childNode(withName: searchName)! as! MySKNode
                         cardToPush.zPosition = 20
                         cardStack.push(cardToPush)
                         
-//                        let colorTabLine = ColorTabLine(colorIndex: colorIndex, spriteName: spriteName, spriteValue: savedSpriteInCycle.minValue)
-//                        colorTab.append(colorTabLine)
                         gameArray[savedSpriteInCycle.column][savedSpriteInCycle.row].used = false
                         makeEmptyCard(savedSpriteInCycle.column, row: savedSpriteInCycle.row)
                         let aktPosition = gameArray[savedSpriteInCycle.column][savedSpriteInCycle.row].position
@@ -2703,17 +2712,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     sprite.row = savedSpriteInCycle.row
                     sprite.minValue = savedSpriteInCycle.minValue
                     sprite.maxValue = savedSpriteInCycle.maxValue
+                    sprite.countPackages = savedSpriteInCycle.countPackages
                     sprite.BGPictureAdded = savedSpriteInCycle.BGPictureAdded
                     sprite.name = savedSpriteInCycle.name
                     levelScore = savedSpriteInCycle.countScore
  
                     updateGameArrayCell(sprite)
-//                    gameArray[sprite.column][sprite.row].colorIndex = sprite.colorIndex
-//                    gameArray[sprite.column][sprite.row].minValue = sprite.minValue
-//                    gameArray[sprite.column][sprite.row].maxValue = sprite.maxValue
-                    
-//                    gameArray[sprite.column][sprite.row].used = true
-//                    addPhysicsBody(sprite)
                     self.addChild(sprite)
                     updateSpriteCount(1)
                     sprite.reload()
@@ -2723,6 +2727,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     sprite.size = savedSpriteInCycle.size
                     sprite.minValue = savedSpriteInCycle.minValue
                     sprite.maxValue = savedSpriteInCycle.maxValue
+                    sprite.countPackages = savedSpriteInCycle.countPackages
                     sprite.BGPictureAdded = savedSpriteInCycle.BGPictureAdded
                     updateGameArrayCell(sprite)
                     //sprite.hitLabel.text = "\(sprite.hitCounter)"
@@ -2733,6 +2738,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     let container = containers[findIndex(savedSpriteInCycle.colorIndex)]
                     container.minValue = savedSpriteInCycle.minValue
                     container.maxValue = savedSpriteInCycle.maxValue
+                    container.countPackages = savedSpriteInCycle.countPackages
                     container.BGPictureAdded = savedSpriteInCycle.BGPictureAdded
                     container.reload()
                     showScore()
@@ -2741,6 +2747,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     let container = containers[findIndex(savedSpriteInCycle.colorIndex)]
                     container.minValue = savedSpriteInCycle.minValue
                     container.maxValue = savedSpriteInCycle.maxValue
+                    container.countPackages = savedSpriteInCycle.countPackages
                     container.BGPictureAdded = savedSpriteInCycle.BGPictureAdded
                     container.colorIndex = NoColor
                     container.reload()
@@ -2751,20 +2758,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     sprite.startPosition = savedSpriteInCycle.startPosition
                     sprite.minValue = savedSpriteInCycle.minValue
                     sprite.maxValue = savedSpriteInCycle.maxValue
+                    sprite.countPackages = savedSpriteInCycle.countPackages
 
                     updateGameArrayCell(sprite)
-//                    gameArray[sprite.column][sprite.row].colorIndex = sprite.colorIndex
-//                    gameArray[sprite.column][sprite.row].minValue = sprite.minValue
-//                    gameArray[sprite.column][sprite.row].maxValue = sprite.maxValue
-//                    
                     sprite.BGPictureAdded = savedSpriteInCycle.BGPictureAdded
                     actionMoveArray.append(SKAction.move(to: savedSpriteInCycle.endPosition, duration: duration))
                     actionMoveArray.append(SKAction.run({
-                    self.removeNodesWithName("\(self.emptySpriteTxt)-\(sprite.column)-\(sprite.row)")
-//                        if self.childNodeWithName("\(self.emptySpriteTxt)-\(sprite.column)-\(sprite.row)") != nil {
-//                            self.childNodeWithName("\(self.emptySpriteTxt)-\(sprite.column)-\(sprite.row)")!.removeFromParent()
-//                        }
-                    }))
+                            self.removeNodesWithName("\(self.emptySpriteTxt)-\(sprite.column)-\(sprite.row)")
+                        })
+                    )
                     sprite.run(SKAction.sequence(actionMoveArray))
                     sprite.reload()
                     
@@ -2881,7 +2883,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func showValue(_ card: MySKNode)->SKLabelNode {
         let score = SKLabelNode()
-        let showValueDelta = self.size.width / 14
+        let showValueDelta = card.size.width * 0.7
         let delta = CGPoint(x: showValueDelta, y: showValueDelta)
         score.position = card.position + delta
         score.text = String(card.countScore)
@@ -2957,7 +2959,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         if lastPair.color == .none || lastPair.color == .red {
                             lastPair.setValue(.green, pair: actFromToColumnRow, founded: foundedPoint!, startTime: Date(), points: myPoints)
                         } else if lastPair.color == .green && lastPair.pair ==  actFromToColumnRow && lastPair.points.count == myPoints.count {
-                            // nothing to do hier - update sets to fixed after 3.0 sec
+                            lastPair.points = myPoints
                         } else if lastPair.points.count <= myPoints.count { // other longer green pair found
                             lastPair.setValue(.green, pair: actFromToColumnRow, founded: foundedPoint!, startTime: Date(), points: myPoints)
                         } else { // other green pair found
@@ -3066,7 +3068,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 actFromToColumnRow.toColumnRow.row = foundedPoint!.row
                 
                 var color = calculateLineColor(foundedPoint!, movedFrom: movedFrom)
-                
                 
                 if lastPair.fixed {
                     actFromToColumnRow.toColumnRow.column = lastPair.pair.toColumnRow.column
@@ -3383,6 +3384,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         savedSprite.countScore = levelScore
         savedSprite.minValue = sprite.minValue
         savedSprite.maxValue = sprite.maxValue
+        savedSprite.countPackages = sprite.countPackages
         savedSprite.column = sprite.column
         savedSprite.row = sprite.row
         stack.push(savedSprite)
