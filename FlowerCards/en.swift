@@ -51,7 +51,7 @@ let enDictionary: [TextConstants: String] = [
     .tcStandardGame:     "Game with Flowers",
     .tcCardGame:         "Game with Cards",
     .tcPreviousLevel:    "Previous Level",
-    .tcNextLevel:        "next level",
+    .tcNextLevel:        "Next level",
     .tcNewGame:          "New Game",
     .tcGameAgain:        "Restart Game",
     .tcChooseGame:       "Choose Please:",

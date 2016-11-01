@@ -126,7 +126,7 @@ class MySKNode: SKSpriteNode {
             hitLabel.text = "\(hitCounter)"
             
             //print(minValue, text)
-            setLabelText(minValueLabel, value: minValue)
+            setLabelText(minValueLabel, value: minValue, dotCount: countPackages == 1 ? 0 : countPackages - 1)
             minValueLabel.zPosition = self.zPosition + 1
             
             
@@ -163,8 +163,8 @@ class MySKNode: SKSpriteNode {
     
     func reload() {
         if isCard {
-            setLabelText(minValueLabel, value: minValue)
-            setLabelText(maxValueLabel, value: maxValue)
+            setLabelText(minValueLabel, value: minValue, dotCount: countPackages == 1 ? 0 : countPackages - 1)
+            setLabelText(maxValueLabel, value: maxValue, dotCount: countPackages == 1 ? 0 : countPackages)
             if minValue != NoColor {
                 self.alpha = 1.0
             } else {
@@ -215,11 +215,12 @@ class MySKNode: SKSpriteNode {
 
     }
 
-    func setLabelText(_ label: SKLabelNode, value: Int) {
+    func setLabelText(_ label: SKLabelNode, value: Int, dotCount: Int) {
         guard let text = cardLib[minValue == NoColor ? NoColor : value % MaxCardValue] else {
             return
         }
-        label.text = "\(value == 10 ? " " : "")\(text)"
+        let starString = " " + String(repeating: "*", count: dotCount)
+        label.text = "\(value == 10 ? " " : "")\(text + starString)"
     }
     
     func getMirroredScore() -> Int {
@@ -237,13 +238,16 @@ class MySKNode: SKSpriteNode {
             actValue = Int(midValue * Double((LastCardValue - minValue + 1)))
             midValue = Double(maxValue + 2) / Double(2)
             actValue += Int(midValue * Double((maxValue + 1)))
-            actValue += 91 * (countPackages - 1)
+            actValue += countPackages < 3 ? 0 : 91 * (countPackages - 2)
         default: actValue = 0
         }
         return actValue
     }
     
     func connectWith(otherSprite: MySKNode) {
+        if otherSprite.countPackages > 1 {
+            self.countPackages += otherSprite.countPackages - 1
+        }
         if self.minValue == otherSprite.maxValue + 1 {
             self.minValue = otherSprite.minValue
         } else if self.maxValue == otherSprite.minValue - 1 {
@@ -258,7 +262,6 @@ class MySKNode: SKSpriteNode {
             self.maxValue = otherSprite.maxValue
             self.minValue = otherSprite.minValue
         }
-        
     }
     
     

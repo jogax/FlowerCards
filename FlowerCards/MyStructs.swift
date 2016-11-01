@@ -255,6 +255,9 @@ struct DeviceConstants {
 */
 struct LevelParam {
     
+    enum ShowHelpLine: Int {
+        case green = 0, cyan, hidden
+    }
     var countContainers: Int
     var countPackages: Int
     var countSpritesProContainer: Int
