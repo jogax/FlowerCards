@@ -48,12 +48,14 @@
 		2025F12F1D5B25C300561FBF /* Mirror2.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F12A1D5B25C300561FBF /* Mirror2.m4a */; };
 		2025F1301D5B25C300561FBF /* Mirror3.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F12B1D5B25C300561FBF /* Mirror3.m4a */; };
 		2025F1321D5B26A200561FBF /* MySKPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1311D5B26A200561FBF /* MySKPanel.swift */; };
+		2029FC621DD76A81006473EE /* LevelModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2029FC611DD76A81006473EE /* LevelModel.swift */; };
 		202A53FD1DBE4B75001152F8 /* News Pro Version EN.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 202A53FC1DBE4B75001152F8 /* News Pro Version EN.rtf */; };
 		202A53FF1DBE4C8E001152F8 /* News Pro Version DE.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 202A53FE1DBE4C8E001152F8 /* News Pro Version DE.rtf */; };
 		202A54011DBE4C9F001152F8 /* News Pro Version HU.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 202A54001DBE4C9F001152F8 /* News Pro Version HU.rtf */; };
 		202A54031DBE4CB1001152F8 /* News Pro Version RU.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 202A54021DBE4CB1001152F8 /* News Pro Version RU.rtf */; };
 		20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20389B541D5F7EB400ADD133 /* Mirror5.m4a */; };
 		20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20720A751D5B55E600389C0C /* Mirror4.m4a */; };
+		2087A2EB1DCA3D120085D711 /* ChooseLevelAndOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2087A2EA1DCA3D120085D711 /* ChooseLevelAndOptions.swift */; };
 		20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1051D5B445300963590 /* MyMusic.m4a */; };
 		20B1F10A1D5B454700963590 /* OK.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1091D5B454700963590 /* OK.m4a */; };
 		20B1F10C1D5B458E00963590 /* Container.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F10B1D5B458E00963590 /* Container.m4a */; };
@@ -121,12 +123,14 @@
 		2025F12A1D5B25C300561FBF /* Mirror2.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror2.m4a; sourceTree = "<group>"; };
 		2025F12B1D5B25C300561FBF /* Mirror3.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror3.m4a; sourceTree = "<group>"; };
 		2025F1311D5B26A200561FBF /* MySKPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKPanel.swift; sourceTree = "<group>"; };
+		2029FC611DD76A81006473EE /* LevelModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelModel.swift; sourceTree = "<group>"; };
 		202A53FC1DBE4B75001152F8 /* News Pro Version EN.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "News Pro Version EN.rtf"; sourceTree = "<group>"; };
 		202A53FE1DBE4C8E001152F8 /* News Pro Version DE.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "News Pro Version DE.rtf"; sourceTree = "<group>"; };
 		202A54001DBE4C9F001152F8 /* News Pro Version HU.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "News Pro Version HU.rtf"; sourceTree = "<group>"; };
 		202A54021DBE4CB1001152F8 /* News Pro Version RU.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "News Pro Version RU.rtf"; sourceTree = "<group>"; };
 		20389B541D5F7EB400ADD133 /* Mirror5.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror5.m4a; sourceTree = "<group>"; };
 		20720A751D5B55E600389C0C /* Mirror4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror4.m4a; sourceTree = "<group>"; };
+		2087A2EA1DCA3D120085D711 /* ChooseLevelAndOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseLevelAndOptions.swift; sourceTree = "<group>"; };
 		20B1F1051D5B445300963590 /* MyMusic.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = MyMusic.m4a; sourceTree = "<group>"; };
 		20B1F1091D5B454700963590 /* OK.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = OK.m4a; sourceTree = "<group>"; };
 		20B1F10B1D5B458E00963590 /* Container.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Container.m4a; sourceTree = "<group>"; };
@@ -169,14 +173,18 @@
 			isa = PBXGroup;
 			children = (
 				2025F1011D5B226E00561FBF /* PlayerModel.swift */,
-				2025F1021D5B226E00561FBF /* GamePredefinitionModel.swift */,
-				2025F1031D5B226E00561FBF /* GamePredefinitions.swift */,
+				2029FC611DD76A81006473EE /* LevelModel.swift */,
 				2025F1041D5B226E00561FBF /* GameModel.swift */,
+				2025F1021D5B226E00561FBF /* GamePredefinitionModel.swift */,
+				2025F1211D5B246E00561FBF /* RecordIDModel.swift */,
+				2025F1171D5B23BB00561FBF /* StatisticModel.swift */,
+				2025F1031D5B226E00561FBF /* GamePredefinitions.swift */,
 				2025F1231D5B253900561FBF /* CardGameScene.swift */,
 				2025F1051D5B226E00561FBF /* PeerToPeerServiceManager.swift */,
 				2025F0F51D5B21AC00561FBF /* MyStructs.swift */,
 				2025F0F61D5B21AC00561FBF /* MySKPlayer.swift */,
 				2025F0F71D5B21AC00561FBF /* MySKTable.swift */,
+				2087A2EA1DCA3D120085D711 /* ChooseLevelAndOptions.swift */,
 				2025F0F81D5B21AC00561FBF /* MySKStatistic.swift */,
 				2025F0F91D5B21AC00561FBF /* MySKDetailedStatistic.swift */,
 				2025F0FA1D5B21AC00561FBF /* MySKGameStatistic.swift */,
@@ -186,15 +194,13 @@
 				2025F0EE1D5B219C00561FBF /* MyRandom.swift */,
 				2025F0EF1D5B219C00561FBF /* MySKNode.swift */,
 				2025F0BD1D5B18F300561FBF /* AppDelegate.swift */,
+				2025F0D31D5B1A1E00561FBF /* GameViewController.swift */,
 				2025F1311D5B26A200561FBF /* MySKPanel.swift */,
 				2025F1251D5B256A00561FBF /* JGXLine.swift */,
-				2025F1211D5B246E00561FBF /* RecordIDModel.swift */,
 				2025F11D1D5B23F600561FBF /* DrawImages.swift */,
 				2025F11B1D5B23C500561FBF /* sprites.atlas */,
-				2025F1171D5B23BB00561FBF /* StatisticModel.swift */,
 				2025F1181D5B23BB00561FBF /* Stack.swift */,
 				2025F10B1D5B231200561FBF /* LevelsForPlayWithCards.swift */,
-				2025F0D31D5B1A1E00561FBF /* GameViewController.swift */,
 				2025F0D41D5B1A1E00561FBF /* Extensions.swift */,
 				2025F0C51D5B18F300561FBF /* Main.storyboard */,
 				2025F0C81D5B18F300561FBF /* Assets.xcassets */,
@@ -288,7 +294,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0800;
+				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = "Jozsef Romhanyi";
 				TargetAttributes = {
 					2025F0B91D5B18F300561FBF = {
@@ -408,12 +414,14 @@
 				2025F1321D5B26A200561FBF /* MySKPanel.swift in Sources */,
 				2025F1091D5B226E00561FBF /* GameModel.swift in Sources */,
 				2025F0F41D5B219C00561FBF /* MySKNode.swift in Sources */,
+				2029FC621DD76A81006473EE /* LevelModel.swift in Sources */,
 				2025F0F21D5B219C00561FBF /* MySKSlider.swift in Sources */,
 				2025F1191D5B23BB00561FBF /* StatisticModel.swift in Sources */,
 				2025F10A1D5B226E00561FBF /* PeerToPeerServiceManager.swift in Sources */,
 				2025F0FB1D5B21AC00561FBF /* MyStructs.swift in Sources */,
 				2025F11E1D5B23F600561FBF /* DrawImages.swift in Sources */,
 				2025F1131D5B236E00561FBF /* ru.swift in Sources */,
+				2087A2EB1DCA3D120085D711 /* ChooseLevelAndOptions.swift in Sources */,
 				2025F1001D5B21AC00561FBF /* MySKGameStatistic.swift in Sources */,
 				2025F0F11D5B219C00561FBF /* MySKLanguages.swift in Sources */,
 				2025F1071D5B226E00561FBF /* GamePredefinitionModel.swift in Sources */,
@@ -487,6 +495,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					"REALM_V1=1",
 					"DEBUG=1",
 					"$(inherited)",
 				);
@@ -499,7 +508,9 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_SWIFT_FLAGS = "";
 				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = REALM_V0;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				"Texture Atlas Maximum Size" = 4096x4096;
@@ -543,6 +554,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = REALM_V0;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				"Texture Atlas Maximum Size" = 4096x4096;

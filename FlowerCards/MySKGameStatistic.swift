@@ -53,7 +53,7 @@ class MySKGameStatistic: MySKTable {
                                     MultiVar(string: GV.language.getText(.tcVictory)),
                                     MultiVar(string: GV.language.getText(.tcStart)),
                                     ]
-        showRowOfTable(elements, row: 0, selected: true)
+        showRowOfTable(elements: elements, row: 0, selected: true)
         var row = 1
         for game in gamesOfThisLevel {
             var gameArt = GV.language.getText(.tcGame) // simple Game
@@ -74,10 +74,10 @@ class MySKGameStatistic: MySKTable {
                                         MultiVar(string: opponent),
                                         MultiVar(string: score),
                                         MultiVar(string: game.time.dayHourMinSec),
-                                        MultiVar(image: victory),
-                                        MultiVar(image: startImage),
+                                        MultiVar(texture: SKTexture(image: victory)),
+                                        MultiVar(texture: SKTexture(image: startImage)),
                                         ]
-            showRowOfTable(elements, row: row, selected: true)
+            showRowOfTable(elements: elements, row: row, selected: true)
             gameNumbers[row] = game.gameNumber
             row += 1
         }
@@ -110,7 +110,7 @@ class MySKGameStatistic: MySKTable {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let (_, row, column) = checkTouches(touches, withEvent: event)
+        let (_, row, column, _) = checkTouches(touches, withEvent: event)
         switch (row, column) {
         case (0, 0):
             let fadeInAction = SKAction.fadeIn(withDuration: 0.5)

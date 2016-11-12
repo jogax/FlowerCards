@@ -24,6 +24,7 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
     var skView: SKView?
     var cardsScene: CardGameScene?
 //    var flowersScene: FlowerGameScene?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         GV.mainViewController = self
@@ -156,6 +157,7 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
             scene.scaleMode = .resizeFill
             skView!.presentScene(scene)
             cardsScene = scene
+            GV.mainScene = scene // global for the whole app
     }
     func printFonts() {
         let fontFamilyNames = UIFont.familyNames

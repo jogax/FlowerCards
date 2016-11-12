@@ -65,7 +65,7 @@ class MySKStatistic: MySKTable {
                                     MultiVar(string: GV.language.getText(.tcCountVictorys)),
                                     MultiVar(string: GV.language.getText(.tcAllTime)),
                                    ]
-        showRowOfTable(elements, row: 0, selected: true)
+        showRowOfTable(elements: elements, row: 0, selected: true)
         for row in 0..<nameTable.count {
             if nameTable[row].name != GV.language.getText(.tcAnonym) || row == 0 {
                 let statisticTable = realm.objects(StatisticModel.self).filter("playerID = %d", nameTable[row].ID)
@@ -86,9 +86,9 @@ class MySKStatistic: MySKTable {
                                             MultiVar(string: "\(countMultiPlays)"),
                                             MultiVar(string: "\(countVictorys) / \(countDefeats)"),
                                             MultiVar(string: allTime.dayHourMinSec),
-                                            MultiVar(image: DrawImages.getGoForwardImage(CGSize(width: 20, height: 20)))
+                                            MultiVar(texture: SKTexture(image: DrawImages.getGoForwardImage(CGSize(width: 20, height: 20))))
                 ]
-                showRowOfTable(elements, row: row + 1, selected: true)
+                showRowOfTable(elements: elements, row: row + 1, selected: true)
             }
         }
     }
@@ -113,7 +113,7 @@ class MySKStatistic: MySKTable {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let (_, row, column) = checkTouches(touches, withEvent: event)
+        let (_, row, column, _) = checkTouches(touches, withEvent: event)
         switch (row, column) {
         case (0, 0):
             let fadeInAction = SKAction.fadeIn(withDuration: 0.5)

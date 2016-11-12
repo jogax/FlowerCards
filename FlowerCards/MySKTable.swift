@@ -17,7 +17,7 @@ class MySKTable: SKSpriteNode {
     }
     
     enum VarType: Int {
-        case string = 0, image
+        case string = 0, texture, textures
     }
     enum Orientation: Int {
         case left = 0, center, right
@@ -25,19 +25,26 @@ class MySKTable: SKSpriteNode {
     struct MultiVar {
         var varType: VarType
         var stringVar: String?
-        var imageVar: UIImage?
+        var textureVar: SKTexture?
+        var textureArray: [SKTexture] = []
+        
         init(string:String) {
             stringVar = string
             varType = .string
         }
-        init(image: UIImage) {
-            imageVar = image
-            varType = .image
+        init(texture: SKTexture) {
+            textureVar = texture
+            varType = .texture
         }
+        init(textures: [SKTexture]) {
+            self.textureArray.append(contentsOf: textures)
+            varType = .textures
+        }
+        
     }
     var heightOfMyHeadRow = CGFloat(0)
-    var heightOfLabelRow = CGFloat(40)
-    var fontSize = CGFloat(30)
+    var heightOfLabelRow = CGFloat(0)
+    var fontSize = CGFloat(20)
     var myImageSize = CGFloat(GV.onIpad ? 30 : 20)
     var columns: Int
     var rows: Int
@@ -47,6 +54,7 @@ class MySKTable: SKSpriteNode {
     var myParent: SKNode
     var myParentScene: SKScene
     let separator = "-"
+    let elementSeparator = ":"
     var columnWidths: [CGFloat]
     var columnXPositions = [CGFloat]()
     var myHeight: CGFloat = 0
@@ -68,7 +76,7 @@ class MySKTable: SKSpriteNode {
         self.sizeOfElement = CGSize(width: parent.frame.size.width / CGFloat(self.columns), height: heightOfLabelRow)
         self.columnWidths = columnWidths
         self.myParent = parent
-        self.myParentScene = parent.parent!.scene!
+        self.myParentScene = (GV.mainScene!.scene!) //parent.parent!.scene!
         self.headLines = headLines.count == 0 ? [""] : headLines
         
         super.init(texture: SKTexture(), color: UIColor.clear, size: CGSize.zero)
@@ -79,11 +87,13 @@ class MySKTable: SKSpriteNode {
         myTargetPosition = CGPoint(x: pSize.width / 2, y: pSize.height / 2)
         let headLineRows = CGFloat(headLines.count)
         
-        heightOfMyHeadRow = (headLineRows == 0 ? 1 : headLineRows) * heightOfLabelRow
+        self.heightOfLabelRow = GV.mainScene!.frame.height / 20
+        self.heightOfMyHeadRow = (headLineRows == 0 ? 1 : headLineRows) * heightOfLabelRow
 
         self.position = myStartPosition
         
         self.zPosition = parent.zPosition + 200
+        self.fontSize = GV.mainScene!.frame.width / 30
 
         myHeight = heightOfLabelRow * CGFloat(rows) + heightOfMyHeadRow
         if myHeight > pSize.height {
@@ -125,13 +135,15 @@ class MySKTable: SKSpriteNode {
         self.headLines.append(contentsOf: headLines)
     }
     
-    func showRowOfTable(_ elements: [MultiVar], row: Int, selected: Bool) {
+    func showRowOfTable(elements: [MultiVar], row: Int, selected: Bool) {
         for column in 0..<elements.count {
             switch elements[column].varType {
             case .string:
                 showElementOfTable(elements[column].stringVar!, column: column, row: row, selected: selected)
-            case .image:
-                showImageInTable(elements[column].imageVar!, column: column, row: row, selected: selected)
+            case .texture:
+                showTextureInTable(texture: elements[column].textureVar!, column: column, row: row, selected: selected)
+            case .textures:
+                showTexturesInTable(textures: elements[column].textureArray, column: column, row: row, selected: selected)
             }
         }
     }
@@ -159,6 +171,7 @@ class MySKTable: SKSpriteNode {
         }
         label.text = element
         label.fontSize = fontSize
+        label.verticalAlignmentMode = .baseline
         
         // when label too long, make it shorter
         
@@ -204,6 +217,7 @@ class MySKTable: SKSpriteNode {
             label.name = name
             label.zPosition = self.zPosition + 100
             label.fontSize = fontSize
+            label.verticalAlignmentMode = .baseline
             var correctur = CGFloat(0)
             switch  headLines.count {
             case 1:
@@ -224,7 +238,7 @@ class MySKTable: SKSpriteNode {
     }
 
     
-    func showImageInTable(_ image: UIImage, column: Int, row: Int, selected: Bool) {
+    func showTextureInTable(texture: SKTexture, column: Int, row: Int, selected: Bool) {
         let name = "\(column)\(separator)\(row)"
         
         for index in 0..<self.children.count {
@@ -239,7 +253,7 @@ class MySKTable: SKSpriteNode {
         }
         
         let shape = SKSpriteNode()
-        shape.texture = SKTexture(image: image)
+        shape.texture = texture
         shape.name = name
         
         var xPos: CGFloat = 0
@@ -253,17 +267,66 @@ class MySKTable: SKSpriteNode {
 //        label.position = CGPointMake(-size.width * 0.45 + CGFloat(column) * sizeOfElement.width,  verticalPosition - CGFloat(row) * sizeOfElement.height)
         shape.position = CGPoint(x: xPos, y: verticalPosition - CGFloat(row) * heightOfLabelRow)
         shape.alpha = 1.0
-        shape.size = image.size
+        shape.size = texture.size()
         shape.zPosition = self.zPosition + 1000
         self.addChild(shape)
         
     }
-    
+
+    func showTexturesInTable(textures: [SKTexture], column: Int, row: Int, selected: Bool) {
+        let name = "\(column)\(separator)\(row)"
+        
+        for child in self.children {
+            if (child.name!.hasPrefix(name)) {
+                child.removeFromParent()
+            }
+        }
+        
+        if !selected {
+            return
+        }
+        
+        var xPos: CGFloat = 0
+        for index in 0..<column {
+            xPos += size.width * columnWidths[index] / 100
+        }
+        
+        let myWidth = size.width * columnWidths[column] / 100
+        
+        
+        let imagePlaceSize = myWidth / CGFloat(textures.count)
+        let imageCenter = imagePlaceSize / 2
+        
+        var imageSize = imagePlaceSize * 0.9
+        if imageSize > heightOfLabelRow {
+            imageSize = heightOfLabelRow * 0.9
+        }
+        var imagePosition = xPos + imageCenter - self.size.width / 2
+        
+        for index in 0..<textures.count {
+            let shape = SKSpriteNode()
+            shape.texture = textures[index]
+            shape.name = name + elementSeparator + String(index) + elementSeparator
+            
+            
+            let verticalPosition = (self.size.height - heightOfLabelRow) / 2 - heightOfMyHeadRow
+            //        label.position = CGPointMake(-size.width * 0.45 + CGFloat(column) * sizeOfElement.width,  verticalPosition - CGFloat(row) * sizeOfElement.height)
+            shape.position = CGPoint(x: imagePosition, y: verticalPosition - CGFloat(row) * heightOfLabelRow)
+            shape.alpha = 1.0
+            shape.size = CGSize(width: imageSize, height: imageSize)
+            shape.zPosition = self.zPosition + 1000
+            self.addChild(shape)
+            imagePosition += imagePlaceSize
+        }
+        
+    }
+
     func  showMe(_ runAfter:@escaping ()->()) {
         let actionMove = SKAction.move(to: myTargetPosition, duration: 0.3)
         let alphaAction = SKAction.fadeOut(withDuration: 0.5)
         let runAfterAction = SKAction.run({runAfter()})
-        myParent.parent!.addChild(self)
+        //myParent.parent!.addChild(self)
+        GV.mainScene?.addChild(self)
         
         myParent.run(alphaAction)
         self.run(SKAction.sequence([actionMove, runAfterAction]))
@@ -394,24 +457,34 @@ class MySKTable: SKSpriteNode {
         return UIImage()
     }
     
-    func checkTouches(_ touches: Set<UITouch>, withEvent event: UIEvent?)->(MyEvents, Int, Int) {
+    func checkTouches(_ touches: Set<UITouch>, withEvent event: UIEvent?)->(MyEvents, Int, Int, Int) {
         let touchLocation = touches.first!.location(in: self)
         let touchesEndedAtNode = atPoint(touchLocation)
         let row = -Int((touchLocation.y - self.size.height / 2) / heightOfLabelRow)
-        var column = -1
+        var column = NoValue
+        var element = NoValue
+        var char: Character
         for index in 0..<columnXPositions.count {
             if columnXPositions[index] > touchLocation.x  + self.frame.minX / 2 {
                 column = index - 1
                 break
             }
         }
-        if column == -1 {
+        if column == NoValue {
             column = columnXPositions.count - 1
         }
-        if touchesEndedAtNode is SKSpriteNode && (touchesEndedAtNode as! SKSpriteNode).name == goBackImageName {
-            return (.goBackEvent,row, column)
+        if let name = touchesEndedAtNode.name {
+            let length = name.length
+            if (name.hasSuffix(elementSeparator)) {
+                char = (name[(name.index((name.startIndex), offsetBy: length - 2))])
+                element = Int(String(char))!
+            }
         }
-        return (.noEvent, row, column)
+
+        if touchesEndedAtNode is SKSpriteNode && (touchesEndedAtNode as! SKSpriteNode).name == goBackImageName {
+            return (.goBackEvent,row, column, NoValue)
+        }
+        return (.noEvent, row, column, element)
         
         
     }

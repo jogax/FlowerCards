@@ -117,4 +117,10 @@ let huDictionary: [TextConstants: String] = [
     .tcPlayerType:      "Játékos",
     .tcOpponentType:    "Ellenfél",
     .tcBestPlayerType:  "Legjobb játékos",
+    .tcChooseLevel:     "Válassz szintet és opciókat",
+    .tcLevelAndGames:   "Szint (lejátszva)",
+    .tcSize:            "Formátum:",
+    .tcPackages:        "Kártyacsomag:",
+    .tcHelpLines:       "Segédvonalak:",
+
 ]

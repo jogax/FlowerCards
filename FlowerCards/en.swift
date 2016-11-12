@@ -117,4 +117,9 @@ let enDictionary: [TextConstants: String] = [
     .tcPlayerType:      "Player",
     .tcOpponentType:    "Opponent",
     .tcBestPlayerType:  "Best Player",
+    .tcChooseLevel:     "Choose level and options",
+    .tcLevelAndGames:   "Level (played)",
+    .tcSize:            "Format:",
+    .tcPackages:        "Packages:",
+    .tcHelpLines:       "Helplines:",
 ]

@@ -17,7 +17,7 @@ class MySKPanel: SKSpriteNode {
             if oldValue != size {
                 for index in 0..<self.children.count {
                     if self.children[index] is SKLabelNode {
-                        print("Label:",  self.children[index].name)
+//                        print("Label:",  self.children[index].name)
                     }
                 }
             }

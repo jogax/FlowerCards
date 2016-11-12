@@ -13,49 +13,66 @@ class LevelsForPlayWithCards {
 
     /*
     enum LevelParamsType: Int {
-        CountPackages = 0,
+
         CountColumns = 1,
         CountRows = 2,
         MinProzent = 3,
         MaxProzent = 4,
         SpriteSize = 5,
-        OnlyiPad   = 6
     }
     */
     var CardPlay = false
     var level: Int
     var aktLevel: LevelParam
+    
+    #if REALM_V1
     fileprivate var levelContent = [
         
-         "1,3,3,40,60,40",
-         "1,3,4,40,60,40",
-         "1,3,5,40,60,40",
-         
-         "1,4,4,40,60,40",
-         "1,4,5,40,60,40",
-         "1,4,6,40,60,32",
-         
-         "1,5,5,40,60,35",
-         "1,5,6,40,60,33",
-         "1,5,7,40,60,33",
-
-         "1,6,6,40,60,33",
-         "1,6,7,40,60,33",
-         "1,6,8,40,60,33",
-         
-         "1,7,7,40,60,30",
-         "1,7,8,40,60,30",
-         "1,7,9,40,60,30",
-
-         "1,8,8,50,60,28",
-         "1,8,9,50,60,28",
-         "1,8,10,50,60,28",
-
-         "1,9,9,80,100,25",
-         "1,9,10,80,100,25",
-
-         "1,10,10,80,100,25",
+        "3,3,40,60,40",
+        "3,4,40,60,40",
+        "3,5,40,60,40",
+        "3,6,40,60,40",
+        
+        "4,4,40,60,40",  // old 0 new 4
+        
+        "4,5,40,60,40",
+        "4,6,40,60,32",
+        "4,7,40,60,32",
+        
+        "5,5,40,60,35",  // old 1 new 8
+        "5,6,40,60,33",
+        "5,7,40,60,33",
+        "5,8,40,60,33",
+        
+        "6,6,40,60,33", // old 2 new 12
+        "6,7,40,60,33",
+        "6,8,40,60,33",
+        
+        "7,7,40,60,30", // old 3 new 15
+        "7,8,40,60,30",
+        "7,9,40,60,30",
+        
+        "8,8,50,60,28", // old 4 new 18
+        "8,9,50,60,28",
+        "8,10,50,60,28",
+        
+        "9,9,80,100,25", // old 5 new 21
+        "9,10,80,100,25",
+        
+        "10,10,80,100,25", // old 6 new 23
     ]
+    #else
+        fileprivate var levelContent = [
+        
+        "4,4,40,60,40",   // old 0 new 4
+        "5,5,40,60,35",   // old 1 new 8
+        "6,6,40,60,33",   // old 2 new 12
+        "7,7,40,60,30",   // old 3 new 15
+        "8,8,50,60,28",   // old 4 new 18
+        "9,9,80,100,25",  // old 5 new 21
+        "10,10,80,100,25",// old 6 new 23
+        ]
+    #endif
     
     var levelParam = [LevelParam]()
     
@@ -67,13 +84,11 @@ class LevelsForPlayWithCards {
             let paramString = levelContent[index]
             let paramArr = paramString.components(separatedBy: ",")
             var aktLevelParam: LevelParam = LevelParam()
-            aktLevelParam.countContainers = 4
-            aktLevelParam.countPackages = Int(paramArr[0])!
-            aktLevelParam.countColumns = Int(paramArr[1])!
-            aktLevelParam.countRows = Int(paramArr[2])!
-            aktLevelParam.minProzent = Int(paramArr[3])!
-            aktLevelParam.maxProzent = Int(paramArr[4])!
-            aktLevelParam.spriteSize = Int(paramArr[5])!
+            aktLevelParam.countColumns = Int(paramArr[0])!
+            aktLevelParam.countRows = Int(paramArr[1])!
+            aktLevelParam.minProzent = Int(paramArr[2])!
+            aktLevelParam.maxProzent = Int(paramArr[3])!
+            aktLevelParam.spriteSize = Int(paramArr[4])!
             levelParam.append(aktLevelParam)
         }
         aktLevel = levelParam[0]
@@ -106,6 +121,10 @@ class LevelsForPlayWithCards {
     
     func count()->Int {
         return levelContent.count
+    }
+    
+    func getLevelFormat(level: Int)->String {
+        return "\(levelParam[level].countColumns) * \(levelParam[level].countRows)"
     }
     
     

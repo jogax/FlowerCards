@@ -10,7 +10,6 @@ import Foundation
 import RealmSwift
 
 class PlayerModel: Object {
-    
     dynamic var ID = 0
     dynamic var levelID = 0
     dynamic var name = ""

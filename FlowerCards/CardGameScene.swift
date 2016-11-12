@@ -124,6 +124,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     
+    enum ShowHelpLine: Int {
+        case green = 0, cyan, hidden
+    }
+    
 
     enum MyColors: Int {
         case none = 0, red, green
@@ -240,6 +244,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     let nextLevel = true
     let previousLevel = false
     let maxLevelForiPhone = GV.levelsForPlay.getLastLevelWithColumnCount(maxColumnCount: 7)
+    let countContainers = 4
 
     var lastUpdateSec = 0
     var lastNextPoint: Founded?
@@ -259,9 +264,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var countCardsProContainer: Int?
     var countColumns = 0
     var countRows = 0
-    var countContainers = 0
-    var countPackages = 0
-    var showHelpLines: LevelParam.ShowHelpLine = .green
+    var countPackages = 1
+    var showHelpLines: ShowHelpLine = .green
     let maxColumnForiPhone = 6
     var targetScoreKorr: Int = 0
     var tableCellSize: CGFloat = 0
@@ -808,8 +812,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         stopCreateTippsInBackground = true
         
 
-        countContainers = GV.levelsForPlay.aktLevel.countContainers
-        countPackages = GV.levelsForPlay.aktLevel.countPackages
         maxCardCount = countPackages * countContainers * MaxCardValue
         countCardsProContainer = MaxCardValue //levelsForPlay.aktLevel.countSpritesProContainer
         countColumns = GV.levelsForPlay.aktLevel.countColumns
@@ -2391,6 +2393,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
     }
     
+    func chooseLevelAndOptions() {
+        let _ = ChooseLevelAndOptions()
+    }
+    
     func randomGameNumber()->Int {
         var freeGameNumbers = [Int]()
         let gameNumberSet = realm.objects(GamePredefinitionModel.self)
@@ -2493,29 +2499,35 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             })
             alert.addAction(newGameAction)
             
-            if levelIndex > 0 {
-                let easierAction = UIAlertAction(title: GV.language.getText(.tcPreviousLevel), style: .default,
-                    handler: {(paramAction:UIAlertAction!) in
-    //                    print("newGame from set Previous Level")
-                        self.setLevel(self.previousLevel)
-                        self.newGame(true)
-                })
-                alert.addAction(easierAction)
-            }
+            let chooseLevelAction = UIAlertAction(title: GV.language.getText(.tcChooseLevel), style: .default,
+                                           handler: {(paramAction:UIAlertAction!) in
+                                            self.chooseLevelAndOptions()
+            })
+            alert.addAction(chooseLevelAction)
+
+//            if levelIndex > 0 {
+//                let easierAction = UIAlertAction(title: GV.language.getText(.tcPreviousLevel), style: .default,
+//                    handler: {(paramAction:UIAlertAction!) in
+//    //                    print("newGame from set Previous Level")
+//                        self.setLevel(self.previousLevel)
+//                        self.newGame(true)
+//                })
+//                alert.addAction(easierAction)
+//            }
             
             
 //            let countGamesOfActLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = yes", GV.player!.ID, levelIndex).count
             
-            let iPhoneForbidden = countColumns > maxColumnForiPhone
-            if (levelIndex < GV.levelsForPlay.levelParam.count - 1) && (GV.onIpad || !iPhoneForbidden) {
-                let complexerAction = UIAlertAction(title: GV.language.getText(TextConstants.tcNextLevel), style: .default,
-                    handler: {(paramAction:UIAlertAction!) in
-    //                    print("newGame from set Next Level")
-                        self.setLevel(self.nextLevel)
-                        self.newGame(true)
-                })
-                alert.addAction(complexerAction)
-            }
+//            let iPhoneForbidden = countColumns > maxColumnForiPhone
+//            if (levelIndex < GV.levelsForPlay.levelParam.count - 1) && (GV.onIpad || !iPhoneForbidden) {
+//                let complexerAction = UIAlertAction(title: GV.language.getText(TextConstants.tcNextLevel), style: .default,
+//                    handler: {(paramAction:UIAlertAction!) in
+//    //                    print("newGame from set Next Level")
+//                        self.setLevel(self.nextLevel)
+//                        self.newGame(true)
+//                })
+//                alert.addAction(complexerAction)
+//            }
             if GV.peerToPeerService!.hasOtherPlayers() {
                 let competitionAction = UIAlertAction(title: GV.language.getText(.tcCompetition), style: .default,
                                                       handler: {(paramAction:UIAlertAction!) in

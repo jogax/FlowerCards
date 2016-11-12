@@ -43,9 +43,43 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        // Migration of realm models if neaded
+        #if REALM_V1
+            let convertLevelID: [Int:Int] = [0:4, 1:8, 2:12, 3:15, 4:18, 5:21, 6:23]
+            Realm.Configuration.defaultConfiguration = Realm.Configuration(
+                schemaVersion: 0,
+                migrationBlock: { migration, oldSchemaVersion in
+                    if (oldSchemaVersion < 1) {
+                        // migrate GameModel
+                        migration.enumerateObjects(ofType: GameModel.className()) { oldObject, newObject in
+                            // The enumerateObjects(ofType:_:) method iterates
+                            // over every Game object stored in the Realm file
+                            let oldLevelID = oldObject!["levelID"] as! Int
+                            newObject!["levelID"] = convertLevelID[oldLevelID]
+                        }
+                        // migrate PlayerModel
+                        migration.enumerateObjects(ofType: PlayerModel.className()) { oldObject, newObject in
+                            // The enumerateObjects(ofType:_:) method iterates
+                            // over every Game object stored in the Realm file
+                            newObject!["levelID"] = 0
+                        }
+                        // migrate PlayerModel
+                        migration.enumerateObjects(ofType: StatisticModel.className()) { oldObject, newObject in
+                            // The enumerateObjects(ofType:_:) method iterates
+                            // over every Game object stored in the Realm file
+                        }
+                        migration.enumerateObjects(ofType: GamePredefinitionModel.className()) { oldObject, newObject in
+                            // The enumerateObjects(ofType:_:) method iterates
+                            // over every Game object stored in the Realm file
+                        }
+                }
+            })
+        #endif
         return true
     }
     
+    func migrationToShemaVersion1 () {
+    }
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.

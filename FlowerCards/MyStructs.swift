@@ -22,10 +22,7 @@ import AVFoundation
 struct GV {
     static var vBounds = CGRect(x: 0, y: 0, width: 0, height: 0)
     static var notificationCenter = NotificationCenter.default
-//    static let notificationGameControllChanged = "gameModusChanged"
-//    static let notificationMadeMove = "MadeMove"
-//    static let notificationJoystickMoved = "joystickMoved"
-//    static let notificationColorChanged = "colorChanged"
+    static var mainScene: SKScene?
     static let freeGameCount = 1000
     static var peerToPeerService: PeerToPeerServiceManager?
 
@@ -41,9 +38,6 @@ struct GV {
     static var mainViewController: UIViewController?
     static let language = Language()
     static var showHelpLines = 0
-//    static var soundVolume: Float = 0
-//    static var musicVolume: Float = 0
-//    static var globalParam = GlobalParamData()
     static var dummyName = GV.language.getText(.tcGuest)
     static var initName = false
     static let oneGrad:CGFloat = CGFloat(M_PI) / 180
@@ -254,13 +248,7 @@ struct DeviceConstants {
 }
 */
 struct LevelParam {
-    
-    enum ShowHelpLine: Int {
-        case green = 0, cyan, hidden
-    }
-    var countContainers: Int
-    var countPackages: Int
-    var countSpritesProContainer: Int
+
     var countColumns: Int
     var countRows: Int
     var minProzent: Int
@@ -269,9 +257,6 @@ struct LevelParam {
     
     init()
     {
-        self.countContainers = 0
-        self.countPackages = 1
-        self.countSpritesProContainer = 0
         self.countColumns = 0
         self.countRows = 0
         self.minProzent = 0

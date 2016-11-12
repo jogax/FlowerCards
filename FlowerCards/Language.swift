@@ -32,6 +32,7 @@ enum TextConstants: Int {
     tcGameOver,
     tcCongratulations,
     tcChooseName,
+    tcChooseLevel,
     tcVolume,
     tcCountHelpLines,
     tcLanguage,
@@ -81,9 +82,6 @@ enum TextConstants: Int {
     tcYourScore,
     tcYouAreTheBest,
     tcGameNumber,
-//    tcChooseGameNumber,
-//    TCPlayerStatistic,
-//    TCGameStatistic,
     tcCompetition,
     tcGame,
     tcChoosePartner,
@@ -110,7 +108,11 @@ enum TextConstants: Int {
     tcPlayerType,
     tcOpponentType,
     tcBestPlayerType,
-    tcCompetitionShort
+    tcCompetitionShort,
+    tcLevelAndGames,
+    tcSize,
+    tcPackages,
+    tcHelpLines
 
 }
 

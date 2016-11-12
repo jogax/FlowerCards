@@ -117,7 +117,11 @@ let deDictionary: [TextConstants: String] = [
     .tcPlayerType:      "Spieler",
     .tcOpponentType:    "Gegner",
     .tcBestPlayerType:  "Beste Spieler",
-
+    .tcChooseLevel:     "Wähle Ebene und Optionen",
+    .tcLevelAndGames:   "Ebene (gespielt)",
+    .tcSize:            "Format:",
+    .tcPackages:        "Pakete:",
+    .tcHelpLines:       "Hilfslinien:",
 ]
 
 

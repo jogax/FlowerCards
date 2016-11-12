@@ -51,10 +51,10 @@ class MySKSlider: MySKTable, AVAudioPlayerDelegate {
         let sliderImage = DrawImages.getSetVolumeImage(CGSize(width: self.size.width * 0.8, height: heightOfLabelRow), volumeValue: volumeValue)
         let elements: [MultiVar] = [
             MultiVar(string: ""),
-            MultiVar(image: sliderImage),
+            MultiVar(texture: SKTexture(image: sliderImage)),
             MultiVar(string: "\(volumeValue)")
         ]
-        showRowOfTable(elements, row: 0, selected: true)
+        showRowOfTable(elements: elements, row: 0, selected: true)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -95,7 +95,7 @@ class MySKSlider: MySKTable, AVAudioPlayerDelegate {
             timer!.invalidate()
             timer = nil
         }
-        let (touch, _, _) = checkTouches(touches, withEvent: event)
+        let (touch, _, _, _) = checkTouches(touches, withEvent: event)
         switch touch {
         case MyEvents.goBackEvent:
             let fadeInAction = SKAction.fadeIn(withDuration: 0.5)

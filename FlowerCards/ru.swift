@@ -117,5 +117,10 @@ let ruDictionary: [TextConstants: String] = [
     .tcPlayerType:      "Игрок",
     .tcOpponentType:    "Противник",
     .tcBestPlayerType:  "Лучший игрок",
+    .tcChooseLevel:     "Выберите уровень и параметры",
+    .tcLevelAndGames:   "Уровень (сыграно)",
+    .tcSize:            "Формат:",
+    .tcPackages:        "Пакете:",
+    .tcHelpLines:       "Тип помощи:",
 
 ]

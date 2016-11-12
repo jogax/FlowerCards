@@ -20,8 +20,8 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
     var countLines = 0
     let myColumnWidths: [CGFloat] = [70, 15, 15]  // in %
     let sizeConstant = GV.mainViewController!.view.frame.width / (GV.onIpad ? 22 : 18)
-    var deleteImage: UIImage
-    var modifyImage: UIImage
+    var deleteTexture: SKTexture
+    var modifyTexture: SKTexture
     var OKImage: UIImage
 //    let statisticImage = DrawImages.getStatisticImage(CGSizeMake(30,30))
     let myName = "MySKPlayer"
@@ -35,8 +35,8 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
         self.parentNode = parent
         self.callBack = callBack
         let imageSize = CGSize(width: sizeConstant, height: sizeConstant)
-        self.deleteImage = DrawImages.getDeleteImage(imageSize)
-        self.modifyImage = DrawImages.getModifyImage(imageSize)
+        self.deleteTexture = SKTexture(image: DrawImages.getDeleteImage(imageSize))
+        self.modifyTexture = SKTexture(image: DrawImages.getModifyImage(imageSize))
         self.OKImage = DrawImages.getOKImage(imageSize)
 
         
@@ -148,12 +148,12 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
             let name = nameTable[index].name == GV.language.getText(.tcAnonym) ? "+        " : nameTable[index].name
             var elements: [MultiVar] = [MultiVar(string: name)]
             if !(name == "+") {
-                elements.append(MultiVar(image: modifyImage))
+                elements.append(MultiVar(texture: modifyTexture))
                 if nameTable.count > 2 {
-                    elements.append(MultiVar(image: deleteImage))
+                    elements.append(MultiVar(texture: deleteTexture))
                 }
             }
-            showRowOfTable(elements, row: index, selected: nameTable[index].isActPlayer)
+            showRowOfTable(elements: elements, row: index, selected: nameTable[index].isActPlayer)
         }
         if nameTable[0].name == GV.language.getText(.tcAnonym) {
             getPlayerName(0)
@@ -200,7 +200,7 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touchLocation = touches.first!.location(in: self)
         let touchesEndedAtNode = atPoint(touchLocation)
-        let (_, touchRow, _) = checkTouches(touches, withEvent: event)
+        let (_, touchRow, _, _) = checkTouches(touches, withEvent: event)
         switch touchRow {
         case 0:
             GV.player = realm.objects(PlayerModel.self).filter("isActPlayer = true").first

@@ -13,11 +13,14 @@ enum MySKNodeType: Int {
 enum TremblingType: Int {
     case noTrembling = 0, changeSize, changeSizeOnce, changePos, changeDirection
 }
+
+// Global Variables
 let NoValue = -1
 let NoColor = 1000
 let MaxCardValue = 13
 let LastCardValue = MaxCardValue - 1
 let FirstCardValue = 0
+
 import SpriteKit
 
 class MySKNode: SKSpriteNode {
