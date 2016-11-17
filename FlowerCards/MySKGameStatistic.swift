@@ -13,13 +13,13 @@ class MySKGameStatistic: MySKTable {
     
     var callBack: (Bool , Int, Int) -> ()
     let myGameColumnWidths: [CGFloat] = [12, 15, 15, 20, 15, 13, 10] // in %
-    let myName = "MySKStatistic"
-    let countLines = 0
+//    let myName = "MySKStatistic"
     let playerID: Int
     let levelID: Int
     let gamesOfThisLevel: Results<GameModel>
-    var lastLocation = CGPoint.zero
+//    var lastLocation = CGPoint.zero
     var gameNumbers = [Int: Int]() // column : gameNumber
+
     
     
     
@@ -32,9 +32,8 @@ class MySKGameStatistic: MySKTable {
         self.callBack = callBack
         let headLines = GV.language.getText(.tcPlayerStatisticLevel, values: playerName, String(levelID + 1))
         gamesOfThisLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true", playerID, levelID).sorted(byProperty: "gameNumber")
-        super.init(columnWidths: myGameColumnWidths, rows:gamesOfThisLevel.count + 1, headLines: [headLines], parent: parent, width: parent.parent!.frame.width * 0.9)
+        super.init(columnWidths: myGameColumnWidths, countRows:gamesOfThisLevel.count + 1, headLines: [headLines], parent: parent, myName: "MySKDetailedStatistic", width: parent.parent!.frame.width * 0.9)
         self.showVerticalLines = true
-        self.name = myName
         
         showMe(showStatistic)
         
@@ -53,7 +52,8 @@ class MySKGameStatistic: MySKTable {
                                     MultiVar(string: GV.language.getText(.tcVictory)),
                                     MultiVar(string: GV.language.getText(.tcStart)),
                                     ]
-        showRowOfTable(elements: elements, row: 0, selected: true)
+        tableOfRows.append(RowOfTable(elements: elements, selected: true))
+//        showRowOfTable(rowOfTable: RowOfTable(elements: elements, selected: true), row: 0)
         var row = 1
         for game in gamesOfThisLevel {
             var gameArt = GV.language.getText(.tcGame) // simple Game
@@ -77,10 +77,12 @@ class MySKGameStatistic: MySKTable {
                                         MultiVar(texture: SKTexture(image: victory)),
                                         MultiVar(texture: SKTexture(image: startImage)),
                                         ]
-            showRowOfTable(elements: elements, row: row, selected: true)
+            tableOfRows.append(RowOfTable(elements: elements, selected: true))
+//            showRowOfTable(rowOfTable: RowOfTable(elements: elements, selected: true), row: row)
             gameNumbers[row] = game.gameNumber
             row += 1
         }
+        showTable()
         
     }
     
@@ -91,23 +93,21 @@ class MySKGameStatistic: MySKTable {
         return name
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let touchLocation = touches.first!.location(in: self)
-        touchesBeganAtNode = atPoint(touchLocation)
-        lastLocation = touches.first!.location(in: GV.mainViewController!.view)
-        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != myName)) {
-            touchesBeganAtNode = nil
-        }
-    }
+//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        let touchLocation = touches.first!.location(in: self)
+//        touchesBeganAtNode = atPoint(touchLocation)
+//        lastLocation = touches.first!.location(in: GV.mainViewController!.view)
+//        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != self.name)) {
+//            touchesBeganAtNode = nil
+//        }
+//    }
     
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-//p         let adder:CGFloat = 100
-        
-        let actLocation = touches.first!.location(in: GV.mainViewController!.view)
-        let delta:CGFloat = lastLocation.y - actLocation.y
-        lastLocation = actLocation
-        scrollView(delta)
-    }
+//    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        let actLocation = touches.first!.location(in: GV.mainViewController!.view)
+//        let delta:CGFloat = lastLocation.y - actLocation.y
+//        lastLocation = actLocation
+//        scrollView(delta)
+//    }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let (_, row, column, _) = checkTouches(touches, withEvent: event)
@@ -130,9 +130,9 @@ class MySKGameStatistic: MySKTable {
         
     }
     
-    override func setMyDeviceSpecialConstants() {
-        fontSize = GV.onIpad ? 20 : 15
-    }
+//    override func setMyDeviceSpecialConstants() {
+//        fontSize = GV.onIpad ? 20 : 15
+//    }
     
     
 }

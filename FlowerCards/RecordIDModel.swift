@@ -14,7 +14,11 @@ class RecordIDModel: Object {
     dynamic var ID = 0
     dynamic var gameModelID = 0
     dynamic var playerModelID = 0
-    dynamic var opponentModelID = 0
+    #if REALM_V1
+    
+    #else
+        dynamic var opponentModelID = 0
+    #endif
     dynamic var statisticModelID = 0
     
     override  class func primaryKey() -> String {

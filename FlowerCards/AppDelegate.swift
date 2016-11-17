@@ -45,9 +45,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         // Migration of realm models if neaded
         #if REALM_V1
-            let convertLevelID: [Int:Int] = [0:4, 1:8, 2:12, 3:15, 4:18, 5:21, 6:23]
+            var convertLevelID = [Int:Int]()
+            if GV.levelsForPlay.count() > 0 {  // search new levelIDs in the new scheme
+                var oldLevelID = 0
+                for column in 4...10 {    // in old Schema columns from 4 to 10
+                    var newLevelID = 0
+                    for level in GV.levelsForPlay.levelParam {
+                        if level.countColumns == column && level.countRows == column && level.countPackages == 1 {
+                            convertLevelID[oldLevelID] = newLevelID
+                        }
+                        newLevelID += 1
+                    }
+                    oldLevelID += 1
+                }
+            }
+//            let convertLevelID: [Int:Int] = [0:4, 1:8, 2:12, 3:15, 4:18, 5:21, 6:23]
             Realm.Configuration.defaultConfiguration = Realm.Configuration(
-                schemaVersion: 0,
+                schemaVersion: 1,
                 migrationBlock: { migration, oldSchemaVersion in
                     if (oldSchemaVersion < 1) {
                         // migrate GameModel
@@ -67,6 +81,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         migration.enumerateObjects(ofType: StatisticModel.className()) { oldObject, newObject in
                             // The enumerateObjects(ofType:_:) method iterates
                             // over every Game object stored in the Realm file
+                            let oldLevelID = oldObject!["levelID"] as! Int
+                            newObject!["levelID"] = convertLevelID[oldLevelID]
                         }
                         migration.enumerateObjects(ofType: GamePredefinitionModel.className()) { oldObject, newObject in
                             // The enumerateObjects(ofType:_:) method iterates
@@ -74,6 +90,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         }
                 }
             })
+        #else
+            print("REALM_V0")
         #endif
         return true
     }

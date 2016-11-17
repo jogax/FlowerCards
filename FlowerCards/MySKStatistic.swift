@@ -15,7 +15,7 @@ class MySKStatistic: MySKTable {
     var callBack: (Bool, Int, Int)->()
     var nameTable = [PlayerModel]()
     let myColumnWidths: [CGFloat] = [15, 13, 20, 30, 12, 10]  // in %
-    let myName = "MySKPlayerStatistic"
+//    let myName = "MySKPlayerStatistic"
 
     
     
@@ -29,9 +29,8 @@ class MySKStatistic: MySKTable {
         
         self.callBack = callBack
         
-        super.init(columnWidths: myColumnWidths, rows:countLines, headLines: [""], parent: parent, width: parent.parent!.frame.width * 0.9)
+        super.init(columnWidths: myColumnWidths, countRows:countLines, headLines: [""], parent: parent, myName: "MySKStatistic", width: parent.parent!.frame.width * 0.9)
         self.showVerticalLines = true
-        self.name = myName
         
 //        let pSize = parent.parent!.scene!.size
 //        let myStartPosition = CGPointMake(-pSize.width, (pSize.height - size.height) / 2 - 10)
@@ -65,7 +64,7 @@ class MySKStatistic: MySKTable {
                                     MultiVar(string: GV.language.getText(.tcCountVictorys)),
                                     MultiVar(string: GV.language.getText(.tcAllTime)),
                                    ]
-        showRowOfTable(elements: elements, row: 0, selected: true)
+        showRowOfTable(rowOfTable: RowOfTable(elements: elements, selected: true), row: 0)
         for row in 0..<nameTable.count {
             if nameTable[row].name != GV.language.getText(.tcAnonym) || row == 0 {
                 let statisticTable = realm.objects(StatisticModel.self).filter("playerID = %d", nameTable[row].ID)
@@ -88,7 +87,7 @@ class MySKStatistic: MySKTable {
                                             MultiVar(string: allTime.dayHourMinSec),
                                             MultiVar(texture: SKTexture(image: DrawImages.getGoForwardImage(CGSize(width: 20, height: 20))))
                 ]
-                showRowOfTable(elements: elements, row: row + 1, selected: true)
+                showRowOfTable(rowOfTable: RowOfTable(elements: elements, selected: true), row: row + 1)
             }
         }
     }
@@ -103,7 +102,7 @@ class MySKStatistic: MySKTable {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touchLocation = touches.first!.location(in: self)
         touchesBeganAtNode = atPoint(touchLocation)
-        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != myName)) {
+        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != self.name)) {
             touchesBeganAtNode = nil
         }
     }
@@ -137,9 +136,9 @@ class MySKStatistic: MySKTable {
     func backFromMySKDetailedStatistic(_ startGame: Bool, gameNumber: Int, levelIndex: Int) {
         callBack(startGame, gameNumber, levelIndex)
     }
-    override func setMyDeviceSpecialConstants() {
-        fontSize = GV.onIpad ? 20 : 15
-    }
+//    override func setMyDeviceSpecialConstants() {
+//        fontSize = GV.onIpad ? 20 : 15
+//    }
 
     
 }

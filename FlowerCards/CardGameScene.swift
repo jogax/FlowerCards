@@ -283,7 +283,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var touchesBeganAt: Date?
     
     let containerSizeOrig: CGFloat = 40
-    let spriteSizeOrig: CGFloat = 35
     
     var showFingerNode = false
     var countMovingSprites = 0
@@ -477,6 +476,14 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     let fixationTime = 0.1
     
     override func didMove(to view: SKView) {
+        // generate Played Games when GamesModel empty
+        #if REALM_V1
+            
+        #else
+            if realm.objects(GameModel.self).count == 0 {
+                generateGamesForTest(countRecordsProLevel: 10)
+            }
+        #endif
         
         if !settingsSceneStarted {
 //            let modelURL = NSBundle.mainBundle().URLForResource("FlowerCards", withExtension: "momd")!
@@ -808,10 +815,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func specialPrepareFuncFirst() {
-//        print("stopCreateTippsInBackground from specialPrepareFuncFirst")
         stopCreateTippsInBackground = true
-        
-
+        #if REALM_V1
+            countPackages = GV.levelsForPlay.aktLevel.countPackages
+        #endif
         maxCardCount = countPackages * countContainers * MaxCardValue
         countCardsProContainer = MaxCardValue //levelsForPlay.aktLevel.countSpritesProContainer
         countColumns = GV.levelsForPlay.aktLevel.countColumns
@@ -961,11 +968,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             push(sprite, status: .addedFromCardStack)
             addChild(sprite)
             sprite.alpha = 0
-            let duration:Double = Double((zielPosition - cardPackage!.position).length()) / 500
+            let duration:Double = Double((zielPosition - cardPackage!.position).length()) / 1000
             let actionMove = SKAction.move(to: zielPosition, duration: duration)
             
             let waitingAction = SKAction.wait(forDuration: waitForStart)
-            waitForStart += 0.5
+            waitForStart += 0.2
             
             let zPositionPlus = SKAction.run({
                 sprite.zPosition += 100
@@ -2505,29 +2512,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             })
             alert.addAction(chooseLevelAction)
 
-//            if levelIndex > 0 {
-//                let easierAction = UIAlertAction(title: GV.language.getText(.tcPreviousLevel), style: .default,
-//                    handler: {(paramAction:UIAlertAction!) in
-//    //                    print("newGame from set Previous Level")
-//                        self.setLevel(self.previousLevel)
-//                        self.newGame(true)
-//                })
-//                alert.addAction(easierAction)
-//            }
-            
-            
-//            let countGamesOfActLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = yes", GV.player!.ID, levelIndex).count
-            
-//            let iPhoneForbidden = countColumns > maxColumnForiPhone
-//            if (levelIndex < GV.levelsForPlay.levelParam.count - 1) && (GV.onIpad || !iPhoneForbidden) {
-//                let complexerAction = UIAlertAction(title: GV.language.getText(TextConstants.tcNextLevel), style: .default,
-//                    handler: {(paramAction:UIAlertAction!) in
-//    //                    print("newGame from set Next Level")
-//                        self.setLevel(self.nextLevel)
-//                        self.newGame(true)
-//                })
-//                alert.addAction(complexerAction)
-//            }
             if GV.peerToPeerService!.hasOtherPlayers() {
                 let competitionAction = UIAlertAction(title: GV.language.getText(.tcCompetition), style: .default,
                                                       handler: {(paramAction:UIAlertAction!) in
@@ -3709,6 +3693,45 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
     func sendAlertToUser(_ fromPeerIndex: Int) {
         
+    }
+    
+    func generateGamesForTest(countRecordsProLevel: Int) {
+        let playerID = GV.player!.ID
+        realm.beginWrite()
+        realm.delete(realm.objects(StatisticModel.self)) // delete the one generated statisticrecord
+        
+        for level in 0..<GV.levelsForPlay.count() { // create min 5 and max 35 games
+            for _ in 0..<(5 + Int(arc4random_uniform(30))) {
+                let game = GameModel()
+                game.gameNumber = Int(arc4random_uniform(999)) // get random gamenumber 0...999
+                game.levelID = level
+                game.ID = GV.createNewRecordID(.gameModel)
+                game.played = true
+                game.playerID = playerID
+                game.playerScore = 2000 + Int(arc4random_uniform(3000)) // get random score 2000...5000
+                game.time = 300 + Int(arc4random_uniform(1200)) // get random time 300...1500 sec (5...25 min)
+                realm.add(game)
+            }
+            let statistic = StatisticModel()
+            statistic.ID = GV.createNewRecordID(.statisticModel)
+            statistic.bestTime = 1000000
+            statistic.playerID = playerID
+            let games = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true", playerID, level)
+            statistic.countPlays = games.count
+            for game in games {
+                statistic.actScore += game.playerScore
+                statistic.actTime += game.time
+                statistic.levelID = level
+                if game.playerScore > statistic.bestScore {
+                    statistic.bestScore = game.playerScore
+                }
+                if game.time < statistic.bestTime {
+                    statistic.bestTime = game.time
+                }
+            }
+            realm.add(statistic)
+        }
+        try! realm.commitWrite()
     }
 
 

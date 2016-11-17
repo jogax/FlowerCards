@@ -63,7 +63,7 @@ struct GV {
     }
     
     enum RealmRecordType: Int {
-        case gameModel, playerModel, opponentModel, statisticModel
+        case gameModel, playerModel, statisticModel
     }
     
     static func createNewRecordID(_ recordType: RealmRecordType)->Int {
@@ -86,9 +86,6 @@ struct GV {
         case .playerModel:
             ID = recordID.playerModelID
             recordID.playerModelID += 1
-        case .opponentModel:
-            ID = recordID.opponentModelID
-            recordID.opponentModelID += 1
         case .statisticModel:
             ID = recordID.statisticModelID
             recordID.statisticModelID += 1
@@ -249,6 +246,9 @@ struct DeviceConstants {
 */
 struct LevelParam {
 
+    #if REALM_V1
+        var countPackages: Int
+    #endif
     var countColumns: Int
     var countRows: Int
     var minProzent: Int
@@ -257,6 +257,9 @@ struct LevelParam {
     
     init()
     {
+        #if REALM_V1
+            countPackages = 0
+        #endif
         self.countColumns = 0
         self.countRows = 0
         self.minProzent = 0

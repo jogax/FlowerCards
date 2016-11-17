@@ -16,7 +16,7 @@ class MySKSlider: MySKTable, AVAudioPlayerDelegate {
     var callBack: ()->()
     let myColumnWidths: [CGFloat] = [10,80,10]  // in %
     //    let myDetailedColumnWidths = [20, 20, 20, 20, 20] // in %
-    let myName = "MySKSlider"
+//    let myName = "MySKSlider"
     let countLines = 1
     var volumeValue = CGFloat(50)
     var startLocation = CGPoint.zero
@@ -39,9 +39,8 @@ class MySKSlider: MySKTable, AVAudioPlayerDelegate {
         self.callBack = callBack
         self.soundType = soundType
         self.volumeValue = CGFloat((soundType == .music ? GV.player!.musicVolume : GV.player!.soundVolume))
-        super.init(columnWidths: myColumnWidths, rows:countLines, headLines: headLines, parent: parent, width: parent.parent!.frame.width * 0.9)
+        super.init(columnWidths: myColumnWidths, countRows:countLines, headLines: headLines, parent: parent, myName: "MySKSlider", width: parent.parent!.frame.width * 0.9)
         sliderMinMaxXPosition = self.size.width * myColumnWidths[1] / 2 / 100
-        self.name = myName
         fileName = soundType == .music ? "MyMusic" : "OK"
         playSound(fileName, volume: Float(volumeValue), loops: -1)
         showMe(showSlider)
@@ -54,7 +53,7 @@ class MySKSlider: MySKTable, AVAudioPlayerDelegate {
             MultiVar(texture: SKTexture(image: sliderImage)),
             MultiVar(string: "\(volumeValue)")
         ]
-        showRowOfTable(elements: elements, row: 0, selected: true)
+        showRowOfTable(rowOfTable: RowOfTable(elements: elements, selected: true), row:  0)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -64,7 +63,7 @@ class MySKSlider: MySKTable, AVAudioPlayerDelegate {
         let touchLocation = touches.first!.location(in: self)
         startLocation = touchLocation
         touchesBeganAtNode = atPoint(touchLocation)
-        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != myName)) {
+        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != self.name)) {
             touchesBeganAtNode = nil
         }
         if soundType == .sound {
@@ -123,10 +122,10 @@ class MySKSlider: MySKTable, AVAudioPlayerDelegate {
         
     }
     
-    override func setMyDeviceSpecialConstants() {
-        fontSize = GV.onIpad ? 20 : 15
-        heightOfLabelRow =  GV.onIpad ? 40 : 35
-    }
+//    override func setMyDeviceSpecialConstants() {
+//        fontSize = GV.onIpad ? 20 : 15
+//        heightOfLabelRow =  GV.onIpad ? 40 : 35
+//    }
     
     func playSound(_ fileName: String, volume: Float, loops: Int) {
         //levelArray = GV.cloudData.readLevelDataArray()

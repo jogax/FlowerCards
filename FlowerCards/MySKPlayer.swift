@@ -24,7 +24,7 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
     var modifyTexture: SKTexture
     var OKImage: UIImage
 //    let statisticImage = DrawImages.getStatisticImage(CGSizeMake(30,30))
-    let myName = "MySKPlayer"
+//    let myName = "MySKPlayer"
     var sleepTime: Double = 0
 
 
@@ -41,9 +41,9 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
 
         
 //        let texture: SKTexture = SKTexture(image: DrawImages().getTableImage(parent.frame.size,countLines: Int(countLines), countRows: 1))
-        super.init(columnWidths: myColumnWidths, rows:countLines, headLines: [], parent: parent)
-
-        self.name = myName
+        super.init(columnWidths: myColumnWidths, countRows:countLines, headLines: [], parent: parent, myName: "MySKPlayer")
+        
+//        self.name = myName
         self.parentView = view
 //        let size = CGSizeMake(parent.frame.width * 0.9, CGFloat(countLines) * self.heightOfLabelRow)
         
@@ -59,14 +59,6 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
         showMe(showPlayers)
         
 
-//        self.alpha = 1.0
-//        let actionMove = SKAction.moveTo(myTargetPosition, duration: 0.5)
-//        let alphaAction = SKAction.fadeOutWithDuration(0.5)
-//        parent.parent!.addChild(self)
-//        
-//        parent.runAction(alphaAction)
-//        self.runAction(actionMove)
-//        parent.addChild(self)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -77,7 +69,6 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
     func getPlayerName(_ row: Int) {
         self.isUserInteractionEnabled = false
         let name = nameTable[row].name == GV.language.getText(.tcAnonym) ? "" : nameTable[row].name
-        let myFont = UIFont(name: "Times New Roman", size: fontSize)
         
         let labelName = "0\(separator)\(row)"
         
@@ -85,11 +76,14 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
            _ = addNewPlayerWhenRequired()
         }
         
+        let myFontSize = (self.childNode(withName: labelName) as! SKLabelNode).fontSize
+        let myFont = UIFont(name: "Times New Roman", size: myFontSize)
         let position = (self.childNode(withName: labelName) as! SKLabelNode).position
-
+        
         
         let xPosition = parentView!.frame.size.width / 2 + position.x
-        let yPosition = parentView!.frame.size.height / 2 - position.y - heightOfLabelRow * 0.45
+        let yPosition = parentView!.frame.size.height / 2 - position.y - heightOfLabelRow * 0.55
+
         nameInputField.isHidden = false
         nameInputField.font = myFont
         nameInputField.textColor = UIColor.blue
@@ -153,7 +147,8 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
                     elements.append(MultiVar(texture: deleteTexture))
                 }
             }
-            showRowOfTable(elements: elements, row: index, selected: nameTable[index].isActPlayer)
+//            showRowOfTable(elements: elements, row: index, selected: nameTable[index].isActPlayer)
+            showRowOfTable(rowOfTable: RowOfTable(elements: elements, selected: nameTable[index].isActPlayer), row: index)
         }
         if nameTable[0].name == GV.language.getText(.tcAnonym) {
             getPlayerName(0)
@@ -188,7 +183,7 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touchLocation = touches.first!.location(in: self)
         touchesBeganAtNode = atPoint(touchLocation)
-        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != myName)) {
+        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != self.name)) {
             touchesBeganAtNode = nil
         }
     }
@@ -210,15 +205,15 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
             callBack()
         case 1..<100:
 
-            if (touchesEndedAtNode.name == myName || touchesEndedAtNode is SKLabelNode) && touchRow == nameTable.count {
+            if (touchesEndedAtNode.name == self.name || touchesEndedAtNode is SKLabelNode) && touchRow == nameTable.count {
                 let newPlayerID = addNewPlayerWhenRequired()
                 nameTableIndex = nameTable.count - 1
                 getPlayerName(indexOfPlayerID(newPlayerID)!)
-            } else if touchesEndedAtNode.name == myName || touchesEndedAtNode is SKLabelNode {
+            } else if touchesEndedAtNode.name! == self.name || touchesEndedAtNode is SKLabelNode {
                 nameTableIndex = touchRow - 1
                 changeActPlayer()
             } else if touchesBeganAtNode != nil && touchesEndedAtNode is SKLabelNode ||
-                    (touchesEndedAtNode is SKSpriteNode && touchesEndedAtNode.name != myName) {
+                    (touchesEndedAtNode is SKSpriteNode && touchesEndedAtNode.name != self.name) {
                 let (column, row) = getColumnRowOfElement(touchesBeganAtNode!.name!)
                 nameTableIndex = row
                 switch column {
@@ -295,9 +290,5 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
             }
         }
         return nil
-    }
-    override func setMyDeviceSpecialConstants() {
-        fontSize = GV.onIpad ? 20 : 15
-        heightOfLabelRow = GV.onIpad ? 40 : 35
     }
 }

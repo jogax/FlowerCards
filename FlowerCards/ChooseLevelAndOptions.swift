@@ -12,11 +12,10 @@ import SpriteKit
 
 
 class ChooseLevelAndOptions: MySKTable {
-    let myDetailedColumnWidths: [CGFloat] = [30, 20, 25, 25] // in %
+    let myDetailedColumnWidths: [CGFloat] = [30, 20, 20, 30] // in %
     let chooseLevelColumn = 0
     let choosePackageNrColumn = 2
     let chooseHelplineTypeColumn = 3
-    let myName = "MyChooseLevel"
     var countColumns = 0
     var countLevels = 0
     let playerID: Int
@@ -32,9 +31,12 @@ class ChooseLevelAndOptions: MySKTable {
         countColumns = myDetailedColumnWidths.count
         countLevels = GV.levelsForPlay.count()
         let headLines = GV.language.getText(.tcPlayerStatisticHeader, values: playerName)
+//        self.myName = "ChooseLevelAndOptions"
+
         super.init(columnWidths: myDetailedColumnWidths,
-                   rows:countLevels + 1, headLines: [headLines],
+                   countRows:countLevels + 1, headLines: [headLines],
                    parent: xxx,
+                   myName: "ChooseLevelAndOptions",
                    width: (GV.mainViewController?.view.frame.width)! * 0.9)
         
         showMe(showLevels)
@@ -46,36 +48,26 @@ class ChooseLevelAndOptions: MySKTable {
     }
     
     func showLevels() {
-        let elements: [MultiVar] = [MultiVar(string: GV.language.getText(.tcLevelAndGames)),
+        let elements: [MultiVar] = [MultiVar(string: GV.language.getText(.tcLevel)),
                                     MultiVar(string: GV.language.getText(.tcSize)),
                                     MultiVar(string: GV.language.getText(.tcPackages)),
                                     MultiVar(string: GV.language.getText(.tcHelpLines))
                                     ]
-        showRowOfTable(elements: elements, row: 0, selected: true)
-        let button1Texture = atlas.textureNamed("button1")
-        let button2Texture = atlas.textureNamed("button2")
-        let button3Texture = atlas.textureNamed("button3")
+//        showRowOfTable(rowOfTable: RowOfTable(elements: elements, selected: true), row: 0)
+        tableOfRows.append(RowOfTable(elements: elements, selected: true))
         let greenRedTexture = atlas.textureNamed("greenRedButton")
         let purpleTexture = atlas.textureNamed("purpleButton")
         let noColorTexture = atlas.textureNamed("noColorButton")
-        for row in 0..<countLevels {
-            let countStr = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true", GV.player!.ID, row).count)
-            var actPackageCount = 0
+        for levelID in 0..<countLevels {
+            let countStr = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true", GV.player!.ID, levelID).count)
+            var actPackageCount = 1
             var helpLinesCount = 2
-            var packageTextures = [button1Texture, button2Texture, button3Texture]
             var helpLineTextures = [greenRedTexture, purpleTexture, noColorTexture]
             if countStr != "0" {
-                let lastGame = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d", GV.player!.ID, row).sorted(byProperty: "created").last!
+                let lastGame = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d", GV.player!.ID, levelID).sorted(byProperty: "created").last!
                 #if REALM_V1
-                actPackageCount = lastGame.packages
-                helpLinesCount = lastGame.helpLines
+                    helpLinesCount = lastGame.helpLines
                 #endif
-            }
-            switch actPackageCount {
-                case 0: packageTextures = [button1Texture, button2Texture, button3Texture]
-                case 1: packageTextures = [button1Texture, button2Texture, button3Texture]
-                case 2: packageTextures = [button1Texture, button2Texture, button3Texture]
-                default: break
             }
             switch helpLinesCount {
                 case 2: helpLineTextures = [greenRedTexture, purpleTexture, noColorTexture]
@@ -83,27 +75,32 @@ class ChooseLevelAndOptions: MySKTable {
                 case 0: helpLineTextures = [greenRedTexture, purpleTexture, noColorTexture]
                 default: break
             }
-            let elements: [MultiVar] = [MultiVar(string: (row < 10 ? " " : "") + String(row + 1) + ": (" + countStr + ")" ),
-                                        MultiVar(string: GV.levelsForPlay.getLevelFormat(level: row)),
-                                        MultiVar(textures: packageTextures),
+            #if REALM_V1
+                actPackageCount = GV.levelsForPlay.levelParam[levelID].countPackages
+            #endif
+            let elements: [MultiVar] = [MultiVar(string: (levelID < 10 ? " " : "") + String(levelID + 1) + ": (" + countStr + ")" ),
+                                        MultiVar(string: GV.levelsForPlay.getLevelFormat(level: levelID)),
+                                        MultiVar(string: String(actPackageCount)),
                                         MultiVar(textures: helpLineTextures),
             ]
-            showRowOfTable(elements: elements, row: row + 1, selected: row == GV.player!.levelID ? true : false)
+//            showRowOfTable(rowOfTable: RowOfTable(elements: elements, selected: levelID == GV.player!.levelID ? true : false), row: levelID + 1)
+            tableOfRows.append(RowOfTable(elements: elements, selected: levelID == GV.player!.levelID ? true : false))
         }
+        showTable()
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let touchLocation = touches.first!.location(in: self)
-        touchesBeganAtNode = atPoint(touchLocation)
-        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != myName)) {
-            touchesBeganAtNode = nil
-        }
-    }
-    
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        _ = touches.first!.location(in: self)
-    }
-    
+//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        let touchLocation = touches.first!.location(in: self)
+//        touchesBeganAtNode = atPoint(touchLocation)
+//        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != self.name)) {
+//            touchesBeganAtNode = nil
+//        }
+//    }
+//    
+//    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        _ = touches.first!.location(in: self)
+//    }
+//    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let (_, row, column, element) = checkTouches(touches, withEvent: event)
         switch (row, column, element) {

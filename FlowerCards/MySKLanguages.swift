@@ -20,7 +20,7 @@ class MySKLanguages: MySKTable {
     let modifyImage = DrawImages.getModifyImage(CGSize(width: 30,height: 30))
     let OKImage = DrawImages.getOKImage(CGSize(width: 30,height: 30))
     //    let statisticImage = DrawImages.getStatisticImage(CGSizeMake(30,30))
-    let myName = "MySKLanguages"
+//    let myName = "MySKLanguages"
     
     
     
@@ -31,8 +31,7 @@ class MySKLanguages: MySKTable {
 //        let size = CGSizeMake(parent.frame.width * 0.9, heightOfTableRow + CGFloat(countLanguages) * heightOfTableRow)
         
         
-        super.init(columnWidths: myColumnWidths, rows:countLanguages, headLines: [GV.language.getText(.tcChooseLanguage)], parent: parent)
-        self.name = myName
+        super.init(columnWidths: myColumnWidths, countRows:countLanguages, headLines: [GV.language.getText(.tcChooseLanguage)], parent: parent, myName: "MySKLanguages")
 
         showMe(showLanguages)
         
@@ -55,7 +54,7 @@ class MySKLanguages: MySKTable {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touchLocation = touches.first!.location(in: self)
         touchesBeganAtNode = atPoint(touchLocation)
-        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != myName)) {
+        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != self.name)) {
             touchesBeganAtNode = nil
         }
     }
@@ -75,7 +74,7 @@ class MySKLanguages: MySKTable {
                 removeFromParent()
                 callBack()
             case .noEvent:
-                if touchesBeganAtNode != nil && touchesEndedAtNode is SKLabelNode || (touchesEndedAtNode is SKSpriteNode && touchesEndedAtNode.name != myName) {
+                if touchesBeganAtNode != nil && touchesEndedAtNode is SKLabelNode || (touchesEndedAtNode is SKSpriteNode && touchesEndedAtNode.name != self.name) {
                     let (_, row) = getColumnRowOfElement(touchesBeganAtNode!.name!)
                     GV.language.setLanguage(LanguageCodes(rawValue: row)!)
                     try! realm.write({
@@ -85,9 +84,9 @@ class MySKLanguages: MySKTable {
                 }        
         }
     }
-    override func setMyDeviceSpecialConstants() {
-        fontSize = GV.onIpad ? 20 : 15
-    }
+//    override func setMyDeviceSpecialConstants() {
+//        fontSize = GV.onIpad ? 20 : 15
+//    }
     
 }
 

@@ -42,13 +42,24 @@ class MySKTable: SKSpriteNode {
         }
         
     }
+    
+    struct RowOfTable {
+        let elements: [MultiVar]
+        let selected: Bool
+        let headerRow: Bool
+        
+        init(elements: [MultiVar], selected: Bool, headerRow: Bool = false) {
+            self.elements = elements
+            self.selected = selected
+            self.headerRow = headerRow
+        }
+    }
     var heightOfMyHeadRow = CGFloat(0)
     var heightOfLabelRow = CGFloat(0)
-    var fontSize = CGFloat(20)
+    var fontSize = CGFloat(0)
     var myImageSize = CGFloat(GV.onIpad ? 30 : 20)
     var columns: Int
     var rows: Int
-    var sizeOfElement: CGSize
     var touchesBeganAt: Date = Date()
     var touchesBeganAtNode: SKNode?
     var myParent: SKNode
@@ -66,22 +77,32 @@ class MySKTable: SKSpriteNode {
     var headLines: [String]
     var scrolling = false
     var verticalPosition: CGFloat = 0
+    var tableOfRows: [RowOfTable] = []
+    var startIndex: Int = 1
+    var maxLineCount: Int = 0
+    var lastLocation = CGPoint.zero
+    let width: CGFloat?
     
     let goBackImageName = "GoBackImage"
     
-    init(columnWidths: [CGFloat], rows: Int, headLines: [String], parent: SKNode, width: CGFloat...) {
+    init(columnWidths: [CGFloat], countRows: Int, headLines: [String], parent: SKNode, myName: String, width: CGFloat? = nil) {
         
         self.columns = columnWidths.count
-        self.rows = rows
-        self.sizeOfElement = CGSize(width: parent.frame.size.width / CGFloat(self.columns), height: heightOfLabelRow)
+        self.rows = countRows
         self.columnWidths = columnWidths
         self.myParent = parent
         self.myParentScene = (GV.mainScene!.scene!) //parent.parent!.scene!
         self.headLines = headLines.count == 0 ? [""] : headLines
-        
+        self.width = width
         super.init(texture: SKTexture(), color: UIColor.clear, size: CGSize.zero)
-        setMyDeviceSpecialConstants()
 
+        self.name = myName
+        
+        createTable()
+
+    }
+    
+    func createTable() {
         let pSize = myParentScene.size
         myStartPosition = CGPoint(x: pSize.width, y: pSize.height / 2)
         myTargetPosition = CGPoint(x: pSize.width / 2, y: pSize.height / 2)
@@ -89,42 +110,53 @@ class MySKTable: SKSpriteNode {
         
         self.heightOfLabelRow = GV.mainScene!.frame.height / 20
         self.heightOfMyHeadRow = (headLineRows == 0 ? 1 : headLineRows) * heightOfLabelRow
-
+        
+        maxLineCount = calculateMaxLineCount()
+        if self.rows > maxLineCount {
+            self.rows = maxLineCount
+            scrolling = true
+        }
         self.position = myStartPosition
         
-        self.zPosition = parent.zPosition + 200
-        self.fontSize = GV.mainScene!.frame.width / 30
-
-        myHeight = heightOfLabelRow * CGFloat(rows) + heightOfMyHeadRow
+        self.zPosition = myParent.zPosition + 200
+        self.fontSize = GV.mainScene!.frame.width / 40 < 20 ? 15 : GV.mainScene!.frame.width / 40
+        
+        
+        
+        myHeight = heightOfLabelRow * CGFloat(self.rows) + heightOfMyHeadRow
         if myHeight > pSize.height {
-            scrolling = true
             let positionToMoveY = (myParentScene.frame.height - myHeight) / 2
             self.myTargetPosition.y += positionToMoveY
         }
         
         var mySize = CGSize.zero
-        if width.count > 0 {
-            mySize = CGSize(width: width[0], height: myHeight)
+        if width != nil {
+            mySize = CGSize(width: width!, height: myHeight)
             self.showVerticalLines = true
         } else {
-            mySize = CGSize(width: parent.frame.size.width * 0.9, height: myHeight)
+            mySize = CGSize(width: GV.mainScene!.frame.width * 0.9, height: myHeight)
         }
         self.size = mySize
         self.alpha = 1.0
-        self.texture = SKTexture(image: drawTableImage(mySize, columnWidths: columnWidths, columns: self.columns, rows: rows))
+        self.texture = SKTexture(image: drawTableImage(mySize, columnWidths: columnWidths, columns: self.columns, rows: self.rows))
         var columnMidX = -(mySize.width * 0.48)
         for column in 0..<columnWidths.count {
             columnXPositions.append(columnMidX)
             columnMidX += mySize.width * columnWidths[column] / 100
         }
-        verticalPosition = (self.size.height - heightOfLabelRow) / 2 - heightOfMyHeadRow
+        verticalPosition = (self.size.height - heightOfLabelRow) / 2 - heightOfMyHeadRow - heightOfLabelRow / 5
         self.isUserInteractionEnabled = true
         //        fontSize = CGFloat(0)
         showMyImagesAndHeader(DrawImages.getGoBackImage(CGSize(width: myImageSize, height: myImageSize)), position: 10, name: goBackImageName)
         
         //        parent!.addChild(self)
+
     }
     
+    func calculateMaxLineCount()->Int{
+        let countLines = Int((GV.mainScene?.size.height)! * 0.9 / heightOfLabelRow)
+        return countLines - headLines.count - 1
+    }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -135,15 +167,30 @@ class MySKTable: SKSpriteNode {
         self.headLines.append(contentsOf: headLines)
     }
     
-    func showRowOfTable(elements: [MultiVar], row: Int, selected: Bool) {
-        for column in 0..<elements.count {
-            switch elements[column].varType {
-            case .string:
-                showElementOfTable(elements[column].stringVar!, column: column, row: row, selected: selected)
+    
+    
+    
+    func showTable() {
+        showRowOfTable(rowOfTable: tableOfRows[0], row: 0)
+        if maxLineCount > tableOfRows.count {
+            maxLineCount = tableOfRows.count
+        }
+        var row = 1
+        while row < maxLineCount {
+            showRowOfTable(rowOfTable: tableOfRows[startIndex + row - 1], row: row)
+            row += 1
+        }
+        
+    }
+    
+    func showRowOfTable(rowOfTable: RowOfTable, row: Int) {
+        for column in 0..<rowOfTable.elements.count {
+            switch rowOfTable.elements[column].varType {            case .string:
+                showElementOfTable(rowOfTable.elements[column].stringVar!, column: column, row: row, selected: rowOfTable.selected)
             case .texture:
-                showTextureInTable(texture: elements[column].textureVar!, column: column, row: row, selected: selected)
+                showTextureInTable(texture: rowOfTable.elements[column].textureVar!, column: column, row: row, selected: rowOfTable.selected)
             case .textures:
-                showTexturesInTable(textures: elements[column].textureArray, column: column, row: row, selected: selected)
+                showTexturesInTable(textures: rowOfTable.elements[column].textureArray, column: column, row: row, selected: rowOfTable.selected)
             }
         }
     }
@@ -152,6 +199,7 @@ class MySKTable: SKSpriteNode {
         let name = "\(column)\(separator)\(row)"
         var label = SKLabelNode()
         var labelExists = false
+        label.fontName = "Times New Roman"
         
         
         for index in 0..<self.children.count {
@@ -162,16 +210,10 @@ class MySKTable: SKSpriteNode {
             }
         }
         
-        if selected {
-            label.fontName = "Times New Roman"
-            label.fontColor = SKColor.blue
-        } else {
-            label.fontName = "Times New Roman"
-            label.fontColor = SKColor.black
-        }
+        label.fontColor = selected ? SKColor.blue : SKColor.black
         label.text = element
         label.fontSize = fontSize
-        label.verticalAlignmentMode = .baseline
+//        label.verticalAlignmentMode = .baseline
         
         // when label too long, make it shorter
         
@@ -183,12 +225,8 @@ class MySKTable: SKSpriteNode {
         if !labelExists {
             label.zPosition = self.zPosition + 10
             label.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.left
-            label.verticalAlignmentMode = SKLabelVerticalAlignmentMode.center
+            label.verticalAlignmentMode = SKLabelVerticalAlignmentMode.baseline
             label.name = name
-            if orientation.count > 0 {
-                
-            }
-            
             let horizontalPosition = columnXPositions[column]
             label.position = CGPoint(x: horizontalPosition,  y: verticalPosition - CGFloat(row) * heightOfLabelRow)
             
@@ -263,9 +301,7 @@ class MySKTable: SKSpriteNode {
         xPos += (size.width * columnWidths[column] / 100) / 2
         xPos -= self.size.width / 2
         
-        let verticalPosition = (self.size.height - heightOfLabelRow) / 2 - heightOfMyHeadRow
-//        label.position = CGPointMake(-size.width * 0.45 + CGFloat(column) * sizeOfElement.width,  verticalPosition - CGFloat(row) * sizeOfElement.height)
-        shape.position = CGPoint(x: xPos, y: verticalPosition - CGFloat(row) * heightOfLabelRow)
+        shape.position = CGPoint(x: xPos, y: (verticalPosition + heightOfLabelRow / 6) - CGFloat(row) * heightOfLabelRow)
         shape.alpha = 1.0
         shape.size = texture.size()
         shape.zPosition = self.zPosition + 1000
@@ -309,8 +345,6 @@ class MySKTable: SKSpriteNode {
             shape.name = name + elementSeparator + String(index) + elementSeparator
             
             
-            let verticalPosition = (self.size.height - heightOfLabelRow) / 2 - heightOfMyHeadRow
-            //        label.position = CGPointMake(-size.width * 0.45 + CGFloat(column) * sizeOfElement.width,  verticalPosition - CGFloat(row) * sizeOfElement.height)
             shape.position = CGPoint(x: imagePosition, y: verticalPosition - CGFloat(row) * heightOfLabelRow)
             shape.alpha = 1.0
             shape.size = CGSize(width: imageSize, height: imageSize)
@@ -345,21 +379,24 @@ class MySKTable: SKSpriteNode {
         for _ in 0..<children.count {
             self.children.last!.removeFromParent()
         }
-        self.sizeOfElement = CGSize(width: size.width / CGFloat(columns), height: size.height / CGFloat(rows))
-        myHeight = heightOfLabelRow * CGFloat(rows) + heightOfMyHeadRow
+        
+        self.removeFromParent()
+        createTable()
+/*
+        myHeight = heightOfLabelRow * CGFloat(self.rows) + heightOfMyHeadRow
 
         self.size = CGSize(width: self.size.width, height: myHeight)
-        verticalPosition = (self.size.height - heightOfLabelRow) / 2 - heightOfMyHeadRow
+//        verticalPosition = (self.size.height - heightOfLabelRow) / 2 - heightOfMyHeadRow
         self.texture = SKTexture(image: drawTableImage(size, columnWidths: columnWidths, columns: columns, rows: rows))
 //        let myTargetPosition = CGPointMake(parentView!.frame.size.width / 2, parentView!.frame.size.height / 2)
-        let pSize = myParent.parent!.scene!.size
+        let pSize = GV.mainScene!.size
         myTargetPosition = CGPoint(x: pSize.width / 2, y: pSize.height / 2)
         self.position = myTargetPosition
         myStartPosition = CGPoint(x: pSize.width, y: pSize.height / 2)
-        self.removeFromParent()
         showMyImagesAndHeader(DrawImages.getGoBackImage(CGSize(width: myImageSize, height: myImageSize)), position: 20, name: goBackImageName)
+*/
+        self.position = myTargetPosition
         myParent.parent!.addChild(self)
-        
     }
     
     func getColumnRowOfElement(_ name: String)->(column:Int, row:Int) {        
@@ -373,12 +410,8 @@ class MySKTable: SKSpriteNode {
         let opaque = false
         let scale: CGFloat = 1
 
-//        let heightOfTableRow = size.height -  / CGFloat(rows)
-        
-        
         let w = size.width / 100
         
-        //let mySize = CGSizeMake(size.width - 20, size.height)
         UIGraphicsBeginImageContextWithOptions(CGSize(width: size.width, height: myHeight), opaque, scale)
         let ctx = UIGraphicsGetCurrentContext()
         
@@ -484,34 +517,46 @@ class MySKTable: SKSpriteNode {
         if touchesEndedAtNode is SKSpriteNode && (touchesEndedAtNode as! SKSpriteNode).name == goBackImageName {
             return (.goBackEvent,row, column, NoValue)
         }
-        return (.noEvent, row, column, element)
+        return (.noEvent, startIndex + row - 1, column, element)
         
         
     }
-    
-    func scrollView(_ delta: CGFloat) {
-        var adder = delta
-        if scrolling {
-            if delta >= 0 {
-                if self.position.y + delta > myHeight / 2 {
-                    adder = self.position.y - myHeight / 2
-                }
-            } else {
-                if self.position.y + delta + myHeight / 2 < myParentScene.frame.maxY {
-                    adder = myParentScene.frame.maxY - self.position.y - myHeight / 2
-                }
-            }
-            if abs(adder) > 1 {
-                self.position.y += adder
-            }
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let touchLocation = touches.first!.location(in: self)
+        touchesBeganAtNode = atPoint(touchLocation)
+        
+        lastLocation = touches.first!.location(in: GV.mainViewController!.view)
+        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != self.name)) {
+            touchesBeganAtNode = nil
+        }
+    }
+
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let actLocation = touches.first!.location(in: GV.mainViewController!.view)
+        let delta:CGFloat = lastLocation.y - actLocation.y
+        if abs(delta) > heightOfLabelRow / 2 {
+            lastLocation = actLocation
+            scrollView(delta)
         }
     }
     
-    func setMyDeviceSpecialConstants() {
-        
-    }
-    
-    
 
-   
+    
+    func scrollView(_ delta: CGFloat) {
+        let adder = delta >= 0 ? 1 : -1
+        if scrolling {
+            if adder >= 0 {
+                if startIndex + adder < tableOfRows.count + 2 - maxLineCount {
+                    startIndex += adder
+                    showTable()
+                }
+            } else {
+                if startIndex + adder > 0 {
+                    startIndex += adder
+                    showTable()
+                }
+            }
+        }
+    }
 }

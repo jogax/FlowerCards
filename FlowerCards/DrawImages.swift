@@ -734,6 +734,32 @@ class DrawImages {
         return UIImage()
     }
     
+    static func getLockImage (_ size: CGSize) -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(size, false, 1)
+        let ctx = UIGraphicsGetCurrentContext()
+        let w = size.width / 100
+        let h = size.height / 100
+        
+        ctx!.setStrokeColor(UIColor.yellow.cgColor)
+        ctx!.setLineJoin (.round)
+        ctx!.setLineCap (.round)
+        
+        ctx!.setLineWidth(w * 20)
+        let points = [
+            CGPoint(x: w * 10, y: h * 70),
+            CGPoint(x: w * 50, y: h * 95),
+            CGPoint(x: w * 80, y: h * 20)
+        ]
+        //        CGContextAddLines(ctx, points, points.count)
+        ctx!.addLines(between: points)
+        ctx!.strokePath()
+        
+        if let image = UIGraphicsGetImageFromCurrentImageContext() {
+            return image
+        }
+        return UIImage()
+    }
+    
     static func getNOKImage (_ size: CGSize) -> UIImage {
         UIGraphicsBeginImageContextWithOptions(size, false, 1)
         let ctx = UIGraphicsGetCurrentContext()

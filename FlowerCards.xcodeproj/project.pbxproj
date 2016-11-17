@@ -48,11 +48,11 @@
 		2025F12F1D5B25C300561FBF /* Mirror2.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F12A1D5B25C300561FBF /* Mirror2.m4a */; };
 		2025F1301D5B25C300561FBF /* Mirror3.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2025F12B1D5B25C300561FBF /* Mirror3.m4a */; };
 		2025F1321D5B26A200561FBF /* MySKPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1311D5B26A200561FBF /* MySKPanel.swift */; };
-		2029FC621DD76A81006473EE /* LevelModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2029FC611DD76A81006473EE /* LevelModel.swift */; };
 		202A53FD1DBE4B75001152F8 /* News Pro Version EN.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 202A53FC1DBE4B75001152F8 /* News Pro Version EN.rtf */; };
 		202A53FF1DBE4C8E001152F8 /* News Pro Version DE.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 202A53FE1DBE4C8E001152F8 /* News Pro Version DE.rtf */; };
 		202A54011DBE4C9F001152F8 /* News Pro Version HU.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 202A54001DBE4C9F001152F8 /* News Pro Version HU.rtf */; };
 		202A54031DBE4CB1001152F8 /* News Pro Version RU.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 202A54021DBE4CB1001152F8 /* News Pro Version RU.rtf */; };
+		202ED85A1DD9EF380003D923 /* FlowerCardsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 202ED8591DD9EF380003D923 /* FlowerCardsTests.swift */; };
 		20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20389B541D5F7EB400ADD133 /* Mirror5.m4a */; };
 		20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20720A751D5B55E600389C0C /* Mirror4.m4a */; };
 		2087A2EB1DCA3D120085D711 /* ChooseLevelAndOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2087A2EA1DCA3D120085D711 /* ChooseLevelAndOptions.swift */; };
@@ -63,6 +63,16 @@
 		20B1F1101D5B483000963590 /* Winner.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F10F1D5B483000963590 /* Winner.m4a */; };
 		27FC725BB5FD5284C6E90A56 /* Pods_FlowerCards.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0912CB345E0E83ECC2EC999C /* Pods_FlowerCards.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		202ED85C1DD9EF380003D923 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2025F0B21D5B18F300561FBF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2025F0B91D5B18F300561FBF;
+			remoteInfo = FlowerCards;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		2025F0EA1D5B208900561FBF /* Embed Frameworks */ = {
@@ -123,11 +133,13 @@
 		2025F12A1D5B25C300561FBF /* Mirror2.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror2.m4a; sourceTree = "<group>"; };
 		2025F12B1D5B25C300561FBF /* Mirror3.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror3.m4a; sourceTree = "<group>"; };
 		2025F1311D5B26A200561FBF /* MySKPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKPanel.swift; sourceTree = "<group>"; };
-		2029FC611DD76A81006473EE /* LevelModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelModel.swift; sourceTree = "<group>"; };
 		202A53FC1DBE4B75001152F8 /* News Pro Version EN.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "News Pro Version EN.rtf"; sourceTree = "<group>"; };
 		202A53FE1DBE4C8E001152F8 /* News Pro Version DE.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "News Pro Version DE.rtf"; sourceTree = "<group>"; };
 		202A54001DBE4C9F001152F8 /* News Pro Version HU.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "News Pro Version HU.rtf"; sourceTree = "<group>"; };
 		202A54021DBE4CB1001152F8 /* News Pro Version RU.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "News Pro Version RU.rtf"; sourceTree = "<group>"; };
+		202ED8571DD9EF380003D923 /* FlowerCardsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlowerCardsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		202ED8591DD9EF380003D923 /* FlowerCardsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowerCardsTests.swift; sourceTree = "<group>"; };
+		202ED85B1DD9EF380003D923 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		20389B541D5F7EB400ADD133 /* Mirror5.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror5.m4a; sourceTree = "<group>"; };
 		20720A751D5B55E600389C0C /* Mirror4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror4.m4a; sourceTree = "<group>"; };
 		2087A2EA1DCA3D120085D711 /* ChooseLevelAndOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseLevelAndOptions.swift; sourceTree = "<group>"; };
@@ -148,6 +160,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		202ED8541DD9EF380003D923 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -155,6 +174,7 @@
 			isa = PBXGroup;
 			children = (
 				2025F0BC1D5B18F300561FBF /* FlowerCards */,
+				202ED8581DD9EF380003D923 /* FlowerCardsTests */,
 				2025F0BB1D5B18F300561FBF /* Products */,
 				40E43C69DAF1E087E8038AB9 /* Frameworks */,
 				9C61685BE5AB956F46BE15D8 /* Pods */,
@@ -165,6 +185,7 @@
 			isa = PBXGroup;
 			children = (
 				2025F0BA1D5B18F300561FBF /* FlowerCards.app */,
+				202ED8571DD9EF380003D923 /* FlowerCardsTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -172,25 +193,11 @@
 		2025F0BC1D5B18F300561FBF /* FlowerCards */ = {
 			isa = PBXGroup;
 			children = (
-				2025F1011D5B226E00561FBF /* PlayerModel.swift */,
-				2029FC611DD76A81006473EE /* LevelModel.swift */,
-				2025F1041D5B226E00561FBF /* GameModel.swift */,
-				2025F1021D5B226E00561FBF /* GamePredefinitionModel.swift */,
-				2025F1211D5B246E00561FBF /* RecordIDModel.swift */,
-				2025F1171D5B23BB00561FBF /* StatisticModel.swift */,
 				2025F1031D5B226E00561FBF /* GamePredefinitions.swift */,
 				2025F1231D5B253900561FBF /* CardGameScene.swift */,
 				2025F1051D5B226E00561FBF /* PeerToPeerServiceManager.swift */,
 				2025F0F51D5B21AC00561FBF /* MyStructs.swift */,
-				2025F0F61D5B21AC00561FBF /* MySKPlayer.swift */,
-				2025F0F71D5B21AC00561FBF /* MySKTable.swift */,
-				2087A2EA1DCA3D120085D711 /* ChooseLevelAndOptions.swift */,
-				2025F0F81D5B21AC00561FBF /* MySKStatistic.swift */,
-				2025F0F91D5B21AC00561FBF /* MySKDetailedStatistic.swift */,
-				2025F0FA1D5B21AC00561FBF /* MySKGameStatistic.swift */,
 				2025F0EB1D5B219C00561FBF /* MySKButton.swift */,
-				2025F0EC1D5B219C00561FBF /* MySKLanguages.swift */,
-				2025F0ED1D5B219C00561FBF /* MySKSlider.swift */,
 				2025F0EE1D5B219C00561FBF /* MyRandom.swift */,
 				2025F0EF1D5B219C00561FBF /* MySKNode.swift */,
 				2025F0BD1D5B18F300561FBF /* AppDelegate.swift */,
@@ -198,18 +205,56 @@
 				2025F1311D5B26A200561FBF /* MySKPanel.swift */,
 				2025F1251D5B256A00561FBF /* JGXLine.swift */,
 				2025F11D1D5B23F600561FBF /* DrawImages.swift */,
-				2025F11B1D5B23C500561FBF /* sprites.atlas */,
 				2025F1181D5B23BB00561FBF /* Stack.swift */,
 				2025F10B1D5B231200561FBF /* LevelsForPlayWithCards.swift */,
 				2025F0D41D5B1A1E00561FBF /* Extensions.swift */,
 				2025F0C51D5B18F300561FBF /* Main.storyboard */,
-				2025F0C81D5B18F300561FBF /* Assets.xcassets */,
 				2025F0CA1D5B18F300561FBF /* LaunchScreen.storyboard */,
 				2025F0CD1D5B18F300561FBF /* Info.plist */,
+				2025F11B1D5B23C500561FBF /* sprites.atlas */,
+				2025F0C81D5B18F300561FBF /* Assets.xcassets */,
+				202C7EBF1DDC931F00DC24BD /* RealmModels */,
+				202C7EBE1DDC926900DC24BD /* MyTableViews */,
 				20720A791D5B72BB00389C0C /* Music */,
 				20720A7A1D5B732B00389C0C /* Language */,
 			);
 			path = FlowerCards;
+			sourceTree = "<group>";
+		};
+		202C7EBE1DDC926900DC24BD /* MyTableViews */ = {
+			isa = PBXGroup;
+			children = (
+				2025F0F71D5B21AC00561FBF /* MySKTable.swift */,
+				2025F0F61D5B21AC00561FBF /* MySKPlayer.swift */,
+				2025F0ED1D5B219C00561FBF /* MySKSlider.swift */,
+				2025F0EC1D5B219C00561FBF /* MySKLanguages.swift */,
+				2087A2EA1DCA3D120085D711 /* ChooseLevelAndOptions.swift */,
+				2025F0F81D5B21AC00561FBF /* MySKStatistic.swift */,
+				2025F0F91D5B21AC00561FBF /* MySKDetailedStatistic.swift */,
+				2025F0FA1D5B21AC00561FBF /* MySKGameStatistic.swift */,
+			);
+			name = MyTableViews;
+			sourceTree = "<group>";
+		};
+		202C7EBF1DDC931F00DC24BD /* RealmModels */ = {
+			isa = PBXGroup;
+			children = (
+				2025F1011D5B226E00561FBF /* PlayerModel.swift */,
+				2025F1041D5B226E00561FBF /* GameModel.swift */,
+				2025F1021D5B226E00561FBF /* GamePredefinitionModel.swift */,
+				2025F1211D5B246E00561FBF /* RecordIDModel.swift */,
+				2025F1171D5B23BB00561FBF /* StatisticModel.swift */,
+			);
+			name = RealmModels;
+			sourceTree = "<group>";
+		};
+		202ED8581DD9EF380003D923 /* FlowerCardsTests */ = {
+			isa = PBXGroup;
+			children = (
+				202ED8591DD9EF380003D923 /* FlowerCardsTests.swift */,
+				202ED85B1DD9EF380003D923 /* Info.plist */,
+			);
+			path = FlowerCardsTests;
 			sourceTree = "<group>";
 		};
 		20720A791D5B72BB00389C0C /* Music */ = {
@@ -287,13 +332,31 @@
 			productReference = 2025F0BA1D5B18F300561FBF /* FlowerCards.app */;
 			productType = "com.apple.product-type.application";
 		};
+		202ED8561DD9EF380003D923 /* FlowerCardsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 202ED8601DD9EF380003D923 /* Build configuration list for PBXNativeTarget "FlowerCardsTests" */;
+			buildPhases = (
+				202ED8531DD9EF380003D923 /* Sources */,
+				202ED8541DD9EF380003D923 /* Frameworks */,
+				202ED8551DD9EF380003D923 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				202ED85D1DD9EF380003D923 /* PBXTargetDependency */,
+			);
+			name = FlowerCardsTests;
+			productName = FlowerCardsTests;
+			productReference = 202ED8571DD9EF380003D923 /* FlowerCardsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		2025F0B21D5B18F300561FBF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0730;
+				LastSwiftUpdateCheck = 0810;
 				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = "Jozsef Romhanyi";
 				TargetAttributes = {
@@ -302,6 +365,12 @@
 						DevelopmentTeam = WT499VC842;
 						LastSwiftMigration = 0800;
 						ProvisioningStyle = Automatic;
+					};
+					202ED8561DD9EF380003D923 = {
+						CreatedOnToolsVersion = 8.1;
+						DevelopmentTeam = WT499VC842;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 2025F0B91D5B18F300561FBF;
 					};
 				};
 			};
@@ -319,6 +388,7 @@
 			projectRoot = "";
 			targets = (
 				2025F0B91D5B18F300561FBF /* FlowerCards */,
+				202ED8561DD9EF380003D923 /* FlowerCardsTests */,
 			);
 		};
 /* End PBXProject section */
@@ -348,6 +418,13 @@
 				20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */,
 				20B1F1101D5B483000963590 /* Winner.m4a in Resources */,
 				2025F12C1D5B25C300561FBF /* MirrorX.m4a in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		202ED8551DD9EF380003D923 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -414,7 +491,6 @@
 				2025F1321D5B26A200561FBF /* MySKPanel.swift in Sources */,
 				2025F1091D5B226E00561FBF /* GameModel.swift in Sources */,
 				2025F0F41D5B219C00561FBF /* MySKNode.swift in Sources */,
-				2029FC621DD76A81006473EE /* LevelModel.swift in Sources */,
 				2025F0F21D5B219C00561FBF /* MySKSlider.swift in Sources */,
 				2025F1191D5B23BB00561FBF /* StatisticModel.swift in Sources */,
 				2025F10A1D5B226E00561FBF /* PeerToPeerServiceManager.swift in Sources */,
@@ -443,7 +519,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		202ED8531DD9EF380003D923 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				202ED85A1DD9EF380003D923 /* FlowerCardsTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		202ED85D1DD9EF380003D923 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2025F0B91D5B18F300561FBF /* FlowerCards */;
+			targetProxy = 202ED85C1DD9EF380003D923 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		2025F0C51D5B18F300561FBF /* Main.storyboard */ = {
@@ -510,7 +602,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "";
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = REALM_V0;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = REALM_V1;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				"Texture Atlas Maximum Size" = 4096x4096;
@@ -554,7 +646,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = REALM_V0;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = REALM_V1;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				"Texture Atlas Maximum Size" = 4096x4096;
@@ -604,6 +696,46 @@
 			};
 			name = Release;
 		};
+		202ED85E1DD9EF380003D923 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = WT499VC842;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = FlowerCardsTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = JOGAXPLAY.FlowerCardsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 3.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FlowerCards.app/FlowerCards";
+			};
+			name = Debug;
+		};
+		202ED85F1DD9EF380003D923 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				DEVELOPMENT_TEAM = WT499VC842;
+				INFOPLIST_FILE = FlowerCardsTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = JOGAXPLAY.FlowerCardsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FlowerCards.app/FlowerCards";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -621,6 +753,15 @@
 			buildConfigurations = (
 				2025F0D11D5B18F300561FBF /* Debug */,
 				2025F0D21D5B18F300561FBF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		202ED8601DD9EF380003D923 /* Build configuration list for PBXNativeTarget "FlowerCardsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				202ED85E1DD9EF380003D923 /* Debug */,
+				202ED85F1DD9EF380003D923 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
