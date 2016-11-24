@@ -77,7 +77,7 @@ let huDictionary: [TextConstants: String] = [
     .tcBestScoreOfGame:   "Legjobb pontszám % %",
     .tcYourScore:         "Pontszámod %",
     .tcYouAreTheBest:    "Tiéd a legjobb pontszám: %",
-    .tcGameNumber:       "Játék sorszáma:",
+    .tcGameNumber:       "Játék: #%",
 //    .tcChooseGameNumber: "Válassz játékot",
 //    .TCPlayerStatistic:  "Játékos statisztika",
 //    .TCGameStatistic:    "Játék statisztika",
@@ -120,7 +120,7 @@ let huDictionary: [TextConstants: String] = [
     .tcChooseLevel:     "Válassz szintet és opciókat",
     .tcLevelAndGames:   "Szint (lejátszva)",
     .tcSize:            "Formátum:",
-    .tcPackages:        "Kártyacsomag:",
+    .tcPackages:        "Csomag:",
     .tcHelpLines:       "Segédvonalak:",
 
 ]

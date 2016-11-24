@@ -9,7 +9,7 @@
 import SpriteKit
 
 let buttonName = "buttonName"
-class MySKButton: MySKNode {
+class MySKButton: MySKCard {
 //    var progressCircle = SKShapeNode()
     convenience init(texture: SKTexture, frame: CGRect) {
         self.init(texture: texture, frame: frame, makePicture: true)
@@ -25,13 +25,13 @@ class MySKButton: MySKNode {
         super.init(texture: buttonTexture, type:.buttonType, value: NoValue)
         self.position = frame.origin
         self.size = frame.size
-            let buttonPicture = MySKNode(texture: texture, type: .buttonType, value: NoValue)
+            let buttonPicture = MySKCard(texture: texture, type: .buttonType, value: NoValue)
             buttonPicture.size = size * 0.95
             buttonPicture.zPosition = 1
             buttonPicture.name = buttonName
             addChild(buttonPicture)
             if makePicture {
-                let shadow = MySKNode(texture: texture, type: .buttonType, value: NoValue)
+                let shadow = MySKCard(texture: texture, type: .buttonType, value: NoValue)
                 shadow.blendMode = SKBlendMode.alpha
                 shadow.colorBlendFactor = 0.5;
                 shadow.color = SKColor.red
@@ -52,7 +52,7 @@ class MySKButton: MySKNode {
         }
     
     func changeButtonPicture(_ texture: SKTexture) {
-        (self.childNode(withName: buttonName)! as! MySKNode).texture = texture
+        (self.childNode(withName: buttonName)! as! MySKCard).texture = texture
     }
 
     required init?(coder aDecoder: NSCoder) {

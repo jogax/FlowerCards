@@ -109,8 +109,7 @@ class MySKGameStatistic: MySKTable {
 //        scrollView(delta)
 //    }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let (_, row, column, _) = checkTouches(touches, withEvent: event)
+    override func ownTouchesEnded(row: Int, column: Int, element: Int) {
         switch (row, column) {
         case (0, 0):
             let fadeInAction = SKAction.fadeIn(withDuration: 0.5)

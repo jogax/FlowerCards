@@ -77,7 +77,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcBestScoreOfGame:   "Лучший результат % %",
     .tcYourScore:         "Твой результат %",
     .tcYouAreTheBest:    "Вы самый лучший со счетом %",
-    .tcGameNumber:       "Номер игры:",
+    .tcGameNumber:       "Игра: #%",
 //    .tcChooseGameNumber: "Выбери игру",
 //    .TCPlayerStatistic:  "Статистика игроков",
 //    .TCGameStatistic:    "Статистика игр",

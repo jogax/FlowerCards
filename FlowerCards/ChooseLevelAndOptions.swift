@@ -12,24 +12,24 @@ import SpriteKit
 
 
 class ChooseLevelAndOptions: MySKTable {
-    let myDetailedColumnWidths: [CGFloat] = [30, 20, 20, 30] // in %
+    var callBack: () -> ()
+    let myDetailedColumnWidths: [CGFloat] = [20, 20, 20, 25, 15] // in %
     let chooseLevelColumn = 0
-    let choosePackageNrColumn = 2
+    let showPackageNrColumn = 2
     let chooseHelplineTypeColumn = 3
+    let startPlayingLevel = 4
     var countColumns = 0
     var countLevels = 0
     let playerID: Int
     let xxx = SKSpriteNode()
+    let startImage = DrawImages.getStartImage(CGSize(width: 20, height: 20))
     
-    
-    
-    
-    
-    init() {
+    init(_ callBack: @escaping ()->()) {
         self.playerID = GV.player!.ID
         let playerName = realm.objects(PlayerModel.self).filter("ID = %d", playerID).first!.name
         countColumns = myDetailedColumnWidths.count
         countLevels = GV.levelsForPlay.count()
+        self.callBack = callBack
         let headLines = GV.language.getText(.tcPlayerStatisticHeader, values: playerName)
 //        self.myName = "ChooseLevelAndOptions"
 
@@ -51,7 +51,8 @@ class ChooseLevelAndOptions: MySKTable {
         let elements: [MultiVar] = [MultiVar(string: GV.language.getText(.tcLevel)),
                                     MultiVar(string: GV.language.getText(.tcSize)),
                                     MultiVar(string: GV.language.getText(.tcPackages)),
-                                    MultiVar(string: GV.language.getText(.tcHelpLines))
+                                    MultiVar(string: GV.language.getText(.tcHelpLines)),
+                                    MultiVar(string: GV.language.getText(.tcStart))
                                     ]
 //        showRowOfTable(rowOfTable: RowOfTable(elements: elements, selected: true), row: 0)
         tableOfRows.append(RowOfTable(elements: elements, selected: true))
@@ -71,8 +72,8 @@ class ChooseLevelAndOptions: MySKTable {
             }
             switch helpLinesCount {
                 case 2: helpLineTextures = [greenRedTexture, purpleTexture, noColorTexture]
-                case 1: helpLineTextures = [greenRedTexture, purpleTexture, noColorTexture]
-                case 0: helpLineTextures = [greenRedTexture, purpleTexture, noColorTexture]
+//                case 1: helpLineTextures = [greenRedTexture, purpleTexture, noColorTexture]
+//                case 0: helpLineTextures = [greenRedTexture, purpleTexture, noColorTexture]
                 default: break
             }
             #if REALM_V1
@@ -82,44 +83,46 @@ class ChooseLevelAndOptions: MySKTable {
                                         MultiVar(string: GV.levelsForPlay.getLevelFormat(level: levelID)),
                                         MultiVar(string: String(actPackageCount)),
                                         MultiVar(textures: helpLineTextures),
+                                        MultiVar(texture: SKTexture(image: startImage))
             ]
 //            showRowOfTable(rowOfTable: RowOfTable(elements: elements, selected: levelID == GV.player!.levelID ? true : false), row: levelID + 1)
             tableOfRows.append(RowOfTable(elements: elements, selected: levelID == GV.player!.levelID ? true : false))
         }
+        // show the actLevel in the first line!
+        setStartIndex() // the actLevel should always be on screen!
         showTable()
     }
     
-//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        let touchLocation = touches.first!.location(in: self)
-//        touchesBeganAtNode = atPoint(touchLocation)
-//        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != self.name)) {
-//            touchesBeganAtNode = nil
-//        }
-//    }
-//    
-//    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        _ = touches.first!.location(in: self)
-//    }
-//    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let (_, row, column, element) = checkTouches(touches, withEvent: event)
+    
+    // called only when not after scrolling of the screen
+    override func ownTouchesEnded(row: Int, column: Int, element: Int) {
         switch (row, column, element) {
         case (0, 0, _):
             removeFromParent()
-        case (2..<1000, chooseLevelColumn, NoValue):
-            realm.beginWrite()
-            GV.player!.levelID = row - 2
-            try! realm.commitWrite()
-            removeFromParent()
-            showMe(showLevels)
-        case (2..<1000, choosePackageNrColumn, 0...2):
-            break
+        case (2..<1000, chooseLevelColumn...chooseHelplineTypeColumn, NoValue):
+            setLevel(level: row - 2)
         case (2..<1000, chooseHelplineTypeColumn, 0...2):
+            break
+        case (2..<1000, startPlayingLevel, _):
+            if tableOfRows[row - 1].selected {
+                callBack()  // start a new Game at this level
+            } else {
+                setLevel(level: row - 2)
+            }
+            
             break
         default:
             break
         }
         
+    }
+    
+    func setLevel(level: Int) {
+        realm.beginWrite()
+        GV.player!.levelID = level
+        try! realm.commitWrite()
+        setStartIndex()
+        showTable()
     }
     
 

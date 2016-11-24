@@ -99,17 +99,17 @@ class MySKStatistic: MySKTable {
         return name
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let touchLocation = touches.first!.location(in: self)
-        touchesBeganAtNode = atPoint(touchLocation)
-        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != self.name)) {
-            touchesBeganAtNode = nil
-        }
-    }
+//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        let touchLocation = touches.first!.location(in: self)
+//        touchesBeganAtNode = atPoint(touchLocation)
+//        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != self.name)) {
+//            touchesBeganAtNode = nil
+//        }
+//    }
     
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        _ = touches.first!.location(in: self)
-    }
+//    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        _ = touches.first!.location(in: self)
+//    }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let (_, row, column, _) = checkTouches(touches, withEvent: event)

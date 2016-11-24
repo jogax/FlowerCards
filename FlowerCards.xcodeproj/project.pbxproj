@@ -18,7 +18,7 @@
 		2025F0F11D5B219C00561FBF /* MySKLanguages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0EC1D5B219C00561FBF /* MySKLanguages.swift */; };
 		2025F0F21D5B219C00561FBF /* MySKSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0ED1D5B219C00561FBF /* MySKSlider.swift */; };
 		2025F0F31D5B219C00561FBF /* MyRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0EE1D5B219C00561FBF /* MyRandom.swift */; };
-		2025F0F41D5B219C00561FBF /* MySKNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0EF1D5B219C00561FBF /* MySKNode.swift */; };
+		2025F0F41D5B219C00561FBF /* MySKCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0EF1D5B219C00561FBF /* MySKCard.swift */; };
 		2025F0FB1D5B21AC00561FBF /* MyStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0F51D5B21AC00561FBF /* MyStructs.swift */; };
 		2025F0FC1D5B21AC00561FBF /* MySKPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0F61D5B21AC00561FBF /* MySKPlayer.swift */; };
 		2025F0FD1D5B21AC00561FBF /* MySKTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F0F71D5B21AC00561FBF /* MySKTable.swift */; };
@@ -102,7 +102,7 @@
 		2025F0EC1D5B219C00561FBF /* MySKLanguages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKLanguages.swift; sourceTree = "<group>"; };
 		2025F0ED1D5B219C00561FBF /* MySKSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKSlider.swift; sourceTree = "<group>"; };
 		2025F0EE1D5B219C00561FBF /* MyRandom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyRandom.swift; sourceTree = "<group>"; };
-		2025F0EF1D5B219C00561FBF /* MySKNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKNode.swift; sourceTree = "<group>"; };
+		2025F0EF1D5B219C00561FBF /* MySKCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKCard.swift; sourceTree = "<group>"; };
 		2025F0F51D5B21AC00561FBF /* MyStructs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyStructs.swift; sourceTree = "<group>"; };
 		2025F0F61D5B21AC00561FBF /* MySKPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKPlayer.swift; sourceTree = "<group>"; };
 		2025F0F71D5B21AC00561FBF /* MySKTable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MySKTable.swift; sourceTree = "<group>"; };
@@ -193,30 +193,23 @@
 		2025F0BC1D5B18F300561FBF /* FlowerCards */ = {
 			isa = PBXGroup;
 			children = (
-				2025F1031D5B226E00561FBF /* GamePredefinitions.swift */,
-				2025F1231D5B253900561FBF /* CardGameScene.swift */,
 				2025F1051D5B226E00561FBF /* PeerToPeerServiceManager.swift */,
 				2025F0F51D5B21AC00561FBF /* MyStructs.swift */,
-				2025F0EB1D5B219C00561FBF /* MySKButton.swift */,
-				2025F0EE1D5B219C00561FBF /* MyRandom.swift */,
-				2025F0EF1D5B219C00561FBF /* MySKNode.swift */,
 				2025F0BD1D5B18F300561FBF /* AppDelegate.swift */,
 				2025F0D31D5B1A1E00561FBF /* GameViewController.swift */,
 				2025F1311D5B26A200561FBF /* MySKPanel.swift */,
-				2025F1251D5B256A00561FBF /* JGXLine.swift */,
 				2025F11D1D5B23F600561FBF /* DrawImages.swift */,
-				2025F1181D5B23BB00561FBF /* Stack.swift */,
-				2025F10B1D5B231200561FBF /* LevelsForPlayWithCards.swift */,
 				2025F0D41D5B1A1E00561FBF /* Extensions.swift */,
 				2025F0C51D5B18F300561FBF /* Main.storyboard */,
 				2025F0CA1D5B18F300561FBF /* LaunchScreen.storyboard */,
 				2025F0CD1D5B18F300561FBF /* Info.plist */,
 				2025F11B1D5B23C500561FBF /* sprites.atlas */,
 				2025F0C81D5B18F300561FBF /* Assets.xcassets */,
+				202D45461DE1E5B900DB6B0E /* GameEngine */,
 				202C7EBF1DDC931F00DC24BD /* RealmModels */,
 				202C7EBE1DDC926900DC24BD /* MyTableViews */,
-				20720A791D5B72BB00389C0C /* Music */,
 				20720A7A1D5B732B00389C0C /* Language */,
+				20720A791D5B72BB00389C0C /* Music */,
 			);
 			path = FlowerCards;
 			sourceTree = "<group>";
@@ -246,6 +239,21 @@
 				2025F1171D5B23BB00561FBF /* StatisticModel.swift */,
 			);
 			name = RealmModels;
+			sourceTree = "<group>";
+		};
+		202D45461DE1E5B900DB6B0E /* GameEngine */ = {
+			isa = PBXGroup;
+			children = (
+				2025F1031D5B226E00561FBF /* GamePredefinitions.swift */,
+				2025F1231D5B253900561FBF /* CardGameScene.swift */,
+				2025F0EF1D5B219C00561FBF /* MySKCard.swift */,
+				2025F10B1D5B231200561FBF /* LevelsForPlayWithCards.swift */,
+				2025F0EB1D5B219C00561FBF /* MySKButton.swift */,
+				2025F0EE1D5B219C00561FBF /* MyRandom.swift */,
+				2025F1181D5B23BB00561FBF /* Stack.swift */,
+				2025F1251D5B256A00561FBF /* JGXLine.swift */,
+			);
+			name = GameEngine;
 			sourceTree = "<group>";
 		};
 		202ED8581DD9EF380003D923 /* FlowerCardsTests */ = {
@@ -490,7 +498,7 @@
 				2025F0FE1D5B21AC00561FBF /* MySKStatistic.swift in Sources */,
 				2025F1321D5B26A200561FBF /* MySKPanel.swift in Sources */,
 				2025F1091D5B226E00561FBF /* GameModel.swift in Sources */,
-				2025F0F41D5B219C00561FBF /* MySKNode.swift in Sources */,
+				2025F0F41D5B219C00561FBF /* MySKCard.swift in Sources */,
 				2025F0F21D5B219C00561FBF /* MySKSlider.swift in Sources */,
 				2025F1191D5B23BB00561FBF /* StatisticModel.swift in Sources */,
 				2025F10A1D5B226E00561FBF /* PeerToPeerServiceManager.swift in Sources */,

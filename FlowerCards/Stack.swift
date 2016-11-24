@@ -8,49 +8,49 @@
 
 
 enum StackType: Int {
-    case saveSpriteType = 0, mySKNodeType
+    case SavedCardType = 0, MySKCardType
 }
 class Stack<T> {
-    fileprivate var savedSpriteStack: Array<SavedSprite>
-    fileprivate var cardStack: Array<MySKNode>
+    fileprivate var savedCardStack: Array<SavedCard>
+    fileprivate var cardStack: Array<MySKCard>
     var lastRandomIndex = -1
     
     init() {
-        savedSpriteStack = Array<SavedSprite>()
-        cardStack = Array<MySKNode>()
+        savedCardStack = Array<SavedCard>()
+        cardStack = Array<MySKCard>()
     }
     
-    func push (_ value: SavedSprite) {
-        savedSpriteStack.append(value)
+    func push (_ value: SavedCard) {
+        savedCardStack.append(value)
     }
     
-    func push (_ value: MySKNode) {
+    func push (_ value: MySKCard) {
         cardStack.append(value)
     }
 
-    func pushLast (_ value: MySKNode) {
+    func pushLast (_ value: MySKCard) {
         cardStack.insert(value, at: 0)
     }
 
     func count(_ type: StackType)->Int {
         switch type {
-            case .mySKNodeType: return cardStack.count
-            case .saveSpriteType: return savedSpriteStack.count
+            case .MySKCardType: return cardStack.count
+            case .SavedCardType: return savedCardStack.count
         }
     }
     
-    func pull () -> SavedSprite? {
+    func pull () -> SavedCard? {
 
-        if savedSpriteStack.count > 0 {
-            let value = savedSpriteStack.last
-            savedSpriteStack.removeLast()
+        if savedCardStack.count > 0 {
+            let value = savedCardStack.last
+            savedCardStack.removeLast()
             return value!
         } else {
             return nil
         }
     }
     
-    func pull () -> MySKNode? {        
+    func pull () -> MySKCard? {        
         if cardStack.count > 0 {
             let value = cardStack.last
             cardStack.removeLast()
@@ -60,7 +60,7 @@ class Stack<T> {
         }
     }
     
-    func last() -> MySKNode? {
+    func last() -> MySKCard? {
         if cardStack.count > 0 {
             let value = cardStack.last
             return value!
@@ -69,7 +69,7 @@ class Stack<T> {
         }
     }
     
-    func random(_ random: MyRandom?)->MySKNode? {
+    func random(_ random: MyRandom?)->MySKCard? {
         lastRandomIndex = random!.getRandomInt(0, max: cardStack.count - 1)
         return cardStack[lastRandomIndex]
     }
@@ -83,16 +83,16 @@ class Stack<T> {
     
     func countChangesInStack() -> Int {
         var counter = 0
-        for index in 0..<savedSpriteStack.count {
-            if !(savedSpriteStack[index].status == .added || savedSpriteStack[index].status == .addedFromCardStack) {counter += 1}
+        for index in 0..<savedCardStack.count {
+            if !(savedCardStack[index].status == .added || savedCardStack[index].status == .addedFromCardStack) {counter += 1}
         }
         return counter
     }
     
     func removeAll(_ type: StackType) {
         switch type {
-            case .mySKNodeType: cardStack.removeAll(keepingCapacity: false)
-            case .saveSpriteType: savedSpriteStack.removeAll(keepingCapacity: false)
+            case .MySKCardType: cardStack.removeAll(keepingCapacity: false)
+            case .SavedCardType: savedCardStack.removeAll(keepingCapacity: false)
         }
     }
 }

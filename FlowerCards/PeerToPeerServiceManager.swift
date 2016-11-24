@@ -171,7 +171,7 @@ extension PeerToPeerServiceManager : MCNearbyServiceAdvertiserDelegate {
 
     
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, error: NSError) {
-        print("didNotStartAdvertisingPeer: \(error)")
+//        print("didNotStartAdvertisingPeer: \(error)")
     }
     
 //    func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?,  invitationHandler: (Bool, MCSession) -> Void) {
@@ -184,7 +184,7 @@ extension PeerToPeerServiceManager : MCNearbyServiceAdvertiserDelegate {
 extension PeerToPeerServiceManager : MCNearbyServiceBrowserDelegate {
 
     private func browser(_ browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: NSError) {
-        print("didNotStartBrowsingForPeers: \(error)")
+//        print("didNotStartBrowsingForPeers: \(error)")
     }
 
     
@@ -249,16 +249,16 @@ extension PeerToPeerServiceManager : MCSessionDelegate {
     }
     
     func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
-        print("from \(myPeerId.displayName):didStartReceivingResourceWithName")
+//        print("from \(myPeerId.displayName):didStartReceivingResourceWithName")
     }
     
     
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL , withError error: Error?) {
-        print("from \(myPeerId.displayName):didFinishReceivingResourceWithName")
+//        print("from \(myPeerId.displayName):didFinishReceivingResourceWithName")
     }
     
    func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
-        print("from \(myPeerId.displayName):didReceiveStream")
+//        print("from \(myPeerId.displayName):didReceiveStream")
     }
     
     

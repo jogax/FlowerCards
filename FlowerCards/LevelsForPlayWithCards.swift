@@ -8,6 +8,31 @@
 
 import SpriteKit
 
+struct LevelParam {
+    
+    #if REALM_V1
+    var countPackages: Int
+    #endif
+    var countColumns: Int
+    var countRows: Int
+    var minProzent: Int
+    var maxProzent: Int
+    var cardSize: Int
+    
+    init()
+    {
+        #if REALM_V1
+            countPackages = 0
+        #endif
+        self.countColumns = 0
+        self.countRows = 0
+        self.minProzent = 0
+        self.maxProzent = 0
+        self.cardSize = 0
+    }
+    
+}
+
 
 class LevelsForPlayWithCards {
 
@@ -18,47 +43,50 @@ class LevelsForPlayWithCards {
         CountRows = 2,
         MinProzent = 3,
         MaxProzent = 4,
-        SpriteSize = 5,
+        CardSize = 5,
     }
     */
     var CardPlay = false
     var level: Int
     var aktLevel: LevelParam
+    let maxCountPackages = 4
     
     #if REALM_V1
     fileprivate var levelContent = [
         
         "3,3,40,60,40",
         "3,4,40,60,40",
-        "3,5,40,60,40",
-        "3,6,40,60,40",
+        "3,5,40,60,35",
+        "3,6,40,60,35",
         
-        "4,4,40,60,40",  // old 0 new 4        
-        "4,5,40,60,40",
+        "4,4,40,60,35",  // old 0 new 4
+        "4,5,40,60,35",
         "4,6,40,60,32",
         "4,7,40,60,32",
         
-        "5,5,40,60,35",  // old 1 new 8
-        "5,6,40,60,33",
-        "5,7,40,60,33",
-        "5,8,40,60,33",
+        "5,5,40,60,32",  // old 1 new 8
+        "5,6,40,60,32",
+        "5,7,40,60,30",
+        "5,8,40,60,30",
         
-        "6,6,40,60,33", // old 2 new 12
-        "6,7,40,60,33",
-        "6,8,40,60,33",
+        "6,6,40,60,30", // old 2 new 12
+        "6,7,40,60,30",
+        "6,8,40,60,24",
+        "6,9,40,60,24",
         
-        "7,7,40,60,30", // old 3 new 15
-        "7,8,40,60,30",
-        "7,9,40,60,30",
+        "7,7,40,60,28", // old 3 new 15
+        "7,8,40,60,28",
+        "7,9,40,60,24",
+        "7,10,40,60,22",
         
-        "8,8,50,60,28", // old 4 new 18
-        "8,9,50,60,28",
-        "8,10,50,60,28",
+        "8,8,50,60,24", // old 4 new 18
+        "8,9,50,60,24",
+        "8,10,50,60,22",
         
         "9,9,60,80,24", // old 5 new 21
-        "9,10,60,80,24",
+        "9,10,60,80,22",
         
-        "10,10,60,80,24", // old 6 new 23
+        "10,10,60,80,22", // old 6 new 23
     ]
     #else
         fileprivate var levelContent = [
@@ -81,7 +109,7 @@ class LevelsForPlayWithCards {
         //let sizeMultiplier: CGFloat = 1.0 //UIDevice.currentDevice().modelConstants[GV.deviceType] //GV.onIpad ? 1.0 : 0.6
         #if REALM_V1
             for index in 0..<levelContent.count {
-                for countPackages in 1...3 {
+                for countPackages in 1...maxCountPackages {
                     let paramString = levelContent[index]
                     let paramArr = paramString.components(separatedBy: ",")
                     var aktLevelParam: LevelParam = LevelParam()
@@ -90,13 +118,8 @@ class LevelsForPlayWithCards {
                     aktLevelParam.countRows = Int(paramArr[1])!
                     aktLevelParam.minProzent = Int(paramArr[2])!
                     aktLevelParam.maxProzent = Int(paramArr[3])!
-                    aktLevelParam.spriteSize = Int(paramArr[4])!
-                    
-                    // for iPhone max. size only 6 x 6
-                    let maxSizeForiPhone = 6
-                    if GV.onIpad || (aktLevelParam.countColumns <= maxSizeForiPhone && aktLevelParam.countRows <= maxSizeForiPhone) {
-                        levelParam.append(aktLevelParam)
-                    }
+                    aktLevelParam.cardSize = Int(paramArr[4])!
+                    levelParam.append(aktLevelParam)
                 }
             }
         #else
@@ -108,7 +131,7 @@ class LevelsForPlayWithCards {
                 aktLevelParam.countRows = Int(paramArr[1])!
                 aktLevelParam.minProzent = Int(paramArr[2])!
                 aktLevelParam.maxProzent = Int(paramArr[3])!
-                aktLevelParam.spriteSize = Int(paramArr[4])!
+                aktLevelParam.cardSize = Int(paramArr[4])!
                 levelParam.append(aktLevelParam)
             }
         #endif

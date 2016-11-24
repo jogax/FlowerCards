@@ -6,8 +6,8 @@
 //  Copyright (c) 2015 Jozsef Romhanyi. All rights reserved.
 //
 
-enum MySKNodeType: Int {
-    case spriteType = 0, containerType, buttonType, emptyCardType, showCardType
+enum MySKCardType: Int {
+    case cardType = 0, containerType, buttonType, emptyCardType, showCardType
 }
 
 enum TremblingType: Int {
@@ -17,13 +17,64 @@ enum TremblingType: Int {
 // Global Variables
 let NoValue = -1
 let NoColor = 1000
+let MaxColorValue = 4
 let MaxCardValue = 13
 let LastCardValue = MaxCardValue - 1
 let FirstCardValue = 0
 
 import SpriteKit
 
-class MySKNode: SKSpriteNode {
+class MySKCard: SKSpriteNode {
+    
+    enum CardStatus: Int {
+        case CardStack = 0, OnScreen, Deleted
+    }
+    struct Card {
+        let bitMaskForPackages: [UInt8] = [1, 2, 4, 8]
+        var color: Int
+        var status: CardStatus
+        var row: Int
+        var column: Int
+        var cardName: String
+        var originalValue: Int
+        var minValue: Int
+        var maxValue: Int
+        var deleted: Bool
+        var countTransitions: Int
+        var belongsToPkg: UInt8 // belongs to package
+        
+        init(color: Int, row: Int, column: Int, originalValue: Int, status: CardStatus, cardName: String) {
+            self.color = color
+            self.status = status
+            self.row = row
+            self.column = column
+            self.originalValue = originalValue
+            self.cardName = cardName
+            self.minValue = originalValue
+            self.maxValue = originalValue
+            self.deleted = false
+            self.belongsToPkg = 0
+            self.countTransitions = 0
+            for i in 0...countPackages - 1 {
+                belongsToPkg += bitMaskForPackages[i]
+            }
+        }
+    }
+    
+    struct CardIndex: Hashable {
+        var hashValue: Int {
+            get {
+                return packageIndex * 1000 + colorIndex * 100 + origValue
+            }
+        }
+        var packageIndex: Int
+        var colorIndex: Int
+        var origValue: Int
+        static func ==(left: CardIndex, right: CardIndex) -> Bool {
+            return left.hashValue == right.hashValue
+        }
+
+    }
     
     override var size: CGSize {
         didSet {
@@ -42,11 +93,14 @@ class MySKNode: SKSpriteNode {
     }
     var column = 0
     var row = 0
-    var colorIndex = 0
+    var isCard = false
+    var cardIndex = CardIndex(packageIndex: 0, colorIndex: 0,origValue: 0)
+    var colorIndex = NoColor
     var startPosition = CGPoint.zero
     var minValue: Int
     var maxValue: Int
-    var countPackages = 1
+    var belongsToPackage = NoValue
+    var countTransitions = 0
     var countScore: Int {
         get {
             return(calculateScore())
@@ -74,12 +128,11 @@ class MySKNode: SKSpriteNode {
         }
     }
     
-    var isCard = false
     
 
     var hitCounter: Int = 0
 
-    var type: MySKNodeType
+    var type: MySKCardType
     var hitLabel = SKLabelNode()
     var maxValueLabel = SKLabelNode()
     var minValueLabel = SKLabelNode()
@@ -95,29 +148,40 @@ class MySKNode: SKSpriteNode {
     let BGOffsetMultiplier = CGPoint(x: -0.10, y: 0.25)
     
 
-    init(texture: SKTexture, type:MySKNodeType, value: Int) {
+    init(texture: SKTexture, type:MySKCardType, value: Int = 0, card: Card? = nil) {
         //let modelMultiplier: CGFloat = 0.5 //UIDevice.currentDevice().modelSizeConstant
         self.type = type
         self.minValue = value
         self.maxValue = value
         self.mirrored = 0
         
-        if value > NoValue {
-            isCard = true
-        }
+        
+        
         
         switch type {
         case .containerType, .emptyCardType, .showCardType:
             hitCounter = 0
         case .buttonType:
             hitCounter = 0
-        case .spriteType:
+        case .cardType:
             hitCounter = 1
         }
         
         
 
         super.init(texture: texture, color: UIColor.clear, size: texture.size())
+        
+        if card != nil {
+            self.colorIndex = card!.color
+            self.minValue = card!.minValue
+            self.maxValue = card!.maxValue
+            self.name = card!.cardName
+        }
+        
+        if value > NoValue {
+            isCard = true
+        }
+
         if type == .buttonType {
             hitLabel.verticalAlignmentMode = SKLabelVerticalAlignmentMode.center
             hitLabel.fontSize = 20;
@@ -129,7 +193,7 @@ class MySKNode: SKSpriteNode {
             hitLabel.text = "\(hitCounter)"
             
             //print(minValue, text)
-            setLabelText(minValueLabel, value: minValue, dotCount: countPackages == 1 ? 0 : countPackages - 1)
+            setLabelText(minValueLabel, value: minValue, dotCount: belongsToPackage == NoValue ? 0 : belongsToPackage)
             minValueLabel.zPosition = self.zPosition + 1
             
             
@@ -166,8 +230,8 @@ class MySKNode: SKSpriteNode {
     
     func reload() {
         if isCard {
-            setLabelText(minValueLabel, value: minValue, dotCount: countPackages == 1 ? 0 : countPackages - 1)
-            setLabelText(maxValueLabel, value: maxValue, dotCount: countPackages == 1 ? 0 : countPackages)
+            setLabelText(minValueLabel, value: minValue, dotCount: countTransitions == 0 ? 0 : countTransitions)
+            setLabelText(maxValueLabel, value: maxValue, dotCount: countTransitions == 0 ? 0 : countTransitions + 1)
             if minValue != NoColor {
                 self.alpha = 1.0
             } else {
@@ -179,7 +243,7 @@ class MySKNode: SKSpriteNode {
             }
             let BGPicturePosition = CGPoint(x: self.size.width * BGOffsetMultiplier.x, y: self.size.height * BGOffsetMultiplier.y)
             let bgPictureName = "BGPicture"
-            if minValue != maxValue  || countPackages > 1 {
+            if minValue != maxValue  || countTransitions > 0  {
                 if !BGPictureAdded {
                     if self.childNode(withName: bgPictureName) == nil {
                         self.addChild(BGPicture)
@@ -232,44 +296,135 @@ class MySKNode: SKSpriteNode {
     
     func calculateScore()->Int {
         var actValue: Int
-        switch countPackages {
-        case 1:
+        if countTransitions == 0 {
             let midValue = Double(minValue + maxValue + 2) / Double(2)
             actValue = Int(midValue * Double((maxValue - minValue + 1)))
-        case 2, 3:
+        } else {
             var midValue = Double(minValue + LastCardValue + 2) / Double(2)
             actValue = Int(midValue * Double((LastCardValue - minValue + 1)))
             midValue = Double(maxValue + 2) / Double(2)
             actValue += Int(midValue * Double((maxValue + 1)))
-            actValue += countPackages < 3 ? 0 : 91 * (countPackages - 2)
-        default: actValue = 0
+            actValue += countTransitions == 1 ? 0 : 91 * (countTransitions - 1)
         }
         return actValue
     }
     
-    func connectWith(otherSprite: MySKNode) {
-        if otherSprite.countPackages > 1 {
-            self.countPackages += otherSprite.countPackages - 1
+    
+    func connectWith(otherCard: MySKCard) {
+
+        if countTransitions == MySKCard.countPackages - 1 {
+//            checkTransitions()
         }
-        if self.minValue == otherSprite.maxValue + 1 {
-            self.minValue = otherSprite.minValue
-        } else if self.maxValue == otherSprite.minValue - 1 {
-            self.maxValue = otherSprite.maxValue
-        } else if self.minValue == FirstCardValue && otherSprite.maxValue == LastCardValue {
-            self.minValue = otherSprite.minValue
-            countPackages += 1
-        } else if self.maxValue == LastCardValue && otherSprite.minValue == FirstCardValue {
-            self.maxValue = otherSprite.maxValue
-            countPackages += 1
+        self.countTransitions += otherCard.countTransitions
+        if self.minValue == otherCard.maxValue + 1 {
+            self.minValue = otherCard.minValue
+        } else if self.maxValue == otherCard.minValue - 1 {
+            self.maxValue = otherCard.maxValue
+        } else if self.minValue == FirstCardValue && otherCard.maxValue == LastCardValue {
+            self.minValue = otherCard.minValue
+            countTransitions += 1
+        } else if self.maxValue == LastCardValue && otherCard.minValue == FirstCardValue {
+            self.maxValue = otherCard.maxValue
+            countTransitions += 1
         } else if self.maxValue == NoColor {  // empty Container
-            self.maxValue = otherSprite.maxValue
-            self.minValue = otherSprite.minValue
+            self.maxValue = otherCard.maxValue
+            self.minValue = otherCard.minValue
         }
     }
     
     
+    
+    func setCardValues(color: Int? = nil, row: Int? = nil, column: Int? = nil, minValue: Int? = nil, maxValue: Int? = nil, status: CardStatus? = nil) {
+        var card = MySKCard.cards[cardIndex]
+        if color != nil {
+            card!.color = color!
+        }
+        if row != nil {
+            card!.row = row!
+        }
+        if column != nil {
+            card!.column = column!
+        }
+        if minValue != nil {
+            card!.minValue = minValue!
+        }
+        if maxValue != nil {
+            card!.maxValue = maxValue!
+        }
+        if status != nil {
+            card!.status = status!
+        }
+        MySKCard.cards[cardIndex] = card
+    }
+    
+    
+    
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    static var cardIndexArray: [CardIndex] = []
+    static var cards: [CardIndex:Card] = [:]
+    static var countPackages: Int = 0
+    
+
+    
+    static func getRandomCard(random: MyRandom?)->(MySKCard, Bool) {
+        let index = random!.getRandomInt(0, max: cardIndexArray.count - 1)
+        let cardIndex = cardIndexArray[index]
+        let color = cards[cardIndex]!.color
+        let texture = atlas.textureNamed ("card\(color)")
+        let card = cards[cardIndex]
+        cardIndexArray.remove(at: index)
+        let newCard = MySKCard(texture: texture, type: .cardType, card: card)
+        return (newCard, cardIndexArray.count != 0)
+    }
+    
+    static func cleanForNewGame(countPackages: Int) {
+        self.countPackages = countPackages
+        cards.removeAll()
+        // generate all cards
+        for pkgIndex in 0..<countPackages {
+            for colorIndex in 0..<MaxColorValue {
+                for cardIndex in 0..<MaxCardValue {
+                    let index = CardIndex(packageIndex: pkgIndex, colorIndex: colorIndex, origValue: cardIndex)
+                    cardIndexArray.append(index)
+                    let name = "\(pkgIndex)-\(colorIndex)-\(cardIndex)"
+                    cards[index] = Card(color: colorIndex, row: NoValue, column: NoValue, originalValue: cardIndex, status: .CardStack, cardName: name)
+                }
+            }
+                    
+        }
+        
+    }
+    
+    static func areConnectable(first: GameArrayPositions, second: GameArrayPositions)->Bool {
+        if first.colorIndex == second.colorIndex &&
+            (first.minValue == second.maxValue + 1 ||
+             first.maxValue == second.minValue - 1 ||
+                (first.maxValue == LastCardValue && second.minValue == FirstCardValue && countPackages > 1) ||
+                (first.minValue == FirstCardValue && second.maxValue == LastCardValue && countPackages > 1))
+        {
+            return true
+        }
+        
+        return false
+        
+        //        gameArray[column2][row2].colorIndex == gameArray[column1][row1].colorIndex &&
+        //            (gameArray[column2][row2].minValue == gameArray[column1][row1].maxValue + 1 ||
+        //                gameArray[column2][row2].maxValue == gameArray[column1][row1].minValue - 1 ||
+        //                (gameArray[column2][row2].maxValue == LastCardValue && gameArray[column1][row1].minValue == FirstCardValue && countPackages > 1)
+        //                ||
+        //                (gameArray[column2][row2].minValue == FirstCardValue && gameArray[column1][row1].maxValue == LastCardValue && countPackages >
+    }
+
+    
+    deinit {
+        if type == .cardType {
+            MySKCard.cards[cardIndex]!.status = .Deleted
+            MySKCard.cards[cardIndex]!.belongsToPkg = 0
+        }
     }
 
 }

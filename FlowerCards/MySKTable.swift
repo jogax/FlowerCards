@@ -45,7 +45,7 @@ class MySKTable: SKSpriteNode {
     
     struct RowOfTable {
         let elements: [MultiVar]
-        let selected: Bool
+        var selected: Bool
         let headerRow: Bool
         
         init(elements: [MultiVar], selected: Bool, headerRow: Bool = false) {
@@ -77,10 +77,13 @@ class MySKTable: SKSpriteNode {
     var headLines: [String]
     var scrolling = false
     var verticalPosition: CGFloat = 0
+    var verticalPositionForTextures: CGFloat = 0
     var tableOfRows: [RowOfTable] = []
     var startIndex: Int = 1
     var maxLineCount: Int = 0
     var lastLocation = CGPoint.zero
+    var firstLocation = CGPoint.zero
+    var maxLocationDelta: CGFloat = 0
     let width: CGFloat?
     
     let goBackImageName = "GoBackImage"
@@ -144,7 +147,10 @@ class MySKTable: SKSpriteNode {
             columnXPositions.append(columnMidX)
             columnMidX += mySize.width * columnWidths[column] / 100
         }
-        verticalPosition = (self.size.height - heightOfLabelRow) / 2 - heightOfMyHeadRow - heightOfLabelRow / 5
+        verticalPositionForTextures = (self.size.height - heightOfLabelRow) * 0.5 - heightOfMyHeadRow
+
+//        verticalPosition = (self.size.height - heightOfLabelRow) * 0.5 - heightOfMyHeadRow - heightOfLabelRow * 0.2
+        verticalPosition = verticalPositionForTextures - heightOfLabelRow * 0.2
         self.isUserInteractionEnabled = true
         //        fontSize = CGFloat(0)
         showMyImagesAndHeader(DrawImages.getGoBackImage(CGSize(width: myImageSize, height: myImageSize)), position: 10, name: goBackImageName)
@@ -181,6 +187,26 @@ class MySKTable: SKSpriteNode {
             row += 1
         }
         
+    }
+    
+    func setStartIndex() {
+        if !(startIndex < GV.player!.levelID + 1 && startIndex + maxLineCount > GV.player!.levelID + 1) {
+            startIndex = GV.player!.levelID + 1
+        }
+        
+        if startIndex + maxLineCount - 1 > tableOfRows.count {
+            startIndex = tableOfRows.count - maxLineCount + 1
+            if startIndex < 1 {
+                startIndex = 1
+            }
+        }
+        // all lines to not selected
+        for index in 0..<tableOfRows.count {
+            if tableOfRows[index].selected {
+                tableOfRows[index].selected = false
+            }
+        }
+        tableOfRows[GV.player!.levelID + 1].selected = true
     }
     
     func showRowOfTable(rowOfTable: RowOfTable, row: Int) {
@@ -301,7 +327,7 @@ class MySKTable: SKSpriteNode {
         xPos += (size.width * columnWidths[column] / 100) / 2
         xPos -= self.size.width / 2
         
-        shape.position = CGPoint(x: xPos, y: (verticalPosition + heightOfLabelRow / 6) - CGFloat(row) * heightOfLabelRow)
+        shape.position = CGPoint(x: xPos, y: verticalPositionForTextures - CGFloat(row) * heightOfLabelRow)
         shape.alpha = 1.0
         shape.size = texture.size()
         shape.zPosition = self.zPosition + 1000
@@ -345,7 +371,7 @@ class MySKTable: SKSpriteNode {
             shape.name = name + elementSeparator + String(index) + elementSeparator
             
             
-            shape.position = CGPoint(x: imagePosition, y: verticalPosition - CGFloat(row) * heightOfLabelRow)
+            shape.position = CGPoint(x: imagePosition, y: verticalPositionForTextures - CGFloat(row) * heightOfLabelRow)
             shape.alpha = 1.0
             shape.size = CGSize(width: imageSize, height: imageSize)
             shape.zPosition = self.zPosition + 1000
@@ -506,6 +532,7 @@ class MySKTable: SKSpriteNode {
         if column == NoValue {
             column = columnXPositions.count - 1
         }
+
         if let name = touchesEndedAtNode.name {
             let length = name.length
             if (name.hasSuffix(elementSeparator)) {
@@ -526,6 +553,8 @@ class MySKTable: SKSpriteNode {
         let touchLocation = touches.first!.location(in: self)
         touchesBeganAtNode = atPoint(touchLocation)
         
+        maxLocationDelta = 0
+        firstLocation = touches.first!.location(in: GV.mainViewController!.view)
         lastLocation = touches.first!.location(in: GV.mainViewController!.view)
         if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != self.name)) {
             touchesBeganAtNode = nil
@@ -534,6 +563,10 @@ class MySKTable: SKSpriteNode {
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         let actLocation = touches.first!.location(in: GV.mainViewController!.view)
+        let actLocationDelta = abs(actLocation.y - firstLocation.y)
+        if actLocationDelta > maxLocationDelta {
+            maxLocationDelta = actLocationDelta
+        }
         let delta:CGFloat = lastLocation.y - actLocation.y
         if abs(delta) > heightOfLabelRow / 2 {
             lastLocation = actLocation
@@ -541,7 +574,17 @@ class MySKTable: SKSpriteNode {
         }
     }
     
-
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        let actLocation = touches.first!.location(in: GV.mainViewController!.view)
+        let (_, row, column, element) = checkTouches(touches, withEvent: event)
+        if abs(actLocation.y - firstLocation.y) < heightOfLabelRow / 2 && maxLocationDelta < heightOfLabelRow / 2 {
+            ownTouchesEnded(row: row, column: column, element: element)
+        }
+    }
+    
+    func ownTouchesEnded(row: Int, column: Int, element: Int) {
+        
+    }
     
     func scrollView(_ delta: CGFloat) {
         let adder = delta >= 0 ? 1 : -1

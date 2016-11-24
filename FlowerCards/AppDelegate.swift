@@ -46,9 +46,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Migration of realm models if neaded
         #if REALM_V1
             var convertLevelID = [Int:Int]()
+            let minColumn = 4
+            let maxColumn = 10
+            let maxLevelID = 7 // in old version were 7 levels
             if GV.levelsForPlay.count() > 0 {  // search new levelIDs in the new scheme
                 var oldLevelID = 0
-                for column in 4...10 {    // in old Schema columns from 4 to 10
+                for column in minColumn...maxColumn {    // in old Schema columns from 4 to 10
                     var newLevelID = 0
                     for level in GV.levelsForPlay.levelParam {
                         if level.countColumns == column && level.countRows == column && level.countPackages == 1 {
@@ -57,6 +60,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         newLevelID += 1
                     }
                     oldLevelID += 1
+                }
+                let lastConvertedLevelID = convertLevelID[convertLevelID.count - 1]
+                while convertLevelID.count < maxLevelID {
+                    convertLevelID[convertLevelID.count] = lastConvertedLevelID
                 }
             }
 //            let convertLevelID: [Int:Int] = [0:4, 1:8, 2:12, 3:15, 4:18, 5:21, 6:23]
@@ -91,7 +98,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             })
         #else
-            print("REALM_V0")
         #endif
         return true
     }

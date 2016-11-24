@@ -244,31 +244,6 @@ struct DeviceConstants {
     
 }
 */
-struct LevelParam {
-
-    #if REALM_V1
-        var countPackages: Int
-    #endif
-    var countColumns: Int
-    var countRows: Int
-    var minProzent: Int
-    var maxProzent: Int
-    var spriteSize: Int
-    
-    init()
-    {
-        #if REALM_V1
-            countPackages = 0
-        #endif
-        self.countColumns = 0
-        self.countRows = 0
-        self.minProzent = 0
-        self.maxProzent = 0
-        self.spriteSize = 0
-    }
-    
-}
-
 struct ColumnRow {
     var column: Int
     var row: Int
@@ -385,19 +360,19 @@ struct MyNodeTypes {
     static let none:            UInt32 = 0
     static let MyGameScene:     UInt32 = 0b1        // 1
     static let LabelNode:       UInt32 = 0b10       // 2
-    static let SpriteNode:      UInt32 = 0b100      // 4
+    static let CardNode:        UInt32 = 0b100      // 4
     static let ContainerNode:   UInt32 = 0b1000     // 8
     static let ButtonNode:      UInt32 = 0b10000    // 16
 }
 
 struct Container {
-    let mySKNode: MySKNode
+    let mySKNode: MySKCard
     //    var label: SKLabelNode
     //    var countHits: Int
 }
 
-enum SpriteStatus: Int, CustomStringConvertible {
-    case added = 0, addedFromCardStack, addedFromShowCard, movingStarted, unification, mirrored, fallingMovingSprite, fallingSprite, hitcounterChanged, firstCardAdded, removed, stopCycle, nothing
+enum CardStatus: Int, CustomStringConvertible {
+    case added = 0, addedFromCardStack, addedFromShowCard, movingStarted, unification, mirrored, fallingMovingCard, fallingCard, hitcounterChanged, firstCardAdded, removed, stopCycle, nothing
     
     var statusName: String {
         let statusNames = [
@@ -407,8 +382,8 @@ enum SpriteStatus: Int, CustomStringConvertible {
             "MovingStarted",
             "Unification",
             "Mirrored",
-            "FallingMovingSprite",
-            "FallingSprite",
+            "FallingMovingCard",
+            "FallingCard",
             "HitcounterChanged",
             "Removed",
             "Exchanged",
@@ -478,9 +453,9 @@ enum PeerToPeerCommands: Int {
 
 
 
-struct SavedSprite {
-    var status: SpriteStatus = .added
-    var type: MySKNodeType = .spriteType
+struct SavedCard {
+    var status: CardStatus = .added
+    var type: MySKCardType = .cardType
     var name: String = ""
     //    var type: MySKNodeType
     var startPosition: CGPoint = CGPoint(x: 0, y: 0)
@@ -489,7 +464,7 @@ struct SavedSprite {
     var size: CGSize = CGSize(width: 0, height: 0)
     var hitCounter: Int = 0
     var countScore: Int = 0 // Score of Game 
-    var countPackages: Int = 0
+    var belongsToPackage: Int = 0
     var minValue: Int = NoValue
     var maxValue: Int = NoValue
     var BGPictureAdded = false
