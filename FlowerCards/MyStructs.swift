@@ -22,7 +22,7 @@ import AVFoundation
 struct GV {
     static var vBounds = CGRect(x: 0, y: 0, width: 0, height: 0)
     static var notificationCenter = NotificationCenter.default
-    static var mainScene: SKScene?
+    static var mainScene: CardGameScene?
     static let freeGameCount = 1000
     static var peerToPeerService: PeerToPeerServiceManager?
 

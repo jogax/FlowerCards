@@ -411,12 +411,6 @@ class MySKCard: SKSpriteNode {
         
         return false
         
-        //        gameArray[column2][row2].colorIndex == gameArray[column1][row1].colorIndex &&
-        //            (gameArray[column2][row2].minValue == gameArray[column1][row1].maxValue + 1 ||
-        //                gameArray[column2][row2].maxValue == gameArray[column1][row1].minValue - 1 ||
-        //                (gameArray[column2][row2].maxValue == LastCardValue && gameArray[column1][row1].minValue == FirstCardValue && countPackages > 1)
-        //                ||
-        //                (gameArray[column2][row2].minValue == FirstCardValue && gameArray[column1][row1].maxValue == LastCardValue && countPackages >
     }
 
     

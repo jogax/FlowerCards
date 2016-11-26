@@ -122,6 +122,8 @@ let deDictionary: [TextConstants: String] = [
     .tcSize:            "Format:",
     .tcPackages:        "Pakete:",
     .tcHelpLines:       "Hilfslinien:",
+    .tcAutoPlay:        "Start automatisches Abspielen",
+
 ]
 
 

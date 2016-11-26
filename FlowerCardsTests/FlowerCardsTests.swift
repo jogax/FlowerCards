@@ -24,8 +24,9 @@ class FlowerCardsTests: XCTestCase {
         super.tearDown()
     }
     
-    func test_MySKTable_calculateMaxLineCount() {
-//®        let mySKTable = MySKTable(columnWidths: [20,20,20,40], countRows: 1, headLines: [""], parent: scene, width: 0)
-//        let maxCountLines = mySKTable.calculateMaxLineCount()
+    func test_startAutoPlay() {
+        let autoPlayer = AutoPlayer()
+        autoPlayer.play(gameNumber: 1)
+        
     }
 }

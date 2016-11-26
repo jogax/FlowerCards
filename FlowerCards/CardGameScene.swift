@@ -162,6 +162,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         var toRow: Int
         var twoArrows: Bool
         var points:[CGPoint]
+        var value: Int
         var lineLength: CGFloat
         
         init() {
@@ -172,6 +173,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             toRow = 0
             points = [CGPoint]()
             twoArrows = false
+            value = 0
             lineLength = 0
         }
     }
@@ -479,6 +481,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     let playMusicForever = -1
     let fixationTime = 0.1
     
+//    var autoPlayerActive = false
+    var autoPlayer: AutoPlayer?
+    
     override func didMove(to view: SKView) {
         // generate Played Games when GamesModel empty
         #if REALM_V1
@@ -518,7 +523,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             buttonYPos = self.size.height * 0.07
             buttonXPosNormalized = self.size.width / 10
             self.name = "CardGameScene"
-            
+            autoPlayer = AutoPlayer(scene: self)
             prepareNextGame(true)
             generateCards(.first)
         } else {
@@ -976,7 +981,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 while true {
                     if findPairForCard(card.colorIndex, minValue: card.minValue, maxValue: card.maxValue) {
                         break
-                        // checkPath
                     }
                     cardStack.pushLast(card)
                     card = cardStack.pull()!
@@ -1008,7 +1012,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             let actionMove = SKAction.move(to: zielPosition, duration: duration)
             
             let waitingAction = SKAction.wait(forDuration: waitForStart)
-            waitForStart += 0.2
+            waitForStart += 0.1
             
             let zPositionPlus = SKAction.run({
                 card.zPosition += 100
@@ -1043,6 +1047,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             doTimeCount = true
         }
         stopped = false
+    }
+    
+    func startAutoplay() {
+        autoPlayer?.startPlay()
     }
     
     func printGameArrayInhalt(_ calledFrom: String) {
@@ -1119,25 +1127,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
 
     func specialButtonPressed(_ buttonName: String) {
-//        if buttonName == "cardPackege" {
-//            if cardStack.count(.MySKCardType) > 0 {
-//                if showCard != nil {
-//                    showCardStack.push(showCard!)
-//                    showCard?.removeFromParent()
-//                }
-//                showCard = cardStack.pull()!
-//                showCard!.position = (cardPlaceButton?.position)!
-//                showCard!.size = (cardPlaceButton?.size)!
-//                showCard!.type = .ShowCardType
-//                cardPlaceButton?.removeFromParent()
-//                cardPlaceButtonAddedToParent = false
-//                addChild(showCard!)
-//                if cardStack.count(.MySKCardType) == 0 {
-//                    cardPackage!.changeButtonPicture(SKTexture(imageNamed: "emptycard"))
-//                    cardPackage!.alpha = 0.3
-//                }
-//            }
-//        }
         if buttonName == "tipps" {
             if !generatingTipps {
                 getTipps()
@@ -1190,6 +1179,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        while gameArray.count < countColumns * countRows {
 //            sleep(1) //wait until gameArray is filled!!
 //        }
+        
         tippsButton!.activateButton(false)
         var pairsToCheck = [FromToColumnRow]()
         for column1 in 0..<countColumns {
@@ -1292,7 +1282,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                             
                             if fromColumn == fromColumn1 && fromRow == fromRow1 && toRow1 == NoValue && containers[toColumn1].minValue == NoColor
                                 && toColumn != toColumn1 {
-                                if tippArray[ind].lineLength > tippArray[ind + index].lineLength {
+                                if tippArray[ind].lineLength < tippArray[ind + index].lineLength {
                                     let tippArchiv = tippArray[ind]
                                     tippArray[ind] = tippArray[ind + index]
                                     tippArray[ind + index] = tippArchiv
@@ -1403,8 +1393,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 if foundedPoint!.foundContainer && actPair.toColumnRow.row == NoValue && foundedPoint!.column == actPair.toColumnRow.column ||
                     (foundedPoint!.column == actPair.toColumnRow.column && foundedPoint!.row == actPair.toColumnRow.row) {
                     if distanceToLine == firstValue ||
-                    myPoints.count < myTipp.points.count ||
-                    (myTipp.points.count == myPoints.count && foundedPoint!.distanceToP0 < distanceToLine) {
+                    myPoints.count > myTipp.points.count ||
+                    (myTipp.points.count == myPoints.count && foundedPoint!.distanceToP0 > distanceToLine) {
                         myTipp.fromColumn = actPair.fromColumnRow.column
                         myTipp.fromRow = actPair.fromColumnRow.row
                         myTipp.toColumn = actPair.toColumnRow.column
@@ -1428,6 +1418,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             for ind in 0..<myTipp.points.count - 1 {
                 myTipp.lineLength += (myTipp.points[ind] - myTipp.points[ind + 1]).length()
             }
+            // calculate the value for this tipp
+            myTipp.value = (self.childNode(withName: gameArray[myTipp.fromColumn][myTipp.fromRow].name) as! MySKCard).countScore * (myTipp.points.count - 1)
             tippArray.append(myTipp)
         }
      }
@@ -2556,6 +2548,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             })
             alert.addAction(chooseLevelAction)
 
+            let autoPlayAction = UIAlertAction(title: GV.language.getText(.tcAutoPlay), style: .default,
+                                                  handler: {(paramAction:UIAlertAction!) in
+                                                    self.startAutoplay()
+            })
+            alert.addAction(autoPlayAction)
+
             if GV.peerToPeerService!.hasOtherPlayers() {
                 let competitionAction = UIAlertAction(title: GV.language.getText(.tcCompetition), style: .default,
                                                       handler: {(paramAction:UIAlertAction!) in
@@ -2566,6 +2564,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 alert.addAction(competitionAction)
                 
             }
+            
+            
 
         }
         let cancelAction = UIAlertAction(title: GV.language.getText(TextConstants.tcCancel), style: .default,
@@ -2864,22 +2864,17 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?)
     {
-        //        if inFirstGenerateCards {
-        //            return
-        //        }
-        //let countTouches = touches.count
-        
-//        stopTimer(&showTippAtTimer)
+        let firstTouch = touches.first
+        let touchLocation = firstTouch!.location(in: self)
+        myTouchesBegan(touchLocation: touchLocation)
+    }
+    
+    func myTouchesBegan(touchLocation: CGPoint) {
         oldFromToColumnRow = FromToColumnRow()
-//        lastGreenPair = nil
-//        lastRedPair = nil
         lastPair.color = .none
         lineWidthMultiplier = lineWidthMultiplierNormal
         touchesBeganAt = Date()
-        let firstTouch = touches.first
-        let touchLocation = firstTouch!.location(in: self)
         
-//        let testNode = self.nodeAtPoint(touchLocation)
         movedFromNode = nil
         let nodes = self.nodes(at: touchLocation)
         for nodesIndex in 0..<nodes.count {
@@ -2950,15 +2945,17 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        //        if inFirstGenerateCards {
-        //            return
-        //        }
+        let firstTouch = touches.first
+        let touchLocation = firstTouch!.location(in: self)
+        myTouchesMoved(touchLocation: touchLocation)
+    }
+    
+    func myTouchesMoved(touchLocation: CGPoint) {
+
         if movedFromNode != nil {
             removeNodesWithName(myLineName)
 
             //let countTouches = touches.count
-            let firstTouch = touches.first
-            let touchLocation = firstTouch!.location(in: self)
             
             var aktNode: SKNode? = movedFromNode
             
@@ -3060,12 +3057,14 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        lineWidthMultiplier = lineWidthMultiplierNormal
-//        stopTimer(&greenLineTimer)
-        stopTrembling()
         let firstTouch = touches.first
         let touchLocation = firstTouch!.location(in: self)
+        myTouchesEnded(touchLocation: touchLocation)
+    }
+    
+    func myTouchesEnded(touchLocation: CGPoint) {
         
+        stopTrembling()
         removeNodesWithName(myLineName)
         let testNode = self.atPoint(touchLocation)
         

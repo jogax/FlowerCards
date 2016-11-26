@@ -112,7 +112,8 @@ enum TextConstants: Int {
     tcLevelAndGames,
     tcSize,
     tcPackages,
-    tcHelpLines
+    tcHelpLines,
+    tcAutoPlay
 
 }
 
