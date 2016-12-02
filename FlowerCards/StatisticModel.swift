@@ -14,10 +14,10 @@ class StatisticModel: Object {
     dynamic var ID = 0
     dynamic var playerID = 0
     dynamic var levelID = 0
-    #if REALM_V1
-    dynamic var helpLines = 0 // new in v1
-    dynamic var packages = 0  // new in v1
-    #endif
+//    #if REALM_V1
+//    dynamic var helpLines = 0 // new in v1
+//    dynamic var packages = 0  // new in v1
+//    #endif
     dynamic var actScore = 0
     dynamic var actTime = 0
     dynamic var allTime = 0

@@ -99,6 +99,7 @@ class MySKCard: SKSpriteNode {
     var startPosition = CGPoint.zero
     var minValue: Int
     var maxValue: Int
+    var origValue: Int
     var belongsToPackage = NoValue
     var countTransitions = 0
     var countScore: Int {
@@ -153,6 +154,7 @@ class MySKCard: SKSpriteNode {
         self.type = type
         self.minValue = value
         self.maxValue = value
+        self.origValue = value
         self.mirrored = 0
         
         
@@ -175,6 +177,7 @@ class MySKCard: SKSpriteNode {
             self.colorIndex = card!.color
             self.minValue = card!.minValue
             self.maxValue = card!.maxValue
+            self.origValue = card!.originalValue
             self.name = card!.cardName
         }
         
@@ -312,9 +315,6 @@ class MySKCard: SKSpriteNode {
     
     func connectWith(otherCard: MySKCard) {
 
-        if countTransitions == MySKCard.countPackages - 1 {
-//            checkTransitions()
-        }
         self.countTransitions += otherCard.countTransitions
         if self.minValue == otherCard.maxValue + 1 {
             self.minValue = otherCard.minValue
@@ -330,32 +330,46 @@ class MySKCard: SKSpriteNode {
             self.maxValue = otherCard.maxValue
             self.minValue = otherCard.minValue
         }
+        var countCardsInThisPackage = 0
+        switch countTransitions {
+        case 0:
+            countCardsInThisPackage = maxValue - minValue + 1
+        case 1:
+            countCardsInThisPackage = maxValue + 1 + LastCardValue - minValue + 1
+        case 2:
+            countCardsInThisPackage = maxValue + 1 + LastCardValue - minValue + 1 + 13
+        case 3:
+            countCardsInThisPackage = maxValue + 1 + LastCardValue - minValue + 1 + 26
+        default:
+            break
+        }
+        print("countCardsInThisPackage: \(countCardsInThisPackage)")
     }
     
     
     
-    func setCardValues(color: Int? = nil, row: Int? = nil, column: Int? = nil, minValue: Int? = nil, maxValue: Int? = nil, status: CardStatus? = nil) {
-        var card = MySKCard.cards[cardIndex]
-        if color != nil {
-            card!.color = color!
-        }
-        if row != nil {
-            card!.row = row!
-        }
-        if column != nil {
-            card!.column = column!
-        }
-        if minValue != nil {
-            card!.minValue = minValue!
-        }
-        if maxValue != nil {
-            card!.maxValue = maxValue!
-        }
-        if status != nil {
-            card!.status = status!
-        }
-        MySKCard.cards[cardIndex] = card
-    }
+//    func setCardValues(color: Int? = nil, row: Int? = nil, column: Int? = nil, minValue: Int? = nil, maxValue: Int? = nil, status: CardStatus? = nil) {
+//        var card = MySKCard.cards[cardIndex]
+//        if color != nil {
+//            card!.color = color!
+//        }
+//        if row != nil {
+//            card!.row = row!
+//        }
+//        if column != nil {
+//            card!.column = column!
+//        }
+//        if minValue != nil {
+//            card!.minValue = minValue!
+//        }
+//        if maxValue != nil {
+//            card!.maxValue = maxValue!
+//        }
+//        if status != nil {
+//            card!.status = status!
+//        }
+//        MySKCard.cards[cardIndex] = card
+//    }
     
     
     
@@ -399,12 +413,13 @@ class MySKCard: SKSpriteNode {
         
     }
     
-    static func areConnectable(first: GameArrayPositions, second: GameArrayPositions)->Bool {
+    static func areConnectable(first: GameArrayPositions, second: GameArrayPositions, secondIsContainer: Bool = false)->Bool {
+        
         if first.colorIndex == second.colorIndex &&
             (first.minValue == second.maxValue + 1 ||
              first.maxValue == second.minValue - 1 ||
-                (first.maxValue == LastCardValue && second.minValue == FirstCardValue && countPackages > 1) ||
-                (first.minValue == FirstCardValue && second.maxValue == LastCardValue && countPackages > 1))
+                (countPackages > 1 && first.maxValue == LastCardValue && second.minValue == FirstCardValue) ||
+                (countPackages > 1 && first.minValue == FirstCardValue && second.maxValue == LastCardValue && !secondIsContainer))
         {
             return true
         }

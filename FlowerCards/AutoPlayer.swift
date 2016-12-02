@@ -31,18 +31,22 @@ class AutoPlayer {
     
     
     @objc func nextStep(timerX: Timer) {
-        if scene.cardCount > 0 && scene.tippArray.count > 0 {
+        if scene.cardCount > 0 /*&& scene.tippArray.count > 0*/ {
             switch autoPlayStatus {
             case .getTipp:
-                bestTipp = CardGameScene.Tipps()
-                for tipp in scene.tippArray {
-                    if bestTipp.value < tipp.value {
-                        bestTipp = tipp
+                if scene.tippsButton!.alpha == 1 {  // if tipps are ready
+                    bestTipp = CardGameScene.Tipps()
+                    for tipp in scene.tippArray {
+                        if bestTipp.value < tipp.value {
+                            bestTipp = tipp
+                        }
                     }
+                    scene.myTouchesBegan(touchLocation: bestTipp.points[0])
+                    autoPlayStatus = .touchesMoved
+                    timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+               } else {
+                    timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
                 }
-                scene.myTouchesBegan(touchLocation: bestTipp.points[0])
-                autoPlayStatus = .touchesMoved
-                timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             case .touchesMoved:
                 scene.myTouchesMoved(touchLocation: bestTipp.points[1])
                 autoPlayStatus = .touchesEnded
@@ -50,7 +54,7 @@ class AutoPlayer {
             case .touchesEnded:
                 scene.myTouchesEnded(touchLocation: bestTipp.points[1])
                 autoPlayStatus = .getTipp
-                timer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+                timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }
         } else {
             scene.isUserInteractionEnabled = true

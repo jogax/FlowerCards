@@ -59,14 +59,21 @@ class MySKGameStatistic: MySKTable {
             var gameArt = GV.language.getText(.tcGame) // simple Game
             var opponent = ""
             var score = String(game.playerScore)
-            var victory = DrawImages.getOKImage(CGSize(width: 20, height: 20))
+            var victory: SKTexture = SKTexture(image: DrawImages.getOKImage(CGSize(width: 20, height: 20)))
+            var textureSize:CGFloat = 1.0
+            #if REALM_V2
+                if !game.gameFinished {
+                    victory = atlas.textureNamed("help")
+                    textureSize = 0.25
+                }
+            #endif
             let startImage = DrawImages.getStartImage(CGSize(width: 20, height: 20))
             if game.multiPlay {
                 gameArt = GV.language.getText(.tcCompetitionShort)
                 opponent = game.opponentName
                 score += " / " + String(game.opponentScore)
                 if game.playerScore < game.opponentScore {
-                    victory = DrawImages.getNOKImage(CGSize(width: 20, height: 20))
+                    victory = SKTexture(image:DrawImages.getNOKImage(CGSize(width: 20, height: 20)))
                 }
             }
             let elements: [MultiVar] = [MultiVar(string: "#\(game.gameNumber + 1)"),
@@ -74,7 +81,7 @@ class MySKGameStatistic: MySKTable {
                                         MultiVar(string: opponent),
                                         MultiVar(string: score),
                                         MultiVar(string: game.time.dayHourMinSec),
-                                        MultiVar(texture: SKTexture(image: victory)),
+                                        MultiVar(texture: victory, textureSize: textureSize),
                                         MultiVar(texture: SKTexture(image: startImage)),
                                         ]
             tableOfRows.append(RowOfTable(elements: elements, selected: true))

@@ -15,9 +15,12 @@ class GameModel: Object {
     dynamic var gameNumber = 0
     dynamic var levelID = 0
     dynamic var played = false
-    #if REALM_V1
+//    #if REALM_V1
     dynamic var helpLines = 0 // new in v1
     dynamic var packages = 0  // new in v1
+//    #endif
+    #if REALM_V2
+        dynamic var gameFinished = false // new in V2
     #endif
     dynamic var time = 0
     dynamic var playerScore = 0

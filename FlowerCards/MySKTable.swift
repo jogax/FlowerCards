@@ -26,14 +26,16 @@ class MySKTable: SKSpriteNode {
         var varType: VarType
         var stringVar: String?
         var textureVar: SKTexture?
+        var textureSizeVar: CGFloat?
         var textureArray: [SKTexture] = []
         
         init(string:String) {
             stringVar = string
             varType = .string
         }
-        init(texture: SKTexture) {
+        init(texture: SKTexture, textureSize: CGFloat = 1.0) {
             textureVar = texture
+            textureSizeVar = textureSize
             varType = .texture
         }
         init(textures: [SKTexture]) {
@@ -214,7 +216,7 @@ class MySKTable: SKSpriteNode {
             switch rowOfTable.elements[column].varType {            case .string:
                 showElementOfTable(rowOfTable.elements[column].stringVar!, column: column, row: row, selected: rowOfTable.selected)
             case .texture:
-                showTextureInTable(texture: rowOfTable.elements[column].textureVar!, column: column, row: row, selected: rowOfTable.selected)
+                showTextureInTable(texture: rowOfTable.elements[column].textureVar!, column: column, row: row, selected: rowOfTable.selected, textureSize: rowOfTable.elements[column].textureSizeVar!)
             case .textures:
                 showTexturesInTable(textures: rowOfTable.elements[column].textureArray, column: column, row: row, selected: rowOfTable.selected)
             }
@@ -302,7 +304,7 @@ class MySKTable: SKSpriteNode {
     }
 
     
-    func showTextureInTable(texture: SKTexture, column: Int, row: Int, selected: Bool) {
+    func showTextureInTable(texture: SKTexture, column: Int, row: Int, selected: Bool, textureSize: CGFloat = 1) {
         let name = "\(column)\(separator)\(row)"
         
         for index in 0..<self.children.count {
@@ -329,7 +331,7 @@ class MySKTable: SKSpriteNode {
         
         shape.position = CGPoint(x: xPos, y: verticalPositionForTextures - CGFloat(row) * heightOfLabelRow)
         shape.alpha = 1.0
-        shape.size = texture.size()
+        shape.size = texture.size() * textureSize
         shape.zPosition = self.zPosition + 1000
         self.addChild(shape)
         

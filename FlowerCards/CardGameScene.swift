@@ -15,6 +15,7 @@ struct GameArrayPositions {
     var position: CGPoint
     var colorIndex: Int
     var name: String
+    var origValue: Int
     var minValue: Int
     var maxValue: Int
     init() {
@@ -22,8 +23,19 @@ struct GameArrayPositions {
         self.position = CGPoint(x: 0, y: 0)
         self.colorIndex = NoColor
         self.name = ""
+        self.origValue = NoValue
         self.minValue = NoValue
         self.maxValue = NoValue
+    }
+    init(colorIndex: Int, minValue: Int, maxValue: Int, origValue: Int) {
+        self.used = false
+        self.position = CGPoint(x: 0, y: 0)
+        self.colorIndex = colorIndex
+        self.name = ""
+        self.origValue = origValue
+        self.minValue = minValue
+        self.maxValue = maxValue
+        
     }
 }
 
@@ -486,13 +498,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     override func didMove(to view: SKView) {
         // generate Played Games when GamesModel empty
-        #if REALM_V1
-            
-        #else
-            if realm.objects(GameModel.self).count == 0 {
-                generateGamesForTest(countRecordsProLevel: 10)
-            }
-        #endif
+//        #if REALM_V1
+//            
+//        #else
+//            if realm.objects(GameModel.self).count == 0 {
+//                generateGamesForTest(countRecordsProLevel: 10)
+//            }
+//        #endif
         
         if !settingsSceneStarted {
 //            let modelURL = NSBundle.mainBundle().URLForResource("FlowerCards", withExtension: "momd")!
@@ -845,9 +857,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func specialPrepareFuncFirst() {
         stopCreateTippsInBackground = true
-        #if REALM_V1
+//        #if REALM_V1
             countPackages = GV.levelsForPlay.aktLevel.countPackages
-        #endif
+//        #endif
         maxCardCount = countPackages * countContainers * MaxCardValue
         countCardsProContainer = MaxCardValue //levelsForPlay.aktLevel.countCardsProContainer
         countColumns = GV.levelsForPlay.aktLevel.countColumns
@@ -1034,7 +1046,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 cardPackage!.changeButtonPicture(SKTexture(imageNamed: "emptycard"))
                 cardPackage!.alpha = 0.3
             }
-            card.setCardValues(color: card.colorIndex, row: card.row, column: card.column, minValue: card.minValue, maxValue: card.maxValue, status: .OnScreen)
+//            card.setCardValues(color: card.colorIndex, row: card.row, column: card.column, minValue: card.minValue, maxValue: card.maxValue, status: .OnScreen)
 
         }
         
@@ -1089,9 +1101,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 }
             } while !(self.tippArray.count > 2 || self.countColumns * self.countRows - self.checkGameArray() == 0 || self.checkGameArray() < 2)
             
-            if self.tippArray.count == 0 && self.cardCount > 0{
+            if self.tippArray.count == 0 && self.cardCount > 0 {
                 
-//                print ("You have lost!")
+                print ("You have lost!")
             }
             self.generatingTipps = false
         } ~>
@@ -1193,19 +1205,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                                 return false
                             }
                             if (column1 != column2 || row1 != row2) &&
-                                MySKCard.areConnectable(first: gameArray[column2][row2], second: gameArray[column1][row1])
-//                                gameArray[column2][row2].colorIndex == gameArray[column1][row1].colorIndex &&
-//                                (gameArray[column2][row2].minValue == gameArray[column1][row1].maxValue + 1 ||
-//                                gameArray[column2][row2].maxValue == gameArray[column1][row1].minValue - 1 ||
-//                                (gameArray[column2][row2].maxValue == LastCardValue && gameArray[column1][row1].minValue == FirstCardValue && countPackages > 1)
-//                            ||
-//                                (gameArray[column2][row2].minValue == FirstCardValue && gameArray[column1][row1].maxValue == LastCardValue && countPackages > 1))
-                               {
-                                        let aktPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: column2, row: row2))
-                                        if !pairExists(pairsToCheck, aktPair: aktPair) {
-                                            pairsToCheck.append(aktPair)
-                                            pairsToCheck.append(FromToColumnRow(fromColumnRow: aktPair.toColumnRow, toColumnRow: aktPair.fromColumnRow))
-                                        }
+                                MySKCard.areConnectable(first: gameArray[column2][row2], second: gameArray[column1][row1]) {
+                                let aktPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: column2, row: row2))
+                                if !pairExists(pairsToCheck, aktPair: aktPair) {
+                                    pairsToCheck.append(aktPair)
+                                    pairsToCheck.append(FromToColumnRow(fromColumnRow: aktPair.toColumnRow, toColumnRow: aktPair.fromColumnRow))
+                                }
                             }
                         }
                     }
@@ -1315,13 +1320,29 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        let tippCountText: String = GV.language.getText(.TCTippCount)
 //        print("Tippcount:", tippArray.count, tippArray)
         showTippCount()
-        if tippArray.count > 0 {
+//        if tippArray.count > 0 {
             tippsButton!.activateButton(true)
-        }
+//        } else {
+//            print("No Tipps")
+//        }
 
         tippIndex = 0  // set tipps to first
         return true
      }
+    
+//    func tippArrayCount()->Int {
+//        var countTipps = tippArray.count
+//        for (index, tipp) in tippArray.enumerated() {
+//            for (index1, tipp1) in tippArray.enumerated() {
+//                if ((tipp.fromColumn == tipp1.fromColumn && tipp.fromRow == tipp1.toRow) ||
+//                    (tipp.fromColumn == tipp1.toColumn && tipp.fromRow == tipp1.toRow)) && index != index1 {
+//                    countTipps -= 1
+//                }
+//                
+//            }
+//        }
+//        return countTipps
+//    }
     
     func findPairForCard (_ colorIndex: Int, minValue: Int, maxValue: Int)->Bool {
         var founded = false
@@ -1356,9 +1377,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func pairExists(_ pairsToCheck:[FromToColumnRow], aktPair: FromToColumnRow)->Bool {
-        for index in 0..<pairsToCheck.count {
-            let aktPairToCheck = pairsToCheck[index]
-            if aktPairToCheck.fromColumnRow.column == aktPair.fromColumnRow.column && aktPairToCheck.fromColumnRow.row == aktPair.fromColumnRow.row && aktPairToCheck.toColumnRow.column == aktPair.toColumnRow.column && aktPairToCheck.toColumnRow.row == aktPair.toColumnRow.row {
+        for pair in pairsToCheck {
+            if pair.fromColumnRow.column == aktPair.fromColumnRow.column && pair.fromColumnRow.row == aktPair.fromColumnRow.row &&
+                pair.toColumnRow.column == aktPair.toColumnRow.column && pair.toColumnRow.row == aktPair.toColumnRow.row {
                 return true
             }
         }
@@ -1502,9 +1523,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func calculateLineColor(_ foundedPoint: Founded, movedFrom: ColumnRow) -> MyColors {
         
         var color = MyColors.red
-        var foundedColorIndex: Int
-        var foundedMinValue: Int
-        var foundedMaxValue: Int
+        var foundedPosition = GameArrayPositions()
+//        var foundedColorIndex: Int
+//        var foundedMinValue: Int
+//        var foundedMaxValue: Int
         
         if foundedPoint.distanceToP0 == foundedPoint.maxDistance {
             return color
@@ -1518,21 +1540,28 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
         
         if foundedPoint.foundContainer {
-            foundedColorIndex = containers[foundedPoint.column].colorIndex
-            foundedMaxValue = containers[foundedPoint.column].maxValue
-            foundedMinValue = containers[foundedPoint.column].minValue
+            foundedPosition.colorIndex = containers[foundedPoint.column].colorIndex
+            foundedPosition.maxValue = containers[foundedPoint.column].maxValue
+            foundedPosition.minValue = containers[foundedPoint.column].minValue
+//            foundedColorIndex = containers[foundedPoint.column].colorIndex
+//            foundedMaxValue = containers[foundedPoint.column].maxValue
+//            foundedMinValue = containers[foundedPoint.column].minValue
         } else {
-            foundedColorIndex = gameArray[foundedPoint.column][foundedPoint.row].colorIndex
-            foundedMaxValue = gameArray[foundedPoint.column][foundedPoint.row].maxValue
-            foundedMinValue = gameArray[foundedPoint.column][foundedPoint.row].minValue
+            foundedPosition = gameArray[foundedPoint.column][foundedPoint.row]
+//            foundedColorIndex = gameArray[foundedPoint.column][foundedPoint.row].colorIndex
+//            foundedMaxValue = gameArray[foundedPoint.column][foundedPoint.row].maxValue
+//            foundedMinValue = gameArray[foundedPoint.column][foundedPoint.row].minValue
         }
-        if (gameArray[movedFrom.column][movedFrom.row].colorIndex == foundedColorIndex &&
-            (gameArray[movedFrom.column][movedFrom.row].maxValue == foundedMinValue - 1 ||
-                gameArray[movedFrom.column][movedFrom.row].minValue == foundedMaxValue + 1 ||
-                (gameArray[movedFrom.column][movedFrom.row].maxValue == LastCardValue && foundedMinValue == FirstCardValue) && countPackages > 1 ||
-                (gameArray[movedFrom.column][movedFrom.row].minValue == FirstCardValue && foundedMaxValue == LastCardValue && !foundedPoint.foundContainer && countPackages > 1))
-            ) ||
-            (foundedMinValue == NoColor && !actColorHasContainer) &&
+
+        if MySKCard.areConnectable(first: gameArray[movedFrom.column][movedFrom.row], second: foundedPosition, secondIsContainer: foundedPoint.foundContainer)
+//            (gameArray[movedFrom.column][movedFrom.row].colorIndex == foundedColorIndex &&
+//            (gameArray[movedFrom.column][movedFrom.row].maxValue == foundedMinValue - 1 ||
+//                gameArray[movedFrom.column][movedFrom.row].minValue == foundedMaxValue + 1 ||
+//                (gameArray[movedFrom.column][movedFrom.row].maxValue == LastCardValue && foundedMinValue == FirstCardValue) && countPackages > 1 ||
+//                (gameArray[movedFrom.column][movedFrom.row].minValue == FirstCardValue && foundedMaxValue == LastCardValue && !foundedPoint.foundContainer && countPackages > 1))
+//            )
+                ||
+            (foundedPosition.minValue == NoColor && !actColorHasContainer) &&
                 (gameArray[movedFrom.column][movedFrom.row].maxValue == LastCardValue) {
                 color = .green
         }
@@ -2034,8 +2063,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         if opponent.finish == .finished || opponent.finish == .interrupted {
             animateFinishGame()
             if opponent.finish == .finished {
-                let statistic = realm.objects(StatisticModel.self).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).first!
-                saveStatisticAndGame(statistic)
+                saveStatisticAndGame()
             }
             opponent.finish = .none
             playerType = .singlePlayer
@@ -2111,31 +2139,35 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let movingCard = node1
         let container = node2
         
-        var containerColorIndex = container.colorIndex
-        let movingCardColorIndex = movingCard.colorIndex
+//        var containerColorIndex = container.colorIndex
+//        let movingCardColorIndex = movingCard.colorIndex
+        let movingCardCompareValue = GameArrayPositions(colorIndex: movingCard.colorIndex, minValue: movingCard.minValue, maxValue: movingCard.maxValue, origValue: movingCard.origValue)
+        var containerCompareValue = GameArrayPositions(colorIndex: container.colorIndex, minValue: container.minValue, maxValue: container.maxValue, origValue: container.origValue)
         
         
         if container.minValue == container.maxValue && container.maxValue == NoColor && movingCard.maxValue == LastCardValue {
             var containerNotFound = true
             for index in 0..<countContainers {
-                if containers[index].colorIndex == movingCardColorIndex {
+                if containers[index].colorIndex == movingCard.colorIndex {
                     containerNotFound = false
                 }
             }
             if containerNotFound {
-                containerColorIndex = movingCardColorIndex
-                container.colorIndex = containerColorIndex
-                container.texture = getTexture(containerColorIndex)
+                containerCompareValue.colorIndex = movingCard.colorIndex
+                container.colorIndex = movingCard.colorIndex
+                container.texture = getTexture(movingCard.colorIndex)
                 push(container, status: .firstCardAdded)
             }
         }
         
-        let OK = movingCardColorIndex == containerColorIndex &&
+        
+        let OK = movingCard.colorIndex == container.colorIndex &&
         (
             container.minValue == NoColor ||
-            movingCard.maxValue + 1 == container.minValue ||
-            movingCard.minValue - 1 == container.maxValue ||
-            (container.minValue == FirstCardValue && movingCard.maxValue == LastCardValue && container.belongsToPackage < countPackages)
+            MySKCard.areConnectable(first: movingCardCompareValue, second: containerCompareValue)
+//            movingCard.maxValue + 1 == container.minValue ||
+//            movingCard.minValue - 1 == container.maxValue ||
+//            (container.minValue == FirstCardValue && movingCard.maxValue == LastCardValue && container.belongsToPackage < countPackages)
         )
 
         
@@ -2198,6 +2230,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         gameArray[card.column][card.row].colorIndex = card.colorIndex
         gameArray[card.column][card.row].minValue = card.minValue
         gameArray[card.column][card.row].maxValue = card.maxValue
+        gameArray[card.column][card.row].origValue = card.origValue
     }
 
     func cardDidCollideWithMovingCard(_ node1:MySKCard, node2:MySKCard) {
@@ -2210,19 +2243,23 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        lastCollisionsTime = collisionsTime
         let movingCard = node1
         let card = node2
-        let movingCardColorIndex = movingCard.colorIndex
-        let cardColorIndex = card.colorIndex
+//        let movingCardColorIndex = movingCard.colorIndex
+//        let cardColorIndex = card.colorIndex
         
         //let aktColor = GV.colorSets[GV.colorSetIndex][card.colorIndex + 1].CGColor
         collisionActive = false
         
-        let OK = movingCardColorIndex == cardColorIndex &&
-        (
-            movingCard.maxValue + 1 == card.minValue ||
-            movingCard.minValue - 1 == card.maxValue ||
-            (movingCard.maxValue == LastCardValue && card.minValue == FirstCardValue && countPackages > 1) ||
-            (movingCard.minValue == FirstCardValue && card.maxValue == LastCardValue && countPackages > 1)
-        )
+        let movingCardValue = GameArrayPositions(colorIndex: movingCard.colorIndex, minValue: movingCard.minValue, maxValue: movingCard.maxValue, origValue: movingCard.origValue)
+        let cardValue = GameArrayPositions(colorIndex: card.colorIndex, minValue: card.minValue, maxValue: card.maxValue, origValue: card.origValue)
+        
+        let OK = MySKCard.areConnectable(first: movingCardValue, second: cardValue)
+//        OK = movingCardColorIndex == cardColorIndex &&
+//        (
+//            movingCard.maxValue + 1 == card.minValue ||
+//            movingCard.minValue - 1 == card.maxValue ||
+//            (movingCard.maxValue == LastCardValue && card.minValue == FirstCardValue && countPackages > 1) ||
+//            (movingCard.minValue == FirstCardValue && card.maxValue == LastCardValue && countPackages > 1)
+//        )
         if OK {
             push(card, status: .unification)
             push(movingCard, status: .removed)
@@ -2245,6 +2282,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             countMovingCards = 0
             updateCardCount(-1)
             checkGameFinished()
+            saveStatisticAndGame()
        } else {
 
             updateCardCount(-1)
@@ -2290,25 +2328,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 GV.peerToPeerService?.sendInfo(.gameIsFinished, message: [String(levelScore)], toPeerIndex: opponent.peerIndex)
             }
             
-            
-            if realm.objects(StatisticModel.self).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).count == 0 {
-                // create a new Statistic record if required
-                let statistic = StatisticModel()
-                statistic.ID = GV.createNewRecordID(.statisticModel)
-                statistic.playerID = GV.player!.ID
-                statistic.levelID = GV.player!.levelID
-                try! realm.write({
-                    realm.add(statistic)
-                })
-            } 
             // get && modify the statistic record
             
-            let statistic = realm.objects(StatisticModel.self).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).first!
-            saveStatisticAndGame(statistic)
+            saveStatisticAndGame()
             if playerType == .multiPlayer {
                 alertIHaveGameFinished()
             } else {
-                let alert = getNextPlayArt(true, statistic: statistic)
+                let alert = getNextPlayArt(true)
                 GV.mainViewController!.showAlert(alert)
             }
         } else if usedCellCount <= minUsedCells && usedCellCount > 1 { //  && cardCount > maxUsedCells {
@@ -2320,7 +2346,19 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     
-    func saveStatisticAndGame (_ statistic: StatisticModel) {
+    func saveStatisticAndGame () {
+        if realm.objects(StatisticModel.self).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).count == 0 {
+            // create a new Statistic record if required
+            let statistic = StatisticModel()
+            statistic.ID = GV.createNewRecordID(.statisticModel)
+            statistic.playerID = GV.player!.ID
+            statistic.levelID = GV.player!.levelID
+            try! realm.write({
+                realm.add(statistic)
+            })
+        }
+
+        let statistic = realm.objects(StatisticModel.self).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).first!
         
         realm.beginWrite()
         statistic.actTime = timeCount
@@ -2332,18 +2370,26 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         
         statistic.actScore = levelScore
-        statistic.levelScore += levelScore
-        if statistic.bestScore < levelScore {
-            statistic.bestScore = levelScore
-        }
-        
-        if statistic.bestScore < levelScore {
-            statistic.bestScore = levelScore
+        if cardCount == 0 {
+            statistic.levelScore += levelScore
+            if statistic.bestScore < levelScore {
+                statistic.bestScore = levelScore
+            }
+            if statistic.bestScore < levelScore {
+                statistic.bestScore = levelScore
+            }
         }
         
         actGame!.time = timeCount
         actGame!.playerScore = levelScore
         actGame!.played = true
+        #if REALM_V2
+            if cardCount > 0 {
+                actGame!.gameFinished = false
+            } else {
+                actGame!.gameFinished = true
+            }
+        #endif
         if playerType == .multiPlayer {
             actGame!.multiPlay = true
             actGame!.opponentName = opponent.name
@@ -2354,7 +2400,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             } else {
                 statistic.victorys += 1
             }
-        } else {
+        } else if cardCount == 0 {  // countPlays only when game is finished
             statistic.countPlays += 1
         }
         try! realm.commitWrite()
@@ -2484,7 +2530,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         generateCards(.first)
     }
 
-    func getNextPlayArt(_ congratulations: Bool, statistic: StatisticModel...)->UIAlertController {
+    func getNextPlayArt(_ congratulations: Bool, firstStart: Bool = false)->UIAlertController {
         let playerName = GV.player!.name + "!"
         let statisticsTxt = ""
         var congratulationsTxt = ""
@@ -2499,6 +2545,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             let bestScorePlayerName = realm.objects(PlayerModel.self).filter("ID = %d",bestScorePlayerID).first!.name
             
             tippCountLabel.text = String(0)
+            let statistic = realm.objects(StatisticModel.self).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).first!
 
             congratulationsTxt = GV.language.getText(.tcLevel, values: " \(levelIndex + 1)")
             congratulationsTxt += "\r\n" + GV.language.getText(.tcGameComplete, values: String(gameNumber + 1))
@@ -2515,7 +2562,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             } else {
                 congratulationsTxt += "\r\n" + GV.language.getText(.tcLevelScore, values: " \(bestGameScore)")
             }
-            congratulationsTxt += "\r\n" + GV.language.getText(.tcActTime) + String(statistic[0].actTime.dayHourMinSec)
+            congratulationsTxt += "\r\n" + GV.language.getText(.tcActTime) + String(statistic.actTime.dayHourMinSec)
         }
         let alert = UIAlertController(title: congratulations ? congratulationsTxt : GV.language.getText(.tcChooseGame),
             message: statisticsTxt,
@@ -2529,11 +2576,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             alert.addAction(stopAction)
             
         } else {
-            let againAction = UIAlertAction(title: GV.language.getText(.tcGameAgain), style: .default,
-                handler: {(paramAction:UIAlertAction!) in
-                    self.startNewGame(false)
-            })
-            alert.addAction(againAction)
+            if !firstStart {
+                let againAction = UIAlertAction(title: GV.language.getText(.tcGameAgain), style: .default,
+                    handler: {(paramAction:UIAlertAction!) in
+                        self.startNewGame(false)
+                })
+                alert.addAction(againAction)
+            }
             let newGameAction = UIAlertAction(title: GV.language.getText(TextConstants.tcNewGame), style: .default,
                 handler: {(paramAction:UIAlertAction!) in
                     self.startNewGame(true)
