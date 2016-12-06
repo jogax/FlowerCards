@@ -371,7 +371,7 @@ struct Container {
     //    var countHits: Int
 }
 
-enum CardStatus: Int, CustomStringConvertible {
+enum CardStackStatus: Int, CustomStringConvertible {
     case added = 0, addedFromCardStack, addedFromShowCard, movingStarted, unification, mirrored, fallingMovingCard, fallingCard, hitcounterChanged, firstCardAdded, removed, stopCycle, nothing
     
     var statusName: String {
@@ -454,7 +454,7 @@ enum PeerToPeerCommands: Int {
 
 
 struct SavedCard {
-    var status: CardStatus = .added
+    var status: CardStackStatus = .added
     var type: MySKCardType = .cardType
     var name: String = ""
     //    var type: MySKNodeType

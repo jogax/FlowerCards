@@ -8,6 +8,39 @@
 
 import SpriteKit
 
+enum CardStatus: Int {
+    case CardStack = 0, OnScreen, Deleted
+}
+
+struct Card {
+    let bitMaskForPackages: [UInt8] = [1, 2, 4, 8]
+    var status: CardStatus
+    var color: Int
+    var column: Int
+    var row: Int
+    var cardName: String
+    var originalValue: Int
+    var minValue: Int
+    var maxValue: Int
+    var deleted: Bool
+    var countTransitions: Int
+    var belongsToPkg: UInt8 // belongs to package
+    
+    init(color: Int, row: Int, column: Int, originalValue: Int, status: CardStatus, cardName: String) {
+        self.color = color
+        self.status = status
+        self.column = column
+        self.row = row
+        self.originalValue = originalValue
+        self.cardName = cardName
+        self.minValue = originalValue
+        self.maxValue = originalValue
+        self.deleted = false
+        self.belongsToPkg = 0
+        self.countTransitions = 0
+        self.belongsToPkg = 0
+    }
+}
 
 struct GameArrayPositions {
     var used: Bool
@@ -59,19 +92,21 @@ struct GameArrayPositions {
         }
         return actValue
     }
-
+    
 }
 
 
-class GameEngine {
+class GameEngine: IteratorProtocol, Sequence {
+    public typealias Element = MySKCard
     var countRows: Int
     var countColumns: Int
     private var gameArray = [[GameArrayPositions]]()
-     var containers = [MySKCard]()
+    private var containers = [MySKCard]()
     private let countContainers = 4
 
-
-    
+    enum SequenceType: Int {
+        case Container = 0, GameArray
+    }
     init() {
         self.countColumns = 0
         self.countRows = 0
@@ -80,6 +115,39 @@ class GameEngine {
         self.countColumns = countColumns
         self.countRows = countRows
     }
+    private var containerColumn = 0
+    func setIterationForContainer() {
+        containerColumn = -1
+    }
+    func next() -> Element? {
+        containerColumn += 1
+        if containerColumn < containers.count {
+            return containers[containerColumn]
+        } else {
+            return nil
+        }
+    }
+    private var gameArrayColumn = 0
+    private var gameArrayRow = 0
+    func setIterationForGameArray() {
+        gameArrayRow = -1
+        gameArrayColumn = 0
+    }
+
+    func next() -> GameArrayPositions? {
+        gameArrayRow += 1
+        if gameArrayRow == countRows {
+            gameArrayRow = 0
+            gameArrayColumn += 1
+            if gameArrayColumn == countColumns {
+                return nil
+            }
+        }
+        return gameArray[gameArrayColumn][gameArrayRow]
+    }
+    
+    
+
     func printGameArrayInhalt(_ calledFrom: String) {
         print(calledFrom, Date())
         var string: String
@@ -140,20 +208,22 @@ class GameEngine {
 
     
     func resetGameArrayCell(_ card:MySKCard) {
-        gameArray[card.column][card.row].used = false
-        gameArray[card.column][card.row].colorIndex = NoColor
-        gameArray[card.column][card.row].minValue = NoValue
-        gameArray[card.column][card.row].maxValue = NoValue
+        let (column, row) = card.getColumnRow()
+        gameArray[column][row].used = false
+        gameArray[column][row].colorIndex = NoColor
+        gameArray[column][row].minValue = NoValue
+        gameArray[column][row].maxValue = NoValue
     }
     
     func updateGameArrayCell(_ card:MySKCard) {
-        gameArray[card.column][card.row].used = true
-        gameArray[card.column][card.row].name = card.name!
-        gameArray[card.column][card.row].colorIndex = card.colorIndex
-        gameArray[card.column][card.row].minValue = card.minValue
-        gameArray[card.column][card.row].maxValue = card.maxValue
-        gameArray[card.column][card.row].countTransitions = card.countTransitions
-        gameArray[card.column][card.row].origValue = card.origValue
+        let (column, row) = card.getColumnRow()
+        gameArray[column][row].used = true
+        gameArray[column][row].name = card.name!
+        gameArray[column][row].colorIndex = card.getColorIndex()
+        gameArray[column][row].minValue = card.getMinValue()
+        gameArray[column][row].maxValue = card.getMaxValue()
+        gameArray[column][row].countTransitions = card.getCountTransitions()
+        gameArray[column][row].origValue = card.getOrigValue()
     }
     
     func setGameArrayPosition(column: Int, row: Int, position: CGPoint) {
@@ -196,26 +266,55 @@ class GameEngine {
                             colorIndex: Int? = nil,
                             minValue: Int? = nil,
                             maxValue: Int? = nil,
-                            name: String? = nil) {
+                            name: String? = nil,
+                            belongsToPackage: Int? = nil,
+                            BGPictureAdded: Bool? = nil) {
         if let inPosition = position {
             containers[column].position = inPosition
         }
-        if let inColorIndex = colorIndex {
-            containers[column].colorIndex = inColorIndex
-        }
-        if let inMinValue = minValue {
-            containers[column].minValue = inMinValue
-            
-        }
-        if let inMaxValue = maxValue {
-            containers[column].maxValue = inMaxValue
-        }
+        containers[column].setParam(column: column, row: NoValue, colorIndex: colorIndex, minValue: minValue, maxValue: maxValue, belongsToPackage: belongsToPackage, BGPictureAdded: BGPictureAdded)
+//        if let inColorIndex = colorIndex {
+//            containers[column].colorIndex = inColorIndex
+//        }
+//        if let inMinValue = minValue {
+//            containers[column].minValue = inMinValue
+//            
+//        }
+//        if let inMaxValue = maxValue {
+//            containers[column].maxValue = inMaxValue
+//        }
         if let inName = name {
             containers[column].name = inName
         }
         if let inSize = size {
             containers[column].size = inSize
         }
+//        if let inBelongsToPackage = belongsToPackage {
+//            containers[column].belongsToPackage = inBelongsToPackage
+//        }
+//        if let inBGPictureAdded = BGPictureAdded {
+//            containers[column].BGPictureAdded = inBGPictureAdded
+//        }
+    }
+    func checkContainers()->Bool {
+//        var first = true
+//        while true {
+//            if let container = game.getIteratedContainerPosition(first: first) {
+//                if container.minValue != FirstCardValue || container.maxValue % MaxCardValue != LastCardValue {
+//                    return false
+//                }
+//                first = false
+//            } else {
+//                break
+//            }
+//        }
+        setIterationForContainer()
+        for container in self {
+            if container.getMinValue() != FirstCardValue || container.getMaxValue() % MaxCardValue != LastCardValue {
+                return false
+            }
+        }
+        return true
     }
 
     
@@ -257,16 +356,16 @@ class GameEngine {
     
     private var iterateContainerColumn: Int = 0
 
-    func getIteratedContainerPosition(first: Bool = false)->MySKCard? {
-        if first {
-            iterateContainerColumn = NoValue
-        }
-        iterateContainerColumn += 1
-        if iterateContainerColumn == countContainers {
-            return nil
-        }
-        return containers[iterateContainerColumn]
-    }
+//    func getIteratedContainerPosition(first: Bool = false)->MySKCard? {
+//        if first {
+//            iterateContainerColumn = NoValue
+//        }
+//        iterateContainerColumn += 1
+//        if iterateContainerColumn == countContainers {
+//            return nil
+//        }
+//        return containers[iterateContainerColumn]
+//    }
     
 
 }
