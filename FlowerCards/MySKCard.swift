@@ -61,20 +61,20 @@ class MySKCard: SKSpriteNode {
 //        }
 //    }
     
-    struct CardIndex: Hashable {
-        var hashValue: Int {
-            get {
-                return packageIndex * 1000 + colorIndex * 100 + origValue
-            }
-        }
-        var packageIndex: Int
-        var colorIndex: Int
-        var origValue: Int
-        static func ==(left: CardIndex, right: CardIndex) -> Bool {
-            return left.hashValue == right.hashValue
-        }
-
-    }
+//    struct CardIndex: Hashable {
+//        var hashValue: Int {
+//            get {
+//                return packageIndex * 1000 + colorIndex * 100 + origValue
+//            }
+//        }
+//        var packageIndex: Int
+//        var colorIndex: Int
+//        var origValue: Int
+//        static func ==(left: CardIndex, right: CardIndex) -> Bool {
+//            return left.hashValue == right.hashValue
+//        }
+//
+//    }
     
     override var size: CGSize {
         didSet {
@@ -163,9 +163,6 @@ class MySKCard: SKSpriteNode {
         self.maxValue = value
         self.origValue = value
         self.mirrored = 0
-        for pkgNr in 0..<MySKCard.countPackages {
-            OKPackages.insert(pkgNr + 1)
-        }
         
         
         
@@ -184,11 +181,11 @@ class MySKCard: SKSpriteNode {
         super.init(texture: texture, color: UIColor.clear, size: texture.size())
         
         if card != nil {
-            self.colorIndex = card!.color
+            self.colorIndex = card!.colorIndex
             self.minValue = card!.minValue
             self.maxValue = card!.maxValue
             self.origValue = card!.originalValue
-            self.name = card!.cardName
+            self.name = card!.name
         }
         
         if value > NoValue {
@@ -492,64 +489,64 @@ class MySKCard: SKSpriteNode {
 //        fatalError("init(coder:) has not been implemented")
 //    }
     
-    static var cardIndexArray: [CardIndex] = []
-    static var cards: [CardIndex:Card] = [:]
-    static var countPackages: Int = 0
+//    static var cardIndexArray: [CardIndex] = []
+//    static var cards: [CardIndex:Card] = [:]
+//    static var countPackages: Int = 0
+//    
+//
+//    
+//    static func getRandomCard(random: MyRandom?)->(MySKCard, Bool) {
+//        let index = random!.getRandomInt(0, max: cardIndexArray.count - 1)
+//        let cardIndex = cardIndexArray[index]
+//        let color = cards[cardIndex]!.colorIndex
+//        let texture = atlas.textureNamed ("card\(color)")
+//        let card = cards[cardIndex]
+//        cardIndexArray.remove(at: index)
+//        let newCard = MySKCard(texture: texture, type: .cardType, card: card!)
+//        return (newCard, cardIndexArray.count != 0)
+//    }
+//    static func setCountPackages(countPackages: Int) {
+//        self.countPackages = countPackages
+//        
+//    }
+//    
+//    static func cleanForNewGame() {
+//        cards.removeAll()
+//        // generate all cards
+//        for pkgIndex in 0..<countPackages {
+//            for colorIndex in 0..<MaxColorValue {
+//                for cardIndex in 0..<MaxCardValue {
+//                    let index = CardIndex(packageIndex: pkgIndex, colorIndex: colorIndex, origValue: cardIndex)
+//                    cardIndexArray.append(index)
+//                    let name = "\(pkgIndex)-\(colorIndex)-\(cardIndex)"
+//                    cards[index] = Card(color: colorIndex, row: NoValue, column: NoValue, originalValue: cardIndex, status: .CardStack, cardName: name)
+//                }
+//            }
+//                    
+//        }
+//        
+//    }
+//    
+//    static func areConnectable(first: GameArrayPositions, second: GameArrayPositions, secondIsContainer: Bool = false)->Bool {
+//        if first.colorIndex == second.colorIndex &&
+//            (first.minValue == second.maxValue + 1 ||
+//             first.maxValue == second.minValue - 1 ||
+//                (countPackages > 1 && first.maxValue == LastCardValue && second.minValue == FirstCardValue) ||
+//                (countPackages > 1 && first.minValue == FirstCardValue && second.maxValue == LastCardValue && !secondIsContainer))
+//        {
+//            return true
+//        }
+//        
+//        return false
+//        
+//    }
+//
     
-
-    
-    static func getRandomCard(random: MyRandom?)->(MySKCard, Bool) {
-        let index = random!.getRandomInt(0, max: cardIndexArray.count - 1)
-        let cardIndex = cardIndexArray[index]
-        let color = cards[cardIndex]!.color
-        let texture = atlas.textureNamed ("card\(color)")
-        let card = cards[cardIndex]
-        cardIndexArray.remove(at: index)
-        let newCard = MySKCard(texture: texture, type: .cardType, card: card!)
-        return (newCard, cardIndexArray.count != 0)
-    }
-    static func setCountPackages(countPackages: Int) {
-        self.countPackages = countPackages
-        
-    }
-    
-    static func cleanForNewGame() {
-        cards.removeAll()
-        // generate all cards
-        for pkgIndex in 0..<countPackages {
-            for colorIndex in 0..<MaxColorValue {
-                for cardIndex in 0..<MaxCardValue {
-                    let index = CardIndex(packageIndex: pkgIndex, colorIndex: colorIndex, origValue: cardIndex)
-                    cardIndexArray.append(index)
-                    let name = "\(pkgIndex)-\(colorIndex)-\(cardIndex)"
-                    cards[index] = Card(color: colorIndex, row: NoValue, column: NoValue, originalValue: cardIndex, status: .CardStack, cardName: name)
-                }
-            }
-                    
-        }
-        
-    }
-    
-    static func areConnectable(first: GameArrayPositions, second: GameArrayPositions, secondIsContainer: Bool = false)->Bool {
-        if first.colorIndex == second.colorIndex &&
-            (first.minValue == second.maxValue + 1 ||
-             first.maxValue == second.minValue - 1 ||
-                (countPackages > 1 && first.maxValue == LastCardValue && second.minValue == FirstCardValue) ||
-                (countPackages > 1 && first.minValue == FirstCardValue && second.maxValue == LastCardValue && !secondIsContainer))
-        {
-            return true
-        }
-        
-        return false
-        
-    }
-
-    
-    deinit {
-        if type == .cardType {
-            MySKCard.cards[cardIndex]!.status = .Deleted
-            MySKCard.cards[cardIndex]!.belongsToPkg = 0
-        }
-    }
-
+//    deinit {
+//        if type == .cardType {
+//            game.cards[cardIndex]!.status = .Deleted
+//            MySKCard.cards[cardIndex]!.belongsToPkg = 0
+//        }
+//    }
+//
 }

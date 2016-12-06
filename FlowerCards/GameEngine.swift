@@ -12,27 +12,69 @@ enum CardStatus: Int {
     case CardStack = 0, OnScreen, Deleted
 }
 
+struct CardIndex: Hashable {
+    var hashValue: Int {
+        get {
+            return packageIndex * 1000 + colorIndex * 100 + origValue
+        }
+    }
+    var packageIndex: Int
+    var colorIndex: Int
+    var origValue: Int
+    static func ==(left: CardIndex, right: CardIndex) -> Bool {
+        return left.hashValue == right.hashValue
+    }
+    
+}
+
+
 struct Card {
+    var used: Bool
+    var position: CGPoint
     let bitMaskForPackages: [UInt8] = [1, 2, 4, 8]
     var status: CardStatus
-    var color: Int
+    var colorIndex: Int
     var column: Int
     var row: Int
-    var cardName: String
+    var name: String
     var originalValue: Int
     var minValue: Int
     var maxValue: Int
     var deleted: Bool
     var countTransitions: Int
     var belongsToPkg: UInt8 // belongs to package
+    var countScore: Int {
+        get {
+            return(calculateScore())
+        }
+    }
+    
+    init() {
+        self.used = false
+        self.position = CGPoint(x: 0, y: 0)
+        self.colorIndex = NoValue
+        self.status = .CardStack
+        self.column = 0
+        self.row = 0
+        self.originalValue = NoValue
+        self.name = ""
+        self.minValue = NoValue
+        self.maxValue = NoValue
+        self.deleted = false
+        self.belongsToPkg = 0
+        self.countTransitions = 0
+        self.belongsToPkg = 0
+    }
     
     init(color: Int, row: Int, column: Int, originalValue: Int, status: CardStatus, cardName: String) {
-        self.color = color
+        self.used = false
+        self.position = CGPoint(x: 0, y: 0)
+        self.colorIndex = color
         self.status = status
         self.column = column
         self.row = row
         self.originalValue = originalValue
-        self.cardName = cardName
+        self.name = cardName
         self.minValue = originalValue
         self.maxValue = originalValue
         self.deleted = false
@@ -40,44 +82,24 @@ struct Card {
         self.countTransitions = 0
         self.belongsToPkg = 0
     }
-}
-
-struct GameArrayPositions {
-    var used: Bool
-    var position: CGPoint
-    var colorIndex: Int
-    var name: String
-    var origValue: Int
-    var minValue: Int
-    var maxValue: Int
-    var countTransitions: Int
-    var countScore: Int {
-        get {
-            return(calculateScore())
-        }
-    }
-    init() {
-        self.used = false
-        self.position = CGPoint(x: 0, y: 0)
-        self.colorIndex = NoColor
-        self.name = ""
-        self.origValue = NoValue
-        self.minValue = NoValue
-        self.maxValue = NoValue
-        self.countTransitions = 0
-    }
     
     init(colorIndex: Int, minValue: Int, maxValue: Int, origValue: Int) {
         self.used = false
         self.position = CGPoint(x: 0, y: 0)
         self.colorIndex = colorIndex
+        self.status = .CardStack
+        self.column = 0
+        self.row = 0
+        self.originalValue = origValue
         self.name = ""
-        self.origValue = origValue
         self.minValue = minValue
         self.maxValue = maxValue
+        self.deleted = false
+        self.belongsToPkg = 0
         self.countTransitions = 0
+        self.belongsToPkg = 0
     }
-    
+
     func calculateScore()->Int {
         var actValue: Int
         if countTransitions == 0 {
@@ -92,16 +114,73 @@ struct GameArrayPositions {
         }
         return actValue
     }
-    
 }
+
+
+//struct GameArrayPositions {
+//    var used: Bool
+//    var position: CGPoint
+////    var cardIndex: CardIndex
+//    var colorIndex: Int
+//    var name: String
+//    var origValue: Int
+//    var minValue: Int
+//    var maxValue: Int
+//    var countTransitions: Int
+//    var countScore: Int {
+//        get {
+//            return(calculateScore())
+//        }
+//    }
+//    init() {
+//        self.used = false
+//        self.position = CGPoint(x: 0, y: 0)
+//        self.colorIndex = NoColor
+//        self.name = ""
+//        self.origValue = NoValue
+//        self.minValue = NoValue
+//        self.maxValue = NoValue
+//        self.countTransitions = 0
+//    }
+//    
+//    init(colorIndex: Int, minValue: Int, maxValue: Int, origValue: Int) {
+//        self.used = false
+//        self.position = CGPoint(x: 0, y: 0)
+//        self.colorIndex = colorIndex
+//        self.name = ""
+//        self.origValue = origValue
+//        self.minValue = minValue
+//        self.maxValue = maxValue
+//        self.countTransitions = 0
+//    }
+//    
+//    func calculateScore()->Int {
+//        var actValue: Int
+//        if countTransitions == 0 {
+//            let midValue = Double(minValue + maxValue + 2) / Double(2)
+//            actValue = Int(midValue * Double((maxValue - minValue + 1)))
+//        } else {
+//            var midValue = Double(minValue + LastCardValue + 2) / Double(2)
+//            actValue = Int(midValue * Double((LastCardValue - minValue + 1)))
+//            midValue = Double(maxValue + 2) / Double(2)
+//            actValue += Int(midValue * Double((maxValue + 1)))
+//            actValue += countTransitions == 1 ? 0 : 91 * (countTransitions - 1)
+//        }
+//        return actValue
+//    }
+//    
+//}
 
 
 class GameEngine: IteratorProtocol, Sequence {
     public typealias Element = MySKCard
-    var countRows: Int
-    var countColumns: Int
-    private var gameArray = [[GameArrayPositions]]()
+    private var countRows: Int
+    private var countColumns: Int
+    private var countPackages: Int
+    private var gameArray = [[Card]]()
     private var containers = [MySKCard]()
+    private var cardIndexArray: [CardIndex] = []
+    private var cards: [CardIndex:Card] = [:]
     private let countContainers = 4
 
     enum SequenceType: Int {
@@ -110,10 +189,12 @@ class GameEngine: IteratorProtocol, Sequence {
     init() {
         self.countColumns = 0
         self.countRows = 0
+        self.countPackages = 0
     }
-    init(countColumns: Int, countRows: Int) {
+    init(countColumns: Int, countRows: Int, countPackages: Int) {
         self.countColumns = countColumns
         self.countRows = countRows
+        self.countPackages = countPackages
     }
     private var containerColumn = 0
     func setIterationForContainer() {
@@ -134,7 +215,7 @@ class GameEngine: IteratorProtocol, Sequence {
         gameArrayColumn = 0
     }
 
-    func next() -> GameArrayPositions? {
+    func next() -> Card? {
         gameArrayRow += 1
         if gameArrayRow == countRows {
             gameArrayRow = 0
@@ -174,7 +255,7 @@ class GameEngine: IteratorProtocol, Sequence {
         gameArray.removeAll(keepingCapacity: false)
         containers.removeAll(keepingCapacity: false)
         for _ in 0..<countColumns {
-            gameArray.append(Array(repeating: GameArrayPositions(), count: countRows))
+            gameArray.append(Array(repeating: Card(), count: countRows))
         }
         containers.removeAll()
         for _ in 0..<countContainers {
@@ -223,7 +304,7 @@ class GameEngine: IteratorProtocol, Sequence {
         gameArray[column][row].minValue = card.getMinValue()
         gameArray[column][row].maxValue = card.getMaxValue()
         gameArray[column][row].countTransitions = card.getCountTransitions()
-        gameArray[column][row].origValue = card.getOrigValue()
+        gameArray[column][row].originalValue = card.getOrigValue()
     }
     
     func setGameArrayPosition(column: Int, row: Int, position: CGPoint) {
@@ -318,7 +399,7 @@ class GameEngine: IteratorProtocol, Sequence {
     }
 
     
-    func getGameArrayPosition(column: Int, row: Int)->GameArrayPositions {
+    func getGameArrayPosition(column: Int, row: Int)->Card {
         return gameArray[column][row]
     }
     
@@ -338,7 +419,7 @@ class GameEngine: IteratorProtocol, Sequence {
     
     private var iterateColumn: Int = 0
     private var iterateRow: Int = 0
-    func getIteratedGameArrayPosition(first: Bool = false)->GameArrayPositions? {
+    func getIteratedGameArrayPosition(first: Bool = false)->Card? {
         if first {
             iterateColumn = 0
             iterateRow = NoValue
@@ -353,19 +434,57 @@ class GameEngine: IteratorProtocol, Sequence {
         }
         return gameArray[iterateColumn][iterateRow]
     }
+  
+    func areConnectable(first: Card, second: Card, secondIsContainer: Bool = false)->Bool {
+        if first.colorIndex == second.colorIndex &&
+            (first.minValue == second.maxValue + 1 ||
+                first.maxValue == second.minValue - 1 ||
+                (countPackages > 1 && first.maxValue == LastCardValue && second.minValue == FirstCardValue) ||
+                (countPackages > 1 && first.minValue == FirstCardValue && second.maxValue == LastCardValue && !secondIsContainer))
+        {
+            return true
+        }
+        
+        return false
+        
+    }
     
-    private var iterateContainerColumn: Int = 0
 
-//    func getIteratedContainerPosition(first: Bool = false)->MySKCard? {
-//        if first {
-//            iterateContainerColumn = NoValue
-//        }
-//        iterateContainerColumn += 1
-//        if iterateContainerColumn == countContainers {
-//            return nil
-//        }
-//        return containers[iterateContainerColumn]
-//    }
+    
+    
+    
+    func getRandomCard(random: MyRandom?)->(MySKCard, Bool) {
+        let index = random!.getRandomInt(0, max: cardIndexArray.count - 1)
+        let cardIndex = cardIndexArray[index]
+        let color = cards[cardIndex]!.colorIndex
+        let texture = atlas.textureNamed ("card\(color)")
+        let card = cards[cardIndex]
+        cardIndexArray.remove(at: index)
+        let newCard = MySKCard(texture: texture, type: .cardType, card: card!)
+        return (newCard, cardIndexArray.count != 0)
+    }
+    func setCountPackages(countPackages: Int) {
+        self.countPackages = countPackages
+        
+    }
+    
+    func cleanForNewGame() {
+        cards.removeAll()
+        // generate all cards
+        for pkgIndex in 0..<countPackages {
+            for colorIndex in 0..<MaxColorValue {
+                for cardIndex in 0..<MaxCardValue {
+                    let index = CardIndex(packageIndex: pkgIndex, colorIndex: colorIndex, origValue: cardIndex)
+                    cardIndexArray.append(index)
+                    let name = "\(pkgIndex)-\(colorIndex)-\(cardIndex)"
+                    cards[index] = Card(color: colorIndex, row: NoValue, column: NoValue, originalValue: cardIndex, status: .CardStack, cardName: name)
+                }
+            }
+            
+        }
+        
+    }
+    
     
 
 }
