@@ -358,28 +358,55 @@ class MySKCard: SKSpriteNode {
         return self.origValue
     }
     
+    func setOrigValue(origValue: Int) {
+        self.origValue = origValue
+    }
+    
     func getCountTransitions()->Int{
         return self.countTransitions
+    }
+    
+    func setCountTransitions(countTransitions: Int) {
+        self.countTransitions = countTransitions
     }
     
     func getOrigSize() -> CGSize {
         return self.origSize
     }
     
+    func setOrigSize(origSize: CGSize) {
+        self.origSize = origSize
+    }
+    
     func getType()-> MySKCardType {
         return self.type
+    }
+    
+    func setType(type: MySKCardType) {
+        self.type = type
     }
     
     func getStartPosition()->CGPoint {
         return self.startPosition
     }
     
+    func setStartPosition(startPosition: CGPoint) {
+        self.startPosition = startPosition
+    }
+    
     func getMirrored()->Int {
         return self.mirrored
+    }
+    func setMirrored(mirrored: Int) {
+        self.mirrored = mirrored
     }
     
     func getBelongsToPackage()->Int {
         return self.belongsToPackage
+    }
+    
+    func setBelongsToPackage(belongsToPackage: Int) {
+        self.belongsToPackage = belongsToPackage
     }
     
     func setParam(column: Int? = nil,

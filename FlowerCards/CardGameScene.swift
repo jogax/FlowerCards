@@ -1070,17 +1070,17 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         if buttonName == "tipps" {
             if !generatingTipps {
                 getTipps()
-                if showTippCounter > 0 {
-                    showTippCounter -= 1
-                } else {
-                    freeTippCounter -= 1
-                    let modifyer = freeTippCounter > 0 ? 0 : freeTippCounter > -freeAmount ? penalty : 2 * penalty
-                    scoreModifyer -= modifyer
-                    levelScore -= modifyer
-                    if modifyer > 0 {
-                        self.addChild(showCountScore("-\(modifyer)", position: undoButton!.position))
-                    }
-                }
+//                if showTippCounter > 0 {
+//                    showTippCounter -= 1
+//                } else {
+//                    freeTippCounter -= 1
+//                    let modifyer = freeTippCounter > 0 ? 0 : freeTippCounter > -freeAmount ? penalty : 2 * penalty
+//                    scoreModifyer -= modifyer
+//                    levelScore -= modifyer
+//                    if modifyer > 0 {
+//                        self.addChild(showCountScore("-\(modifyer)", position: undoButton!.position))
+//                    }
+//                }
             }
         }
         startTippTimer()
@@ -2890,23 +2890,23 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     card.reload()
                     
                 case .hitcounterChanged:
-                    
-                    game.setContainerParams(column: findIndex(savedCardInCycle.colorIndex),
-                                            minValue: savedCardInCycle.minValue,
-                                            maxValue: savedCardInCycle.maxValue,
-                                            belongsToPackage: savedCardInCycle.belongsToPackage,
-                                            BGPictureAdded: savedCardInCycle.BGPictureAdded)
-                    game.getContainer(column:findIndex(savedCardInCycle.colorIndex)).reload()
-                    showScore()
-                    
+                    break
+//                    game.setContainerParams(column: findIndex(savedCardInCycle.colorIndex),
+//                                            minValue: savedCardInCycle.minValue,
+//                                            maxValue: savedCardInCycle.maxValue,
+//                                            belongsToPackage: savedCardInCycle.belongsToPackage,
+//                                            BGPictureAdded: savedCardInCycle.BGPictureAdded)
+//                    showScore()
+//                    
                 case .firstCardAdded:
+                    let container = game.getContainer(column:findIndex(savedCardInCycle.colorIndex))
                     game.setContainerParams(column: findIndex(savedCardInCycle.colorIndex),
-                                            colorIndex: NoValue,
+                                            colorIndex: NoColor,
                                             minValue: savedCardInCycle.minValue,
                                             maxValue: savedCardInCycle.maxValue,
                                             belongsToPackage: savedCardInCycle.belongsToPackage,
                                             BGPictureAdded: savedCardInCycle.BGPictureAdded)
-                    game.getContainer(column:findIndex(savedCardInCycle.colorIndex)).reload()
+                    container.reload()
 
                     
                     
@@ -3652,13 +3652,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func undoButtonPressed() {
         pull(true)
-        freeUndoCounter -= 1
-        let modifyer = freeUndoCounter > 0 ? 0 : freeUndoCounter > -freeAmount ? penalty : 2 * penalty
-        scoreModifyer -= modifyer
-        levelScore -= modifyer
-        if modifyer > 0 {
-            self.addChild(showCountScore("-\(modifyer)", position: undoButton!.position))
-        }
+//        freeUndoCounter -= 1
+//        let modifyer = freeUndoCounter > 0 ? 0 : freeUndoCounter > -freeAmount ? penalty : 2 * penalty
+//        scoreModifyer -= modifyer
+//        levelScore -= modifyer
+//        if modifyer > 0 {
+//            self.addChild(showCountScore("-\(modifyer)", position: undoButton!.position))
+//        }
     }
 
     
