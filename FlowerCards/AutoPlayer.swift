@@ -43,19 +43,20 @@ class AutoPlayer {
                     }
                     scene.myTouchesBegan(touchLocation: bestTipp.points[0])
                     autoPlayStatus = .touchesMoved
-                    timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+//                    timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
                } else {
-                    timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+//                    timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
                 }
             case .touchesMoved:
                 scene.myTouchesMoved(touchLocation: bestTipp.points[1])
                 autoPlayStatus = .touchesEnded
-                timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+//                timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             case .touchesEnded:
                 scene.myTouchesEnded(touchLocation: bestTipp.points[1])
                 autoPlayStatus = .getTipp
-                timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+//                timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }
+            timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
         } else {
             scene.isUserInteractionEnabled = true
             timer.invalidate()

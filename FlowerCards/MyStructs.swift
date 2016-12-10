@@ -372,7 +372,7 @@ struct Container {
 }
 
 enum CardStatus: Int, CustomStringConvertible {
-    case added = 0, addedFromCardStack, addedFromShowCard, movingStarted, unification, mirrored, fallingMovingCard, fallingCard, hitcounterChanged, firstCardAdded, removed, stopCycle, nothing
+    case added = 0, addedFromCardStack, addedFromShowCard, movingStarted, unification, mirrored, fallingMovingCard, fallingCard, firstCardAdded, removed, stopCycle, nothing
     
     var statusName: String {
         let statusNames = [
@@ -384,7 +384,6 @@ enum CardStatus: Int, CustomStringConvertible {
             "Mirrored",
             "FallingMovingCard",
             "FallingCard",
-            "HitcounterChanged",
             "Removed",
             "Exchanged",
             "Nothing"
@@ -462,12 +461,12 @@ struct SavedCard {
     var endPosition: CGPoint = CGPoint(x: 0, y: 0)
     var colorIndex: Int = 0
     var size: CGSize = CGSize(width: 0, height: 0)
-    var hitCounter: Int = 0
     var countScore: Int = 0 // Score of Game 
     var belongsToPackage: Int = 0
     var minValue: Int = NoValue
     var maxValue: Int = NoValue
     var BGPictureAdded = false
+    var countTransitions = 0
     var column: Int = 0
     var row: Int = 0
 }
@@ -514,6 +513,21 @@ func stringArrayToNSData(_ array: [String]) -> Data {
     return data as Data
 }
 
+//var deepCount = 0
+//func printFunc(function: String, start: Bool) {
+//    #if PRINT
+//        var text = ""
+//        if start {
+//            deepCount += 1
+//            text = "Start Func " + function
+//        } else {
+//            deepCount -= 1
+//            text = "End func " + function
+//        }
+//        print(text + ", deep: " + String(deepCount))
+//    #endif
+//}
+//
 
 
 let atlas = SKTextureAtlas(named: "sprites")

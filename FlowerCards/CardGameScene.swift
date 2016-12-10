@@ -497,6 +497,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var autoPlayer: AutoPlayer?
     
     override func didMove(to view: SKView) {
+//        //printFunc(function: "didMove", start: true)
         // generate Played Games when GamesModel empty
 //        #if REALM_V1
 //            
@@ -542,10 +543,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
             
         }
+//        //printFunc(function: "didMove", start: false)
     }
     
     func prepareNextGame(_ newGame: Bool) {
-        
+//        //printFunc(function: "prepareNextGame", start: true)
+
 //        labelFontSize = GV.onIpad ? 20 : 15
         labelFontSize = GV.onIpad ? self.size.height / 50 : self.size.height / 70
 
@@ -788,11 +791,14 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             maxLevelIndex = 0
         }
         prepareCards()
+//        //printFunc(function: "prepareNextGame", start: false)
 
 
     }
     
     func createGameRecord(_ gameNumber: Int) {
+//        //printFunc(function: "createGameRecord", start: true)
+
         let gameNew = GameModel()
         gameNew.ID = GV.createNewRecordID(.gameModel)
         gameNew.gameNumber = gameNumber
@@ -803,11 +809,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             realm.add(gameNew)
         }
         actGame = gameNew
+//        //printFunc(function: "createGameRecord", start: false)
     }
     
     
     
     func createLabels(_ label: SKLabelNode, text: String, row: Int, xPosProzent: Int = 0, buttonLabel: Int = NoValue) {
+//        //printFunc(function: "createLabels", start: true)
         
         // values for buttonLabel: NoValue - No Button, 1 - cardPackage, 2 tippsButton
         label.text = text
@@ -832,6 +840,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         label.fontColor = SKColor.black
         label.color = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
         self.addChild(label)
+        //printFunc(function: "createLabels", start: false)
     }
     
     
@@ -848,14 +857,18 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
 
     func getTexture(_ index: Int)->SKTexture {
+        //printFunc(function: "getTexture", start: true)
         if index == NoColor {
+            //printFunc(function: "getTexture", start: false)
             return atlas.textureNamed("emptycard")
         } else {
+            //printFunc(function: "getTexture", start: false)
             return atlas.textureNamed ("card\(index)")
         }
     }
     
     func specialPrepareFuncFirst() {
+        //printFunc(function: "specialPrepareFuncFirst", start: true)
         stopCreateTippsInBackground = true
 //        #if REALM_V1
             countPackages = GV.levelsForPlay.aktLevel.countPackages
@@ -881,11 +894,14 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             }
             cardArray.append(hilfsArray)
         }
+        //printFunc(function: "specialPrepareFuncFirst", start: false)
     }
     
     func updateCardCount(_ adder: Int) {
+        //printFunc(function: "updateCardCount", start: true)
         cardCount += adder
         showCardCount()
+        //printFunc(function: "updateCardCount", start: false)
     }
     
     func showCardCount() {
@@ -894,6 +910,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
     
     func changeLanguage()->Bool {
+        //printFunc(function: "changeLanguage", start: true)
         let name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
         
         whoIsHeaderLabel.text = GV.language.getText(.tcWhoIs)
@@ -913,16 +930,19 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         showCardCount()
         showTippCount()
         showLevelScore()
+        //printFunc(function: "changeLanguage", start: false)
         return true
     }
     
     func showTippCount() {
+        //printFunc(function: "showTippCount", start: true)
         tippCountLabel.text = String(tippArray.count)
         if tippArray.count > 9 {
             tippCountLabel.fontSize = labelFontSize
         } else {
             tippCountLabel.fontSize = labelFontSize * 1.5
         }
+        //printFunc(function: "showTippCount", start: false)
     }
 
     func setBGImageNode()->SKSpriteNode {
@@ -940,6 +960,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
  
     func createCardStack() {
+        //printFunc(function: "createCardStack", start: true)
         cardStack.removeAll(.MySKCardType)
         showCardStack.removeAll(.MySKCardType)
         MySKCard.cleanForNewGame(countPackages: countPackages)
@@ -962,17 +983,21 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             (newCard, go) = MySKCard.getRandomCard(random: random)
             cardStack.push(newCard)
         }
+        //printFunc(function: "createCardStack", start: false)
     }
     
     func fillEmptyCards() {
+        //printFunc(function: "fillEmptyCards", start: true)
         for column in 0..<countColumns {
             for row in 0..<countRows {
                 makeEmptyCard(column, row: row)
             }
         }
+        //printFunc(function: "fillEmptyCards", start: false)
     }
 
     func generateCards(_ generatingType: CardGeneratingType) {
+        //printFunc(function: "generateCards", start: true)
         var waitForStart: TimeInterval = 0.0
         var generateSpecial = generatingType ==  .special
         var positionsTab = [(Int, Int)]()
@@ -984,7 +1009,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     positionsTab.append(appendValue)
                 }
             }
-        }
+       }
         
         while cardStack.count(.MySKCardType) > 0 && (checkGameArray() < maxUsedCells || (generateSpecial && positionsTab.count > 0)) {
             var card: MySKCard = cardStack.pull()!
@@ -1059,6 +1084,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             doTimeCount = true
         }
         stopped = false
+        //printFunc(function: "generateCards", start: false)
     }
     
     func startAutoplay() {
@@ -1114,15 +1140,18 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     
     func deleteEmptyCard(_ column: Int, row: Int) {
+        //printFunc(function: "deleteEmptyCard", start: true)
         let searchName = "\(emptyCardTxt)-\(column)-\(row)"
         if self.childNode(withName: searchName) != nil {
             self.childNode(withName: searchName)!.removeFromParent()
         }
+        //printFunc(function: "deleteEmptyCard", start: false)
 
     
     }
     
     func makeEmptyCard(_ column:Int, row: Int) {
+        //printFunc(function: "makeEmptyCard", start: true)
         let searchName = "\(emptyCardTxt)-\(column)-\(row)"
         if self.childNode(withName: searchName) == nil {
             let emptyCard = MySKCard(texture: getTexture(NoColor), type: .emptyCardType, value: NoColor)
@@ -1136,32 +1165,35 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             gameArray[column][row].name = searchName
             addChild(emptyCard)
         }
+        //printFunc(function: "makeEmptyCard", start: false)
     }
 
     func specialButtonPressed(_ buttonName: String) {
+//        //printFunc(function: "specialButtonPressed", start: true)
         if buttonName == "tipps" {
             if !generatingTipps {
                 getTipps()
-                if showTippCounter > 0 {
-                    showTippCounter -= 1
-                } else {
-                    freeTippCounter -= 1
-                    let modifyer = freeTippCounter > 0 ? 0 : freeTippCounter > -freeAmount ? penalty : 2 * penalty
-                    scoreModifyer -= modifyer
-                    levelScore -= modifyer
-                    if modifyer > 0 {
-                        self.addChild(showCountScore("-\(modifyer)", position: undoButton!.position))
-                    }
-                }
+//                if showTippCounter > 0 {
+//                    showTippCounter -= 1
+//                } else {
+//                    freeTippCounter -= 1
+//                    let modifyer = freeTippCounter > 0 ? 0 : freeTippCounter > -freeAmount ? penalty : 2 * penalty
+//                    scoreModifyer -= modifyer
+//                    levelScore -= modifyer
+//                    if modifyer > 0 {
+//                        self.addChild(showCountScore("-\(modifyer)", position: undoButton!.position))
+//                    }
+//                }
             }
         }
-        startTippTimer()
+//        //printFunc(function: "specialButtonPressed", start: false)
     }
     
     func startTippTimer(){
     }
     
     func getTipps() {
+        //printFunc(function: "getTipps", start: true)
         if tippArray.count > 0 && !generatingTipps {
                 stopTrembling()
                 drawHelpLines(tippArray[tippIndex].points, lineWidth: cardSize.width, twoArrows: tippArray[tippIndex].twoArrows, color: .green)
@@ -1183,9 +1215,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             tippIndex %= tippArray.count
         }
         
+        //printFunc(function: "getTipps", start: false)
     }
     
     func createTipps()->Bool {
+        //printFunc(function: "createTipps", start: true)
 //        printGameArrayInhalt("from createTipps")
         tippArray.removeAll()
 //        while gameArray.count < countColumns * countRows {
@@ -1312,6 +1346,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //                print("stopped before sorting Tipp pairs")
 
                 stopCreateTippsInBackground = false
+                //printFunc(function: "createTipps", start: false)
                 return false
             }
             tippArray.sort(by: {checkForSort($0, t1: $1) })
@@ -1327,6 +1362,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        }
 
         tippIndex = 0  // set tipps to first
+        //printFunc(function: "createTipps", start: false)
         return true
      }
     
@@ -2173,7 +2209,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         
         if OK  {
-            push(container, status: .hitcounterChanged)
+            push(container, status: .unification)
             push(movingCard, status: .removed)
 //            let adder = movingCard.maxValue * (movingCard.maxValue - movingCard.minValue + 1)
             container.connectWith(otherCard: movingCard)
@@ -2727,6 +2763,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
 
     func pull(_ createTipps: Bool) {
+        //printFunc(function: "pull", start: true)
         let duration = 0.5
         var actionMoveArray = [SKAction]()
         if let savedCard:SavedCard  = stack.pull() {
@@ -2804,6 +2841,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     card.maxValue = savedCardInCycle.maxValue
                     card.belongsToPackage = savedCardInCycle.belongsToPackage
                     card.BGPictureAdded = savedCardInCycle.BGPictureAdded
+                    card.countTransitions = savedCardInCycle.countTransitions
                     card.name = savedCardInCycle.name
                     levelScore = savedCardInCycle.countScore
  
@@ -2819,19 +2857,20 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     card.maxValue = savedCardInCycle.maxValue
                     card.belongsToPackage = savedCardInCycle.belongsToPackage
                     card.BGPictureAdded = savedCardInCycle.BGPictureAdded
+                    card.countTransitions = savedCardInCycle.countTransitions
                     updateGameArrayCell(card)
                     //card.hitLabel.text = "\(card.hitCounter)"
                     card.reload()
                     
-                case .hitcounterChanged:
-                    
-                    let container = containers[findIndex(savedCardInCycle.colorIndex)]
-                    container.minValue = savedCardInCycle.minValue
-                    container.maxValue = savedCardInCycle.maxValue
-                    container.belongsToPackage = savedCardInCycle.belongsToPackage
-                    container.BGPictureAdded = savedCardInCycle.BGPictureAdded
-                    container.reload()
-                    showScore()
+//                case .hitcounterChanged:
+//                    
+//                    let container = containers[findIndex(savedCardInCycle.colorIndex)]
+//                    container.minValue = savedCardInCycle.minValue
+//                    container.maxValue = savedCardInCycle.maxValue
+//                    container.belongsToPackage = savedCardInCycle.belongsToPackage
+//                    container.BGPictureAdded = savedCardInCycle.BGPictureAdded
+//                    container.reload()
+//                    showScore()
                     
                 case .firstCardAdded:
                     let container = containers[findIndex(savedCardInCycle.colorIndex)]
@@ -2839,6 +2878,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     container.maxValue = savedCardInCycle.maxValue
                     container.belongsToPackage = savedCardInCycle.belongsToPackage
                     container.BGPictureAdded = savedCardInCycle.BGPictureAdded
+                    container.countTransitions = savedCardInCycle.countTransitions
                     container.colorIndex = NoColor
                     container.reload()
                     
@@ -2852,6 +2892,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
                     updateGameArrayCell(card)
                     card.BGPictureAdded = savedCardInCycle.BGPictureAdded
+                    card.countTransitions = savedCardInCycle.countTransitions
                     actionMoveArray.append(SKAction.move(to: savedCardInCycle.endPosition, duration: duration))
                     actionMoveArray.append(SKAction.run({
                             self.removeNodesWithName("\(self.emptyCardTxt)-\(card.column)-\(card.row)")
@@ -2895,6 +2936,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         if createTipps {
             gameArrayChanged = true
         }
+        //printFunc(function: "pull", start: false)
 
     }
     
@@ -3479,11 +3521,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         savedCard.endPosition = card.position
         savedCard.colorIndex = card.colorIndex
         savedCard.size = card.size
-        savedCard.hitCounter = card.hitCounter
         savedCard.countScore = levelScore
         savedCard.minValue = card.minValue
         savedCard.maxValue = card.maxValue
         savedCard.belongsToPackage = card.belongsToPackage
+        savedCard.countTransitions = card.countTransitions
         savedCard.column = card.column
         savedCard.row = card.row
         stack.push(savedCard)
@@ -3561,14 +3603,17 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func undoButtonPressed() {
+        //printFunc(function: "undoButtonPressed", start: true)
+
         pull(true)
-        freeUndoCounter -= 1
-        let modifyer = freeUndoCounter > 0 ? 0 : freeUndoCounter > -freeAmount ? penalty : 2 * penalty
-        scoreModifyer -= modifyer
-        levelScore -= modifyer
-        if modifyer > 0 {
-            self.addChild(showCountScore("-\(modifyer)", position: undoButton!.position))
-        }
+//        freeUndoCounter -= 1
+//        let modifyer = freeUndoCounter > 0 ? 0 : freeUndoCounter > -freeAmount ? penalty : 2 * penalty
+//        scoreModifyer -= modifyer
+//        levelScore -= modifyer
+//        if modifyer > 0 {
+//            self.addChild(showCountScore("-\(modifyer)", position: undoButton!.position))
+//        }
+        //printFunc(function: "undoButtonPressed", start: false)
     }
 
     

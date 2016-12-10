@@ -131,7 +131,7 @@ class MySKCard: SKSpriteNode {
     
     
 
-    var hitCounter: Int = 0
+//    var hitCounter: Int = 0
 
     var type: MySKCardType
     var hitLabel = SKLabelNode()
@@ -160,14 +160,14 @@ class MySKCard: SKSpriteNode {
         
         
         
-        switch type {
-        case .containerType, .emptyCardType, .showCardType:
-            hitCounter = 0
-        case .buttonType:
-            hitCounter = 0
-        case .cardType:
-            hitCounter = 1
-        }
+//        switch type {
+//        case .containerType, .emptyCardType, .showCardType:
+//            hitCounter = 0
+//        case .buttonType:
+//            hitCounter = 0
+//        case .cardType:
+//            hitCounter = 1
+//        }
         
         
 
@@ -193,7 +193,7 @@ class MySKCard: SKSpriteNode {
             
             hitLabel.position = CGPoint(x: self.position.x, y: self.position.y + self.size.width * 0.08)
             hitLabel.fontSize = 15;
-            hitLabel.text = "\(hitCounter)"
+//            hitLabel.text = "\(hitCounter)"
             
             //print(minValue, text)
             setLabelText(minValueLabel, value: minValue, dotCount: belongsToPackage == NoValue ? 0 : belongsToPackage)
@@ -280,7 +280,7 @@ class MySKCard: SKSpriteNode {
                 }
             }
         } else {
-            hitLabel.text = "\(hitCounter)"
+//            hitLabel.text = "\(hitCounter)"
         }
 
     }
