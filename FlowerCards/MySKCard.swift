@@ -98,8 +98,10 @@ class MySKCard: SKSpriteNode {
     var minValue: Int
     var maxValue: Int
     var origValue: Int
+    
     var belongsToPackageMin: UInt8 = 0
     var belongsToPackageMax: UInt8 = 0
+    
     var countTransitions = 0
     var countScore: Int {
         get {
