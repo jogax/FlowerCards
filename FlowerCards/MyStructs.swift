@@ -462,7 +462,8 @@ struct SavedCard {
     var colorIndex: Int = 0
     var size: CGSize = CGSize(width: 0, height: 0)
     var countScore: Int = 0 // Score of Game 
-    var belongsToPackage: Int = 0
+    var belongsToPackageMin: UInt8 = 0
+    var belongsToPackageMax: UInt8 = 0
     var minValue: Int = NoValue
     var maxValue: Int = NoValue
     var BGPictureAdded = false

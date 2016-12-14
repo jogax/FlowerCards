@@ -13,31 +13,22 @@ import MultipeerConnectivity
 struct GameArrayPositions {
     var used: Bool
     var position: CGPoint
-    var colorIndex: Int
-    var name: String
-    var origValue: Int
-    var minValue: Int
-    var maxValue: Int
+    var card: MySKCard
     init() {
         self.used = false
         self.position = CGPoint(x: 0, y: 0)
-        self.colorIndex = NoColor
-        self.name = ""
-        self.origValue = NoValue
-        self.minValue = NoValue
-        self.maxValue = NoValue
+        self.card = MySKCard()
     }
-    init(colorIndex: Int, minValue: Int, maxValue: Int, origValue: Int) {
+    init(colorIndex: Int, minValue: Int, maxValue: Int, origValue: Int, card: MySKCard) {
         self.used = false
         self.position = CGPoint(x: 0, y: 0)
-        self.colorIndex = colorIndex
-        self.name = ""
-        self.origValue = origValue
-        self.minValue = minValue
-        self.maxValue = maxValue
-        
+        self.card = card
     }
 }
+
+var gameArray = [[GameArrayPositions]]()
+var containers = [MySKCard]()
+
 
 
 
@@ -324,8 +315,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var maxLevelIndex = 0
     var stack:Stack<SavedCard> = Stack()
     //var gameArray = [[Bool]]() // true if Cell used
-    var gameArray = [[GameArrayPositions]]()
-    var containers = [MySKCard]()
     var colorTab = [ColorTabLine]()
     var countColorsProContainer = [Int]()
     var labelBackground = SKSpriteNode()
@@ -493,7 +482,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     let playMusicForever = -1
     let fixationTime = 0.1
     
-//    var autoPlayerActive = false
+    var autoPlayerActive = false
     var autoPlayer: AutoPlayer?
     
     override func didMove(to view: SKView) {
@@ -882,7 +871,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         showHelpLines = .green
         containerSize = CGSize(width: CGFloat(containerSizeOrig) * cardSizeMultiplier.width, height: CGFloat(containerSizeOrig) * cardSizeMultiplier.height)
         cardSize = CGSize(width: CGFloat(GV.levelsForPlay.aktLevel.cardSize) * cardSizeMultiplier.width, height: CGFloat(GV.levelsForPlay.aktLevel.cardSize) * cardSizeMultiplier.height )
-        
+        MySKCard.cleanForNewGame(countPackages: countPackages)
+
         for _ in 0..<countContainers {
             var hilfsArray: [GenerateCard] = []
             for cardIndex in 0..<countCardsProContainer! * countPackages {
@@ -963,7 +953,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         //printFunc(function: "createCardStack", start: true)
         cardStack.removeAll(.MySKCardType)
         showCardStack.removeAll(.MySKCardType)
-        MySKCard.cleanForNewGame(countPackages: countPackages)
+//        MySKCard.cleanForNewGame(countPackages: countPackages)
 //        while colorTab.count > 0 && checkGameArray() < maxUsedCells {
 //            let colorTabIndex = random!.getRandomInt(0, max: colorTab.count - 1)//colorTab.count - 1 //
 //            let colorIndex = colorTab[colorTabIndex].colorIndex
@@ -1060,7 +1050,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             })
 
             let actionHideEmptyCard = SKAction.run({
-                self.deleteEmptyCard(actColumn, row: actRow)
+                self.deleteEmptyCard(column: actColumn, row: actRow)
             })
             
             let actionFadeAlpha = SKAction.fadeAlpha(to: 1, duration: 0.2)
@@ -1088,6 +1078,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func startAutoplay() {
+        autoPlayerActive = true
         autoPlayer?.startPlay()
     }
     
@@ -1098,10 +1089,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             let rowIndex = countRows - row - 1
             string = ""
             for column in 0..<countColumns {
-                let color = gameArray[column][rowIndex].colorIndex
+                let color = gameArray[column][rowIndex].card.colorIndex
                 if gameArray[column][rowIndex].used {
-                    let minInt = gameArray[column][rowIndex].minValue + 1
-                    let maxInt = gameArray[column][rowIndex].maxValue + 1
+                    let minInt = gameArray[column][rowIndex].card.minValue + 1
+                    let maxInt = gameArray[column][rowIndex].card.maxValue + 1
                     string += " (" + String(color) + ")" +
                     (minInt < 10 ? "0" : "") + String(minInt) + "-" +
                     (maxInt < 10 ? "0" : "") + String(maxInt)
@@ -1139,12 +1130,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     
-    func deleteEmptyCard(_ column: Int, row: Int) {
+    func deleteEmptyCard(column: Int, row: Int) {
         //printFunc(function: "deleteEmptyCard", start: true)
         let searchName = "\(emptyCardTxt)-\(column)-\(row)"
         if self.childNode(withName: searchName) != nil {
             self.childNode(withName: searchName)!.removeFromParent()
         }
+//        if gameArray[column][row].card.name == searchName {
+//            gameArray[column][row].card.removeFromParent()
+//        }
         //printFunc(function: "deleteEmptyCard", start: false)
 
     
@@ -1154,15 +1148,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         //printFunc(function: "makeEmptyCard", start: true)
         let searchName = "\(emptyCardTxt)-\(column)-\(row)"
         if self.childNode(withName: searchName) == nil {
-            let emptyCard = MySKCard(texture: getTexture(NoColor), type: .emptyCardType, value: NoColor)
+            let emptyCard = MySKCard()
             emptyCard.position = gameArray[column][row].position
             emptyCard.size = CGSize(width: cardSize.width, height: cardSize.height)
             emptyCard.name = "\(emptyCardTxt)-\(column)-\(row)"
             emptyCard.column = column
             emptyCard.row = row
+            gameArray[column][row].card = emptyCard
             gameArray[column][row].used = false
-            gameArray[column][row].colorIndex = NoColor
-            gameArray[column][row].name = searchName
+//            gameArray[column][row].card.colorIndex = NoColor
+//            gameArray[column][row].name = searchName
             addChild(emptyCard)
         }
         //printFunc(function: "makeEmptyCard", start: false)
@@ -1233,35 +1228,37 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 if gameArray[column1][row1].used {
                     for column2 in 0..<countColumns {
                         for row2 in 0..<countRows {
-                            if stopCreateTippsInBackground {
-//                                print("stopped while searching pairs")
-                                stopCreateTippsInBackground = false
-                                return false
-                            }
-                            if (column1 != column2 || row1 != row2) &&
-                                MySKCard.areConnectable(first: gameArray[column2][row2], second: gameArray[column1][row1]) {
-                                let aktPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: column2, row: row2))
-                                if !pairExists(pairsToCheck, aktPair: aktPair) {
-                                    pairsToCheck.append(aktPair)
-                                    pairsToCheck.append(FromToColumnRow(fromColumnRow: aktPair.toColumnRow, toColumnRow: aktPair.fromColumnRow))
+                            if gameArray[column2][row2].used {
+                                if stopCreateTippsInBackground {
+    //                                print("stopped while searching pairs")
+                                    stopCreateTippsInBackground = false
+                                    return false
+                                }
+                                if (column1 != column2 || row1 != row2) &&
+                                    MySKCard.areConnectable(first: gameArray[column2][row2].card, second: gameArray[column1][row1].card) {
+                                    let aktPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: column2, row: row2))
+                                    if !pairExists(pairsToCheck: pairsToCheck, aktPair: aktPair) {
+                                        pairsToCheck.append(aktPair)
+                                        pairsToCheck.append(FromToColumnRow(fromColumnRow: aktPair.toColumnRow, toColumnRow: aktPair.fromColumnRow))
+                                    }
                                 }
                             }
                         }
                     }
                     var thisColorHasContainer = false
                     for container in containers {
-                        if gameArray[column1][row1].colorIndex == container.colorIndex {
+                        if gameArray[column1][row1].card.colorIndex == container.colorIndex {
                             thisColorHasContainer = true
                         }
                     }
                     for index in 0..<containers.count {
-                        if !thisColorHasContainer && containers[index].minValue == NoColor && gameArray[column1][row1].maxValue == LastCardValue {
+                        if !thisColorHasContainer && containers[index].minValue == NoColor && gameArray[column1][row1].card.maxValue == LastCardValue {
                             let actContainerPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: index, row: NoValue))
                             pairsToCheck.append(actContainerPair)
                         }
-                        if containers[index].colorIndex == gameArray[column1][row1].colorIndex &&
-                            (containers[index].minValue == gameArray[column1][row1].maxValue + 1 ||
-                            (containers[index].minValue ==  FirstCardValue && gameArray[column1][row1].maxValue == LastCardValue))   {
+                        if containers[index].colorIndex == gameArray[column1][row1].card.colorIndex &&
+                            (containers[index].minValue == gameArray[column1][row1].card.maxValue + 1 ||
+                            (containers[index].minValue ==  FirstCardValue && gameArray[column1][row1].card.maxValue == LastCardValue))   {
                             let actContainerPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: index, row: NoValue))
                             pairsToCheck.append(actContainerPair)
                         }
@@ -1291,26 +1288,27 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                        fromRow == tippArray[ind + 1].toRow &&
                        toColumn == tippArray[ind + 1].fromColumn  &&
                        toRow == tippArray[ind + 1].fromRow {
-                            switch tippArray[ind].points.count {
-                            case 2:
-                                tippArray[ind].twoArrows = true
-                                removeIndex.insert(ind + 1, at: 0)
-                            case 3:
-                                if (tippArray[ind].points[1] - tippArray[ind + 1].points[1]).length() < cardSize.height{
-                                    tippArray[ind].twoArrows = true
-                                    removeIndex.insert(ind + 1, at: 0)
-                                }
-                            case 4:
-                                if tippArray[ind + 1].points.count == 4 && (tippArray[ind].points[1] - tippArray[ind + 1].points[2]).length() < cardSize.height && (tippArray[ind].points[2] - tippArray[ind + 1].points[1]).length() < cardSize.height
-                                {
-                                    tippArray[ind].twoArrows = true
-                                    removeIndex.insert(ind + 1, at: 0)
-                                }
-                            default:
-                                tippArray[ind].twoArrows = false
-                            }
+                            removeIndex.insert(ind + 1, at: 0)
+//                            switch tippArray[ind].points.count {
+//                            case 2:
+//                                tippArray[ind].twoArrows = true
+//                                removeIndex.insert(ind + 1, at: 0)
+//                            case 3:
+//                                if (tippArray[ind].points[1] - tippArray[ind + 1].points[1]).length() < cardSize.height{
+//                                    tippArray[ind].twoArrows = true
+//                                    removeIndex.insert(ind + 1, at: 0)
+//                                }
+//                            case 4:
+//                                if tippArray[ind + 1].points.count == 4 && (tippArray[ind].points[1] - tippArray[ind + 1].points[2]).length() < cardSize.height && (tippArray[ind].points[2] - tippArray[ind + 1].points[1]).length() < cardSize.height
+//                                {
+//                                    tippArray[ind].twoArrows = true
+//                                    removeIndex.insert(ind + 1, at: 0)
+//                                }
+//                            default:
+//                                tippArray[ind].twoArrows = false
+//                            }
                     }
-                    if gameArray[fromColumn][fromRow].maxValue == LastCardValue && toRow == NoValue && containers[toColumn].minValue == NoColor {
+                    if gameArray[fromColumn][fromRow].card.maxValue == LastCardValue && toRow == NoValue && containers[toColumn].minValue == NoColor {
                         // King to empty Container
                         var index = 1
                         while (ind + index) < tippArray.count && index < 4 {
@@ -1349,7 +1347,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 //printFunc(function: "createTipps", start: false)
                 return false
             }
-            tippArray.sort(by: {checkForSort($0, t1: $1) })
+            tippArray.sort(by: {checkForSort(t0: $0, t1: $1) })
             
         }
 //        let tippCountText: String = GV.language.getText(.TCTippCount)
@@ -1384,9 +1382,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         var founded = false
         for column in 0..<countColumns {
             for row in 0..<countRows {
-                if gameArray[column][row].colorIndex == colorIndex &&
-                    (gameArray[column][row].minValue == maxValue + 1 ||
-                    gameArray[column][row].maxValue == minValue - 1) {
+                if gameArray[column][row].card.colorIndex == colorIndex &&
+                    (gameArray[column][row].card.minValue == maxValue + 1 ||
+                    gameArray[column][row].card.maxValue == minValue - 1) {
                         founded = true
                         break
                 }
@@ -1404,15 +1402,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         return founded
     }
     
-    func checkForSort(_ t0: Tipps, t1:Tipps)->Bool {
-        let returnValue = gameArray[t0.fromColumn][t0.fromRow].colorIndex < gameArray[t1.fromColumn][t1.fromRow].colorIndex
-            || (gameArray[t0.fromColumn][t0.fromRow].colorIndex == gameArray[t1.fromColumn][t1.fromRow].colorIndex &&
-                (gameArray[t0.fromColumn][t0.fromRow].maxValue < gameArray[t1.fromColumn][t1.fromRow].minValue
-            || (t0.toRow != NoValue && t1.toRow != NoValue && gameArray[t0.toColumn][t0.toRow].maxValue < gameArray[t1.toColumn][t1.toRow].minValue)))
+    func checkForSort(t0: Tipps, t1:Tipps)->Bool {
+        let returnValue = gameArray[t0.fromColumn][t0.fromRow].card.colorIndex < gameArray[t1.fromColumn][t1.fromRow].card.colorIndex
+            || (gameArray[t0.fromColumn][t0.fromRow].card.colorIndex == gameArray[t1.fromColumn][t1.fromRow].card.colorIndex &&
+                (gameArray[t0.fromColumn][t0.fromRow].card.maxValue < gameArray[t1.fromColumn][t1.fromRow].card.minValue
+            || (t0.toRow != NoValue && t1.toRow != NoValue && gameArray[t0.toColumn][t0.toRow].card.maxValue < gameArray[t1.toColumn][t1.toRow].card.minValue)))
         return returnValue
     }
     
-    func pairExists(_ pairsToCheck:[FromToColumnRow], aktPair: FromToColumnRow)->Bool {
+    func pairExists(pairsToCheck:[FromToColumnRow], aktPair: FromToColumnRow)->Bool {
         for pair in pairsToCheck {
             if pair.fromColumnRow.column == aktPair.fromColumnRow.column && pair.fromColumnRow.row == aktPair.fromColumnRow.row &&
                 pair.toColumnRow.column == aktPair.toColumnRow.column && pair.toColumnRow.row == aktPair.toColumnRow.row {
@@ -1476,7 +1474,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 myTipp.lineLength += (myTipp.points[ind] - myTipp.points[ind + 1]).length()
             }
             // calculate the value for this tipp
-            myTipp.value = (self.childNode(withName: gameArray[myTipp.fromColumn][myTipp.fromRow].name) as! MySKCard).countScore * (myTipp.points.count - 1)
+//            myTipp.value = (self.childNode(withName: gameArray[myTipp.fromColumn][myTipp.fromRow].name) as! MySKCard).countScore * (myTipp.points.count - 1)
+            myTipp.value = gameArray[myTipp.fromColumn][myTipp.fromRow].card.countScore * (myTipp.points.count - 1)
             tippArray.append(myTipp)
         }
      }
@@ -1570,15 +1569,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         var actColorHasContainer = false
         for container in containers {
-            if container.colorIndex == gameArray[movedFrom.column][movedFrom.row].colorIndex {
+            if container.colorIndex == gameArray[movedFrom.column][movedFrom.row].card.colorIndex {
                 actColorHasContainer = true
             }
         }
         
         if foundedPoint.foundContainer {
-            foundedPosition.colorIndex = containers[foundedPoint.column].colorIndex
-            foundedPosition.maxValue = containers[foundedPoint.column].maxValue
-            foundedPosition.minValue = containers[foundedPoint.column].minValue
+            foundedPosition.card = containers[foundedPoint.column]
+//            foundedPosition.card.colorIndex = containers[foundedPoint.column].colorIndex
+            foundedPosition.card.maxValue = containers[foundedPoint.column].maxValue
+            foundedPosition.card.minValue = containers[foundedPoint.column].minValue
 //            foundedColorIndex = containers[foundedPoint.column].colorIndex
 //            foundedMaxValue = containers[foundedPoint.column].maxValue
 //            foundedMinValue = containers[foundedPoint.column].minValue
@@ -1589,7 +1589,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //            foundedMinValue = gameArray[foundedPoint.column][foundedPoint.row].minValue
         }
 
-        if MySKCard.areConnectable(first: gameArray[movedFrom.column][movedFrom.row], second: foundedPosition, secondIsContainer: foundedPoint.foundContainer)
+        if MySKCard.areConnectable(first: gameArray[movedFrom.column][movedFrom.row].card, second: foundedPosition.card, secondIsContainer: foundedPoint.foundContainer)
 //            (gameArray[movedFrom.column][movedFrom.row].colorIndex == foundedColorIndex &&
 //            (gameArray[movedFrom.column][movedFrom.row].maxValue == foundedMinValue - 1 ||
 //                gameArray[movedFrom.column][movedFrom.row].minValue == foundedMaxValue + 1 ||
@@ -1597,8 +1597,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //                (gameArray[movedFrom.column][movedFrom.row].minValue == FirstCardValue && foundedMaxValue == LastCardValue && !foundedPoint.foundContainer && countPackages > 1))
 //            )
                 ||
-            (foundedPosition.minValue == NoColor && !actColorHasContainer) &&
-                (gameArray[movedFrom.column][movedFrom.row].maxValue == LastCardValue) {
+            (foundedPosition.card.minValue == NoColor && !actColorHasContainer) &&
+                (gameArray[movedFrom.column][movedFrom.row].card.maxValue == LastCardValue) {
                 color = .green
         }
         return color
@@ -2115,9 +2115,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func animateFinishGame() {
         for gameRow in gameArray {
-            for card in gameRow {
-                if card.used {
-                    let cardToMove = self.childNode(withName: card.name) as! MySKCard
+            for game in gameRow {
+                if game.used {
+                    let cardToMove = game.card
                     makeEmptyCard(cardToMove.column, row: cardToMove.row)
                     animateMovingCard(cardToMove)
                 }
@@ -2177,9 +2177,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
 //        var containerColorIndex = container.colorIndex
 //        let movingCardColorIndex = movingCard.colorIndex
-        let movingCardCompareValue = GameArrayPositions(colorIndex: movingCard.colorIndex, minValue: movingCard.minValue, maxValue: movingCard.maxValue, origValue: movingCard.origValue)
-        var containerCompareValue = GameArrayPositions(colorIndex: container.colorIndex, minValue: container.minValue, maxValue: container.maxValue, origValue: container.origValue)
-        
+//        let movingCardCompareValue = GameArrayPositions(colorIndex: movingCard.colorIndex, minValue: movingCard.minValue, maxValue: movingCard.maxValue, origValue: movingCard.origValue)
+//        var containerCompareValue = GameArrayPositions(colorIndex: container.colorIndex, minValue: container.minValue, maxValue: container.maxValue, origValue: container.origValue)
+//        
         
         if container.minValue == container.maxValue && container.maxValue == NoColor && movingCard.maxValue == LastCardValue {
             var containerNotFound = true
@@ -2189,7 +2189,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 }
             }
             if containerNotFound {
-                containerCompareValue.colorIndex = movingCard.colorIndex
+                container.colorIndex = movingCard.colorIndex
                 container.colorIndex = movingCard.colorIndex
                 container.texture = getTexture(movingCard.colorIndex)
                 push(container, status: .firstCardAdded)
@@ -2200,7 +2200,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let OK = movingCard.colorIndex == container.colorIndex &&
         (
             container.minValue == NoColor ||
-            MySKCard.areConnectable(first: movingCardCompareValue, second: containerCompareValue)
+            MySKCard.areConnectable(first: movingCard, second: container)
 //            movingCard.maxValue + 1 == container.minValue ||
 //            movingCard.minValue - 1 == container.maxValue ||
 //            (container.minValue == FirstCardValue && movingCard.maxValue == LastCardValue && container.belongsToPackage < countPackages)
@@ -2254,22 +2254,24 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
      }
     
     func resetGameArrayCell(_ card:MySKCard) {
+        gameArray[card.column][card.row].card = MySKCard()
         gameArray[card.column][card.row].used = false
-        gameArray[card.column][card.row].colorIndex = NoColor
-        gameArray[card.column][card.row].minValue = NoValue
-        gameArray[card.column][card.row].maxValue = NoValue
+//        gameArray[card.column][card.row].colorIndex = NoColor
+//        gameArray[card.column][card.row].minValue = NoValue
+//        gameArray[card.column][card.row].maxValue = NoValue
     }
     
     func updateGameArrayCell(_ card:MySKCard) {
+        gameArray[card.column][card.row].card = card
         gameArray[card.column][card.row].used = true
-        gameArray[card.column][card.row].name = card.name!
-        gameArray[card.column][card.row].colorIndex = card.colorIndex
-        gameArray[card.column][card.row].minValue = card.minValue
-        gameArray[card.column][card.row].maxValue = card.maxValue
-        gameArray[card.column][card.row].origValue = card.origValue
+//        gameArray[card.column][card.row].name = card.name!
+//        gameArray[card.column][card.row].colorIndex = card.colorIndex
+//        gameArray[card.column][card.row].minValue = card.minValue
+//        gameArray[card.column][card.row].maxValue = card.maxValue
+//        gameArray[card.column][card.row].origValue = card.origValue
     }
 
-    func cardDidCollideWithMovingCard(_ node1:MySKCard, node2:MySKCard) {
+    func cardDidCollideWithMovingCard(node1:MySKCard, node2:MySKCard) {
 //        let collisionsTime = NSDate()
 //        let timeInterval: Double = collisionsTime.timeIntervalSinceDate(lastCollisionsTime); // <<<<< Difference in seconds (double)
 //
@@ -2285,10 +2287,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         //let aktColor = GV.colorSets[GV.colorSetIndex][card.colorIndex + 1].CGColor
         collisionActive = false
         
-        let movingCardValue = GameArrayPositions(colorIndex: movingCard.colorIndex, minValue: movingCard.minValue, maxValue: movingCard.maxValue, origValue: movingCard.origValue)
-        let cardValue = GameArrayPositions(colorIndex: card.colorIndex, minValue: card.minValue, maxValue: card.maxValue, origValue: card.origValue)
+//        let movingCardValue = GameArrayPositions(colorIndex: movingCard.colorIndex, minValue: movingCard.minValue, maxValue: movingCard.maxValue, origValue: movingCard.origValue)
+//        let cardValue = GameArrayPositions(colorIndex: card.colorIndex, minValue: card.minValue, maxValue: card.maxValue, origValue: card.origValue)
         
-        let OK = MySKCard.areConnectable(first: movingCardValue, second: cardValue)
+        let OK = MySKCard.areConnectable(first: movingCard, second: card)
 //        OK = movingCardColorIndex == cardColorIndex &&
 //        (
 //            movingCard.maxValue + 1 == card.minValue ||
@@ -2718,7 +2720,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 centerY -= labelBackground.size.height / 2
                 centerY -= containerSize.height // / 2
 //                centerY -= containerSize.height / 4
-            containers.append(MySKCard(texture: getTexture(NoColor), type: .containerType, value: NoColor))
+            containers.append(MySKCard(colorIndex: NoColor, type: .containerType, value: NoColor))
             containers[index].name = "\(index)"
             containers[index].position = CGPoint(x: centerX, y: centerY)
             containers[index].size = CGSize(width: containerSize.width, height: containerSize.height)
@@ -2826,9 +2828,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     }
                 case .removed:
                     //let cardTexture = SKTexture(imageNamed: "card\(savedCardInCycle.colorIndex)")
-                    let cardTexture = getTexture(savedCardInCycle.colorIndex)
-                    let type = savedCardInCycle.type
-                    let card = MySKCard(texture: cardTexture, type: type, value: savedCardInCycle.minValue) //NoValue)
+                    let card = MySKCard(colorIndex: savedCardInCycle.colorIndex, type: savedCardInCycle.type, value: savedCardInCycle.minValue)
                     
                     
                     card.colorIndex = savedCardInCycle.colorIndex
@@ -2839,7 +2839,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     card.row = savedCardInCycle.row
                     card.minValue = savedCardInCycle.minValue
                     card.maxValue = savedCardInCycle.maxValue
-                    card.belongsToPackage = savedCardInCycle.belongsToPackage
+                    card.belongsToPackageMin = savedCardInCycle.belongsToPackageMin
+                    card.belongsToPackageMax = savedCardInCycle.belongsToPackageMax
                     card.BGPictureAdded = savedCardInCycle.BGPictureAdded
                     card.countTransitions = savedCardInCycle.countTransitions
                     card.name = savedCardInCycle.name
@@ -2855,7 +2856,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     card.size = savedCardInCycle.size
                     card.minValue = savedCardInCycle.minValue
                     card.maxValue = savedCardInCycle.maxValue
-                    card.belongsToPackage = savedCardInCycle.belongsToPackage
+                    card.belongsToPackageMin = savedCardInCycle.belongsToPackageMin
+                    card.belongsToPackageMax = savedCardInCycle.belongsToPackageMax
                     card.BGPictureAdded = savedCardInCycle.BGPictureAdded
                     card.countTransitions = savedCardInCycle.countTransitions
                     updateGameArrayCell(card)
@@ -2876,7 +2878,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     let container = containers[findIndex(savedCardInCycle.colorIndex)]
                     container.minValue = savedCardInCycle.minValue
                     container.maxValue = savedCardInCycle.maxValue
-                    container.belongsToPackage = savedCardInCycle.belongsToPackage
+                    container.belongsToPackageMin = savedCardInCycle.belongsToPackageMin
+                    container.belongsToPackageMax = savedCardInCycle.belongsToPackageMax
                     container.BGPictureAdded = savedCardInCycle.BGPictureAdded
                     container.countTransitions = savedCardInCycle.countTransitions
                     container.colorIndex = NoColor
@@ -2888,7 +2891,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     card.startPosition = savedCardInCycle.startPosition
                     card.minValue = savedCardInCycle.minValue
                     card.maxValue = savedCardInCycle.maxValue
-                    card.belongsToPackage = savedCardInCycle.belongsToPackage
+                    card.belongsToPackageMin = savedCardInCycle.belongsToPackageMin
+                    card.belongsToPackageMax = savedCardInCycle.belongsToPackageMax
 
                     updateGameArrayCell(card)
                     card.BGPictureAdded = savedCardInCycle.BGPictureAdded
@@ -3261,9 +3265,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         self.cardDidCollideWithContainer(self.movedFromNode, node2: containerNode)
                     })
                 } else {
-                    let cardNode = self.childNode(withName: gameArray[actFromToColumnRow.toColumnRow.column][actFromToColumnRow.toColumnRow.row].name) as! MySKCard
+                    let cardNode = gameArray[actFromToColumnRow.toColumnRow.column][actFromToColumnRow.toColumnRow.row].card
+
+//                    let cardNode = self.childNode(withName: gameArray[actFromToColumnRow.toColumnRow.column][actFromToColumnRow.toColumnRow.row].name) as! MySKCard
+//                    let startNode = gameArray[movedFromNode.column][movedFromNode.row].card
                     collisionAction = SKAction.run({
-                        self.cardDidCollideWithMovingCard(self.movedFromNode, node2: cardNode)
+                        self.cardDidCollideWithMovingCard(node1: self.movedFromNode, node2: cardNode)
                     })
                 }
                 let userInteractionEnablingAction = SKAction.run({self.isUserInteractionEnabled = true})
@@ -3322,8 +3329,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                             }
                             foundedCard!.reload()
                             push(startNode!, status: .removed)
-                            gameArray[(startNode?.column)!][(startNode?.row)!].minValue = foundedCard!.minValue
-                            gameArray[(startNode?.column)!][(startNode?.row)!].maxValue = foundedCard!.maxValue
+                            gameArray[(startNode?.column)!][(startNode?.row)!].card.minValue = foundedCard!.minValue
+                            gameArray[(startNode?.column)!][(startNode?.row)!].card.maxValue = foundedCard!.maxValue
                             startNode?.removeFromParent()
                             pullShowCard()
                             founded = true
@@ -3351,7 +3358,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
     }
     
-    func createActionsForMirroring(_ card: MySKCard, adder: Int, color: MyColors, fromPoint: CGPoint, toPoint: CGPoint)->[SKAction] {
+    func ActionsForMirroring(_ card: MySKCard, adder: Int, color: MyColors, fromPoint: CGPoint, toPoint: CGPoint)->[SKAction] {
         var actions = [SKAction]()
         if color == .green {
             actions.append(SKAction.run({
@@ -3524,7 +3531,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         savedCard.countScore = levelScore
         savedCard.minValue = card.minValue
         savedCard.maxValue = card.maxValue
-        savedCard.belongsToPackage = card.belongsToPackage
+        savedCard.belongsToPackageMin = card.belongsToPackageMin
+        savedCard.belongsToPackageMax = card.belongsToPackageMax
         savedCard.countTransitions = card.countTransitions
         savedCard.column = card.column
         savedCard.row = card.row

@@ -30,7 +30,6 @@ class MySKCard: SKSpriteNode {
         case CardStack = 0, OnScreen, Deleted
     }
     struct Card {
-        let bitMaskForPackages: [UInt8] = [1, 2, 4, 8]
         var color: Int
         var status: CardStatus
         var row: Int
@@ -55,9 +54,6 @@ class MySKCard: SKSpriteNode {
             self.deleted = false
             self.belongsToPkg = 0
             self.countTransitions = 0
-            for i in 0...countPackages - 1 {
-                belongsToPkg += bitMaskForPackages[i]
-            }
         }
     }
     
@@ -91,16 +87,19 @@ class MySKCard: SKSpriteNode {
             }
         }
     }
+    private static let bitMaskForPackages: [UInt8] = [1, 2, 4, 8]
+
     var column = 0
     var row = 0
     var isCard = false
-    var cardIndex = CardIndex(packageIndex: 0, colorIndex: 0,origValue: 0)
+//    var cardIndex = CardIndex(packageIndex: 0, colorIndex: 0,origValue: 0)
     var colorIndex = NoColor
     var startPosition = CGPoint.zero
     var minValue: Int
     var maxValue: Int
     var origValue: Int
-    var belongsToPackage = NoValue
+    var belongsToPackageMin: UInt8 = 0
+    var belongsToPackageMax: UInt8 = 0
     var countTransitions = 0
     var countScore: Int {
         get {
@@ -148,6 +147,14 @@ class MySKCard: SKSpriteNode {
     let offsetMultiplier = CGPoint(x: -0.48, y: 0.48)
     let BGOffsetMultiplier = CGPoint(x: -0.10, y: 0.25)
     
+    convenience init() {
+        self.init(colorIndex: NoColor, type: .emptyCardType, value: NoColor)
+    }
+    
+    convenience init(colorIndex: Int, type:MySKCardType, value: Int = 0, card: Card? = nil) {
+        let texture = colorIndex == NoColor ? atlas.textureNamed("emptycard") : atlas.textureNamed ("card\(colorIndex)")
+        self.init(texture: texture, type: type, value: value, card: card)
+    }
 
     init(texture: SKTexture, type:MySKCardType, value: Int = 0, card: Card? = nil) {
         //let modelMultiplier: CGFloat = 0.5 //UIDevice.currentDevice().modelSizeConstant
@@ -156,21 +163,11 @@ class MySKCard: SKSpriteNode {
         self.maxValue = value
         self.origValue = value
         self.mirrored = 0
+        for i in 0...MySKCard.countPackages - 1 {
+            belongsToPackageMin += MySKCard.bitMaskForPackages[i]
+            belongsToPackageMax += MySKCard.bitMaskForPackages[i]
+        }
         
-        
-        
-        
-//        switch type {
-//        case .containerType, .emptyCardType, .showCardType:
-//            hitCounter = 0
-//        case .buttonType:
-//            hitCounter = 0
-//        case .cardType:
-//            hitCounter = 1
-//        }
-        
-        
-
         super.init(texture: texture, color: UIColor.clear, size: texture.size())
         
         if card != nil {
@@ -196,7 +193,7 @@ class MySKCard: SKSpriteNode {
 //            hitLabel.text = "\(hitCounter)"
             
             //print(minValue, text)
-            setLabelText(minValueLabel, value: minValue, dotCount: belongsToPackage == NoValue ? 0 : belongsToPackage)
+            setLabelText(minValueLabel, value: minValue, dotCount: belongsToPackageMin == MySKCard.allPackages ? 0 : Int(belongsToPackageMin))
             minValueLabel.zPosition = self.zPosition + 1
             
             
@@ -329,21 +326,22 @@ class MySKCard: SKSpriteNode {
         } else if self.maxValue == NoColor {  // empty Container
             self.maxValue = otherCard.maxValue
             self.minValue = otherCard.minValue
+            self.belongsToPackageMax = MySKCard.maxPackage
+            self.belongsToPackageMin = MySKCard.bitMaskForPackages[MySKCard.countPackages - countTransitions - 1]
+            resetMaxPackageAtOtherCards()
         }
-        var countCardsInThisPackage = 0
-        switch countTransitions {
-        case 0:
-            countCardsInThisPackage = maxValue - minValue + 1
-        case 1:
-            countCardsInThisPackage = maxValue + 1 + LastCardValue - minValue + 1
-        case 2:
-            countCardsInThisPackage = maxValue + 1 + LastCardValue - minValue + 1 + 13
-        case 3:
-            countCardsInThisPackage = maxValue + 1 + LastCardValue - minValue + 1 + 26
-        default:
-            break
+    }
+    
+    func resetMaxPackageAtOtherCards() {
+        for gameRow in gameArray {
+            for game in gameRow {
+                if game.used {
+                    if game.card.colorIndex == self.colorIndex {
+                        
+                    }
+                }
+            }
         }
-        print("countCardsInThisPackage: \(countCardsInThisPackage)")
     }
     
     
@@ -371,7 +369,14 @@ class MySKCard: SKSpriteNode {
 //        MySKCard.cards[cardIndex] = card
 //    }
     
-    
+    func getTexture(color: Int)->SKTexture {
+        if color == NoColor {
+            return atlas.textureNamed("emptycard")
+        } else {
+            return atlas.textureNamed ("card\(color)")
+        }
+    }
+
     
     
     required init?(coder aDecoder: NSCoder) {
@@ -381,6 +386,9 @@ class MySKCard: SKSpriteNode {
     static var cardIndexArray: [CardIndex] = []
     static var cards: [CardIndex:Card] = [:]
     static var countPackages: Int = 0
+    static var allPackages: UInt8 = 0
+    static var maxPackage: UInt8 = 0
+    static var minPackage: UInt8 = 0
     
 
     
@@ -388,15 +396,20 @@ class MySKCard: SKSpriteNode {
         let index = random!.getRandomInt(0, max: cardIndexArray.count - 1)
         let cardIndex = cardIndexArray[index]
         let color = cards[cardIndex]!.color
-        let texture = atlas.textureNamed ("card\(color)")
+//        let texture = atlas.textureNamed ("card\(color)")
         let card = cards[cardIndex]
         cardIndexArray.remove(at: index)
-        let newCard = MySKCard(texture: texture, type: .cardType, card: card)
+        let newCard = MySKCard(colorIndex: color, type: .cardType, card: card)
         return (newCard, cardIndexArray.count != 0)
     }
     
     static func cleanForNewGame(countPackages: Int) {
         self.countPackages = countPackages
+        for packageNr in 0..<countPackages {
+            self.allPackages += bitMaskForPackages[packageNr]
+        }
+        self.maxPackage = bitMaskForPackages[countPackages - 1]
+        self.minPackage = bitMaskForPackages[0]
         cards.removeAll()
         // generate all cards
         for pkgIndex in 0..<countPackages {
@@ -413,7 +426,7 @@ class MySKCard: SKSpriteNode {
         
     }
     
-    static func areConnectable(first: GameArrayPositions, second: GameArrayPositions, secondIsContainer: Bool = false)->Bool {
+    static func areConnectable(first: MySKCard, second: MySKCard, secondIsContainer: Bool = false)->Bool {
         
         if first.colorIndex == second.colorIndex &&
             (first.minValue == second.maxValue + 1 ||
@@ -431,8 +444,8 @@ class MySKCard: SKSpriteNode {
     
     deinit {
         if type == .cardType {
-            MySKCard.cards[cardIndex]!.status = .Deleted
-            MySKCard.cards[cardIndex]!.belongsToPkg = 0
+//            MySKCard.cards[cardIndex]!.status = .Deleted
+//            MySKCard.cards[cardIndex]!.belongsToPkg = 0
         }
     }
 

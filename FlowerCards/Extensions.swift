@@ -207,6 +207,12 @@ extension String {
         return OK
     }
     
+    func pad(with character: String = "0", toLength length: Int = 8) -> String {
+        let padCount = length - self.characters.count
+        guard padCount > 0 else { return self }
+        
+        return String(repeating: character, count: padCount) + self
+    }
 }
 
 extension UIColor {

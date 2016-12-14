@@ -41,8 +41,12 @@ class AutoPlayer {
                             bestTipp = tipp
                         }
                     }
-                    scene.myTouchesBegan(touchLocation: bestTipp.points[0])
-                    autoPlayStatus = .touchesMoved
+                    if bestTipp.points.count > 0 {
+                        scene.myTouchesBegan(touchLocation: bestTipp.points[0])
+                        autoPlayStatus = .touchesMoved
+                    } else {
+                        
+                    }
 //                    timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
                } else {
 //                    timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
@@ -59,6 +63,7 @@ class AutoPlayer {
             timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
         } else {
             scene.isUserInteractionEnabled = true
+            scene.autoPlayerActive = false
             timer.invalidate()
         }
     }
