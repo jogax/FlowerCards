@@ -88,7 +88,7 @@ class MySKCard: SKSpriteNode {
         }
     }
     private static let bitMaskForPackages: [UInt8] = [1, 2, 4, 8]
-
+    private static let colorNames = ["Purple", "Blue  ", "Green ", "Red   "]
     var column = 0
     var row = 0
     var isCard = false
@@ -195,7 +195,7 @@ class MySKCard: SKSpriteNode {
 //            hitLabel.text = "\(hitCounter)"
             
             //print(minValue, text)
-            setLabelText(minValueLabel, value: minValue, dotCount: belongsToPackageMin == MySKCard.allPackages ? 0 : Int(belongsToPackageMin))
+            setLabelText(minValueLabel, value: minValue, dotCount: calculateDotCount(forMinLabel: true))
             minValueLabel.zPosition = self.zPosition + 1
             
             
@@ -222,6 +222,23 @@ class MySKCard: SKSpriteNode {
 
     }
     
+    func calculateDotCount(forMinLabel: Bool)->Int {
+        if self.countTransitions == 0 {
+            return 0
+        }
+        var maxDotCount = 0
+        if self.belongsToPackageMax == MySKCard.allPackages {
+            maxDotCount = MySKCard.countPackages
+        } else if countTransitions > 0 {
+            maxDotCount = countTransitions + 1
+        }
+        
+        if forMinLabel {
+            return maxDotCount - countTransitions
+        }
+        return maxDotCount
+    }
+    
     func setLabel(_ label: SKLabelNode, fontSize: CGFloat) {
         label.fontName = "ArielItalic"
         label.fontColor = SKColor.black
@@ -232,8 +249,8 @@ class MySKCard: SKSpriteNode {
     
     func reload() {
         if isCard {
-            setLabelText(minValueLabel, value: minValue, dotCount: countTransitions == 0 ? 0 : countTransitions)
-            setLabelText(maxValueLabel, value: maxValue, dotCount: countTransitions == 0 ? 0 : countTransitions + 1)
+            setLabelText(minValueLabel, value: minValue, dotCount: calculateDotCount(forMinLabel: true))
+            setLabelText(maxValueLabel, value: maxValue, dotCount: calculateDotCount(forMinLabel: false))
             if minValue != NoColor {
                 self.alpha = 1.0
             } else {
@@ -313,7 +330,9 @@ class MySKCard: SKSpriteNode {
     
     
     func connectWith(otherCard: MySKCard) {
-
+        #if PRINT
+            let text1 = "move \(MySKCard.colorNames[colorIndex]) \(createCardText(card: otherCard, from: true)) to \(createCardText(card: self, from: false))"
+        #endif
         self.countTransitions += otherCard.countTransitions
         if self.minValue == otherCard.maxValue + 1 {
             self.minValue = otherCard.minValue
@@ -322,9 +341,13 @@ class MySKCard: SKSpriteNode {
         } else if self.minValue == FirstCardValue && otherCard.maxValue == LastCardValue {
             self.minValue = otherCard.minValue
             countTransitions += 1
+            MySKCard.countTransitionsProColor[colorIndex] += 1
+            setMyBelongingFlags()
         } else if self.maxValue == LastCardValue && otherCard.minValue == FirstCardValue {
             self.maxValue = otherCard.maxValue
             countTransitions += 1
+            MySKCard.countTransitionsProColor[colorIndex] += 1
+            setMyBelongingFlags()
         } else if self.maxValue == NoColor {  // empty Container
             self.maxValue = otherCard.maxValue
             self.minValue = otherCard.minValue
@@ -332,6 +355,21 @@ class MySKCard: SKSpriteNode {
             self.belongsToPackageMin = MySKCard.bitMaskForPackages[MySKCard.countPackages - countTransitions - 1]
             resetMaxPackageAtOtherCards()
         }
+        #if PRINT
+            print("\(text1): new \(createCardText(card: self, from: false))")
+        #endif
+    }
+    
+    #if PRINT
+    func createCardText(card: MySKCard, from: Bool)->String {
+        let minValueText = cardLib[card.minValue]! == "10" ? "" : " " + cardLib[card.minValue]!
+        let maxValueText = cardLib[card.maxValue]! == "10" ? "" : " " + cardLib[card.maxValue]!
+        return "\(card.type == .containerType ? "Container" : "Card     ")(\(minValueText)-\(maxValueText)) \(from ? "from" : "at") [\(card.column):\(card.row)]"
+    }
+    #endif
+    
+    func setMyBelongingFlags() {
+        
     }
     
     func resetMaxPackageAtOtherCards() {
@@ -347,29 +385,6 @@ class MySKCard: SKSpriteNode {
     }
     
     
-    
-//    func setCardValues(color: Int? = nil, row: Int? = nil, column: Int? = nil, minValue: Int? = nil, maxValue: Int? = nil, status: CardStatus? = nil) {
-//        var card = MySKCard.cards[cardIndex]
-//        if color != nil {
-//            card!.color = color!
-//        }
-//        if row != nil {
-//            card!.row = row!
-//        }
-//        if column != nil {
-//            card!.column = column!
-//        }
-//        if minValue != nil {
-//            card!.minValue = minValue!
-//        }
-//        if maxValue != nil {
-//            card!.maxValue = maxValue!
-//        }
-//        if status != nil {
-//            card!.status = status!
-//        }
-//        MySKCard.cards[cardIndex] = card
-//    }
     
     func getTexture(color: Int)->SKTexture {
         if color == NoColor {
@@ -387,6 +402,7 @@ class MySKCard: SKSpriteNode {
     
     static var cardIndexArray: [CardIndex] = []
     static var cards: [CardIndex:Card] = [:]
+    static var countTransitionsProColor: [Int] = [0, 0, 0 ,0]
     static var countPackages: Int = 0
     static var allPackages: UInt8 = 0
     static var maxPackage: UInt8 = 0
@@ -431,6 +447,7 @@ class MySKCard: SKSpriteNode {
     static func areConnectable(first: MySKCard, second: MySKCard, secondIsContainer: Bool = false)->Bool {
         
         if first.colorIndex == second.colorIndex &&
+            MySKCard.countTransitionsProColor[first.colorIndex] < MySKCard.countPackages - 1 &&
             (first.minValue == second.maxValue + 1 ||
              first.maxValue == second.minValue - 1 ||
                 (countPackages > 1 && first.maxValue == LastCardValue && second.minValue == FirstCardValue) ||
