@@ -60,6 +60,10 @@ class Stack<T> {
         }
     }
     
+    func get (index: Int)-> MySKCard {
+        return cardStack[index]
+    }
+    
     func last() -> MySKCard? {
         if cardStack.count > 0 {
             let value = cardStack.last

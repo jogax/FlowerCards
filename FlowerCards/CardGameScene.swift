@@ -28,9 +28,7 @@ struct GameArrayPositions {
 
 var gameArray = [[GameArrayPositions]]()
 var containers = [MySKCard]()
-
-
-
+var cardStack:Stack<MySKCard> = Stack()
 
 class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, PeerToPeerServiceManagerDelegate { //,  JGXLineDelegate { //MyGameScene {
 
@@ -228,8 +226,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     let emptyCardTxt = "emptycard"
     
-    var cardStack:Stack<MySKCard> = Stack()
-    var showCardStack:Stack<MySKCard> = Stack()
+//    var cardStack:Stack<MySKCard> = Stack()
+//    var showCardStack:Stack<MySKCard> = Stack()
     var tippCountLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     
     var cardPackage: MySKButton?
@@ -544,6 +542,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
         levelIndex = GV.player!.levelID
         GV.levelsForPlay.setAktLevel(levelIndex)
+        if newGame {
+            gameNumber = randomGameNumber()
+        }
+        createGameRecord(gameNumber)
         specialPrepareFuncFirst()
         freeUndoCounter = freeAmount
         freeTippCounter = freeAmount
@@ -558,10 +560,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
         stack = Stack()
         timeCount = 0
-        if newGame {
-            gameNumber = randomGameNumber()
-        }
-        createGameRecord(gameNumber)
+//        if newGame {
+//            gameNumber = randomGameNumber()
+//        }
+//        createGameRecord(gameNumber)
 
         
         random = MyRandom(gameNumber: gameNumber)
@@ -871,6 +873,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         showHelpLines = .green
         containerSize = CGSize(width: CGFloat(containerSizeOrig) * cardSizeMultiplier.width, height: CGFloat(containerSizeOrig) * cardSizeMultiplier.height)
         cardSize = CGSize(width: CGFloat(GV.levelsForPlay.aktLevel.cardSize) * cardSizeMultiplier.width, height: CGFloat(GV.levelsForPlay.aktLevel.cardSize) * cardSizeMultiplier.height )
+        
+        #if PRINT
+            let line = "GameNr: \(gameNumber + 1), Packages: \(countPackages), Level: \(levelIndex + 1), Format: \(countColumns) * \(countRows)"
+            print(line)
+        #endif
         MySKCard.cleanForNewGame(countPackages: countPackages)
 
         for _ in 0..<countContainers {
@@ -952,7 +959,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func createCardStack() {
         //printFunc(function: "createCardStack", start: true)
         cardStack.removeAll(.MySKCardType)
-        showCardStack.removeAll(.MySKCardType)
+//        showCardStack.removeAll(.MySKCardType)
 //        MySKCard.cleanForNewGame(countPackages: countPackages)
 //        while colorTab.count > 0 && checkGameArray() < maxUsedCells {
 //            let colorTabIndex = random!.getRandomInt(0, max: colorTab.count - 1)//colorTab.count - 1 //
@@ -2804,7 +2811,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     var removeOldShowCard = SKAction()
                     if oldShowCardExists {
                         var oldShowCard = showCard
-                        showCardStack.push(showCard!)
+//                        showCardStack.push(showCard!)
                         removeOldShowCard = SKAction.run({
                             oldShowCard!.removeFromParent()
                             oldShowCard = nil
@@ -3065,18 +3072,18 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             }
             if movedFromNode.type == .showCardType {
                 movedFromNode.position = touchLocation
-                if showCardStack.count(.MySKCardType) > 0 {
-                    if !showCardFromStackAddedToParent {
-                        showCardFromStackAddedToParent = true
-                        showCardFromStack = showCardStack.last()
-                        showCardFromStack!.position = cardPlaceButton!.position
-                        showCardFromStack!.size = cardPlaceButton!.size
-                        addChild(showCardFromStack!)
-                    }
-                } else if !cardPlaceButtonAddedToParent {
-                    cardPlaceButtonAddedToParent = true
-                    addChild(cardPlaceButton!)
-                }
+//                if showCardStack.count(.MySKCardType) > 0 {
+//                    if !showCardFromStackAddedToParent {
+//                        showCardFromStackAddedToParent = true
+//                        showCardFromStack = showCardStack.last()
+//                        showCardFromStack!.position = cardPlaceButton!.position
+//                        showCardFromStack!.size = cardPlaceButton!.size
+//                        addChild(showCardFromStack!)
+//                    }
+//                } else if !cardPlaceButtonAddedToParent {
+//                    cardPlaceButtonAddedToParent = true
+//                    addChild(cardPlaceButton!)
+//                }
             }  else if movedFromNode == aktNode && tremblingCards.count > 0 { // stop trembling
                 lastPair.color = .none
                 stopTrembling()
@@ -3311,7 +3318,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         foundedCard!.removeFromParent()
                         founded = true
                         updateGameArrayCell(startNode!)
-                        pullShowCard()
+//                        pullShowCard()
                         gameArrayChanged = true
 
                         break
@@ -3332,7 +3339,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                             gameArray[(startNode?.column)!][(startNode?.row)!].card.minValue = foundedCard!.minValue
                             gameArray[(startNode?.column)!][(startNode?.row)!].card.maxValue = foundedCard!.maxValue
                             startNode?.removeFromParent()
-                            pullShowCard()
+//                            pullShowCard()
                             founded = true
                             gameArrayChanged = true
 
@@ -3379,17 +3386,17 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
         tremblingCards.removeAll()
     }
-    func pullShowCard() {
-        showCard = nil
-        if showCardStack.count(.MySKCardType) > 0 {
-            removeShowCardFromStack()
-            showCard = showCardStack.pull()
-            self.addChild(showCard!)
-        } else if !cardPlaceButtonAddedToParent {
-            addChild(cardPlaceButton!)
-            cardPlaceButtonAddedToParent = true
-        }
-    }
+//    func pullShowCard() {
+//        showCard = nil
+//        if showCardStack.count(.MySKCardType) > 0 {
+//            removeShowCardFromStack()
+//            showCard = showCardStack.pull()
+//            self.addChild(showCard!)
+//        } else if !cardPlaceButtonAddedToParent {
+//            addChild(cardPlaceButton!)
+//            cardPlaceButtonAddedToParent = true
+//        }
+//    }
     
     func removeShowCardFromStack() {
         if showCardFromStackAddedToParent {
