@@ -60,7 +60,7 @@ class AutoPlayer {
                 autoPlayStatus = .getTipp
 //                timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }
-            timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+            timer = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
         } else {
             scene.isUserInteractionEnabled = true
             scene.autoPlayerActive = false

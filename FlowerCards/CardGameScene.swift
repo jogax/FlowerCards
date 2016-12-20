@@ -482,6 +482,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     var autoPlayerActive = false
     var autoPlayer: AutoPlayer?
+    var durationMultiplier = 0.001
+    let durationMultiplierForPlayer = 0.001
+    let durationMultiplierForAutoplayer = 0.0001
     
     override func didMove(to view: SKView) {
 //        //printFunc(function: "didMove", start: true)
@@ -539,7 +542,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        labelFontSize = GV.onIpad ? 20 : 15
         labelFontSize = GV.onIpad ? self.size.height / 50 : self.size.height / 70
 
-
+        durationMultiplier = durationMultiplierForPlayer
         levelIndex = GV.player!.levelID
         GV.levelsForPlay.setAktLevel(levelIndex)
         if newGame {
@@ -1042,7 +1045,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             push(card, status: .addedFromCardStack)
             addChild(card)
             card.alpha = 0
-            let duration:Double = Double((zielPosition - cardPackage!.position).length()) / 1000
+            let duration:Double = Double((zielPosition - cardPackage!.position).length()) * durationMultiplier
             let actionMove = SKAction.move(to: zielPosition, duration: duration)
             
             let waitingAction = SKAction.wait(forDuration: waitForStart)
@@ -1086,6 +1089,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func startAutoplay() {
         autoPlayerActive = true
+        durationMultiplier = durationMultiplierForAutoplayer
         autoPlayer?.startPlay()
     }
     
@@ -1596,7 +1600,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //            foundedMinValue = gameArray[foundedPoint.column][foundedPoint.row].minValue
         }
 
-        if MySKCard.areConnectable(first: gameArray[movedFrom.column][movedFrom.row].card, second: foundedPosition.card, secondIsContainer: foundedPoint.foundContainer)
+        if MySKCard.areConnectable(first: gameArray[movedFrom.column][movedFrom.row].card, second: foundedPosition.card)
 //            (gameArray[movedFrom.column][movedFrom.row].colorIndex == foundedColorIndex &&
 //            (gameArray[movedFrom.column][movedFrom.row].maxValue == foundedMinValue - 1 ||
 //                gameArray[movedFrom.column][movedFrom.row].minValue == foundedMaxValue + 1 ||
@@ -3240,7 +3244,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     self.makeEmptyCard((card?.column)!, row: (card?.row)!)
                 })
 
-                let speed: CGFloat = 0.001
+                let speed = CGFloat(durationMultiplier)
                 
                 card?.zPosition += 5
 
@@ -3267,7 +3271,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 }
                 var collisionAction: SKAction
                 if actFromToColumnRow.toColumnRow.row == NoValue {
-                    let containerNode = self.childNode(withName: containers[actFromToColumnRow.toColumnRow.column].name!) as! MySKCard
+                    let containerNode = containers[actFromToColumnRow.toColumnRow.column] //self.childNode(withName: containers[actFromToColumnRow.toColumnRow.column].name!) as! MySKCard
                     collisionAction = SKAction.run({
                         self.cardDidCollideWithContainer(self.movedFromNode, node2: containerNode)
                     })
