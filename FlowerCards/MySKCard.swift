@@ -247,7 +247,7 @@ class MySKCard: SKSpriteNode {
     }
     
     func setLabel(_ label: SKLabelNode, fontSize: CGFloat) {
-        label.fontName = "ArielItalic"
+        label.fontName = "ArialMT"
         label.fontColor = SKColor.black
         label.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.left
         label.verticalAlignmentMode = SKLabelVerticalAlignmentMode.top
@@ -337,9 +337,12 @@ class MySKCard: SKSpriteNode {
     
     
     func connectWith(otherCard: MySKCard) {
-        #if PRINT
+        #if TEST
             let cardCountTxt = (MySKCard.cardCount > 100 ? "" : MySKCard.cardCount > 9 ? " " : "  ") + String(MySKCard.cardCount)
             MySKCard.cardCount += 1
+            if MySKCard.cardCount == 67 {//67 {
+                MySKCard.cardCount = 98  // aussteigein wenn problemfall erreicht
+            }
             let text1 = "\(cardCountTxt) move \(MySKCard.colorNames[colorIndex]) \(createCardText(card: otherCard, from: true)) to \(createCardText(card: self, from: false))"
         #endif
         self.countTransitions += otherCard.countTransitions
@@ -369,81 +372,18 @@ class MySKCard: SKSpriteNode {
 //            self.belongsToPackageMin = self.belongsToPackageMax >> UInt8(self.countTransitions)
 //            resetMaxPackageAtMyBrothers()
         }
-        #if PRINT
+        #if TEST
             print("\(text1): new \(createCardText(card: self, from: false))")
         #endif
     }
     
-    #if PRINT
+    #if TEST
     func createCardText(card: MySKCard, from: Bool)->String {
         let minValueText = (cardLib[card.minValue]! == "10" ? "" : " ") + cardLib[card.minValue]!
         let maxValueText = (cardLib[card.maxValue]! == "10" ? "" : " ") + cardLib[card.maxValue]!
-        return "\(card.type == .containerType ? "Container" : "Card     ")(\(minValueText)-\(maxValueText)) \(from ? "from" : "at") [\(card.column):\(card.row)]"
+        return "\(card.type == .containerType ? "Container" : "Card     ")(\(maxValueText)-\(minValueText)) \(from ? "from" : "at") [\(card.column):\(card.row)]"
     }
     #endif
-    
-    
-//    func setMyBelongingFlags() {
-//        self.belongsToPackageMax = self.belongsToPackageMax & ~MySKCard.minPackage  //can't be in less package
-//        self.belongsToPackageMin = self.belongsToPackageMin & ~MySKCard.maxPackage  // can't be in max package
-//        let (_, cards) = MySKCard.findMyBrothers(me: self)
-//        for _ in cards {
-//            let _ = 1
-//        }
-//    }
-    private static func findMyBrothers(me: MySKCard)->(Int, [MySKCard]) {
-        var cardArray: [MySKCard] = []
-        var myValues: [Int] = []
-        var value = me.minValue
-        var countValues = 0
-        var countTransitions = me.countTransitions
-        if me.countTransitions == 0 {
-            countValues = me.maxValue - me.minValue + 1
-        } else {
-            countValues = me.maxValue + MaxCardValue - me.minValue + 1
-        }
-        for _ in 0..<countValues {
-            myValues.append(value)
-            value += 1
-            if value > LastCardValue {
-                value = 0
-            }
-        }
-        for cardRow in gameArray {
-            for cardToCheck in cardRow {
-                if cardToCheck.used && cardToCheck.card.colorIndex == me.colorIndex &&
-                    (cardToCheck.card.column != me.column || cardToCheck.card.row != me.row) {
-                    countTransitions += cardToCheck.card.countTransitions
-//                    if myValues.contains(cardToCheck.card.maxValue)  -- hier check if cardtocheck minValue...maxValue in myValues
-                    switch cardToCheck.card.countTransitions {
-                    case 0:
-                        if me.maxValue > cardToCheck.card.maxValue && me.minValue < cardToCheck.card.maxValue {
-                            cardArray.append(cardToCheck.card)
-                        }
-                    case 1:
-                        break
-                    default:
-                        break
-                    }
-                }
-            }
-        }
-        for index in 0..<cardStack.count(.MySKCardType) {
-            let cardFromStack = cardStack.get(index: index)
-            if myValues.contains(cardFromStack.maxValue) && cardFromStack.colorIndex == me.colorIndex {
-                cardArray.append(cardFromStack)
-            }
-        }
-        return (countTransitions, cardArray)
-    }
-    
-//    func resetMaxPackageAtMyBrothers() {
-//        let (_, cards) = MySKCard.findMyBrothers(me:self)
-//        for card in cards {
-//            card.belongsToPackageMax = card.belongsToPackageMax & ~self.belongsToPackageMax
-//            card.belongsToPackageMin = card.belongsToPackageMax >> UInt8(card.countTransitions)
-//        }
-//    }
     
     
     func getTexture(color: Int)->SKTexture {
@@ -466,7 +406,7 @@ class MySKCard: SKSpriteNode {
     static var allPackages: UInt8 = 0
     static var maxPackage: UInt8 = 0
     static var minPackage: UInt8 = 0
-    #if PRINT
+    #if TEST
     static var cardCount: Int = 0
     #endif
     
@@ -485,6 +425,7 @@ class MySKCard: SKSpriteNode {
     
     static func cleanForNewGame(countPackages: Int) {
         self.countPackages = countPackages
+        self.allPackages = 0
         cardCount = 1
         for packageNr in 0..<countPackages {
             self.allPackages += bitMaskForPackages[packageNr]
@@ -535,56 +476,80 @@ class MySKCard: SKSpriteNode {
     }
     
     static func analyzeGame(colorIndex: Int) {
-        var countTransitions = 0
+        var usedCardValues: [[Bool]] = []
+        for _ in 1...countPackages {
+            usedCardValues.append(Array(repeating: false, count: MaxCardValue))
+        }
+
+        var countTransitionsForColor = 0
         var containerValues = [Int]()
         var actContainer: MySKCard? = nil
         for container in containers {
             if container.colorIndex == colorIndex {
                 actContainer = container
-                container.belongsToPackageMax = allPackages
-                container.belongsToPackageMin = allPackages
                 container.belongsToPackageMax = MySKCard.maxPackage
+                container.belongsToPackageMin = 0
                 container.belongsToPackageMin = MySKCard.bitMaskForPackages[MySKCard.countPackages - container.countTransitions - 1]
-                countTransitions = container.countTransitions
-                var value = container.minValue
-                var countValues = 0
-                if countTransitions == 0 {
-                    countValues = container.maxValue - container.minValue + 1
-                } else {
-                    countValues = container.maxValue + MaxCardValue - container.minValue + 1
-                }
-                for _ in 0..<countValues {
-                    containerValues.append(value)
-                    value += 1
-                    if value > LastCardValue {
-                        value = 0
-                    }
+                countTransitionsForColor = container.countTransitions
+                containerValues = findCardValues(card: container)
+                for index in 0..<containerValues.count {
+                    let myIndex = containerValues[containerValues.count - index - 1]
+                    let packageIndex = countPackages - (index / MaxCardValue) - 1
+                    usedCardValues[packageIndex][myIndex] = true
                 }
 
             }
         }
+        // search cards with countTransitions > 0
+        var myCards: [MySKCard] = []
+        var cardsWithTransitions: [MySKCard] = []
         for gameRow in gameArray {
             for game in gameRow {
                 if game.used && game.card.colorIndex == colorIndex {
+                    if game.card.countTransitions > 0 {
+                        cardsWithTransitions.append(game.card)
+                        countTransitionsForColor += game.card.countTransitions
+                    }
                     game.card.belongsToPackageMin = allPackages
                     game.card.belongsToPackageMax = allPackages
-                    if containerValues.contains(game.card.maxValue) {
-                        let containerPackages = maxPackage | actContainer!.belongsToPackageMin
-                        game.card.belongsToPackageMax &= ~containerPackages
-                        if game.card.belongsToPackageMax == 0 {
-                            game.card.belongsToPackageMax = minPackage
-                        }
-                        game.card.belongsToPackageMin &= game.card.belongsToPackageMax >> UInt8(game.card.countTransitions)
-                        if game.card.belongsToPackageMin == 0 {
-                            game.card.belongsToPackageMin = minPackage
-                        }
-                    } else {
-                        
-                    }
-                    countTransitions += game.card.countTransitions
+                    myCards.append(game.card)
                 }
             }
         }
+        for card in cardsWithTransitions {
+            let cardValues = findCardValues(card: card)
+            for index in 0..<cardValues.count {
+            }
+        }
+        for myCard in myCards {
+            if countTransitionsForColor == countPackages - 1 {
+                if myCard.countTransitions == 0 {
+                    
+                } else {
+//                    hier analyse the cardsWithTransitions
+//                    nothing to do
+                }
+            }
+        }
+    }
+    
+    private static func findCardValues(card: MySKCard)->[Int] {
+        var cardValues: [Int] = []
+        var value = card.minValue
+        var countValues = 0
+        if card.countTransitions == 0 {
+            countValues = card.maxValue - card.minValue + 1
+        } else {
+            countValues = card.maxValue + MaxCardValue - card.minValue + 1 + (MaxCardValue * (card.countTransitions - 1))
+        }
+        for _ in 0..<countValues {
+            cardValues.append(value)
+            value += 1
+            if value > LastCardValue {
+                value = 0
+            }
+        }
+        return cardValues
     }
     
     deinit {

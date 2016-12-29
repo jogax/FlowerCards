@@ -123,4 +123,5 @@ let enDictionary: [TextConstants: String] = [
     .tcPackages:        "Packages:",
     .tcHelpLines:       "Helplines:",
     .tcAutoPlay:        "Start autoplay",
+    .tcReplay:          "Replay",
 ]

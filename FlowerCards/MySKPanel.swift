@@ -118,7 +118,7 @@ class MySKPanel: SKSpriteNode {
         label.name = name
         
         label.position = CGPoint(x: -CGFloat(size.width / 2) + sizeMultiplier.width ,  y: CGFloat(5 - lineNr) * sizeMultiplier.height )
-        label.fontName = "AvenirNext"
+        label.fontName = "ArialMT"
 //        print (self.frame, label.frame)
         label.fontColor = SKColor.blue
         label.zPosition = self.zPosition + 10

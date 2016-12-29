@@ -20,7 +20,9 @@ class RecordIDModel: Object {
 //        dynamic var opponentModelID = 0
 //    #endif
     dynamic var statisticModelID = 0
-    
+    #if REALM_V2
+        dynamic var historyModelID = 0
+    #endif
     override  class func primaryKey() -> String {
         return "ID"
     }

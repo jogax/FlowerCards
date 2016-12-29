@@ -123,5 +123,5 @@ let huDictionary: [TextConstants: String] = [
     .tcPackages:        "Csomag:",
     .tcHelpLines:       "Segédvonalak:",
     .tcAutoPlay:        "Automatikus lejátszás",
-
+    .tcReplay:          "Visszajátszás",
 ]

@@ -123,7 +123,7 @@ let deDictionary: [TextConstants: String] = [
     .tcPackages:        "Pakete:",
     .tcHelpLines:       "Hilfslinien:",
     .tcAutoPlay:        "Start automatisches Abspielen",
-
+    .tcReplay:          "Wiedergabe des Spiels",
 ]
 
 

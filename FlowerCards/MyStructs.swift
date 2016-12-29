@@ -63,7 +63,7 @@ struct GV {
     }
     
     enum RealmRecordType: Int {
-        case gameModel, playerModel, statisticModel
+        case gameModel, playerModel, statisticModel, historyModel
     }
     
     static func createNewRecordID(_ recordType: RealmRecordType)->Int {
@@ -79,17 +79,34 @@ struct GV {
         } else  {
             recordID = realm.objects(RecordIDModel.self).first!
         }
-        switch recordType {
-        case .gameModel:
-            ID = recordID.gameModelID
-            recordID.gameModelID += 1
-        case .playerModel:
-            ID = recordID.playerModelID
-            recordID.playerModelID += 1
-        case .statisticModel:
-            ID = recordID.statisticModelID
-            recordID.statisticModelID += 1
-        }
+        #if REALM_V2
+            switch recordType {
+            case .gameModel:
+                ID = recordID.gameModelID
+                recordID.gameModelID += 1
+            case .playerModel:
+                ID = recordID.playerModelID
+                recordID.playerModelID += 1
+            case .statisticModel:
+                ID = recordID.statisticModelID
+                recordID.statisticModelID += 1
+            case RealmRecordType.historyModel:
+                ID = recordID.historyModelID
+                recordID.historyModelID += 1
+           }
+        #else
+            switch recordType {
+            case .gameModel:
+                ID = recordID.gameModelID
+                recordID.gameModelID += 1
+            case .playerModel:
+                ID = recordID.playerModelID
+                recordID.playerModelID += 1
+            case .statisticModel:
+                ID = recordID.statisticModelID
+                recordID.statisticModelID += 1
+            }
+        #endif
         if !inWrite {
             try! realm.commitWrite()
         }
@@ -514,21 +531,6 @@ func stringArrayToNSData(_ array: [String]) -> Data {
     return data as Data
 }
 
-//var deepCount = 0
-//func printFunc(function: String, start: Bool) {
-//    #if PRINT
-//        var text = ""
-//        if start {
-//            deepCount += 1
-//            text = "Start Func " + function
-//        } else {
-//            deepCount -= 1
-//            text = "End func " + function
-//        }
-//        print(text + ", deep: " + String(deepCount))
-//    #endif
-//}
-//
 
 
 let atlas = SKTextureAtlas(named: "sprites")

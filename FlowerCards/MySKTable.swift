@@ -227,7 +227,7 @@ class MySKTable: SKSpriteNode {
         let name = "\(column)\(separator)\(row)"
         var label = SKLabelNode()
         var labelExists = false
-        label.fontName = "Times New Roman"
+        label.fontName = "ArialMT"
         
         
         for index in 0..<self.children.count {
@@ -277,7 +277,7 @@ class MySKTable: SKSpriteNode {
         
         for index in 0..<headLines.count {
             let label = SKLabelNode()
-            label.fontName = "Times New Roman"
+            label.fontName = "ArialMT"
             label.fontColor = SKColor.black
             label.text = headLines[index]
             label.name = name
