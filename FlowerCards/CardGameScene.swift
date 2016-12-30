@@ -29,6 +29,7 @@ struct GameArrayPositions {
 var gameArray = [[GameArrayPositions]]()
 var containers = [MySKCard]()
 var cardStack:Stack<MySKCard> = Stack()
+var countPackages = 1
 
 class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, PeerToPeerServiceManagerDelegate { //,  JGXLineDelegate { //MyGameScene {
 
@@ -269,7 +270,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var countCardsProContainer: Int?
     var countColumns = 0
     var countRows = 0
-    var countPackages = 1
     var showHelpLines: ShowHelpLine = .green
     let maxColumnForiPhone = 6
     var targetScoreKorr: Int = 0
@@ -484,6 +484,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var durationMultiplier = 0.001
     let durationMultiplierForPlayer = 0.001
     let durationMultiplierForAutoplayer = 0.0001
+    var cardManager: GameArrayManager?
     
     override func didMove(to view: SKView) {
 //        //printFunc(function: "didMove", start: true)
@@ -551,6 +552,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             getGameRecord(gameNumber: gameNumber)
         }
         specialPrepareFuncFirst()
+        cardManager = GameArrayManager()
         freeUndoCounter = freeAmount
         freeTippCounter = freeAmount
         scoreModifyer = 0
@@ -1047,9 +1049,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             card.row = actRow
             
             card.size = CGSize(width: cardSize.width, height: cardSize.height)
+            
             updateGameArrayCell(card)
 
             push(card, status: .addedFromCardStack)
+            
+            cardManager!.addCard(card: card)
             addChild(card)
             card.alpha = 0
             let duration:Double = Double((zielPosition - cardPackage!.position).length()) * durationMultiplier
@@ -2206,6 +2211,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             push(container, status: .unification)
             push(movingCard, status: .removed)
             container.connectWith(otherCard: movingCard)
+            cardManager!.moveCard(card: movingCard, toCard: container)
             saveHistoryRecord(colorIndex: movingCard.colorIndex, points:  points,
                               fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
                               toColumn: container.column,   toRow: container.row,   toMinValue: container.minValue,   toMaxValue: container.maxValue)
@@ -2263,6 +2269,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             push(movingCard, status: .removed)
             
             card.connectWith(otherCard: movingCard)
+            cardManager!.moveCard(card: movingCard, toCard: card)
             saveHistoryRecord(colorIndex: movingCard.colorIndex, points: points,
                               fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
                               toColumn: card.column,   toRow: card.row,   toMinValue: card.minValue,   toMaxValue: card.maxValue)
@@ -2800,6 +2807,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         cardStack.push(cardToPush)
                         
                         gameArray[savedCardInCycle.column][savedCardInCycle.row].used = false
+                        cardManager!.removeCard(card: cardToPush)
                         makeEmptyCard(savedCardInCycle.column, row: savedCardInCycle.row)
                         let aktPosition = gameArray[savedCardInCycle.column][savedCardInCycle.row].position
                         let duration = Double((cardPackage!.position - aktPosition).length()) / 500.0
@@ -2859,6 +2867,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     card.countTransitions = savedCardInCycle.countTransitions
                     card.name = savedCardInCycle.name
                     levelScore = savedCardInCycle.countScore
+                    cardManager!.addCard(card: card)
  
                     updateGameArrayCell(card)
                     self.addChild(card)

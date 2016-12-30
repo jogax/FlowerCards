@@ -340,8 +340,8 @@ class MySKCard: SKSpriteNode {
         #if TEST
             let cardCountTxt = (MySKCard.cardCount > 100 ? "" : MySKCard.cardCount > 9 ? " " : "  ") + String(MySKCard.cardCount)
             MySKCard.cardCount += 1
-            if MySKCard.cardCount == 67 {//67 {
-                MySKCard.cardCount = 98  // aussteigein wenn problemfall erreicht
+            if MySKCard.cardCount == 92 {//67 {
+                MySKCard.cardCount = 126  // aussteigein wenn problemfall erreicht
             }
             let text1 = "\(cardCountTxt) move \(MySKCard.colorNames[colorIndex]) \(createCardText(card: otherCard, from: true)) to \(createCardText(card: self, from: false))"
         #endif
@@ -375,6 +375,7 @@ class MySKCard: SKSpriteNode {
         #if TEST
             print("\(text1): new \(createCardText(card: self, from: false))")
         #endif
+        
     }
     
     #if TEST
@@ -451,7 +452,7 @@ class MySKCard: SKSpriteNode {
     
     static func areConnectable(first: MySKCard, second: MySKCard)->Bool {
 //        let (countAllTransitions, _) = findMyBrothers(me: first)
-        analyzeGame(colorIndex: first.colorIndex)
+//        analyzeGame(colorIndex: first.colorIndex)
         if first.colorIndex == second.colorIndex &&
             ((first.minValue == second.maxValue + 1 && first.belongsToPackageMin & second.belongsToPackageMax != 0) ||
              (first.maxValue == second.minValue - 1 && first.belongsToPackageMax & second.belongsToPackageMin != 0) ||

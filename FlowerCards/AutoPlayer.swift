@@ -79,7 +79,7 @@ class AutoPlayer {
                 autoPlayStatus = .touchesEnded
             case .touchesEnded:
                 scene.myTouchesEnded(touchLocation: bestTipp.points[1])
-                if MySKCard.cardCount == 98 {
+                if MySKCard.cardCount == 126 {
                     stopAutoplay()
                 }
                 autoPlayStatus = .getTipp
