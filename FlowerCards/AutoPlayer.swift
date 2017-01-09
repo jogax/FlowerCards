@@ -16,7 +16,7 @@ class AutoPlayer {
     var scene: CardGameScene
 //    @objc let nextStepSelector = "nextStep:"
     var timer: Timer = Timer()
-    var bestTipp = CardGameScene.Tipps()
+    var bestTipp = Tipps()
     var autoPlayStatus: runStatus = .getTipp
     var replay: Bool
     var indexForReplay: Int = 0
@@ -47,7 +47,7 @@ class AutoPlayer {
             switch autoPlayStatus {
             case .getTipp:
                 if scene.tippsButton!.alpha == 1 && scene.countMovingCards == 0 {  // if tipps are ready
-                    bestTipp = CardGameScene.Tipps()
+                    bestTipp = Tipps()
                     if replay {
                         if indexForReplay < realm.objects(HistoryModel.self).filter("gameID = %d", scene.actGame!.ID).count {
                             let historyRecord = realm.objects(HistoryModel.self).filter("gameID = %d", scene.actGame!.ID)[indexForReplay]

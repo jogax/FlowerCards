@@ -98,6 +98,19 @@ class MySKCard: SKSpriteNode {
     var minValue: Int
     var maxValue: Int
     var origValue: Int
+    var printValue: String {
+        get {
+            let value =
+                "color: " +
+                MySKCard.colorNames[colorIndex] + ", column: " +
+                String(column) + ", row: " +
+                String(row) + ", min: " +
+                String(minValue) + ", max: " +
+                String(maxValue) +
+                String(type == .cardType ? " Card" : " Container")
+            return value
+        }
+    }
     
     var belongsToPackageMin: UInt8 = 0
     var belongsToPackageMax: UInt8 = 0
@@ -340,8 +353,8 @@ class MySKCard: SKSpriteNode {
         #if TEST
             let cardCountTxt = (MySKCard.cardCount > 100 ? "" : MySKCard.cardCount > 9 ? " " : "  ") + String(MySKCard.cardCount)
             MySKCard.cardCount += 1
-            if MySKCard.cardCount == 92 {//67 {
-                MySKCard.cardCount = 126  // aussteigein wenn problemfall erreicht
+            if MySKCard.cardCount == 1000 {//67 {
+                MySKCard.cardCount = 126  // aussteigen wenn problemfall erreicht
             }
             let text1 = "\(cardCountTxt) move \(MySKCard.colorNames[colorIndex]) \(createCardText(card: otherCard, from: true)) to \(createCardText(card: self, from: false))"
         #endif
@@ -450,108 +463,109 @@ class MySKCard: SKSpriteNode {
     }
     
     
-    static func areConnectable(first: MySKCard, second: MySKCard)->Bool {
-//        let (countAllTransitions, _) = findMyBrothers(me: first)
-//        analyzeGame(colorIndex: first.colorIndex)
-        if first.colorIndex == second.colorIndex &&
-            ((first.minValue == second.maxValue + 1 && first.belongsToPackageMin & second.belongsToPackageMax != 0) ||
-             (first.maxValue == second.minValue - 1 && first.belongsToPackageMax & second.belongsToPackageMin != 0) ||
-                (countPackages > 1 &&
-                    first.maxValue == LastCardValue &&
-                    second.minValue == FirstCardValue &&
-                    second.belongsToPackageMin & ~minPackage != 0 &&
-                    first.belongsToPackageMax & ~maxPackage != 0 &&
-                    first.countTransitions + second.countTransitions + 1 <= countPackages - 1) ||
-                (countPackages > 1 &&
-                    first.minValue == FirstCardValue &&
-                    second.maxValue == LastCardValue &&
-                    first.belongsToPackageMin & ~minPackage != 0 &&
-                    second.belongsToPackageMax & ~maxPackage != 0 &&
-                    first.countTransitions + second.countTransitions + 1 <= countPackages - 1))
-        {
-            return true
-        }
-        
-        return false
-        
-    }
+//    static func areConnectable(first: MySKCard, second: MySKCard)->Bool {
+//        
+////        let (countAllTransitions, _) = findMyBrothers(me: first)
+////        analyzeGame(colorIndex: first.colorIndex)
+//        if first.colorIndex == second.colorIndex &&
+//            ((first.minValue == second.maxValue + 1 && first.belongsToPackageMin & second.belongsToPackageMax != 0 && second.type != .containerType) ||
+//             (first.maxValue == second.minValue - 1 && first.belongsToPackageMax & second.belongsToPackageMin != 0) ||
+//                (countPackages > 1 &&
+//                    first.maxValue == LastCardValue &&
+//                    second.minValue == FirstCardValue &&
+//                    second.belongsToPackageMin & ~minPackage != 0 &&
+//                    first.belongsToPackageMax & ~maxPackage != 0 &&
+//                    first.countTransitions + second.countTransitions + 1 <= countPackages - 1) ||
+//                (countPackages > 1 &&
+//                    first.minValue == FirstCardValue &&
+//                    second.maxValue == LastCardValue &&
+//                    first.belongsToPackageMin & ~minPackage != 0 &&
+//                    second.belongsToPackageMax & ~maxPackage != 0 &&
+//                    first.countTransitions + second.countTransitions + 1 <= countPackages - 1 &&
+//                    second.type != .containerType))
+//        {
+//            return true
+//        }
+//        
+//        return false
+//        
+//    }
     
-    static func analyzeGame(colorIndex: Int) {
-        var usedCardValues: [[Bool]] = []
-        for _ in 1...countPackages {
-            usedCardValues.append(Array(repeating: false, count: MaxCardValue))
-        }
-
-        var countTransitionsForColor = 0
-        var containerValues = [Int]()
-        var actContainer: MySKCard? = nil
-        for container in containers {
-            if container.colorIndex == colorIndex {
-                actContainer = container
-                container.belongsToPackageMax = MySKCard.maxPackage
-                container.belongsToPackageMin = 0
-                container.belongsToPackageMin = MySKCard.bitMaskForPackages[MySKCard.countPackages - container.countTransitions - 1]
-                countTransitionsForColor = container.countTransitions
-                containerValues = findCardValues(card: container)
-                for index in 0..<containerValues.count {
-                    let myIndex = containerValues[containerValues.count - index - 1]
-                    let packageIndex = countPackages - (index / MaxCardValue) - 1
-                    usedCardValues[packageIndex][myIndex] = true
-                }
-
-            }
-        }
-        // search cards with countTransitions > 0
-        var myCards: [MySKCard] = []
-        var cardsWithTransitions: [MySKCard] = []
-        for gameRow in gameArray {
-            for game in gameRow {
-                if game.used && game.card.colorIndex == colorIndex {
-                    if game.card.countTransitions > 0 {
-                        cardsWithTransitions.append(game.card)
-                        countTransitionsForColor += game.card.countTransitions
-                    }
-                    game.card.belongsToPackageMin = allPackages
-                    game.card.belongsToPackageMax = allPackages
-                    myCards.append(game.card)
-                }
-            }
-        }
-        for card in cardsWithTransitions {
-            let cardValues = findCardValues(card: card)
-            for index in 0..<cardValues.count {
-            }
-        }
-        for myCard in myCards {
-            if countTransitionsForColor == countPackages - 1 {
-                if myCard.countTransitions == 0 {
-                    
-                } else {
-//                    hier analyse the cardsWithTransitions
-//                    nothing to do
-                }
-            }
-        }
-    }
-    
-    private static func findCardValues(card: MySKCard)->[Int] {
-        var cardValues: [Int] = []
-        var value = card.minValue
-        var countValues = 0
-        if card.countTransitions == 0 {
-            countValues = card.maxValue - card.minValue + 1
-        } else {
-            countValues = card.maxValue + MaxCardValue - card.minValue + 1 + (MaxCardValue * (card.countTransitions - 1))
-        }
-        for _ in 0..<countValues {
-            cardValues.append(value)
-            value += 1
-            if value > LastCardValue {
-                value = 0
-            }
-        }
-        return cardValues
-    }
+//    static func analyzeGame(colorIndex: Int) {
+//        var usedCardValues: [[Bool]] = []
+//        for _ in 1...countPackages {
+//            usedCardValues.append(Array(repeating: false, count: MaxCardValue))
+//        }
+//
+//        var countTransitionsForColor = 0
+//        var containerValues = [Int]()
+//        var actContainer: MySKCard? = nil
+//        for container in containers {
+//            if container.colorIndex == colorIndex {
+//                actContainer = container
+//                container.belongsToPackageMax = MySKCard.maxPackage
+//                container.belongsToPackageMin = MySKCard.maxPackage >> UInt8(container.countTransitions - 1)
+//                countTransitionsForColor = container.countTransitions
+//                containerValues = findCardValues(card: container)
+//                for index in 0..<containerValues.count {
+//                    let myIndex = containerValues[containerValues.count - index - 1]
+//                    let packageIndex = countPackages - (index / MaxCardValue) - 1
+//                    usedCardValues[packageIndex][myIndex] = true
+//                }
+//
+//            }
+//        }
+//        // search cards with countTransitions > 0
+//        var myCards: [MySKCard] = []
+//        var cardsWithTransitions: [MySKCard] = []
+//        for gameRow in gameArray {
+//            for game in gameRow {
+//                if game.used && game.card.colorIndex == colorIndex {
+//                    if game.card.countTransitions > 0 {
+//                        cardsWithTransitions.append(game.card)
+//                        countTransitionsForColor += game.card.countTransitions
+//                    }
+//                    game.card.belongsToPackageMin = allPackages
+//                    game.card.belongsToPackageMax = allPackages
+//                    myCards.append(game.card)
+//                }
+//            }
+//        }
+//        for card in cardsWithTransitions {
+//            let cardValues = findCardValues(card: card)
+//            for index in 0..<cardValues.count {
+//            }
+//        }
+//        for myCard in myCards {
+//            if countTransitionsForColor == countPackages - 1 {
+//                if myCard.countTransitions == 0 {
+//                    
+//                } else {
+////                    hier analyse the cardsWithTransitions
+////                    nothing to do
+//                }
+//            }
+//        }
+//    }
+//    
+//    private static func findCardValues(card: MySKCard)->[Int] {
+//        var cardValues: [Int] = []
+//        var value = card.minValue
+//        var countValues = 0
+//        if card.countTransitions == 0 {
+//            countValues = card.maxValue - card.minValue + 1
+//        } else {
+//            countValues = card.maxValue + MaxCardValue - card.minValue + 1 + (MaxCardValue * (card.countTransitions - 1))
+//        }
+//        for _ in 0..<countValues {
+//            cardValues.append(value)
+//            value += 1
+//            if value > LastCardValue {
+//                value = 0
+//            }
+//        }
+//        return cardValues
+//    }
     
     deinit {
         if type == .cardType {

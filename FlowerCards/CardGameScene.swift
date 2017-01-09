@@ -26,6 +26,32 @@ struct GameArrayPositions {
     }
 }
 
+struct Tipps {
+    var removed: Bool
+    var fromColumn: Int
+    var fromRow: Int
+    var toColumn: Int
+    var toRow: Int
+    var twoArrows: Bool
+    var points:[CGPoint]
+    var value: Int
+    var lineLength: CGFloat
+    
+    init() {
+        removed = false
+        fromColumn = 0
+        fromRow = 0
+        toColumn = 0
+        toRow = 0
+        points = [CGPoint]()
+        twoArrows = false
+        value = 0
+        lineLength = 0
+    }
+}
+
+
+
 var gameArray = [[GameArrayPositions]]()
 var containers = [MySKCard]()
 var cardStack:Stack<MySKCard> = Stack()
@@ -153,30 +179,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             cardValue = 0
             packageNr = 0
             used      = false
-        }
-    }
-    
-    struct Tipps {
-        var removed: Bool
-        var fromColumn: Int
-        var fromRow: Int
-        var toColumn: Int
-        var toRow: Int
-        var twoArrows: Bool
-        var points:[CGPoint]
-        var value: Int
-        var lineLength: CGFloat
-        
-        init() {
-            removed = false
-            fromColumn = 0
-            fromRow = 0
-            toColumn = 0
-            toRow = 0
-            points = [CGPoint]()
-            twoArrows = false
-            value = 0
-            lineLength = 0
         }
     }
     
@@ -1267,8 +1269,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                                     stopCreateTippsInBackground = false
                                     return false
                                 }
-                                if (column1 != column2 || row1 != row2) &&
-                                    MySKCard.areConnectable(first: gameArray[column2][row2].card, second: gameArray[column1][row1].card) {
+                                let first = gameArray[column2][row2].card
+                                let second = gameArray[column1][row1].card
+                                let connectable = cardManager?.areConnectable(first: first, second: second)
+                                if (column1 != column2 || row1 != row2) && connectable! {
+//                                    MySKCard.areConnectable(first: first, second: second) {
                                     let aktPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: column2, row: row2))
                                     if !pairExists(pairsToCheck: pairsToCheck, aktPair: aktPair) {
                                         pairsToCheck.append(aktPair)
@@ -1598,8 +1603,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         } else {
             foundedPosition = gameArray[foundedPoint.column][foundedPoint.row]
         }
-
-        if MySKCard.areConnectable(first: gameArray[movedFrom.column][movedFrom.row].card, second: foundedPosition.card)
+        let first = gameArray[movedFrom.column][movedFrom.row].card
+        let second = foundedPosition.card
+        let connectable = cardManager!.areConnectable(first: first, second: second)
+        if connectable //MySKCard.areConnectable(first: first, second: second)
                 ||
             (foundedPosition.card.minValue == NoColor && !actColorHasContainer) &&
                 (gameArray[movedFrom.column][movedFrom.row].card.maxValue == LastCardValue) {
@@ -2195,11 +2202,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             }
         }
         
-        
+        let connectable = cardManager?.areConnectable(first: movingCard, second: container)
+
         let OK = movingCard.colorIndex == container.colorIndex &&
         (
-            container.minValue == NoColor ||
-            MySKCard.areConnectable(first: movingCard, second: container)
+            container.minValue == NoColor || connectable!
+//            MySKCard.areConnectable(first: movingCard, second: container)
 //            movingCard.maxValue + 1 == container.minValue ||
 //            movingCard.minValue - 1 == container.maxValue ||
 //            (container.minValue == FirstCardValue && movingCard.maxValue == LastCardValue && container.belongsToPackage < countPackages)
@@ -2262,9 +2270,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let card = node2
         collisionActive = false
         
-        
-        let OK = MySKCard.areConnectable(first: movingCard, second: card)
-        if OK {
+        let connectable = cardManager!.areConnectable(first: movingCard, second: card)
+
+//        let OK = connectable //MySKCard.areConnectable(first: movingCard, second: card)
+        if connectable {
             push(card, status: .unification)
             push(movingCard, status: .removed)
             
@@ -2355,7 +2364,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func deleteLastHistoryRecord() {
         #if REALM_V2
             try! realm.write() {
-                realm.delete(realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID).last!)
+                if let last = realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID).last {
+                    realm.delete(last)
+                }
             }
         #endif
     }
@@ -2871,6 +2882,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
  
                     updateGameArrayCell(card)
                     self.addChild(card)
+                    print("in pulled: removed--> card with name: \(card.name) added")
                     updateCardCount(1)
                     deleteLastHistoryRecord()
                     card.reload()
