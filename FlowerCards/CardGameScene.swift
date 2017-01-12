@@ -486,7 +486,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var durationMultiplier = 0.001
     let durationMultiplierForPlayer = 0.001
     let durationMultiplierForAutoplayer = 0.0001
-    var cardManager: GameArrayManager?
+    var cardManager: CardManager?
     
     override func didMove(to view: SKView) {
 //        //printFunc(function: "didMove", start: true)
@@ -554,7 +554,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             getGameRecord(gameNumber: gameNumber)
         }
         specialPrepareFuncFirst()
-        cardManager = GameArrayManager()
+        cardManager = CardManager()
         freeUndoCounter = freeAmount
         freeTippCounter = freeAmount
         scoreModifyer = 0
@@ -1011,6 +1011,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         var waitForStart: TimeInterval = 0.0
         var generateSpecial = generatingType ==  .special
         var positionsTab = [(Int, Int)]()
+        var runFlag = true
 //        countMovingCards = 0
         // search all available Positions in gameArray
         for column in 0..<countColumns {
@@ -1022,17 +1023,22 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             }
        }
         
-        while cardStack.count(.MySKCardType) > 0 && (checkGameArray() < maxUsedCells || (generateSpecial && positionsTab.count > 0)) {
+        while runFlag && cardStack.count(.MySKCardType) > 0 && (checkGameArray() < maxUsedCells || (generateSpecial && positionsTab.count > 0)) {
             var card: MySKCard = cardStack.pull()!
             
             if generateSpecial {
+                var counter = cardStack.count(.MySKCardType)
                 while true {
                     if findPairForCard(card.colorIndex, minValue: card.minValue, maxValue: card.maxValue) {
                         break
                     }
                     cardStack.pushLast(card)
                     card = cardStack.pull()!
-                    
+                    counter -= 1
+                    if counter == 0 {
+                        runFlag = false
+                        break
+                    }
                 }
                 generateSpecial = false
             }
@@ -1056,7 +1062,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
             push(card, status: .addedFromCardStack)
             
-            cardManager!.addCard(card: card)
+            cardManager!.check(card: card)
             addChild(card)
             card.alpha = 0
             let duration:Double = Double((zielPosition - cardPackage!.position).length()) * durationMultiplier
@@ -2219,7 +2225,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             push(container, status: .unification)
             push(movingCard, status: .removed)
             container.connectWith(otherCard: movingCard)
-            cardManager!.moveCard(card: movingCard, toCard: container)
+            cardManager!.check(card: movingCard)
             saveHistoryRecord(colorIndex: movingCard.colorIndex, points:  points,
                               fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
                               toColumn: container.column,   toRow: container.row,   toMinValue: container.minValue,   toMaxValue: container.maxValue)
@@ -2278,7 +2284,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             push(movingCard, status: .removed)
             
             card.connectWith(otherCard: movingCard)
-            cardManager!.moveCard(card: movingCard, toCard: card)
+            cardManager!.check(card: card)
             saveHistoryRecord(colorIndex: movingCard.colorIndex, points: points,
                               fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
                               toColumn: card.column,   toRow: card.row,   toMinValue: card.minValue,   toMaxValue: card.maxValue)
@@ -2818,7 +2824,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         cardStack.push(cardToPush)
                         
                         gameArray[savedCardInCycle.column][savedCardInCycle.row].used = false
-                        cardManager!.removeCard(card: cardToPush)
+                        cardManager!.check(card: cardToPush)
                         makeEmptyCard(savedCardInCycle.column, row: savedCardInCycle.row)
                         let aktPosition = gameArray[savedCardInCycle.column][savedCardInCycle.row].position
                         let duration = Double((cardPackage!.position - aktPosition).length()) / 500.0
@@ -2878,11 +2884,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     card.countTransitions = savedCardInCycle.countTransitions
                     card.name = savedCardInCycle.name
                     levelScore = savedCardInCycle.countScore
-                    cardManager!.addCard(card: card)
  
                     updateGameArrayCell(card)
+                    cardManager!.check(card: card)
                     self.addChild(card)
-                    print("in pulled: removed--> card with name: \(card.name) added")
                     updateCardCount(1)
                     deleteLastHistoryRecord()
                     card.reload()
@@ -2897,18 +2902,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     card.BGPictureAdded = savedCardInCycle.BGPictureAdded
                     card.countTransitions = savedCardInCycle.countTransitions
                     updateGameArrayCell(card)
+                    cardManager!.check(card: card)
                     //card.hitLabel.text = "\(card.hitCounter)"
                     card.reload()
-                    
-//                case .hitcounterChanged:
-//                    
-//                    let container = containers[findIndex(savedCardInCycle.colorIndex)]
-//                    container.minValue = savedCardInCycle.minValue
-//                    container.maxValue = savedCardInCycle.maxValue
-//                    container.belongsToPackage = savedCardInCycle.belongsToPackage
-//                    container.BGPictureAdded = savedCardInCycle.BGPictureAdded
-//                    container.reload()
-//                    showScore()
                     
                 case .firstCardAdded:
                     let container = containers[findIndex(savedCardInCycle.colorIndex)]
@@ -2931,6 +2927,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     card.belongsToPackageMax = savedCardInCycle.belongsToPackageMax
 
                     updateGameArrayCell(card)
+                    cardManager!.check(card: card)
                     card.BGPictureAdded = savedCardInCycle.BGPictureAdded
                     card.countTransitions = savedCardInCycle.countTransitions
                     actionMoveArray.append(SKAction.move(to: savedCardInCycle.endPosition, duration: duration))
@@ -2941,15 +2938,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     card.run(SKAction.sequence(actionMoveArray))
                     card.reload()
                     
-                case .fallingMovingCard:
-//                    let card = self.childNodeWithName(savedCardInCycle.name)! as! MySKCard
-                    actionMoveArray.append(SKAction.move(to: savedCardInCycle.endPosition, duration: duration))
-                    
-                case .fallingCard:
-                    let card = self.childNode(withName: savedCardInCycle.name)! as! MySKCard
-                    card.startPosition = savedCardInCycle.startPosition
-                    let moveFallingCard = SKAction.move(to: savedCardInCycle.startPosition, duration: duration)
-                    card.run(SKAction.sequence([moveFallingCard]))
+//                case .fallingMovingCard:
+////                    let card = self.childNodeWithName(savedCardInCycle.name)! as! MySKCard
+//                    actionMoveArray.append(SKAction.move(to: savedCardInCycle.endPosition, duration: duration))
+//                    
+//                case .fallingCard:
+//                    let card = self.childNode(withName: savedCardInCycle.name)! as! MySKCard
+//                    card.startPosition = savedCardInCycle.startPosition
+//                    let moveFallingCard = SKAction.move(to: savedCardInCycle.startPosition, duration: duration)
+//                    card.run(SKAction.sequence([moveFallingCard]))
                     
                 case .mirrored:
                     //var card = self.childNodeWithName(savedCardInCycle.name)! as! MySKCard

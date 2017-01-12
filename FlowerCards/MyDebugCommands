@@ -1,0 +1,1 @@
+p (upperValues.contains(otherCard.maxValue), upperValues.contains(otherCard.minValue), data.countTransitions > 0, lowerValues.contains(otherCard.maxValue), lowerValues.contains(otherCard.minValue))

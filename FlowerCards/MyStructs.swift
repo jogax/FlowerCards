@@ -389,7 +389,7 @@ struct Container {
 }
 
 enum CardStatus: Int, CustomStringConvertible {
-    case added = 0, addedFromCardStack, addedFromShowCard, movingStarted, unification, mirrored, fallingMovingCard, fallingCard, firstCardAdded, removed, stopCycle, nothing
+    case added = 0, addedFromCardStack, addedFromShowCard, movingStarted, unification, mirrored, firstCardAdded, removed, stopCycle, nothing
     
     var statusName: String {
         let statusNames = [
@@ -399,8 +399,6 @@ enum CardStatus: Int, CustomStringConvertible {
             "MovingStarted",
             "Unification",
             "Mirrored",
-            "FallingMovingCard",
-            "FallingCard",
             "Removed",
             "Exchanged",
             "Nothing"

@@ -26,6 +26,25 @@ import SpriteKit
 
 class MySKCard: SKSpriteNode {
     
+    var cardHashValue: Int {
+        get {
+            let hash = column |
+                row << 4 |
+                colorIndex << 8 |
+                minValue << 12 |
+                maxValue << 16 |
+                countTransitions << 20
+            return hash
+        }
+    }
+
+    static func ==(left: MySKCard, right: MySKCard)->Bool {
+        return left.cardHashValue == right.cardHashValue
+    }
+//    static func !=(left: MySKCard, right: MySKCard)->Bool {
+//        return left.cardHashValue != left.cardHashValue
+//    }
+    
     enum CardStatus: Int {
         case CardStack = 0, OnScreen, Deleted
     }
@@ -36,8 +55,8 @@ class MySKCard: SKSpriteNode {
         var column: Int
         var cardName: String
         var originalValue: Int
-        var minValue: Int
         var maxValue: Int
+        var minValue: Int
         var deleted: Bool
         var countTransitions: Int
         var belongsToPkg: UInt8 // belongs to package
@@ -95,8 +114,8 @@ class MySKCard: SKSpriteNode {
 //    var cardIndex = CardIndex(packageIndex: 0, colorIndex: 0,origValue: 0)
     var colorIndex = NoColor
     var startPosition = CGPoint.zero
-    var minValue: Int
     var maxValue: Int
+    var minValue: Int
     var origValue: Int
     var printValue: String {
         get {
@@ -112,8 +131,8 @@ class MySKCard: SKSpriteNode {
         }
     }
     
-    var belongsToPackageMin: UInt8 = 0
     var belongsToPackageMax: UInt8 = 0
+    var belongsToPackageMin: UInt8 = 0
     
     var countTransitions = 0
     var countScore: Int {
@@ -353,9 +372,6 @@ class MySKCard: SKSpriteNode {
         #if TEST
             let cardCountTxt = (MySKCard.cardCount > 100 ? "" : MySKCard.cardCount > 9 ? " " : "  ") + String(MySKCard.cardCount)
             MySKCard.cardCount += 1
-            if MySKCard.cardCount == 1000 {//67 {
-                MySKCard.cardCount = 126  // aussteigen wenn problemfall erreicht
-            }
             let text1 = "\(cardCountTxt) move \(MySKCard.colorNames[colorIndex]) \(createCardText(card: otherCard, from: true)) to \(createCardText(card: self, from: false))"
         #endif
         self.countTransitions += otherCard.countTransitions
@@ -395,7 +411,8 @@ class MySKCard: SKSpriteNode {
     func createCardText(card: MySKCard, from: Bool)->String {
         let minValueText = (cardLib[card.minValue]! == "10" ? "" : " ") + cardLib[card.minValue]!
         let maxValueText = (cardLib[card.maxValue]! == "10" ? "" : " ") + cardLib[card.maxValue]!
-        return "\(card.type == .containerType ? "Container" : "Card     ")(\(maxValueText)-\(minValueText)) \(from ? "from" : "at") [\(card.column):\(card.row)]"
+        let betweenTxt = "-" + String(card.countTransitions) + "-"
+        return "\(card.type == .containerType ? "Container" : "Card     ")(\(maxValueText)\(betweenTxt)\(minValueText)) \(from ? "from" : "at") [\(card.column):\(card.row)]"
     }
     #endif
     

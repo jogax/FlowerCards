@@ -43,7 +43,7 @@ class AutoPlayer {
     
     
     @objc func nextStep(timerX: Timer) {
-        if scene.cardCount > 0 /*&& scene.tippArray.count > 0*/ {
+        if scene.cardCount > 0 && scene.tippArray.count > 0 {
             switch autoPlayStatus {
             case .getTipp:
                 if scene.tippsButton!.alpha == 1 && scene.countMovingCards == 0 {  // if tipps are ready
@@ -79,7 +79,8 @@ class AutoPlayer {
                 autoPlayStatus = .touchesEnded
             case .touchesEnded:
                 scene.myTouchesEnded(touchLocation: bestTipp.points[1])
-                if MySKCard.cardCount == 126 {
+//                if MySKCard.cardCount == 40 { //51 { // #34 == 65 #18 {
+                if MySKCard.cardCount == 500 { //18 { // #34 == 65 #18 {
                     stopAutoplay()
                 }
                 autoPlayStatus = .getTipp
@@ -90,7 +91,11 @@ class AutoPlayer {
                 timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }
         } else {
-            stopAutoplay()
+            if autoPlayStatus != .getTipp {
+                stopAutoplay()
+            } else {
+                timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+            }
         }
     }
     

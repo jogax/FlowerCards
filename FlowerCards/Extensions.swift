@@ -143,6 +143,22 @@ extension Int {
             return false
         }
     }
+    
+    func toBinary()->String {
+        let spacing = 4
+        var string = ""
+        var shifted = self
+        var digit = 0
+        for index in 0...63 {
+            let digit = shifted & 1 == 0 ? "0" : "1"
+            string = digit + string
+            if index % spacing == 3 {
+                string = " " + string
+            }
+            shifted = shifted >> 1
+        }
+        return string
+    }
 }
 
 extension CGFloat {
