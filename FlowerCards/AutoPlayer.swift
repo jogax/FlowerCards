@@ -13,6 +13,16 @@ class AutoPlayer {
     enum runStatus: Int {
         case getTipp = 0, touchesBegan, touchesMoved, touchesEnded
     }
+    struct GameToPlay {
+        var level: Int
+        var gameNumber: Int
+        var stopAt: Int
+        init(level: Int, gameNumber: Int, stopAt: Int = 0) {
+            self.level = level
+            self.gameNumber = gameNumber
+            self.stopAt = stopAt
+        }
+    }
     var scene: CardGameScene
 //    @objc let nextStepSelector = "nextStep:"
     var timer: Timer = Timer()
@@ -21,6 +31,28 @@ class AutoPlayer {
     var replay: Bool
     var indexForReplay: Int = 0
     var stopTimer = false
+    var gamesToPlay: [GameToPlay] = [
+//        GameToPlay(level: 2, gameNumber: 272),    // Game Lost
+//        GameToPlay(level: 2, gameNumber: 424),    // Game Lost
+//        GameToPlay(level: 2, gameNumber: 616),    // Game Lost
+//        GameToPlay(level: 2, gameNumber: 644),    // OK
+//        GameToPlay(level: 2, gameNumber: 810),    // OK
+
+        
+//        GameToPlay(level: 30, gameNumber: 128), //, stopAt: 97),   // ?
+//        GameToPlay(level: 30, gameNumber: 378),     //, stopAt: 87),
+//        GameToPlay(level: 30, gameNumber: 476),
+//        GameToPlay(level: 30, gameNumber: 480),
+//        GameToPlay(level: 30, gameNumber: 542),
+//        GameToPlay(level: 30, gameNumber: 860),
+        
+        GameToPlay(level: 66, gameNumber: 377),
+        GameToPlay(level: 66, gameNumber: 470),
+        GameToPlay(level: 66, gameNumber: 557),
+        GameToPlay(level: 66, gameNumber: 882)
+        
+    ]
+    var gameIndex = 0
 
     init(scene: CardGameScene) {
         self.scene = scene
@@ -36,14 +68,25 @@ class AutoPlayer {
             scene.startNewGame(false)
             scene.durationMultiplier = scene.durationMultiplierForAutoplayer
             indexForReplay = 0
+        } else {
+            startNextGame()
         }
         scene.isUserInteractionEnabled = false
         timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
     }
     
+    func startNextGame() {
+        realm.beginWrite()
+        GV.player!.levelID = gamesToPlay[gameIndex].level - 1
+        try! realm.commitWrite()
+        scene.gameNumber = gamesToPlay[gameIndex].gameNumber - 1
+        scene.startNewGame(false)
+        scene.durationMultiplier = scene.durationMultiplierForAutoplayer
+    }
+    
     
     @objc func nextStep(timerX: Timer) {
-        if scene.cardCount > 0 && scene.tippArray.count > 0 {
+        if scene.cardCount > 0 /*&& scene.tippArray.count > 0*/ {
             switch autoPlayStatus {
             case .getTipp:
                 if scene.tippsButton!.alpha == 1 && scene.countMovingCards == 0 {  // if tipps are ready
@@ -67,7 +110,14 @@ class AutoPlayer {
                     if bestTipp.points.count > 0 {
                         autoPlayStatus = .touchesBegan
                     } else {
-                        stopAutoplay()
+                        if gamesToPlay.count == 0 {
+                            stopAutoplay()
+                        } else {
+                            gameIndex += 1
+                            if gameIndex < gamesToPlay.count {
+                               startNextGame()
+                            }
+                        }
                     }
                     
                 }
@@ -79,8 +129,7 @@ class AutoPlayer {
                 autoPlayStatus = .touchesEnded
             case .touchesEnded:
                 scene.myTouchesEnded(touchLocation: bestTipp.points[1])
-//                if MySKCard.cardCount == 40 { //51 { // #34 == 65 #18 {
-                if MySKCard.cardCount == 500 { //18 { // #34 == 65 #18 {
+                if MySKCard.cardCount == gamesToPlay[gameIndex].stopAt { 
                     stopAutoplay()
                 }
                 autoPlayStatus = .getTipp
@@ -91,9 +140,17 @@ class AutoPlayer {
                 timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }
         } else {
-            if autoPlayStatus != .getTipp {
-                stopAutoplay()
-            } else {
+                if gamesToPlay.count == 0 {
+                    stopAutoplay()
+                } else {
+                    gameIndex += 1
+                    if gameIndex < gamesToPlay.count {
+                        startNextGame()
+                    } else {
+                        stopAutoplay()
+                    }
+                }
+            if !stopTimer {
                 timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }
         }
@@ -104,6 +161,7 @@ class AutoPlayer {
         scene.autoPlayerActive = false
         scene.replaying = false
         stopTimer = true
+        timer.invalidate()
         print("timer stopped at indexForReplay: \(indexForReplay)")
     }
     

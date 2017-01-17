@@ -108,33 +108,17 @@ class MySKCard: SKSpriteNode {
     }
     private static let bitMaskForPackages: [UInt8] = [1, 2, 4, 8]
     private static let colorNames = ["Purple", "Blue  ", "Green ", "Red   "]
+    var type: MySKCardType
+    var colorIndex = NoColor
     var column = 0
     var row = 0
-    var isCard = false
-//    var cardIndex = CardIndex(packageIndex: 0, colorIndex: 0,origValue: 0)
-    var colorIndex = NoColor
-    var startPosition = CGPoint.zero
     var maxValue: Int
     var minValue: Int
-    var origValue: Int
-    var printValue: String {
-        get {
-            let value =
-                "color: " +
-                MySKCard.colorNames[colorIndex] + ", column: " +
-                String(column) + ", row: " +
-                String(row) + ", min: " +
-                String(minValue) + ", max: " +
-                String(maxValue) +
-                String(type == .cardType ? " Card" : " Container")
-            return value
-        }
-    }
-    
     var belongsToPackageMax: UInt8 = 0
     var belongsToPackageMin: UInt8 = 0
-    
     var countTransitions = 0
+    
+    var startPosition = CGPoint.zero
     var countScore: Int {
         get {
             return(calculateScore())
@@ -142,9 +126,25 @@ class MySKCard: SKSpriteNode {
 //            return Int(midValue * Double((maxValue - minValue + 1)))
         }
     }
+    var origValue: Int
+    var isCard = false
     var mirrored: Int
     let device = GV.deviceType
     let modelConstantLocal = UIDevice.current.modelName
+    var printValue: String {
+        get {
+            let value =
+                "color: " +
+                    MySKCard.colorNames[colorIndex] + ", column: " +
+                    String(column) + ", row: " +
+                    String(row) + ", min: " +
+                    String(minValue) + ", max: " +
+                    String(maxValue) +
+                    String(type == .cardType ? " Card" : " Container")
+            return value
+        }
+    }
+    
 
     var origSize = CGSize(width: 0, height: 0)
 
@@ -166,7 +166,6 @@ class MySKCard: SKSpriteNode {
 
 //    var hitCounter: Int = 0
 
-    var type: MySKCardType
     var hitLabel = SKLabelNode()
     var maxValueLabel = SKLabelNode()
     var minValueLabel = SKLabelNode()

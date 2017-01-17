@@ -270,6 +270,20 @@ class CardManager {
                         lowerValues.contains(otherCard.maxValue),
                         lowerValues.contains(otherCard.minValue))
                     {
+                    case (true, true, true, false, false):
+                        if cardWithTransition.belongsToPackageMax == maxPackage {
+                            otherCard.belongsToPackageMax = cardWithTransition.belongsToPackageMax >> 1 | cardWithTransition.belongsToPackageMax >> 2 | cardWithTransition.belongsToPackageMax >> 3
+                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
+                        } else if cardWithTransition.belongsToPackageMax == minPackage {
+                            otherCard.belongsToPackageMin = cardWithTransition.belongsToPackageMax << 1 | cardWithTransition.belongsToPackageMax << 2 | cardWithTransition.belongsToPackageMax << 3
+                            otherCard.belongsToPackageMax = otherCard.belongsToPackageMax << UInt8(otherCard.countTransitions)
+                        }
+                    case (true, false, false, false, false):
+                        otherCard.belongsToPackageMax = cardWithTransition.belongsToPackageMin | cardWithTransition.belongsToPackageMin >> 1 | cardWithTransition.belongsToPackageMin >> 2
+                        otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
+                    case (false, true, true, false, false):
+                        otherCard.belongsToPackageMax = cardWithTransition.belongsToPackageMin | cardWithTransition.belongsToPackageMin >> 1 | cardWithTransition.belongsToPackageMin >> 2
+                        otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
                     case (true, _, false, true, _):
                         otherCard.belongsToPackageMax = cardWithTransition.belongsToPackageMin >> 1 | cardWithTransition.belongsToPackageMin >> 2 | cardWithTransition.belongsToPackageMin >> 3
                         otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
@@ -313,21 +327,15 @@ class CardManager {
         if let container = data.container {
             // set the belongingsFlags by all other Cards
             setOtherCardBelonging(cardWithTransition: container)
-//            for card in data.allCards {
-//                if card.maxValue >= container.minValue {
-//                    card.belongsToPackageMax = container.belongsToPackageMin >> 1 | container.belongsToPackageMin >> 2 | container.belongsToPackageMin >> 3
-//                    card.belongsToPackageMin = card.belongsToPackageMax >> UInt8(card.countTransitions)
-//                } else {
-//                    card.belongsToPackageMax = container.belongsToPackageMin | container.belongsToPackageMin >> 1 | container.belongsToPackageMin >> 2 | container.belongsToPackageMin >> 3
-//                    if card.countTransitions > 0 {
-//                        card.belongsToPackageMin = card.belongsToPackageMax >> UInt8(card.countTransitions)
-//                        card.belongsToPackageMax = card.belongsToPackageMin << UInt8(card.countTransitions)
-//                    }
-//                }
-//            }
         }
         for card in data.cardsWithTransitions {
             setOtherCardBelonging(cardWithTransition: card)
+        }
+        
+        for card in data.allCards {
+            if card.belongsToPackageMax != allPackages {
+                setOtherCardBelonging(cardWithTransition: card)
+            }
         }
 
         if data.container != nil {
@@ -346,13 +354,13 @@ class CardManager {
     
     
     
-    private func checkCardBelonging(data: inout DataForColor, card: MySKCard) {
-        for cardWithTransition in data.cardsWithTransitions {
-            if cardWithTransition.maxValue <= card.minValue && data.countTransitions == countPackages - 1 {
-                card.belongsToPackageMax = cardWithTransition.belongsToPackageMin
-            }
-        }
-    }
+//    private func checkCardBelonging(data: inout DataForColor, card: MySKCard) {
+//        for cardWithTransition in data.cardsWithTransitions {
+//            if cardWithTransition.maxValue <= card.minValue && data.countTransitions == countPackages - 1 {
+//                card.belongsToPackageMax = cardWithTransition.belongsToPackageMin
+//            }
+//        }
+//    }
     
 //    private func analyzeColor(data: inout DataForColor) {
 //        data.connectablePairs.removeAll()

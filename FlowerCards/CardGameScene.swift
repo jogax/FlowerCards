@@ -559,6 +559,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         freeTippCounter = freeAmount
         scoreModifyer = 0
         levelScore = 0
+        countMovingCards = 0
         showTippCounter = showTippsFreeCount
 
 //        GV.statistic = GV.realm.objects(StatisticModel).filter("playerID = %d and levelID = %d", GV.player!.ID, GV.player!.levelID).first
@@ -813,6 +814,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func getGameRecord(gameNumber: Int) {
         actGame = realm.objects(GameModel.self).filter("gameNumber = %d and levelID = %d and playerID = %d", gameNumber, levelIndex, GV.player!.ID).first
+        if actGame == nil {
+            createGameRecord(gameNumber: gameNumber)
+        }
     }
     
     
@@ -1154,8 +1158,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             repeat {
                 if self.tippArray.count <= 2 && self.checkGameArray() > 2 {
-                    self.generateCards(.special)
-                    _ = self.createTipps()
+                    if cardStack.count(.MySKCardType) > 0 {
+                        self.generateCards(.special)
+                        _ = self.createTipps()
+                    } else {
+                        break
+                    }
                 }
             } while !(self.tippArray.count > 2 || self.countColumns * self.countRows - self.checkGameArray() == 0 || self.checkGameArray() < 2)
             
@@ -1295,22 +1303,24 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                             thisColorHasContainer = true
                         }
                     }
-                    for index in 0..<containers.count {
-                        if !thisColorHasContainer && containers[index].minValue == NoColor && gameArray[column1][row1].card.maxValue == LastCardValue {
-                            let actContainerPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: index, row: NoValue))
-                            pairsToCheck.append(actContainerPair)
-                        }
-                        if containers[index].colorIndex == gameArray[column1][row1].card.colorIndex &&
-                            (containers[index].minValue == gameArray[column1][row1].card.maxValue + 1 ||
-                            (containers[index].minValue ==  FirstCardValue && gameArray[column1][row1].card.maxValue == LastCardValue))   {
-                            let actContainerPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: index, row: NoValue))
-                            pairsToCheck.append(actContainerPair)
+                    let cardToCheck = gameArray[column1][row1].card
+                    for (index, container) in containers.enumerated() {
+                        if cardToCheck.belongsToPackageMax & container.belongsToPackageMin != 0 || cardToCheck.maxValue == LastCardValue && container.minValue == FirstCardValue {
+                            if !thisColorHasContainer && container.minValue == NoColor && cardToCheck.maxValue == LastCardValue {
+                                let actContainerPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: index, row: NoValue))
+                                pairsToCheck.append(actContainerPair)
+                            } else  if container.colorIndex == cardToCheck.colorIndex &&
+                                (container.minValue == cardToCheck.maxValue + 1 ||
+                                (container.minValue ==  FirstCardValue && cardToCheck.maxValue == LastCardValue))   {
+                                let actContainerPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: index, row: NoValue))
+                                pairsToCheck.append(actContainerPair)
+                            }
                         }
                     }
                 }
             }
         }
-
+        
 //        let startCheckTime = NSDate()
         for ind in 0..<pairsToCheck.count {
             checkPathToFoundedCards(pairsToCheck[ind])
@@ -2383,7 +2393,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let usedCellCount = checkGameArray()
 //        let containersOK = checkContainers()
         
-        let finishGame = GV.player!.name != "tester" ? cardCount == 0 : cardCount < maxCardCount
+        let finishGame = cardCount == 0
         
         if finishGame { // Level completed, start a new game
             
