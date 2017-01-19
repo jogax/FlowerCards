@@ -436,9 +436,7 @@ class MySKCard: SKSpriteNode {
     static var allPackages: UInt8 = 0
     static var maxPackage: UInt8 = 0
     static var minPackage: UInt8 = 0
-    #if TEST
     static var cardCount: Int = 0
-    #endif
     
 
     

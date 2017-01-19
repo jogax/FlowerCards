@@ -113,7 +113,10 @@ enum TextConstants: Int {
     tcSize,
     tcPackages,
     tcHelpLines,
-    tcAutoPlay,
+    tcAutoPlayNormal,
+    tcAutoPlayNewTest,
+    tcAutoPlayErrors,
+    tcAutoPlayTable,
     tcReplay
 
 }

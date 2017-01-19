@@ -122,6 +122,9 @@ let huDictionary: [TextConstants: String] = [
     .tcSize:            "Formátum:",
     .tcPackages:        "Csomag:",
     .tcHelpLines:       "Segédvonalak:",
-    .tcAutoPlay:        "Automatikus lejátszás",
+    .tcAutoPlayNormal:  "Automatikus lejátszás",
+    .tcAutoPlayNewTest: "Automatikus teszt játékok",
+    .tcAutoPlayErrors:  "Hibás játékok ismétlése",
+    .tcAutoPlayTable:  "Automatikus játék teszt táblázatból",
     .tcReplay:          "Visszajátszás",
 ]

@@ -279,11 +279,29 @@ class CardManager {
                             otherCard.belongsToPackageMax = otherCard.belongsToPackageMax << UInt8(otherCard.countTransitions)
                         }
                     case (true, false, false, false, false):
-                        otherCard.belongsToPackageMax = cardWithTransition.belongsToPackageMin | cardWithTransition.belongsToPackageMin >> 1 | cardWithTransition.belongsToPackageMin >> 2
-                        otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
+                        if cardWithTransition.type == .containerType {
+                            otherCard.belongsToPackageMax = cardWithTransition.belongsToPackageMin >> 1 | cardWithTransition.belongsToPackageMin >> 2 | cardWithTransition.belongsToPackageMin >> 3
+                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
+                        } else {
+                            otherCard.belongsToPackageMax = cardWithTransition.belongsToPackageMin | cardWithTransition.belongsToPackageMin >> 1 | cardWithTransition.belongsToPackageMin >> 2
+                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
+                        }
+                    case (true, true, false, false, false):
+                        if cardWithTransition.belongsToPackageMax == maxPackage {
+                            otherCard.belongsToPackageMax = cardWithTransition.belongsToPackageMax >> 1 | cardWithTransition.belongsToPackageMax >> 2 | cardWithTransition.belongsToPackageMax >> 3
+                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
+                        } else if cardWithTransition.belongsToPackageMax == minPackage {
+                            otherCard.belongsToPackageMin = cardWithTransition.belongsToPackageMax << 1 | cardWithTransition.belongsToPackageMax << 2 | cardWithTransition.belongsToPackageMax << 3
+                            otherCard.belongsToPackageMax = otherCard.belongsToPackageMax << UInt8(otherCard.countTransitions)
+                        }
                     case (false, true, true, false, false):
-                        otherCard.belongsToPackageMax = cardWithTransition.belongsToPackageMin | cardWithTransition.belongsToPackageMin >> 1 | cardWithTransition.belongsToPackageMin >> 2
-                        otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
+                        if cardWithTransition.belongsToPackageMax == maxPackage {
+                            otherCard.belongsToPackageMax = cardWithTransition.belongsToPackageMin | cardWithTransition.belongsToPackageMin >> 1 | cardWithTransition.belongsToPackageMin >> 2
+                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
+                        } else if cardWithTransition.belongsToPackageMax == minPackage {
+                                otherCard.belongsToPackageMin = cardWithTransition.belongsToPackageMax << 1 | cardWithTransition.belongsToPackageMax << 2 | cardWithTransition.belongsToPackageMax << 3
+                                otherCard.belongsToPackageMax = otherCard.belongsToPackageMax << UInt8(otherCard.countTransitions)
+                        }
                     case (true, _, false, true, _):
                         otherCard.belongsToPackageMax = cardWithTransition.belongsToPackageMin >> 1 | cardWithTransition.belongsToPackageMin >> 2 | cardWithTransition.belongsToPackageMin >> 3
                         otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
@@ -331,10 +349,12 @@ class CardManager {
         for card in data.cardsWithTransitions {
             setOtherCardBelonging(cardWithTransition: card)
         }
-        
-        for card in data.allCards {
-            if card.belongsToPackageMax != allPackages {
-                setOtherCardBelonging(cardWithTransition: card)
+
+        for _ in 0..<data.allCards.count {
+            for card in data.allCards {
+                if card.belongsToPackageMax != allPackages {
+                    setOtherCardBelonging(cardWithTransition: card)
+                }
             }
         }
 

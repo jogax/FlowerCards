@@ -553,6 +553,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         } else {
             getGameRecord(gameNumber: gameNumber)
         }
+        realm.beginWrite()
+            realm.delete(realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID))
+        try! realm.commitWrite()
         specialPrepareFuncFirst()
         cardManager = CardManager()
         freeUndoCounter = freeAmount
@@ -1115,10 +1118,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         //printFunc(function: "generateCards", start: false)
     }
     
-    func startAutoplay() {
+    func startAutoplay(testType: AutoPlayer.TestType) {
         autoPlayerActive = true
         durationMultiplier = durationMultiplierForAutoplayer
-        autoPlayer?.startPlay(replay: false)
+        autoPlayer?.startPlay(replay: false, testType: testType)
     }
     
     func replay() {
@@ -2672,20 +2675,40 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                                             self.chooseLevelAndOptions()
             })
             alert.addAction(chooseLevelAction)
-
-            let autoPlayAction = UIAlertAction(title: GV.language.getText(.tcAutoPlay), style: .default,
-                                                  handler: {(paramAction:UIAlertAction!) in
-                                                    self.startAutoplay()
-            })
-            alert.addAction(autoPlayAction)
+            
             #if TEST
-                if realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID).count > 0 {
-                    let replayAction = UIAlertAction(title: GV.language.getText(.tcReplay), style: .default,
-                                                       handler: {(paramAction:UIAlertAction!) in
-                                                        self.replay()
-                    })
-                    alert.addAction(replayAction)
-                }
+                let autoPlayActionNormal = UIAlertAction(title: GV.language.getText(.tcAutoPlayNormal), style: .default,
+                                                      handler: {(paramAction:UIAlertAction!) in
+                                                        self.startAutoplay(testType: .runOnce)
+                })
+                alert.addAction(autoPlayActionNormal)
+                
+                let autoPlayActionNewTest = UIAlertAction(title: GV.language.getText(.tcAutoPlayNewTest), style: .default,
+                                                   handler: {(paramAction:UIAlertAction!) in
+                                                    self.startAutoplay(testType: .newTest)
+                })
+                alert.addAction(autoPlayActionNewTest)
+
+                let autoPlayActionErrors = UIAlertAction(title: GV.language.getText(.tcAutoPlayErrors), style: .default,
+                                                   handler: {(paramAction:UIAlertAction!) in
+                                                    self.startAutoplay(testType: .fromDB)
+                })
+                alert.addAction(autoPlayActionErrors)
+
+                let autoPlayActionTable = UIAlertAction(title: GV.language.getText(.tcAutoPlayTable), style: .default,
+                                                         handler: {(paramAction:UIAlertAction!) in
+                                                            self.startAutoplay(testType: .fromTable)
+                })
+                alert.addAction(autoPlayActionTable)
+
+                
+//                if realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID).count > 0 {
+//                    let replayAction = UIAlertAction(title: GV.language.getText(.tcReplay), style: .default,
+//                                                       handler: {(paramAction:UIAlertAction!) in
+//                                                        self.replay()
+//                    })
+//                    alert.addAction(replayAction)
+//                }
             #endif
 
 
