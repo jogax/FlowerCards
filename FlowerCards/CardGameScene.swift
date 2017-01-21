@@ -556,6 +556,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         realm.beginWrite()
             realm.delete(realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID))
         try! realm.commitWrite()
+        
         specialPrepareFuncFirst()
         cardManager = CardManager()
         freeUndoCounter = freeAmount
@@ -2676,12 +2677,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             })
             alert.addAction(chooseLevelAction)
             
-            #if TEST
-                let autoPlayActionNormal = UIAlertAction(title: GV.language.getText(.tcAutoPlayNormal), style: .default,
-                                                      handler: {(paramAction:UIAlertAction!) in
+            let autoPlayActionNormal = UIAlertAction(title: GV.language.getText(.tcAutoPlayNormal), style: .default,
+                                                     handler: {(paramAction:UIAlertAction!) in
                                                         self.startAutoplay(testType: .runOnce)
-                })
-                alert.addAction(autoPlayActionNormal)
+            })
+            alert.addAction(autoPlayActionNormal)
+            
+            #if TEST
                 
                 let autoPlayActionNewTest = UIAlertAction(title: GV.language.getText(.tcAutoPlayNewTest), style: .default,
                                                    handler: {(paramAction:UIAlertAction!) in

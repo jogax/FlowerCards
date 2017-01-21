@@ -37,7 +37,7 @@ class AutoPlayer {
     var testType: TestType = .runOnce //.test
     var gamesToPlay: [GameToPlay] = [
         
-        GameToPlay(level: 10, gameNumber: 574, stopAt: 132),    //OK
+        GameToPlay(level: 2, gameNumber: 71, stopAt: 194),    //OK
 //        GameToPlay(level: 10, gameNumber: 213)                  // OK
 //        GameToPlay(level: 2, gameNumber: 272),    // Game Lost
 //        GameToPlay(level: 2, gameNumber: 424),    // Game Lost
@@ -71,7 +71,6 @@ class AutoPlayer {
     func printOldGames () {
         let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID).sorted(byProperty: "levelID")
         for game in errorGames {
-            let gameNumber = game.gameNumber
             let countColumns = GV.levelsForPlay.levelParam[game.levelID].countColumns
             let countRows = GV.levelsForPlay.levelParam[game.levelID].countRows
             let countPackages = GV.levelsForPlay.levelParam[game.levelID].countPackages
@@ -112,7 +111,7 @@ class AutoPlayer {
                 let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID)
                 for game in errorGames {
                     let countHistoryRecords = realm.objects(HistoryModel.self).filter("gameID = %d", game.ID).count
-                    if countHistoryRecords >= 100 && countHistoryRecords < 105 {
+                    if countHistoryRecords >= 5 && countHistoryRecords < 105 {
                         gamesToPlay.append(GameToPlay(level: game.levelID + 1 , gameNumber: game.gameNumber + 1))
                     }
                 }

@@ -133,14 +133,11 @@ class MySKCard: SKSpriteNode {
     let modelConstantLocal = UIDevice.current.modelName
     var printValue: String {
         get {
-            let value =
-                "color: " +
-                    MySKCard.colorNames[colorIndex] + ", column: " +
-                    String(column) + ", row: " +
-                    String(row) + ", min: " +
-                    String(minValue) + ", max: " +
-                    String(maxValue) +
-                    String(type == .cardType ? " Card" : " Container")
+            var value = String(type == .cardType ? "Card:" : "Container:") + "color: " + MySKCard.colorNames[colorIndex]
+            value += ", column: " + String(column) + ", row: " + String(row)
+            value += ", max: " + cardLib[maxValue]! + ", min: " + cardLib[minValue]!
+            value += ", belongs: " + String(belongsToPackageMax) + "/" + String(belongsToPackageMin)
+            value += ", transitions: " + String(countTransitions)
             return value
         }
     }
@@ -374,14 +371,14 @@ class MySKCard: SKSpriteNode {
             let text1 = "\(cardCountTxt) move \(MySKCard.colorNames[colorIndex]) \(createCardText(card: otherCard, from: true)) to \(createCardText(card: self, from: false))"
         #endif
         self.countTransitions += otherCard.countTransitions
-        if self.minValue == otherCard.maxValue + 1 {
+        if self.minValue == otherCard.maxValue + 1  && self.belongsToPackageMin & otherCard.belongsToPackageMax != 0 {
             self.minValue = otherCard.minValue
 //            self.belongsToPackageMax = self.belongsToPackageMax & otherCard.belongsToPackageMax
 //            self.belongsToPackageMin = self.belongsToPackageMin & otherCard.belongsToPackageMin
 //            if self.type == .containerType {
 //                resetMaxPackageAtMyBrothers()
 //            }
-        } else if self.maxValue == otherCard.minValue - 1 {
+        } else if self.maxValue == otherCard.minValue - 1 && self.belongsToPackageMax & otherCard.belongsToPackageMin != 0 {
             self.maxValue = otherCard.maxValue
 //            self.belongsToPackageMax = self.belongsToPackageMax & otherCard.belongsToPackageMax
 //            self.belongsToPackageMin = self.belongsToPackageMin & otherCard.belongsToPackageMin

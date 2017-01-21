@@ -148,7 +148,6 @@ extension Int {
         let spacing = 4
         var string = ""
         var shifted = self
-        var digit = 0
         for index in 0...63 {
             let digit = shifted & 1 == 0 ? "0" : "1"
             string = digit + string
