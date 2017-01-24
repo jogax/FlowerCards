@@ -114,8 +114,18 @@ class MySKCard: SKSpriteNode {
     var row = 0
     var maxValue: Int
     var minValue: Int
-    var belongsToPackageMax: UInt8 = 0
-    var belongsToPackageMin: UInt8 = 0
+    var belongsToPackageMax: UInt8 = 0 {
+        didSet {
+            setLabelText(minValueLabel, value: minValue, dotCount: calculateDotCount(forMinLabel: true))
+            setLabelText(maxValueLabel, value: maxValue, dotCount: calculateDotCount(forMinLabel: false))
+        }
+    }
+    var belongsToPackageMin: UInt8 = 0 {
+        didSet {
+            setLabelText(minValueLabel, value: minValue, dotCount: calculateDotCount(forMinLabel: true))
+            setLabelText(maxValueLabel, value: maxValue, dotCount: calculateDotCount(forMinLabel: false))
+        }
+    }
     var countTransitions = 0
     
     var startPosition = CGPoint.zero
@@ -258,14 +268,23 @@ class MySKCard: SKSpriteNode {
                 return MySKCard.countPackages == 1 ? 0 : MySKCard.countPackages
             }
         }
-        if self.countTransitions == 0 {
-            return 0
-        }
+//        if self.countTransitions == 0 {
+//            return 0
+//        }
         var maxDotCount = 0
+//        if self.belongsToPackageMax == MySKCard.allPackages {
+//            maxDotCount = MySKCard.countPackages
+//        } else if countTransitions > 0 {
+//            maxDotCount = countTransitions + 1
+//        }
         if self.belongsToPackageMax == MySKCard.allPackages {
+            return 0
+        } else if self.belongsToPackageMax == MySKCard.maxPackage {
             maxDotCount = MySKCard.countPackages
-        } else if countTransitions > 0 {
-            maxDotCount = countTransitions + 1
+        } else if self.belongsToPackageMax == MySKCard.minPackage {
+            maxDotCount = 1
+        } else {
+            return 0
         }
         
         if forMinLabel {
@@ -580,8 +599,7 @@ class MySKCard: SKSpriteNode {
     
     deinit {
         if type == .cardType {
-//            MySKCard.cards[cardIndex]!.status = .Deleted
-//            MySKCard.cards[cardIndex]!.belongsToPkg = 0
+//            print ("Card deinit: \(self.printValue)")
         }
     }
 
