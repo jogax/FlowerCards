@@ -144,7 +144,7 @@ extension Int {
         }
     }
     
-    func toBinary()->String {
+    func toBinary(len: Int = 0)->String {
         let spacing = 4
         var string = ""
         var shifted = self
@@ -156,7 +156,10 @@ extension Int {
             }
             shifted = shifted >> 1
         }
-        return string
+        let offset = len == 0 ? 0 : string.length - len
+        let startPos = string.index(string.startIndex, offsetBy: offset)
+        let returnString = string.substring(from: startPos)
+        return returnString
     }
 }
 

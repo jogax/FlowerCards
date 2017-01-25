@@ -1346,25 +1346,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                        fromRow == tippArray[ind + 1].toRow &&
                        toColumn == tippArray[ind + 1].fromColumn  &&
                        toRow == tippArray[ind + 1].fromRow {
-                            removeIndex.insert(ind + 1, at: 0)
-//                            switch tippArray[ind].points.count {
-//                            case 2:
-//                                tippArray[ind].twoArrows = true
-//                                removeIndex.insert(ind + 1, at: 0)
-//                            case 3:
-//                                if (tippArray[ind].points[1] - tippArray[ind + 1].points[1]).length() < cardSize.height{
-//                                    tippArray[ind].twoArrows = true
-//                                    removeIndex.insert(ind + 1, at: 0)
-//                                }
-//                            case 4:
-//                                if tippArray[ind + 1].points.count == 4 && (tippArray[ind].points[1] - tippArray[ind + 1].points[2]).length() < cardSize.height && (tippArray[ind].points[2] - tippArray[ind + 1].points[1]).length() < cardSize.height
-//                                {
-//                                    tippArray[ind].twoArrows = true
-//                                    removeIndex.insert(ind + 1, at: 0)
-//                                }
-//                            default:
-//                                tippArray[ind].twoArrows = false
-//                            }
+//                            removeIndex.insert(ind + 1, at: 0)
                     }
                     if gameArray[fromColumn][fromRow].card.maxValue == LastCardValue && toRow == NoValue && containers[toColumn].minValue == NoColor {
                         // King to empty Container
@@ -1383,7 +1365,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                                     tippArray[ind + index] = tippArchiv
                                 }
                                 tippArray[ind + index].removed = true
-                                removeIndex.insert(ind + index, at: 0)
+//                                removeIndex.insert(ind + index, at: 0)
                             }
                             index += 1
                         }

@@ -16,6 +16,9 @@ class AutoPlayer {
     enum TestType: Int {
         case newTest = 1, fromTable, fromDB, runOnce
     }
+    enum TesterType: Int {
+        case beginner = 0, medium, expert
+    }
     struct GameToPlay {
         var level: Int
         var gameNumber: Int
@@ -35,10 +38,11 @@ class AutoPlayer {
     var indexForReplay: Int = 0
     var stopTimer = false
     var testType: TestType = .runOnce //.test
+    var testerType: TesterType = .expert
     var gamesToPlay: [GameToPlay] = [        
-//        GameToPlay(level: 10, gameNumber: 47), //You have lost ===> now too!!!
+        GameToPlay(level: 18, gameNumber: 25), //You have lost ===> now too!!!
 
-//        GameToPlay(level: 6, gameNumber: 36), //OK
+        GameToPlay(level: 18, gameNumber: 45), //OK
 //        GameToPlay(level: 6, gameNumber: 97), //OK
 
 //        GameToPlay(level: 10, gameNumber: 37),  //OK --> crash!!!
@@ -46,81 +50,81 @@ class AutoPlayer {
 //        GameToPlay(level: 10, gameNumber: 78), // OK --> crash!!!
 //        GameToPlay(level: 10, gameNumber: 86), //OK --> You have Lost
 //        GameToPlay(level: 10, gameNumber: 95), //OK --> endlos at 58
-        GameToPlay(level: 14, gameNumber: 5), //OK
-        GameToPlay(level: 14, gameNumber: 8), //OK
-        GameToPlay(level: 14, gameNumber: 11), //OK
-        GameToPlay(level: 14, gameNumber: 12), //OK
-        GameToPlay(level: 14, gameNumber: 13), //OK
-        GameToPlay(level: 14, gameNumber: 14), //OK
-        GameToPlay(level: 14, gameNumber: 15), //OK
-        GameToPlay(level: 14, gameNumber: 17), //OK
-        GameToPlay(level: 14, gameNumber: 18), //OK
-        GameToPlay(level: 14, gameNumber: 19), //OK
-        GameToPlay(level: 14, gameNumber: 22), //OK
-        GameToPlay(level: 14, gameNumber: 24), //OK
-        GameToPlay(level: 14, gameNumber: 26), //OK
-        GameToPlay(level: 14, gameNumber: 27), //OK
-        GameToPlay(level: 14, gameNumber: 30), //OK
-        GameToPlay(level: 14, gameNumber: 31), //OK
-        GameToPlay(level: 14, gameNumber: 35), //OK
-        GameToPlay(level: 14, gameNumber: 38), //OK
-        GameToPlay(level: 14, gameNumber: 40, stopAt: 47), // crash at 48
-//        GameToPlay(level: 14, gameNumber: 42),
-        GameToPlay(level: 14, gameNumber: 50),
-        GameToPlay(level: 14, gameNumber: 52),
-        GameToPlay(level: 14, gameNumber: 55),
-        GameToPlay(level: 14, gameNumber: 57),
-        GameToPlay(level: 14, gameNumber: 59),
-        GameToPlay(level: 14, gameNumber: 61),
-        GameToPlay(level: 14, gameNumber: 63),
-        GameToPlay(level: 14, gameNumber: 64),
-        GameToPlay(level: 14, gameNumber: 65),
-        GameToPlay(level: 14, gameNumber: 67),
-        GameToPlay(level: 14, gameNumber: 70),
-        GameToPlay(level: 14, gameNumber: 71),
-        GameToPlay(level: 14, gameNumber: 77),
-        GameToPlay(level: 14, gameNumber: 78),
-        GameToPlay(level: 14, gameNumber: 84),
-        GameToPlay(level: 14, gameNumber: 86),
-        GameToPlay(level: 14, gameNumber: 87),
-        GameToPlay(level: 14, gameNumber: 90),
-        GameToPlay(level: 14, gameNumber: 91),
-        GameToPlay(level: 14, gameNumber: 92),
-        GameToPlay(level: 14, gameNumber: 96),
-        GameToPlay(level: 18, gameNumber: 3),
-        GameToPlay(level: 18, gameNumber: 6),
-        GameToPlay(level: 18, gameNumber: 12),
-        GameToPlay(level: 18, gameNumber: 22),
-        GameToPlay(level: 18, gameNumber: 24),
-        GameToPlay(level: 18, gameNumber: 27),
-        GameToPlay(level: 18, gameNumber: 36),
-        GameToPlay(level: 18, gameNumber: 37),
-        GameToPlay(level: 18, gameNumber: 38),
-        GameToPlay(level: 18, gameNumber: 39),
-        GameToPlay(level: 18, gameNumber: 40),
-        GameToPlay(level: 18, gameNumber: 42),
-        GameToPlay(level: 18, gameNumber: 43),
-        GameToPlay(level: 18, gameNumber: 45),
-        GameToPlay(level: 18, gameNumber: 48),
-        GameToPlay(level: 18, gameNumber: 50),
-        GameToPlay(level: 18, gameNumber: 52),
-        GameToPlay(level: 18, gameNumber: 53),
-        GameToPlay(level: 18, gameNumber: 54),
-        GameToPlay(level: 18, gameNumber: 60),
-        GameToPlay(level: 18, gameNumber: 65),
-        GameToPlay(level: 18, gameNumber: 66),
-        GameToPlay(level: 18, gameNumber: 67),
-        GameToPlay(level: 18, gameNumber: 69),
-        GameToPlay(level: 18, gameNumber: 73),
-        GameToPlay(level: 18, gameNumber: 74),
-        GameToPlay(level: 18, gameNumber: 75),
-        GameToPlay(level: 18, gameNumber: 77),
-        GameToPlay(level: 18, gameNumber: 78),
-        GameToPlay(level: 18, gameNumber: 79),
-        GameToPlay(level: 18, gameNumber: 86),
-        GameToPlay(level: 18, gameNumber: 92),
-        GameToPlay(level: 18, gameNumber: 96),
-        GameToPlay(level: 18, gameNumber: 100),
+//        GameToPlay(level: 14, gameNumber: 5), //OK
+//        GameToPlay(level: 14, gameNumber: 8), //OK
+//        GameToPlay(level: 14, gameNumber: 11), //OK
+//        GameToPlay(level: 14, gameNumber: 12), //OK
+//        GameToPlay(level: 14, gameNumber: 13), //OK
+//        GameToPlay(level: 14, gameNumber: 14), //OK
+//        GameToPlay(level: 14, gameNumber: 15), //OK
+//        GameToPlay(level: 14, gameNumber: 17), //OK
+//        GameToPlay(level: 14, gameNumber: 18), //OK
+//        GameToPlay(level: 14, gameNumber: 19), //OK
+//        GameToPlay(level: 14, gameNumber: 22), //OK
+//        GameToPlay(level: 14, gameNumber: 24), //OK
+//        GameToPlay(level: 14, gameNumber: 26), //OK
+//        GameToPlay(level: 14, gameNumber: 27), //OK
+//        GameToPlay(level: 14, gameNumber: 30), //OK
+//        GameToPlay(level: 14, gameNumber: 31), //OK
+//        GameToPlay(level: 14, gameNumber: 35), //OK
+//        GameToPlay(level: 14, gameNumber: 38), //OK
+//        GameToPlay(level: 14, gameNumber: 40, stopAt: 47), // crash at 48
+////        GameToPlay(level: 14, gameNumber: 42),
+//        GameToPlay(level: 14, gameNumber: 50),
+//        GameToPlay(level: 14, gameNumber: 52),
+//        GameToPlay(level: 14, gameNumber: 55),
+//        GameToPlay(level: 14, gameNumber: 57),
+//        GameToPlay(level: 14, gameNumber: 59),
+//        GameToPlay(level: 14, gameNumber: 61),
+//        GameToPlay(level: 14, gameNumber: 63),
+//        GameToPlay(level: 14, gameNumber: 64),
+//        GameToPlay(level: 14, gameNumber: 65),
+//        GameToPlay(level: 14, gameNumber: 67),
+//        GameToPlay(level: 14, gameNumber: 70),
+//        GameToPlay(level: 14, gameNumber: 71),
+//        GameToPlay(level: 14, gameNumber: 77),
+//        GameToPlay(level: 14, gameNumber: 78),
+//        GameToPlay(level: 14, gameNumber: 84),
+//        GameToPlay(level: 14, gameNumber: 86),
+//        GameToPlay(level: 14, gameNumber: 87),
+//        GameToPlay(level: 14, gameNumber: 90),
+//        GameToPlay(level: 14, gameNumber: 91),
+//        GameToPlay(level: 14, gameNumber: 92),
+//        GameToPlay(level: 14, gameNumber: 96),
+//        GameToPlay(level: 18, gameNumber: 3),
+//        GameToPlay(level: 18, gameNumber: 6),
+//        GameToPlay(level: 18, gameNumber: 12),
+//        GameToPlay(level: 18, gameNumber: 22),
+//        GameToPlay(level: 18, gameNumber: 24),
+//        GameToPlay(level: 18, gameNumber: 27),
+//        GameToPlay(level: 18, gameNumber: 36),
+//        GameToPlay(level: 18, gameNumber: 37),
+//        GameToPlay(level: 18, gameNumber: 38),
+//        GameToPlay(level: 18, gameNumber: 39),
+//        GameToPlay(level: 18, gameNumber: 40),
+//        GameToPlay(level: 18, gameNumber: 42),
+//        GameToPlay(level: 18, gameNumber: 43),
+//        GameToPlay(level: 18, gameNumber: 45),
+//        GameToPlay(level: 18, gameNumber: 48),
+//        GameToPlay(level: 18, gameNumber: 50),
+//        GameToPlay(level: 18, gameNumber: 52),
+//        GameToPlay(level: 18, gameNumber: 53),
+//        GameToPlay(level: 18, gameNumber: 54),
+//        GameToPlay(level: 18, gameNumber: 60),
+//        GameToPlay(level: 18, gameNumber: 65),
+//        GameToPlay(level: 18, gameNumber: 66),
+//        GameToPlay(level: 18, gameNumber: 67),
+//        GameToPlay(level: 18, gameNumber: 69),
+//        GameToPlay(level: 18, gameNumber: 73),
+//        GameToPlay(level: 18, gameNumber: 74),
+//        GameToPlay(level: 18, gameNumber: 75),
+//        GameToPlay(level: 18, gameNumber: 77),
+//        GameToPlay(level: 18, gameNumber: 78),
+//        GameToPlay(level: 18, gameNumber: 79),
+//        GameToPlay(level: 18, gameNumber: 86),
+//        GameToPlay(level: 18, gameNumber: 92),
+//        GameToPlay(level: 18, gameNumber: 96),
+//        GameToPlay(level: 18, gameNumber: 100),
         ]
     var gameIndex = 0
     
@@ -135,17 +139,11 @@ class AutoPlayer {
         var oldLevelID: Int = -1
         let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID).sorted(byProperty: "levelID")
         for game in errorGames {
-            let countColumns = GV.levelsForPlay.levelParam[game.levelID].countColumns
-            let countRows = GV.levelsForPlay.levelParam[game.levelID].countRows
-            let countPackages = GV.levelsForPlay.levelParam[game.levelID].countPackages
             let countHistoryRecords = realm.objects(HistoryModel.self).filter("gameID = %d", game.ID).count
-            if countHistoryRecords > 99 && countHistoryRecords < 105 {
+            if countHistoryRecords > 0 && countHistoryRecords < 105 {
                 if game.levelID != oldLevelID {
-//                    print("==========================")
                     oldLevelID = game.levelID
                 }
-//                let line = "Level: \(game.levelID + 1), GameNr: \(game.gameNumber + 1), Packages: \(countPackages), Format: \(countColumns) * \(countRows), Steps: \(countHistoryRecords)"
-//                print(line)
                 let lineGameToPlay = "GameToPlay(level: \(game.levelID + 1), gameNumber: \(game.gameNumber + 1)),"
                 print (lineGameToPlay)
             }
@@ -181,7 +179,7 @@ class AutoPlayer {
                 let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID)
                 for game in errorGames {
                     let countHistoryRecords = realm.objects(HistoryModel.self).filter("gameID = %d", game.ID).count
-                    if countHistoryRecords >= 50 && countHistoryRecords < 105 {
+                    if countHistoryRecords >= 0 && countHistoryRecords < 105 {
                         gamesToPlay.append(GameToPlay(level: game.levelID + 1 , gameNumber: game.gameNumber + 1))
                     }
                 }
@@ -241,10 +239,37 @@ class AutoPlayer {
                             stopAutoplay()
                         }
                     } else {
-                        for tipp in scene.tippArray {
-                            if bestTipp.value < tipp.value {
-                                bestTipp = tipp
+                        switch testerType {
+                        case .beginner:
+                            for tipp in scene.tippArray {
+                                if bestTipp.value < tipp.value {
+                                    bestTipp = tipp
+                                }
                             }
+                        case .medium:
+                            for tipp in scene.tippArray {
+                                if bestTipp.value < tipp.value {
+                                    bestTipp = tipp
+                                }
+                            }
+                        case .expert:
+                            for tipp in scene.tippArray {
+                                if tipp.toRow != NoValue  { // first check only Cards
+                                    if bestTipp.value < tipp.value {
+                                        bestTipp = tipp
+                                    }
+                                }
+                            }
+                            if bestTipp.points.count == 0 {
+                                for tipp in scene.tippArray {
+                                    if tipp.toRow == NoValue  { // first check only Cards
+                                        if bestTipp.value < tipp.value {
+                                            bestTipp = tipp
+                                        }
+                                    }
+                                }
+                            }
+
                         }
                     }
                     if bestTipp.points.count > 0 {
