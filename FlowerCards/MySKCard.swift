@@ -94,11 +94,18 @@ class MySKCard: SKSpriteNode {
     override var size: CGSize {
         didSet {
             if oldValue != CGSize(width: 0,height: 0) && (type != .buttonType) {
-                minValueLabel.fontSize = size.width * fontSizeMultiplier
-                maxValueLabel.fontSize = size.width * fontSizeMultiplier
-                let positionOffset = CGPoint(x: self.size.width * offsetMultiplier.x,  y: self.size.height * offsetMultiplier.y)
+                standardFontSize = size.width * fontSizeMultiplier
+                fontSize10 = size.width * fontSizeMultiplier * 0.85
+                maxPackageLabel.fontSize = size.width * packageFontSizeMultiplier
+                minPackageLabel.fontSize = size.width * packageFontSizeMultiplier
+                let valueOffsetMultiplier = CGPoint(x: -0.48, y: 0.48)
+                let packageOffsetMultiplier = CGPoint(x: -0.10, y: 0.48)
+                let positionOffset = CGPoint(x: self.size.width * valueOffsetMultiplier.x,  y: self.size.height * valueOffsetMultiplier.y)
+                let packageOffset = CGPoint(x:self.size.width * packageOffsetMultiplier.x,  y: self.size.height * packageOffsetMultiplier.y)
                 minValueLabel.position = positionOffset
                 maxValueLabel.position = positionOffset
+                minPackageLabel.position = packageOffset
+                maxPackageLabel.position = packageOffset
                 if BGPictureAdded {
                     BGPicture.size = size
                 }
@@ -116,14 +123,14 @@ class MySKCard: SKSpriteNode {
     var minValue: Int
     var belongsToPackageMax: UInt8 = 0 {
         didSet {
-            setLabelText(minValueLabel, value: minValue, dotCount: calculateDotCount(forMinLabel: true))
-            setLabelText(maxValueLabel, value: maxValue, dotCount: calculateDotCount(forMinLabel: false))
+            setLabelText(upper: false)
+            setLabelText(upper: true)
         }
     }
     var belongsToPackageMin: UInt8 = 0 {
         didSet {
-            setLabelText(minValueLabel, value: minValue, dotCount: calculateDotCount(forMinLabel: true))
-            setLabelText(maxValueLabel, value: maxValue, dotCount: calculateDotCount(forMinLabel: false))
+            setLabelText(upper: false)
+            setLabelText(upper: true)
         }
     }
     var countTransitions = 0
@@ -176,15 +183,18 @@ class MySKCard: SKSpriteNode {
     var hitLabel = SKLabelNode()
     var maxValueLabel = SKLabelNode()
     var minValueLabel = SKLabelNode()
-    var packageLabel = SKLabelNode()
+    var maxPackageLabel = SKLabelNode()
+    var minPackageLabel = SKLabelNode()
     var BGPicture = SKSpriteNode()
     var BGPictureAdded = false
+    private var standardFontSize: CGFloat = 0
+    private var fontSize10: CGFloat = 0
     
     let cardLib: [Int:String] = [
         0:"A", 1:"2", 2:"3", 3:"4", 4:"5", 5:"6", 6:"7", 7:"8", 8:"9", 9:"10", 10: GV.language.getText(.tcj), 11: GV.language.getText(.tcd), 12: GV.language.getText(.tck), NoColor: ""]
     
-    let fontSizeMultiplier: CGFloat = 0.35
-    let offsetMultiplier = CGPoint(x: -0.48, y: 0.48)
+    let fontSizeMultiplier: CGFloat = 0.38
+    let packageFontSizeMultiplier: CGFloat = 0.28
     let BGOffsetMultiplier = CGPoint(x: -0.10, y: 0.25)
     
     convenience init() {
@@ -233,8 +243,9 @@ class MySKCard: SKSpriteNode {
 //            hitLabel.text = "\(hitCounter)"
             
             //print(minValue, text)
-            setLabelText(minValueLabel, value: minValue, dotCount: calculateDotCount(forMinLabel: true))
+            setLabelText(upper:false)
             minValueLabel.zPosition = self.zPosition + 1
+            minPackageLabel.zPosition = self.zPosition + 1
             
             
         }
@@ -242,6 +253,8 @@ class MySKCard: SKSpriteNode {
         setLabel(hitLabel, fontSize: 15)
         setLabel(maxValueLabel, fontSize: size.width * fontSizeMultiplier)
         setLabel(minValueLabel, fontSize: size.width * fontSizeMultiplier)
+        setLabel(maxPackageLabel, fontSize: size.width * packageFontSizeMultiplier)
+        setLabel(minPackageLabel, fontSize: size.width * packageFontSizeMultiplier)
         
 
         
@@ -254,44 +267,120 @@ class MySKCard: SKSpriteNode {
                 }
             }
             self.addChild(minValueLabel)
+            self.addChild(minPackageLabel)
         } else {
             self.addChild(hitLabel)
         }
 
     }
     
-    func calculateDotCount(forMinLabel: Bool)->Int {
+    func generateBelongsToPackageString(upper: Bool)->String {
+        if MySKCard.countPackages == 1 {
+            return ""
+        }
         if self.type == .containerType && self.colorIndex != NoValue {
-            if forMinLabel {
-                return MySKCard.countPackages == 1 ? 0 : MySKCard.countPackages - self.countTransitions
+            if upper {
+                switch MySKCard.countPackages {
+                case 2:
+                    return "2"
+                case 3:
+                    return "3"
+                case 4:
+                    return "4"
+                default: return ""
+                }
             } else {
-                return MySKCard.countPackages == 1 ? 0 : MySKCard.countPackages
+                switch (MySKCard.countPackages, self.countTransitions) {
+                case (2, 0):
+                    return "2"
+                case (2, 1):
+                    return "1"
+                case (3, 0):
+                    return "3"
+                case (3, 1):
+                    return "2"
+                case (3, 2):
+                    return "1"
+                case (4, 0):
+                    return "4"
+                case (4, 1):
+                    return "3"
+                case (4, 2):
+                    return "2"
+                case (4, 3):
+                    return "1"
+                default: return ""
+                }
             }
         }
-//        if self.countTransitions == 0 {
+        let belongsTo: UInt8 = upper ? belongsToPackageMax : belongsToPackageMin
+        switch (MySKCard.countPackages, belongsTo) {
+        case (2, MySKCard.maxPackage):
+            return "2"
+        case (2, MySKCard.minPackage):
+            return "1"
+        case (3, 6): // 110
+            return "32"
+        case (3, 3): // 011
+            return "21"
+        case (3, 2): // 010
+            return "2"
+        case (4, 14): // 1110
+            return "432"
+        case (4, 12): // 1100
+            return "43"
+        case (4, 7): // 0111
+            return "321"
+        case (4, 6): // 0110
+            return "32"
+        case (4, 4): // 0100
+            return "3"
+        case (4, 3): // 0011
+            return "21"
+        case (4, 2): // 0010
+            return "2"
+        case (4, 1): // 0001
+            return "1"
+        default:
+            return ""
+        }
+
+        return ""
+    }
+    
+//    func calculateDotCount(forMinLabel: Bool)->Int {
+//        let belongsTo = generateBelongsToPackageString(upper: !forMinLabel)
+//        if self.type == .containerType && self.colorIndex != NoValue {
+//            if forMinLabel {
+//                return MySKCard.countPackages == 1 ? 0 : MySKCard.countPackages - self.countTransitions
+//            } else {
+//                return MySKCard.countPackages == 1 ? 0 : MySKCard.countPackages
+//            }
+//        }
+////        if self.countTransitions == 0 {
+////            return 0
+////        }
+//        var maxDotCount = 0
+////        if self.belongsToPackageMax == MySKCard.allPackages {
+////            maxDotCount = MySKCard.countPackages
+////        } else if countTransitions > 0 {
+////            maxDotCount = countTransitions + 1
+////        }
+//        if self.belongsToPackageMax == MySKCard.allPackages {
+//            return 0
+//        } else if self.belongsToPackageMax == MySKCard.maxPackage {
+//            maxDotCount = MySKCard.countPackages
+//        } else if self.belongsToPackageMax == MySKCard.minPackage {
+//            maxDotCount = 1
+//        } else {
 //            return 0
 //        }
-        var maxDotCount = 0
-//        if self.belongsToPackageMax == MySKCard.allPackages {
-//            maxDotCount = MySKCard.countPackages
-//        } else if countTransitions > 0 {
-//            maxDotCount = countTransitions + 1
+//        
+//        if forMinLabel {
+//            return maxDotCount - countTransitions
 //        }
-        if self.belongsToPackageMax == MySKCard.allPackages {
-            return 0
-        } else if self.belongsToPackageMax == MySKCard.maxPackage {
-            maxDotCount = MySKCard.countPackages
-        } else if self.belongsToPackageMax == MySKCard.minPackage {
-            maxDotCount = 1
-        } else {
-            return 0
-        }
-        
-        if forMinLabel {
-            return maxDotCount - countTransitions
-        }
-        return maxDotCount
-    }
+//        return maxDotCount
+//    }
     
     func setLabel(_ label: SKLabelNode, fontSize: CGFloat) {
         label.fontName = "ArialMT"
@@ -303,8 +392,8 @@ class MySKCard: SKSpriteNode {
     
     func reload() {
         if isCard {
-            setLabelText(minValueLabel, value: minValue, dotCount: calculateDotCount(forMinLabel: true))
-            setLabelText(maxValueLabel, value: maxValue, dotCount: calculateDotCount(forMinLabel: false))
+            setLabelText(upper: false)
+            setLabelText(upper:true)
             if minValue != NoColor {
                 self.alpha = 1.0
             } else {
@@ -321,6 +410,7 @@ class MySKCard: SKSpriteNode {
                     if self.childNode(withName: bgPictureName) == nil {
                         self.addChild(BGPicture)
                         BGPicture.addChild(maxValueLabel)
+                        BGPicture.addChild(maxPackageLabel)
                         BGPicture.name = bgPictureName
                         BGPicture.alpha = 1.0
                     }
@@ -331,13 +421,13 @@ class MySKCard: SKSpriteNode {
                     self.zPosition = 0
                     BGPicture.zPosition = self.zPosition - 1
                     BGPicture.isUserInteractionEnabled = false
-                    //maxValueLabel.position = positionOffset //CGPointMake(-20, 35)
                     maxValueLabel.zPosition = self.zPosition + 1
-                    //minValueLabel.zPosition = maxValueLabel.zPosition + 1
+                    maxPackageLabel.zPosition = self.zPosition + 1
                 }
             } else {
                 if BGPictureAdded || self.childNode(withName: bgPictureName) != nil {
                     maxValueLabel.removeFromParent()
+                    maxPackageLabel.removeFromParent()
                     BGPicture.removeFromParent()
                     BGPictureAdded = false
                     if type == .containerType && minValue == NoValue {
@@ -355,12 +445,19 @@ class MySKCard: SKSpriteNode {
 
     }
 
-    func setLabelText(_ label: SKLabelNode, value: Int, dotCount: Int) {
-        guard let text = cardLib[minValue == NoColor ? NoColor : value % MaxCardValue] else {
-            return
+    func setLabelText(upper: Bool) {
+        if colorIndex != NoColor && (type == .cardType || type == .containerType) {
+            let valueLabel = upper ? maxValueLabel : minValueLabel
+            let packageLabel = upper ? maxPackageLabel : minPackageLabel
+            let value = upper ? maxValue : minValue
+            guard let text = cardLib[minValue == NoColor ? NoColor : value % MaxCardValue] else {
+                return
+            }
+            valueLabel.text = "\(text)"
+            valueLabel.fontSize = value == 9 ? fontSize10 : standardFontSize // 9 is on card 10
+            let packageLabelText = generateBelongsToPackageString(upper: upper)
+            packageLabel.text = packageLabelText
         }
-        let starString = "" + String(repeating: "*", count: dotCount)
-        label.text = "\(value == 10 ? "" : "")\(text + starString)"
     }
     
     func getMirroredScore() -> Int {

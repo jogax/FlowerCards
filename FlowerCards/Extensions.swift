@@ -163,6 +163,12 @@ extension Int {
     }
 }
 
+extension UInt8 {
+    func toBinary(len: Int = 0)->String {
+        return Int(self).toBinary(len: len)
+    }
+}
+
 extension CGFloat {
     func between(_ min: CGFloat, max: CGFloat)->Bool {
         return self >= min && self <= max

@@ -132,24 +132,31 @@ class AutoPlayer {
         self.scene = scene
         self.replay = false
         self.stopTimer = false
-        printOldGames()
+        #if TEST
+            printOldGames()
+        #endif
     }
-    
+    #if TEST
     func printOldGames () {
         var oldLevelID: Int = -1
-        let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID).sorted(byProperty: "levelID")
-        for game in errorGames {
-            let countHistoryRecords = realm.objects(HistoryModel.self).filter("gameID = %d", game.ID).count
-            if countHistoryRecords > 0 && countHistoryRecords < 105 {
-                if game.levelID != oldLevelID {
-                    oldLevelID = game.levelID
+        let maxLevelID = GV.levelsForPlay.count()
+        var levelID = 0
+        while levelID < maxLevelID {
+            let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and levelID = %d", GV.player!.ID, levelID).sorted(byProperty: "gameNumber")
+            for game in errorGames {
+                let countHistoryRecords = realm.objects(HistoryModel.self).filter("gameID = %d", game.ID).count
+                if countHistoryRecords > 0 && countHistoryRecords < 105 {
+                    if game.levelID != oldLevelID {
+                        oldLevelID = game.levelID
+                    }
+                    let lineGameToPlay = "GameToPlay(level: \(game.levelID + 1), gameNumber: \(game.gameNumber + 1)), // at Step: \(countHistoryRecords)"
+                    print (lineGameToPlay)
                 }
-                let lineGameToPlay = "GameToPlay(level: \(game.levelID + 1), gameNumber: \(game.gameNumber + 1)),"
-                print (lineGameToPlay)
             }
+            levelID += 1
         }
     }
-    
+    #endif
     func startPlay(replay: Bool, testType: TestType = .runOnce) {
         self.replay = replay
         scene.replaying = replay

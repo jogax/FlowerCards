@@ -9,6 +9,12 @@
 import Foundation
 import SpriteKit
 
+var allPackages: UInt8 = 0
+var maxPackage: UInt8 = 0
+var minPackage: UInt8 = 0
+let bitMaskForPackages: [UInt8] = [1, 2, 4, 8]
+
+
 // for managing of connectibility of gameArray members
 class CardManager {
     
@@ -60,10 +66,6 @@ class CardManager {
     private let green = 2
     private let red = 3
     private var colorArray: [DataForColor] = []
-    private var allPackages: UInt8 = 0
-    private var maxPackage: UInt8 = 0
-    private var minPackage: UInt8 = 0
-    private let bitMaskForPackages: [UInt8] = [1, 2, 4, 8]
     
 
     init () {
@@ -72,7 +74,7 @@ class CardManager {
         }
         allPackages = 0
         for packageNr in 0..<countPackages {
-            self.allPackages += bitMaskForPackages[packageNr]
+            allPackages += bitMaskForPackages[packageNr]
         }
         maxPackage = bitMaskForPackages[countPackages - 1]
         minPackage = bitMaskForPackages[0]
@@ -381,14 +383,15 @@ class CardManager {
         for card in data.cardsWithTransitions {
             countChanges += setOtherCardBelonging(cardWithTransition: card)
         }
-
-        while countChanges > 0 {
+        var counter = data.allCards.count
+        while countChanges > 0 && counter > 0 {
             countChanges = 0
             for card in data.allCards {
                 if card.belongsToPackageMax != allPackages {
                     countChanges += setOtherCardBelonging(cardWithTransition: card)
                 }
             }
+            counter -= 1
         }
 
         if data.container != nil {
