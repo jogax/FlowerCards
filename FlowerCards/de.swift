@@ -127,6 +127,7 @@ let deDictionary: [TextConstants: String] = [
     .tcAutoPlayErrors:  "Start autoplay Fehler",
     .tcAutoPlayTable:  "Start autoplay Tabelle",
     .tcReplay:          "Wiedergabe des Spiels",
+    .tcActivateAutoPlay: "Autoplay aktivieren",
 ]
 
 

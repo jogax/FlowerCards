@@ -123,8 +123,9 @@ let ruDictionary: [TextConstants: String] = [
     .tcPackages:        "Колоды:",
     .tcHelpLines:       "Тип помощи:",
     .tcAutoPlayNormal:  "Автовыполнение игры",
-    .tcAutoPlayNewTest: "Автоматическое тестирование",
-    .tcAutoPlayErrors:  "Автоматическое выполнение ошибочных игр",
-    .tcAutoPlayTable:  "Автоматическое тестирование из таблицы",
+    .tcAutoPlayNewTest: "Автотестирование",
+    .tcAutoPlayErrors:  "Автовыполнение ошибочных игр",
+    .tcAutoPlayTable:   "Автотестирование из таблицы",
     .tcReplay:          "Воспроизведение игры",
+    .tcActivateAutoPlay: "Активировать автотест",
 ]

@@ -117,7 +117,8 @@ enum TextConstants: Int {
     tcAutoPlayNewTest,
     tcAutoPlayErrors,
     tcAutoPlayTable,
-    tcReplay
+    tcReplay,
+    tcActivateAutoPlay
 
 }
 

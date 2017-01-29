@@ -167,6 +167,16 @@ extension UInt8 {
     func toBinary(len: Int = 0)->String {
         return Int(self).toBinary(len: len)
     }
+    
+    func countOnes()->Int {
+        var counter = 0
+        var myValue = self
+        while myValue > 0 {
+            counter += Int(myValue & 1)
+            myValue >>= 1
+        }
+        return counter
+    }
 }
 
 extension CGFloat {

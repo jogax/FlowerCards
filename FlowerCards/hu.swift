@@ -127,4 +127,5 @@ let huDictionary: [TextConstants: String] = [
     .tcAutoPlayErrors:  "Hibás játékok ismétlése",
     .tcAutoPlayTable:  "Automatikus játék teszt táblázatból",
     .tcReplay:          "Visszajátszás",
+    .tcActivateAutoPlay: "Automatikus lejátszás aktiválása",
 ]

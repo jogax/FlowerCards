@@ -2685,14 +2685,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 })
                 alert.addAction(autoPlayActionTable)
 
+                let autoStepActionTable = UIAlertAction(title: GV.language.getText(.tcActivateAutoPlay), style: .default,
+                                                        handler: {(paramAction:UIAlertAction!) in
+                                                            self.autoPlayerActive = true
+                })
+                alert.addAction(autoStepActionTable)
                 
-//                if realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID).count > 0 {
-//                    let replayAction = UIAlertAction(title: GV.language.getText(.tcReplay), style: .default,
-//                                                       handler: {(paramAction:UIAlertAction!) in
-//                                                        self.replay()
-//                    })
-//                    alert.addAction(replayAction)
-//                }
+                
             #endif
 
 
@@ -3619,14 +3618,22 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         default: return MyNodeTypes.none
         }
     }
+
+    func prepareHelpButtonForStepByStep(callBack: ()->()) {
+    }
     
+
     func helpButtonPressed() {
-        doTimeCount = false
-        let url = GV.language.getText(.tcHelpURL)
-        if let url = URL(string: url) {
-            UIApplication.shared.openURL(url)
+        if autoPlayerActive {
+            autoPlayer!.makeStep()
+        } else {
+            doTimeCount = false
+            let url = GV.language.getText(.tcHelpURL)
+            if let url = URL(string: url) {
+                UIApplication.shared.openURL(url)
+            }
+            doTimeCount = true
         }
-        doTimeCount = true
     }
     
     func settingsButtonPressed() {

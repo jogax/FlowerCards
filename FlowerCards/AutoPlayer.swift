@@ -11,10 +11,10 @@ import SpriteKit
 
 class AutoPlayer {
     enum runStatus: Int {
-        case getTipp = 0, touchesBegan, touchesMoved, touchesEnded
+        case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep
     }
     enum TestType: Int {
-        case newTest = 1, fromTable, fromDB, runOnce
+        case newTest = 1, fromTable, fromDB, runOnce, stepByStep
     }
     enum TesterType: Int {
         case beginner = 0, medium, expert
@@ -40,91 +40,8 @@ class AutoPlayer {
     var testType: TestType = .runOnce //.test
     var testerType: TesterType = .expert
     var gamesToPlay: [GameToPlay] = [        
-        GameToPlay(level: 18, gameNumber: 25), //You have lost ===> now too!!!
-
-        GameToPlay(level: 18, gameNumber: 45), //OK
-//        GameToPlay(level: 6, gameNumber: 97), //OK
-
-//        GameToPlay(level: 10, gameNumber: 37),  //OK --> crash!!!
-//        GameToPlay(level: 10, gameNumber: 42), //, stopAt: 101),
-//        GameToPlay(level: 10, gameNumber: 78), // OK --> crash!!!
-//        GameToPlay(level: 10, gameNumber: 86), //OK --> You have Lost
-//        GameToPlay(level: 10, gameNumber: 95), //OK --> endlos at 58
-//        GameToPlay(level: 14, gameNumber: 5), //OK
-//        GameToPlay(level: 14, gameNumber: 8), //OK
-//        GameToPlay(level: 14, gameNumber: 11), //OK
-//        GameToPlay(level: 14, gameNumber: 12), //OK
-//        GameToPlay(level: 14, gameNumber: 13), //OK
-//        GameToPlay(level: 14, gameNumber: 14), //OK
-//        GameToPlay(level: 14, gameNumber: 15), //OK
-//        GameToPlay(level: 14, gameNumber: 17), //OK
-//        GameToPlay(level: 14, gameNumber: 18), //OK
-//        GameToPlay(level: 14, gameNumber: 19), //OK
-//        GameToPlay(level: 14, gameNumber: 22), //OK
-//        GameToPlay(level: 14, gameNumber: 24), //OK
-//        GameToPlay(level: 14, gameNumber: 26), //OK
-//        GameToPlay(level: 14, gameNumber: 27), //OK
-//        GameToPlay(level: 14, gameNumber: 30), //OK
-//        GameToPlay(level: 14, gameNumber: 31), //OK
-//        GameToPlay(level: 14, gameNumber: 35), //OK
-//        GameToPlay(level: 14, gameNumber: 38), //OK
-//        GameToPlay(level: 14, gameNumber: 40, stopAt: 47), // crash at 48
-////        GameToPlay(level: 14, gameNumber: 42),
-//        GameToPlay(level: 14, gameNumber: 50),
-//        GameToPlay(level: 14, gameNumber: 52),
-//        GameToPlay(level: 14, gameNumber: 55),
-//        GameToPlay(level: 14, gameNumber: 57),
-//        GameToPlay(level: 14, gameNumber: 59),
-//        GameToPlay(level: 14, gameNumber: 61),
-//        GameToPlay(level: 14, gameNumber: 63),
-//        GameToPlay(level: 14, gameNumber: 64),
-//        GameToPlay(level: 14, gameNumber: 65),
-//        GameToPlay(level: 14, gameNumber: 67),
-//        GameToPlay(level: 14, gameNumber: 70),
-//        GameToPlay(level: 14, gameNumber: 71),
-//        GameToPlay(level: 14, gameNumber: 77),
-//        GameToPlay(level: 14, gameNumber: 78),
-//        GameToPlay(level: 14, gameNumber: 84),
-//        GameToPlay(level: 14, gameNumber: 86),
-//        GameToPlay(level: 14, gameNumber: 87),
-//        GameToPlay(level: 14, gameNumber: 90),
-//        GameToPlay(level: 14, gameNumber: 91),
-//        GameToPlay(level: 14, gameNumber: 92),
-//        GameToPlay(level: 14, gameNumber: 96),
-//        GameToPlay(level: 18, gameNumber: 3),
-//        GameToPlay(level: 18, gameNumber: 6),
-//        GameToPlay(level: 18, gameNumber: 12),
-//        GameToPlay(level: 18, gameNumber: 22),
-//        GameToPlay(level: 18, gameNumber: 24),
-//        GameToPlay(level: 18, gameNumber: 27),
-//        GameToPlay(level: 18, gameNumber: 36),
-//        GameToPlay(level: 18, gameNumber: 37),
-//        GameToPlay(level: 18, gameNumber: 38),
-//        GameToPlay(level: 18, gameNumber: 39),
-//        GameToPlay(level: 18, gameNumber: 40),
-//        GameToPlay(level: 18, gameNumber: 42),
-//        GameToPlay(level: 18, gameNumber: 43),
-//        GameToPlay(level: 18, gameNumber: 45),
-//        GameToPlay(level: 18, gameNumber: 48),
-//        GameToPlay(level: 18, gameNumber: 50),
-//        GameToPlay(level: 18, gameNumber: 52),
-//        GameToPlay(level: 18, gameNumber: 53),
-//        GameToPlay(level: 18, gameNumber: 54),
-//        GameToPlay(level: 18, gameNumber: 60),
-//        GameToPlay(level: 18, gameNumber: 65),
-//        GameToPlay(level: 18, gameNumber: 66),
-//        GameToPlay(level: 18, gameNumber: 67),
-//        GameToPlay(level: 18, gameNumber: 69),
-//        GameToPlay(level: 18, gameNumber: 73),
-//        GameToPlay(level: 18, gameNumber: 74),
-//        GameToPlay(level: 18, gameNumber: 75),
-//        GameToPlay(level: 18, gameNumber: 77),
-//        GameToPlay(level: 18, gameNumber: 78),
-//        GameToPlay(level: 18, gameNumber: 79),
-//        GameToPlay(level: 18, gameNumber: 86),
-//        GameToPlay(level: 18, gameNumber: 92),
-//        GameToPlay(level: 18, gameNumber: 96),
-//        GameToPlay(level: 18, gameNumber: 100),
+        GameToPlay(level: 11, gameNumber: 3, stopAt: 60), //You have lost ===> now too!!!
+        GameToPlay(level: 35, gameNumber: 995, stopAt: 91), //You have lost ===> now too!!!
         ]
     var gameIndex = 0
     
@@ -170,17 +87,21 @@ class AutoPlayer {
             switch testType {
             case .newTest:
                 gamesToPlay.removeAll()
-                var levelIndex = 2
+                var levelIndex = 9
                 for _ in 0...21 {
-                    for gameNumber in 1...100 {
-                        gamesToPlay.append(GameToPlay(level: levelIndex, gameNumber: gameNumber))
+                for gameNumber in 1...100 {
+                    for levelAdder in 0...3 {
+                        gamesToPlay.append(GameToPlay(level: levelIndex + levelAdder, gameNumber: gameNumber))
                     }
+                }
                     levelIndex += 4
                 }
             case .runOnce:
                 gamesToPlay.removeAll()
             case .fromTable:
                 break
+            case .stepByStep:
+                scene.prepareHelpButtonForStepByStep(callBack: makeStep)
             case .fromDB:
                 gamesToPlay.removeAll()
                 let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID)
@@ -197,6 +118,14 @@ class AutoPlayer {
             }
         }
         scene.isUserInteractionEnabled = false
+        timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+    }
+    
+    func makeStep() {
+        
+        testType = .stepByStep
+        autoPlayStatus = .getTipp
+        stopTimer = false
         timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
     }
     
@@ -255,10 +184,22 @@ class AutoPlayer {
                             }
                         case .medium:
                             for tipp in scene.tippArray {
-                                if bestTipp.value < tipp.value {
-                                    bestTipp = tipp
+                                if tipp.toRow != NoValue  { // first check only Cards
+                                    if bestTipp.value < tipp.value {
+                                        bestTipp = tipp
+                                    }
                                 }
                             }
+                            if bestTipp.points.count == 0 {
+                                for tipp in scene.tippArray {
+                                    if tipp.toRow == NoValue  { // first check only Cards
+                                        if bestTipp.value < tipp.value {
+                                            bestTipp = tipp
+                                        }
+                                    }
+                                }
+                            }
+                            
                         case .expert:
                             for tipp in scene.tippArray {
                                 if tipp.toRow != NoValue  { // first check only Cards
@@ -301,10 +242,21 @@ class AutoPlayer {
                 autoPlayStatus = .touchesEnded
             case .touchesEnded:
                 scene.myTouchesEnded(touchLocation: bestTipp.points[1])
-                if self.testType != .runOnce && MySKCard.cardCount == gamesToPlay[gameIndex].stopAt {
-                    stopAutoplay()
+                switch testType {
+                case .runOnce:
+                    break
+                case .stepByStep:
+                    autoPlayStatus = .waitingForNextStep
+                    stopTimer = true
+                    timer.invalidate()
+                default:
+                    if MySKCard.cardCount == gamesToPlay[gameIndex].stopAt {
+                        stopAutoplay()
+                    }
                 }
                 autoPlayStatus = .getTipp
+            case .waitingForNextStep:
+                break
             }
             if stopTimer {
                 timer.invalidate()

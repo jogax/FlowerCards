@@ -127,4 +127,5 @@ let enDictionary: [TextConstants: String] = [
     .tcAutoPlayErrors:  "Start autoplay errors",
     .tcAutoPlayTable:  "Start autoplay table",
     .tcReplay:          "Replay",
+    .tcActivateAutoPlay: "Activate Autoplay",
 ]

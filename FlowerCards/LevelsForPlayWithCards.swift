@@ -54,8 +54,8 @@ class LevelsForPlayWithCards {
 //    #if REALM_V1
     fileprivate var levelContent = [
         
-        "3,3,40,60,40",
-        "3,4,40,60,40",
+        "3,3,25,50,40",
+        "3,4,25,50,40",
         "3,5,40,60,35",
         "3,6,40,60,35",
         
