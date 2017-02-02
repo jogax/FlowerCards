@@ -121,18 +121,8 @@ class MySKCard: SKSpriteNode {
     var row = 0
     var maxValue: Int
     var minValue: Int
-    var belongsToPackageMax: UInt8 = 0 {
-        didSet {
-            setLabelText(upper: false)
-            setLabelText(upper: true)
-        }
-    }
-    var belongsToPackageMin: UInt8 = 0 {
-        didSet {
-            setLabelText(upper: false)
-            setLabelText(upper: true)
-        }
-    }
+    var belongsToPackageMax: UInt8 = 0
+    var belongsToPackageMin: UInt8 = 0
     var countTransitions = 0
     
     var startPosition = CGPoint.zero
@@ -359,8 +349,6 @@ class MySKCard: SKSpriteNode {
         default:
             return ""
         }
-
-        return ""
     }
     
     func setLabel(_ label: SKLabelNode, fontSize: CGFloat) {
@@ -424,6 +412,11 @@ class MySKCard: SKSpriteNode {
 //            hitLabel.text = "\(hitCounter)"
         }
 
+    }
+    
+    func setBelongsLabels() {
+        setLabelText(upper: false)
+        setLabelText(upper: true)
     }
 
     func setLabelText(upper: Bool) {

@@ -91,8 +91,10 @@ class CardManager {
 
     }
 
-    func check(card: MySKCard) {
-        analyzeColor(data: &colorArray[card.colorIndex])
+    func check() {
+        for colorIndex in 0..<MaxColorValue {
+            analyzeColor(data: &colorArray[colorIndex])
+        }
     }
     
     func areConnectable(first: MySKCard, second: MySKCard)->Bool {
@@ -239,7 +241,53 @@ class CardManager {
             }
         }
         func setOtherCardBelonging(cardWithTransition: MySKCard)->Int {
-            
+            enum ToDoValues: Int {
+                case NothingToDo = 0,
+                SecondMaxInFirstMax,
+                SecondMaxInFirstMaxShift1,
+                SecondMaxInFirstMin,
+                SecondMinInFirstMax,
+                SecondMinInFirstMaxShift1,
+                SecondMinInFirstMin,
+                SecondMaxInFirstMaxAndFirstMin,
+                SecondMinMaxToMaxPackage,
+                SecondMinMaxToMinPackage
+            }
+            let ToDoTable: [UInt16:ToDoValues] = [
+            0b0100000000: .NothingToDo,
+            0b1000000000: .NothingToDo,
+            0b1100000000: .NothingToDo,
+            0b0100001000: .SecondMaxInFirstMax,         // 2 Packages, e.g. cwt: K-0-K (2/2) other: K-0-Q
+            0b0100000100: .SecondMaxInFirstMax,         // 2 Packages, e.g. cwt: 6-0-A (1/1) other: 8-0-4
+            0b0100001100: .SecondMaxInFirstMax,         // 2 Packages, e.g. cwt: K-0-10, other: Q-0-Q
+            0b0101000000: .NothingToDo,                 // 2 Packages, e.g. cwt: A-1-K, other: 9-0-9 --> break, nothing to do
+            0b0101000010: .SecondMaxInFirstMin,         // 2 Packages, e.g. cwt: 2-1-Q, other: Q-0-9
+            0b0101000011: .SecondMaxInFirstMin,         // 2 Packages, e.g. cwt: A-1-K, other: K-0-K
+            0b0101000100: .SecondMaxInFirstMax,         // 2 Packages, e.g. cwt: A-1-K, other: 2-0-A
+            0b0101001100: .SecondMaxInFirstMax,         // 2 Packages, e.g. cwt: A-1-K, other: A-0-A
+            0b1001000000: .NothingToDo,                 // 2 Packages, e.g. cwt: A-1-K, other: 9-0-9 --> break, nothing to do
+            0b1000000100: .SecondMaxInFirstMax,         // 3 Packages, e.g. cwt: 7-0-2 (1/1) other: 8-0-7 (3/3)
+            0b1000001100: .SecondMaxInFirstMax,         // 3 Packages, e.g. cwt: K-0-Q (4/4, container) other: K-0-K
+            0b1000001000: .SecondMaxInFirstMax,         // 3 Packages, e.g. cwt: K-0-Q (4/4, container) other: Q-0-J
+            0b1000010100: .SecondMinInFirstMaxShift1,   // 3 Packages, e.g. cwt: K-0-Q (4/4, container) other: 3-1-Q
+            0b1000011000: .SecondMaxInFirstMaxShift1,   // 3 Packages, e.g. cwt: K-0-K (4/4, container) other: K-1-J (6/3)
+            0b1000011100: .SecondMaxInFirstMaxShift1,   // 3 Packages, e.g. cwt: K-0-4 (4/4, container) other: 8-1-10 (6/3)
+            0b1001000011: .SecondMinInFirstMin,         // 3 Packages, e.g. cwt: A-1-Q (6/3) other: K-0-K (7/7) nothing to do
+            0b1001000100: .SecondMinInFirstMax,         // 3 Packages, e.g. cwt: 6-1-K (2/1) other: 7-0-2 (3/3)
+            0b1001001100: .SecondMaxInFirstMax,         // 3 Packages, e.g. cwt: A-1-K (6/3) other: A-0-A (7/7)
+            0b1001001110: .SecondMaxInFirstMaxAndFirstMin, // 3 Packages, e.g. cwt: K-1-3 (4/2, container) other: 3-0-2 (7/7)
+            0b1001001111: .SecondMaxInFirstMaxAndFirstMin, // 3 Packages, e.g. cwt: K-1-10 (4/2) other: 10-0-10 (7/7)
+            0b1001011100: .SecondMaxInFirstMaxShift1,   // 3 Packages, e.g. cwt: K-1-10 (4/2) other: 5-1-9 (6/3)
+            0b1001011101: .SecondMaxInFirstMaxShift1,   // 3 Packages, e.g. cwt: K-1-10 (4/2) other: 6-1-K (6/3)
+            0b1010000000: .NothingToDo,                 // 3 Packages, e.g. cwt: 2-2-Q (4/1) other: 6-0-6 (7/7) --> nothing to do
+            0b1010000010: .SecondMinMaxToMaxPackage,    // 3 Packages, e.g. cwt: 4-2-Q (4/1) other: Q-0-6 (7/7)
+            0b1010000011: .SecondMinMaxToMaxPackage,    // 3 Packages, e.g. cwt: 2-2-Q (4/1) other: K-0-Q (7/7)
+            0b1010001100: .SecondMinMaxToMinPackage,    // 3 Packages, e.g. cwt: 2-2-Q (4/1) other: 2-0-2 (7/7)
+            0b1000010000: .NothingToDo,                 // 3 Packages, e.g. cwt: K-0-K (6/3) other: K-0-K (7/7) --> nothing to do
+            0b1100001000: .SecondMaxInFirstMax,         // 4 Packages, e.g. cwt: 8-0-2 other: 5-0-1
+            0b1100010000: .NothingToDo,                 // 4 Packages, e.g. cwt: K-0-5 other: 3-1-J
+            0b1100011000: .NothingToDo,                 // 4 Packages, e.g. cwt: K-0-10 other: 8-1-J
+            ]
             func findCardValues(card: MySKCard)->(upper:[Int], mid: [Int], lower: [Int]) {
                 var upperValues: [Int] = []
                 var midValues: [Int] = []
@@ -271,18 +319,83 @@ class CardManager {
                 }
                 return (upper: upperValues, mid: midValues, lower: lowerValues)
             }
+            
+            
             let (upperValues, _, lowerValues) = findCardValues(card: cardWithTransition)
             var countChanges = 0
             var switchValue: UInt16 = 0
-            var switchValue1: UInt16 = 0
             var index = 0
             for (ind, otherCard) in data.allCards.enumerated() {
+                func doAction(toDo: ToDoValues) {
+                    switch toDo {
+                    case .NothingToDo:
+                        break
+                    case .SecondMaxInFirstMax:
+                        setIfSecondMaxInFirstMax()
+                    case .SecondMaxInFirstMaxShift1:
+                        setIfSecondMaxInFirstMaxShift1()
+                    case .SecondMaxInFirstMin:
+                        setIfSecondMaxInFirstMin()
+                    case .SecondMaxInFirstMaxAndFirstMin:
+                        setIfSecondMaxInFirstMaxAndFirstMin()
+                    case .SecondMinInFirstMax:
+                        setIfSecondMinInFirstMax()
+                    case .SecondMinInFirstMaxShift1:
+                        setIfSecondMinInFirstMaxShift1()
+                    case .SecondMinInFirstMin:
+                        setIfSecondMinInFirstMin()
+                    case .SecondMinMaxToMaxPackage:
+                        setSecondMinMaxToMaxPackage()
+                    case .SecondMinMaxToMinPackage:
+                        setSecondMinMaxToMinPackage()
+                    }
+                }
+                func setIfSecondMaxInFirstMax() {
+                    otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
+                    otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
+                    countChanges += 1
+                }
+                func setIfSecondMaxInFirstMaxShift1() {
+                    otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
+                    otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> 1
+                    countChanges += 1
+                }
+                func setIfSecondMaxInFirstMin() {
+                    otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMin
+                    otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
+                    countChanges += 1
+                }
+                func setIfSecondMinInFirstMax() {
+                    otherCard.belongsToPackageMin &= ~cardWithTransition.belongsToPackageMax
+                    otherCard.belongsToPackageMax = otherCard.belongsToPackageMin
+                    countChanges += 1
+                }
+                func setIfSecondMinInFirstMaxShift1() {
+                    otherCard.belongsToPackageMin &= ~cardWithTransition.belongsToPackageMax
+                    otherCard.belongsToPackageMax = otherCard.belongsToPackageMin << 1
+                    countChanges += 1
+                }
+                func setIfSecondMaxInFirstMaxAndFirstMin() {
+                    otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax & ~cardWithTransition.belongsToPackageMin
+                    otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
+                    countChanges += 1
+                }
+                func setIfSecondMinInFirstMin() {
+                    otherCard.belongsToPackageMin &= ~cardWithTransition.belongsToPackageMin
+                    otherCard.belongsToPackageMax = otherCard.belongsToPackageMin
+                    countChanges += 1
+                }
+                func setSecondMinMaxToMaxPackage() {
+                    otherCard.belongsToPackageMax = maxPackage
+                    otherCard.belongsToPackageMin = maxPackage
+                    countChanges += 1
+                }
+                func setSecondMinMaxToMinPackage() {
+                    otherCard.belongsToPackageMax = minPackage
+                    otherCard.belongsToPackageMin = minPackage
+                    countChanges += 1
+                }
                 index = ind
-                let maxInUpper = 16
-                let minInUpper = 8
-                let allCountTransitions = 4
-                let maxInLower = 2
-                let minInLower = 1
                 if cardWithTransition != otherCard && otherCard.belongsToPackageMax.countOnes() > 1 && otherCard.belongsToPackageMin.countOnes() > 1 {
                     
                     let b1 = UInt16(countPackages - 1) << 8
@@ -293,137 +406,32 @@ class CardManager {
                     let c2: UInt16 = UInt16(upperValues.contains(otherCard.minValue) ? 4 : 0)
                     let c3: UInt16 = UInt16(lowerValues.contains(otherCard.maxValue) ? 2 : 0)
                     let c4: UInt16 = UInt16(lowerValues.contains(otherCard.minValue) ? 1 : 0)
-
                     switchValue = b1 + b2 + b3
                     switchValue += c1 + c2 + c3 + c4
-                    if !setOfBinarys.contains(switchValue1.toBinary(len:12)) {
-                        setOfBinarys.append(switchValue1.toBinary(len:12))
+                    if !setOfBinarys.contains(switchValue.toBinary(len:12)) {
+                        setOfBinarys.append(switchValue.toBinary(len:12))
                     }
+//                    if realm.objects(NotImplementedModel.self).filter("switchValue = %@", switchValue.toBinary()).count == 0 {
+//                        let notImplementedValue = NotImplementedModel()
+//                        if ToDoTable[switchValue] != nil {
+//                            notImplementedValue.implemented = true
+//                        }
+//                        notImplementedValue.switchValue = switchValue.toBinary()
+//                        notImplementedValue.gameNumber = (GV.mainScene?.actGame?.gameNumber)!
+//                        notImplementedValue.levelID = (GV.mainScene?.actGame?.levelID)!
+//                        notImplementedValue.cardPrintValue = cardWithTransition.printValue
+//                        notImplementedValue.card1PrintValue = otherCard.printValue
+//                        realm.beginWrite()
+//                        realm.add(notImplementedValue)
+//                        try! realm.commitWrite()
+//                    }
+                    
                     if cardWithTransition.belongsToPackageMax.countOnes() == 1 { // check only if belongs to 1 concrete Package
-                        switch switchValue {
-                        case 0b0100000000, 0b1000000000, 0b1100000000:
-                            break
-                        case 0b0100001000: // 2 Packages, e.g. cwt: K-0-K (2/2) other: K-0-Q
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
-                            countChanges += 1
-                        case 0b0100000100: // 2 Packages, e.g. cwt: 6-0-A (1/1) other: 8-0-4
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
-                            countChanges += 1
-                        case 0b0100001100: // 2 Packages, e.g. cwt: K-0-10, other: Q-0-Q
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
-                            countChanges += 1
-                        case 0b0101000000: // 2 Packages, e.g. cwt: A-1-K, other: 9-0-9 --> break, nothing to do
-                            break
-                        case 0b0101000010: // 2 Packages, e.g. cwt: 2-1-Q, other: Q-0-9
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMin
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
-                            countChanges += 1
-                        case 0b0101000011: // 2 Packages, e.g. cwt: A-1-K, other: K-0-K
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMin
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
-                            countChanges += 1
-                        case 0b0101000100: // 2 Packages, e.g. cwt: A-1-K, other: 2-0-A
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
-                            countChanges += 1
-                        case 0b0101001100: // 2 Packages, e.g. cwt: A-1-K, other: A-0-A
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
-                            countChanges += 1
-                            
-                            
-                            
-                        case 0b1001000000: // 2 Packages, e.g. cwt: A-1-K, other: 9-0-9 --> break, nothing to do
-                            break
-                        case 0b1000000100: // 3 Packages, e.g. cwt: 7-0-2 (1/1) other: 8-0-7 (3/3)
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
-                            countChanges += 1
-                        case 0b1000001100: // 3 Packages, e.g. cwt: K-0-Q (4/4, container) other: K-0-K
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
-                            countChanges += 1
-                        case 0b1000001000: // 3 Packages, e.g. cwt: K-0-Q (4/4, container) other: Q-0-J
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
-                            countChanges += 1
-                        case 0b1000010100: // 3 Packages, e.g. cwt: K-0-Q (4/4, container) other: 3-1-Q
-                            otherCard.belongsToPackageMin &= ~cardWithTransition.belongsToPackageMax
-                            otherCard.belongsToPackageMax = otherCard.belongsToPackageMin << 1
-                            countChanges += 1
-                        case 0b1000011000: // 3 Packages, e.g. cwt: K-0-K (4/4, container) other: K-1-J (6/3)
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> 1
-                            countChanges += 1
-                        case 0b1000011100: // 3 Packages, e.g. cwt: K-0-4 (4/4, container) other: 8-1-10 (6/3)
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMin >> 1
-                            countChanges += 1
-                        case 0b1001000011: // 3 Packages, e.g. cwt: A-1-Q (6/3) other: K-0-K (7/7) nothing to do
-                            otherCard.belongsToPackageMin &= ~cardWithTransition.belongsToPackageMin
-                            otherCard.belongsToPackageMax = otherCard.belongsToPackageMin
-                            countChanges += 1
-                        case 0b1001000100: // 3 Packages, e.g. cwt: 6-1-K (2/1) other: 7-0-2 (3/3)
-                            otherCard.belongsToPackageMin &= ~cardWithTransition.belongsToPackageMax
-                            otherCard.belongsToPackageMax = otherCard.belongsToPackageMin
-                            countChanges += 1
-                        case 0b1001001100: // 3 Packages, e.g. cwt: A-1-K (6/3) other: A-0-A (7/7)
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
-                            countChanges += 1
-                        case 0b1001001110: // 3 Packages, e.g. cwt: K-1-3 (4/2, container) other: 3-0-2 (7/7)
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax & ~cardWithTransition.belongsToPackageMin
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
-                            countChanges += 1
-                        case 0b1001001111: // 3 Packages, e.g. cwt: K-1-10 (4/2) other: 10-0-10 (7/7)
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax & ~cardWithTransition.belongsToPackageMin
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
-                            countChanges += 1
-                        case 0b1001011100: // 3 Packages, e.g. cwt: K-1-10 (4/2) other: 5-1-9 (6/3)
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> 1
-                            countChanges += 1
-                        case 0b1001011101: // 3 Packages, e.g. cwt: K-1-10 (4/2) other: 6-1-K (6/3)
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> 1
-                            countChanges += 1
-                        case 0b1010000000: // 3 Packages, e.g. cwt: 2-2-Q (4/1) other: 6-0-6 (7/7) --> nothing to do
-                            break
-                        case 0b1010000010: // 3 Packages, e.g. cwt: 4-2-Q (4/1) other: Q-0-6 (7/7)
-                            otherCard.belongsToPackageMax = maxPackage
-                            otherCard.belongsToPackageMin = maxPackage
-                            countChanges += 1                            
-                        case 0b1010000011: // 3 Packages, e.g. cwt: 2-2-Q (4/1) other: K-0-Q (7/7)
-                            otherCard.belongsToPackageMax = maxPackage
-                            otherCard.belongsToPackageMin = maxPackage
-                            countChanges += 1
-                        case 0b1010001100: // 3 Packages, e.g. cwt: 2-2-Q (4/1) other: 2-0-2 (7/7)
-                            otherCard.belongsToPackageMax = minPackage
-                            otherCard.belongsToPackageMin = minPackage
-                            countChanges += 1
-                        case 0b1000010000: // 3 Packages, e.g. cwt: K-0-K (6/3) other: K-0-K (7/7) --> nothing to do
-                            break
-                            
-                            
-                        case 0b1100001000: // 4 Packages, e.g. cwt: 8-0-2 other: 5-0-1
-                            otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
-                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax
-                            countChanges += 1
-                        case 0b1100010000: // 4 Packages, e.g. cwt: K-0-5 other: 3-1-J
-                            break
-                        case 0b1100011000: // 4 Packages, e.g. cwt: K-0-10 other: 8-1-J
-                            break
-                        default:
-                            
-                            print("not implemented: \(switchValue1.toBinary(len:12))")
-                            break
+                        if let toDoValue = ToDoTable[switchValue] {
+                            doAction(toDo: toDoValue)
+                        } else {
+                            print("not Implemented: \(switchValue)")
                         }
-                    }
-                    if otherCard.belongsToPackageMax == 0 {
-//                        print ("\(otherCard.printValue)")
                     }
                 }
             }
@@ -472,8 +480,11 @@ class CardManager {
                 }
             }
         }
-        if data.allCards.count > 0 {
-//            print("foundedPairs: \(data.connectablePairs.count) for color: \(colorNames[data.allCards[0].colorIndex])")
+        if data.container != nil {
+            data.container!.setBelongsLabels()
+        }
+        for card in data.allCards {
+            card.setBelongsLabels()
         }
     }
     

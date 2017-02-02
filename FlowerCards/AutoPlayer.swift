@@ -262,7 +262,7 @@ class AutoPlayer {
             if stopTimer {
                 timer.invalidate()
             } else {
-//                let interval = autoPlayStatus == .getTipp ? 0.1 : 0.0001
+//                let interval = autoPlayStatus == .getTipp || autoPlayStatus == .touchesBegan ? 0.15 : 0.001
                 timer = Timer.scheduledTimer(timeInterval: 0.15, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }
         } else {
