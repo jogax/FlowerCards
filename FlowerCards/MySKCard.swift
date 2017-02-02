@@ -330,16 +330,20 @@ class MySKCard: SKSpriteNode {
             return "1"
         case (3, 6): // 110
             return "32"
+        case (3, 4): // 100
+            return "3"
         case (3, 3): // 011
             return "21"
         case (3, 2): // 010
             return "2"
-        case (3, 1): // 010
+        case (3, 1): // 001
             return "1"
         case (4, 14): // 1110
             return "432"
         case (4, 12): // 1100
             return "43"
+        case (4, 8): // 1100
+            return "4"
         case (4, 7): // 0111
             return "321"
         case (4, 6): // 0110

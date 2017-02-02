@@ -39,9 +39,10 @@ class AutoPlayer {
     var stopTimer = false
     var testType: TestType = .runOnce //.test
     var testerType: TesterType = .expert
-    var gamesToPlay: [GameToPlay] = [        
-        GameToPlay(level: 11, gameNumber: 3, stopAt: 60), //You have lost ===> now too!!!
-        GameToPlay(level: 35, gameNumber: 995, stopAt: 91), //You have lost ===> now too!!!
+    var gamesToPlay: [GameToPlay] = [
+        GameToPlay(level: 35, gameNumber: 122, stopAt: 128), // test example 3 Packages
+//        GameToPlay(level: 11, gameNumber: 3, stopAt: 60), //You have lost ===> now too!!!
+//        GameToPlay(level: 35, gameNumber: 995, stopAt: 91), //You have lost ===> now too!!!
         ]
     var gameIndex = 0
     
@@ -90,7 +91,7 @@ class AutoPlayer {
                 var levelIndex = 9
                 for _ in 0...21 {
                 for gameNumber in 1...100 {
-                    for levelAdder in 0...3 {
+                    for levelAdder in 0...2 {
                         gamesToPlay.append(GameToPlay(level: levelIndex + levelAdder, gameNumber: gameNumber))
                     }
                 }
@@ -261,7 +262,8 @@ class AutoPlayer {
             if stopTimer {
                 timer.invalidate()
             } else {
-                timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+//                let interval = autoPlayStatus == .getTipp ? 0.1 : 0.0001
+                timer = Timer.scheduledTimer(timeInterval: 0.15, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }
         } else {
                 if gamesToPlay.count == 0 {
@@ -275,7 +277,7 @@ class AutoPlayer {
                     }
                 }
             if !stopTimer {
-                timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+                timer = Timer.scheduledTimer(timeInterval: 0.15, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }
         }
     }
