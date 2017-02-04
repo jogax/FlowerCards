@@ -54,7 +54,6 @@
 		202A54031DBE4CB1001152F8 /* News Pro Version RU.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 202A54021DBE4CB1001152F8 /* News Pro Version RU.rtf */; };
 		202ED85A1DD9EF380003D923 /* FlowerCardsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 202ED8591DD9EF380003D923 /* FlowerCardsTests.swift */; };
 		202EEB5E1E268A990052E400 /* MyDebugCommands in Resources */ = {isa = PBXBuildFile; fileRef = 202EEB5D1E268A990052E400 /* MyDebugCommands */; };
-		20322A6B1E43901C00DBA670 /* NotImplementedModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20322A6A1E43901C00DBA670 /* NotImplementedModel.swift */; };
 		2035F57E1E1685C200AEBE31 /* CardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035F57D1E1685C200AEBE31 /* CardManager.swift */; };
 		20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20389B541D5F7EB400ADD133 /* Mirror5.m4a */; };
 		2040E4CC1DE74F3600B16B19 /* AutoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2040E4CB1DE74F3600B16B19 /* AutoPlayer.swift */; };
@@ -147,7 +146,6 @@
 		202ED8591DD9EF380003D923 /* FlowerCardsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowerCardsTests.swift; sourceTree = "<group>"; };
 		202ED85B1DD9EF380003D923 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		202EEB5D1E268A990052E400 /* MyDebugCommands */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MyDebugCommands; sourceTree = "<group>"; };
-		20322A6A1E43901C00DBA670 /* NotImplementedModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotImplementedModel.swift; sourceTree = "<group>"; };
 		2035F57D1E1685C200AEBE31 /* CardManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardManager.swift; sourceTree = "<group>"; };
 		20389B541D5F7EB400ADD133 /* Mirror5.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror5.m4a; sourceTree = "<group>"; };
 		2040E4CB1DE74F3600B16B19 /* AutoPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoPlayer.swift; sourceTree = "<group>"; };
@@ -252,7 +250,6 @@
 				2077998B1E13F767001EBE29 /* PointModel.swift */,
 				2025F1211D5B246E00561FBF /* RecordIDModel.swift */,
 				2025F1171D5B23BB00561FBF /* StatisticModel.swift */,
-				20322A6A1E43901C00DBA670 /* NotImplementedModel.swift */,
 			);
 			name = RealmModels;
 			sourceTree = "<group>";
@@ -511,7 +508,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2025F1261D5B256A00561FBF /* JGXLine.swift in Sources */,
-				20322A6B1E43901C00DBA670 /* NotImplementedModel.swift in Sources */,
 				2025F0D61D5B1A1E00561FBF /* Extensions.swift in Sources */,
 				2025F0F31D5B219C00561FBF /* MyRandom.swift in Sources */,
 				2025F0FF1D5B21AC00561FBF /* MySKDetailedStatistic.swift in Sources */,
