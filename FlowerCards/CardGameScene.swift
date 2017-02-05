@@ -1070,7 +1070,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
             push(card, status: .addedFromCardStack)
             
-//            cardManager!.check(card: card)
+            cardManager!.check(color: card.colorIndex)
             addChild(card)
             card.alpha = 0
             let duration:Double = Double((zielPosition - cardPackage!.position).length()) * durationMultiplier
@@ -1273,7 +1273,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        while gameArray.count < countColumns * countRows {
 //            sleep(1) //wait until gameArray is filled!!
 //        }
-        cardManager!.check()
+//        cardManager!.check()
 
         tippsButton!.activateButton(false)
         var pairsToCheck = [FromToColumnRow]()
@@ -2222,7 +2222,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             push(container, status: .unification)
             push(movingCard, status: .removed)
             container.connectWith(otherCard: movingCard)
-//            cardManager!.check(card: movingCard)
+            cardManager!.check(color: movingCard.colorIndex)
             saveHistoryRecord(colorIndex: movingCard.colorIndex, points:  points,
                               fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
                               toColumn: container.column,   toRow: container.row,   toMinValue: container.minValue,   toMaxValue: container.maxValue)
@@ -2281,7 +2281,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             push(movingCard, status: .removed)
             
             card.connectWith(otherCard: movingCard)
-//            cardManager!.check(card: card)
+            cardManager!.check(color: card.colorIndex)
             saveHistoryRecord(colorIndex: movingCard.colorIndex, points: points,
                               fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
                               toColumn: card.column,   toRow: card.row,   toMinValue: card.minValue,   toMaxValue: card.maxValue)
@@ -2841,7 +2841,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         cardStack.push(cardToPush)
                         
                         gameArray[savedCardInCycle.column][savedCardInCycle.row].used = false
-//                        cardManager!.check(card: cardToPush)
+                        cardManager!.check(color: cardToPush.colorIndex)
                         makeEmptyCard(savedCardInCycle.column, row: savedCardInCycle.row)
                         let aktPosition = gameArray[savedCardInCycle.column][savedCardInCycle.row].position
                         let duration = Double((cardPackage!.position - aktPosition).length()) / 500.0
@@ -2884,42 +2884,39 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     }
                 case .removed:
                     //let cardTexture = SKTexture(imageNamed: "card\(savedCardInCycle.colorIndex)")
-                    let card = MySKCard(colorIndex: savedCardInCycle.colorIndex, type: savedCardInCycle.type, value: savedCardInCycle.minValue)
+//                    let card = MySKCard(colorIndex: savedCardInCycle.colorIndex, type: savedCardInCycle.type, value: savedCardInCycle.minValue)
                     
-                    
-                    card.colorIndex = savedCardInCycle.colorIndex
-                    card.position = savedCardInCycle.endPosition
-                    card.startPosition = savedCardInCycle.startPosition
-                    card.size = savedCardInCycle.size
-                    card.column = savedCardInCycle.column
-                    card.row = savedCardInCycle.row
-                    card.minValue = savedCardInCycle.minValue
-                    card.maxValue = savedCardInCycle.maxValue
-                    card.belongsToPackageMin = savedCardInCycle.belongsToPackageMin
-                    card.belongsToPackageMax = savedCardInCycle.belongsToPackageMax
-                    card.BGPictureAdded = savedCardInCycle.BGPictureAdded
-                    card.countTransitions = savedCardInCycle.countTransitions
-                    card.name = savedCardInCycle.name
-                    levelScore = savedCardInCycle.countScore
- 
-                    updateGameArrayCell(card)
-//                    cardManager!.check(card: card)
-                    self.addChild(card)
-                    updateCardCount(1)
-                    deleteLastHistoryRecord()
-                    card.reload()
+                    if let card = savedCardInCycle.card {
+                        card.colorIndex = savedCardInCycle.colorIndex
+                        card.position = savedCardInCycle.endPosition
+                        card.startPosition = savedCardInCycle.startPosition
+                        card.size = savedCardInCycle.size
+                        card.column = savedCardInCycle.column
+                        card.row = savedCardInCycle.row
+                        card.minValue = savedCardInCycle.minValue
+                        card.maxValue = savedCardInCycle.maxValue
+                        card.BGPictureAdded = savedCardInCycle.BGPictureAdded
+                        card.countTransitions = savedCardInCycle.countTransitions
+                        card.name = savedCardInCycle.name
+                        levelScore = savedCardInCycle.countScore
+     
+                        updateGameArrayCell(card)
+                        cardManager!.check(color: card.colorIndex)
+                        self.addChild(card)
+                        updateCardCount(1)
+                        deleteLastHistoryRecord()
+                        card.reload()
+                    }
                     
                 case .unification:
                     let card = self.childNode(withName: savedCardInCycle.name)! as! MySKCard
                     card.size = savedCardInCycle.size
                     card.minValue = savedCardInCycle.minValue
                     card.maxValue = savedCardInCycle.maxValue
-                    card.belongsToPackageMin = savedCardInCycle.belongsToPackageMin
-                    card.belongsToPackageMax = savedCardInCycle.belongsToPackageMax
                     card.BGPictureAdded = savedCardInCycle.BGPictureAdded
                     card.countTransitions = savedCardInCycle.countTransitions
                     updateGameArrayCell(card)
-//                    cardManager!.check(card: card)
+                    cardManager!.check(color: card.colorIndex)
                     //card.hitLabel.text = "\(card.hitCounter)"
                     card.reload()
                     
@@ -2927,8 +2924,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     let container = containers[findIndex(savedCardInCycle.colorIndex)]
                     container.minValue = savedCardInCycle.minValue
                     container.maxValue = savedCardInCycle.maxValue
-                    container.belongsToPackageMin = savedCardInCycle.belongsToPackageMin
-                    container.belongsToPackageMax = savedCardInCycle.belongsToPackageMax
                     container.BGPictureAdded = savedCardInCycle.BGPictureAdded
                     container.countTransitions = savedCardInCycle.countTransitions
                     container.colorIndex = NoColor
@@ -2940,11 +2935,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     card.startPosition = savedCardInCycle.startPosition
                     card.minValue = savedCardInCycle.minValue
                     card.maxValue = savedCardInCycle.maxValue
-                    card.belongsToPackageMin = savedCardInCycle.belongsToPackageMin
-                    card.belongsToPackageMax = savedCardInCycle.belongsToPackageMax
 
                     updateGameArrayCell(card)
-//                    cardManager!.check(card: card)
+                    cardManager!.check(color: card.colorIndex)
                     card.BGPictureAdded = savedCardInCycle.BGPictureAdded
                     card.countTransitions = savedCardInCycle.countTransitions
                     actionMoveArray.append(SKAction.move(to: savedCardInCycle.endPosition, duration: duration))
@@ -3572,6 +3565,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func push(_ card: MySKCard, status: CardStatus) {
         var savedCard = SavedCard()
+        savedCard.card = card
         savedCard.type = card.type
         savedCard.name = card.name!
         savedCard.status = status
@@ -3582,8 +3576,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         savedCard.countScore = levelScore
         savedCard.minValue = card.minValue
         savedCard.maxValue = card.maxValue
-        savedCard.belongsToPackageMin = card.belongsToPackageMin
-        savedCard.belongsToPackageMax = card.belongsToPackageMax
         savedCard.countTransitions = card.countTransitions
         savedCard.column = card.column
         savedCard.row = card.row

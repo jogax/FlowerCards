@@ -139,10 +139,14 @@ class CardManager {
 //        fillToDoTable()
     }
 
-    func check() {
-        for colorIndex in 0..<MaxColorValue {
-            analyzeColor(data: &colorArray[colorIndex])
-        }
+//    func check() {
+//        for colorIndex in 0..<MaxColorValue {
+//            analyzeColor(data: &colorArray[colorIndex])
+//        }
+//    }
+    
+    func check(color: Int) {
+        analyzeColor(data: &colorArray[color])
     }
     
     func areConnectable(first: MySKCard, second: MySKCard)->Bool {
@@ -394,7 +398,7 @@ class CardManager {
                     otherCard.belongsToPackageMax = otherCard.belongsToPackageMin << 1
                 }
                 func set0b0111() {
-                    otherCard.belongsToPackageMin &= ~cardWithTransition.belongsToPackageMax & ~cardWithTransition.belongsToPackageMin
+                    otherCard.belongsToPackageMin &= ~createMask()
                     otherCard.belongsToPackageMax = otherCard.belongsToPackageMin << UInt8(otherCard.countTransitions)
                 }
                 func set0b1000() {
@@ -406,28 +410,38 @@ class CardManager {
                     otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
                 }
                 func set0b1010() {
-                    otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax & ~cardWithTransition.belongsToPackageMin
+                    otherCard.belongsToPackageMax &= ~createMask()
                     otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
                 }
                 func set0b1011() {
-                    otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax & ~cardWithTransition.belongsToPackageMin
+                    otherCard.belongsToPackageMax &= ~createMask()
                     otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
                 }
                 func set0b1100() {
-                    otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
+                    otherCard.belongsToPackageMax &= ~createMask(withMinPackage: false)
                     otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
                 }
                 func set0b1101() {
-                    otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax
+                    otherCard.belongsToPackageMax &= ~createMask(withMinPackage: false)
                     otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
                 }
                 func set0b1110() {
-                    otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax & ~cardWithTransition.belongsToPackageMin
+                    otherCard.belongsToPackageMax &= ~createMask()
                     otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
                 }
                 func set0b1111() {
-                    otherCard.belongsToPackageMax &= ~cardWithTransition.belongsToPackageMax & ~cardWithTransition.belongsToPackageMin
+                    otherCard.belongsToPackageMax &= ~createMask()
                     otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
+                }
+                
+                func createMask(withMinPackage: Bool = true)->UInt8 {
+                    var bit = cardWithTransition.belongsToPackageMax
+                    var mask = cardWithTransition.belongsToPackageMax | (withMinPackage ? cardWithTransition.belongsToPackageMin : 0)
+                    while bit != cardWithTransition.belongsToPackageMin {
+                        mask |= bit
+                        bit = bit >> 1
+                    }
+                    return mask
                 }
 //                func setSecondMinMaxToMaxPackage() {
 //                    otherCard.belongsToPackageMax = maxPackage

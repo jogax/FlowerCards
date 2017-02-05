@@ -468,6 +468,7 @@ enum PeerToPeerCommands: Int {
 
 
 struct SavedCard {
+    var card: MySKCard? = nil
     var status: CardStatus = .added
     var type: MySKCardType = .cardType
     var name: String = ""
@@ -477,8 +478,6 @@ struct SavedCard {
     var colorIndex: Int = 0
     var size: CGSize = CGSize(width: 0, height: 0)
     var countScore: Int = 0 // Score of Game 
-    var belongsToPackageMin: UInt8 = 0
-    var belongsToPackageMax: UInt8 = 0
     var minValue: Int = NoValue
     var maxValue: Int = NoValue
     var BGPictureAdded = false

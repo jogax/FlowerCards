@@ -40,7 +40,7 @@ class AutoPlayer {
     var testType: TestType = .runOnce //.test
     var testerType: TesterType = .expert
     var gamesToPlay: [GameToPlay] = [
-        GameToPlay(level: 10, gameNumber: 2, stopAt: 51), // test example 3 Packages
+        GameToPlay(level: 11, gameNumber: 66, stopAt: 114), // test example 3 Packages
 //        GameToPlay(level: 11, gameNumber: 3, stopAt: 60), //You have lost ===> now too!!!
 //        GameToPlay(level: 35, gameNumber: 995, stopAt: 91), //You have lost ===> now too!!!
         ]
@@ -63,7 +63,7 @@ class AutoPlayer {
             let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and levelID = %d", GV.player!.ID, levelID).sorted(byProperty: "gameNumber")
             for game in errorGames {
                 let countHistoryRecords = realm.objects(HistoryModel.self).filter("gameID = %d", game.ID).count
-                if countHistoryRecords > 0 && countHistoryRecords < 105 {
+                if countHistoryRecords > 80 {
                     if game.levelID != oldLevelID {
                         oldLevelID = game.levelID
                     }
@@ -108,7 +108,7 @@ class AutoPlayer {
                 let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID)
                 for game in errorGames {
                     let countHistoryRecords = realm.objects(HistoryModel.self).filter("gameID = %d", game.ID).count
-                    if countHistoryRecords >= 0 && countHistoryRecords < 105 {
+                    if countHistoryRecords >= 80 {
                         gamesToPlay.append(GameToPlay(level: game.levelID + 1 , gameNumber: game.gameNumber + 1))
                     }
                 }
@@ -262,8 +262,8 @@ class AutoPlayer {
             if stopTimer {
                 timer.invalidate()
             } else {
-//                let interval = autoPlayStatus == .getTipp || autoPlayStatus == .touchesBegan ? 0.15 : 0.001
-                timer = Timer.scheduledTimer(timeInterval: 0.15, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+                let interval = autoPlayStatus == .getTipp || autoPlayStatus == .touchesBegan ? 0.1 : 0.01
+                timer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }
         } else {
                 if gamesToPlay.count == 0 {
@@ -277,7 +277,7 @@ class AutoPlayer {
                     }
                 }
             if !stopTimer {
-                timer = Timer.scheduledTimer(timeInterval: 0.25, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+                timer = Timer.scheduledTimer(timeInterval: 0.15, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }
         }
     }
