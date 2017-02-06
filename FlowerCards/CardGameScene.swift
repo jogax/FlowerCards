@@ -1037,8 +1037,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             if generateSpecial {
                 var counter = cardStack.count(.MySKCardType)
                 while true {
-                    if findPairForCard(card.colorIndex, minValue: card.minValue, maxValue: card.maxValue) {
-                        break
+                    if (cardManager?.checkIfCardUsable(card: card))! {
+                        if findPairForCard(card.colorIndex, minValue: card.minValue, maxValue: card.maxValue) {
+                            break
+                        }
                     }
                     cardStack.pushLast(card)
                     card = cardStack.pull()!
@@ -1154,10 +1156,38 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     
+//    func startCreateTippsInBackground() {
+//        {
+//            self.generatingTipps = true
+////            self.stopTimer(&self.showTippAtTimer)
+//            _ = self.createTipps()
+//            
+//            repeat {
+//                if self.tippArray.count <= 2 && self.checkGameArray() > 2 {
+//                    if cardStack.count(.MySKCardType) > 0 {
+//                        self.generateCards(.special)
+//                        _ = self.createTipps()
+//                    } else {
+//                        break
+//                    }
+//                }
+//            } while !(self.tippArray.count > 2 || self.countColumns * self.countRows - self.checkGameArray() == 0 || self.checkGameArray() < 2)
+//            
+//            if self.tippArray.count == 0 && self.cardCount > 0 {
+//                
+//                print ("You have lost!")
+//            }
+//            self.generatingTipps = false
+//        } ~>
+//        {
+//            self.generatingTipps = false
+//        }
+//    }
+    
     func startCreateTippsInBackground() {
-        {
+//        {
             self.generatingTipps = true
-//            self.stopTimer(&self.showTippAtTimer)
+            //            self.stopTimer(&self.showTippAtTimer)
             _ = self.createTipps()
             
             repeat {
@@ -1169,19 +1199,18 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         break
                     }
                 }
-            } while !(self.tippArray.count > 2 || self.countColumns * self.countRows - self.checkGameArray() == 0 || self.checkGameArray() < 2)
+            } while !(self.tippArray.count > 2 || self.countColumns * self.countRows - self.checkGameArray() == 0 || self.checkGameArray() < 5)
             
             if self.tippArray.count == 0 && self.cardCount > 0 {
                 
                 print ("You have lost!")
             }
             self.generatingTipps = false
-        } ~>
-        {
-            self.generatingTipps = false
-        }
+//            } ~>
+//            {
+//                self.generatingTipps = false
+//        }
     }
-    
     
     func deleteEmptyCard(column: Int, row: Int) {
         //printFunc(function: "deleteEmptyCard", start: true)
