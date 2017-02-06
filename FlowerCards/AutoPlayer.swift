@@ -40,7 +40,9 @@ class AutoPlayer {
     var testType: TestType = .runOnce //.test
     var testerType: TesterType = .expert
     var gamesToPlay: [GameToPlay] = [
-        GameToPlay(level: 11, gameNumber: 66, stopAt: 114), // test example 3 Packages
+        GameToPlay(level: 72, gameNumber: 962, stopAt: 161),
+//        GameToPlay(level: 72, gameNumber: 466),
+//        GameToPlay(level: 11, gameNumber: 66, stopAt: 114), // test example 3 Packages
 //        GameToPlay(level: 11, gameNumber: 3, stopAt: 60), //You have lost ===> now too!!!
 //        GameToPlay(level: 35, gameNumber: 995, stopAt: 91), //You have lost ===> now too!!!
         ]
@@ -108,7 +110,7 @@ class AutoPlayer {
                 let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID)
                 for game in errorGames {
                     let countHistoryRecords = realm.objects(HistoryModel.self).filter("gameID = %d", game.ID).count
-                    if countHistoryRecords >= 80 {
+                    if countHistoryRecords >= 20 {
                         gamesToPlay.append(GameToPlay(level: game.levelID + 1 , gameNumber: game.gameNumber + 1))
                     }
                 }
@@ -131,31 +133,33 @@ class AutoPlayer {
     }
     
     func startNextGame() {
-        var go = true
-        while true {
-            let levelIndex = gamesToPlay[gameIndex].level - 1
-            let gameNumber = gamesToPlay[gameIndex].gameNumber - 1
-            if self.testType == .newTest {
-                if realm.objects(GameModel.self).filter("gameNumber = %d and levelID = %d and playerID = %d", gameNumber, levelIndex, GV.player!.ID).count > 0 {
-                    gameIndex += 1
-                    if gameIndex == gamesToPlay.count {
-                        go = false
+        if gameIndex < gamesToPlay.count {
+            var go = true
+            while true {
+                let levelIndex = gamesToPlay[gameIndex].level - 1
+                let gameNumber = gamesToPlay[gameIndex].gameNumber - 1
+                if self.testType == .newTest {
+                    if realm.objects(GameModel.self).filter("gameNumber = %d and levelID = %d and playerID = %d", gameNumber, levelIndex, GV.player!.ID).count > 0 {
+                        gameIndex += 1
+                        if gameIndex == gamesToPlay.count {
+                            go = false
+                            break
+                        }
+                    } else {
                         break
                     }
                 } else {
                     break
                 }
-            } else {
-                break
             }
-        }
-        if go {
-            realm.beginWrite()
-            GV.player!.levelID = gamesToPlay[gameIndex].level - 1
-            try! realm.commitWrite()
-            scene.gameNumber = gamesToPlay[gameIndex].gameNumber - 1
-            scene.startNewGame(false)
-            scene.durationMultiplier = scene.durationMultiplierForAutoplayer
+            if go {
+                realm.beginWrite()
+                GV.player!.levelID = gamesToPlay[gameIndex].level - 1
+                try! realm.commitWrite()
+                scene.gameNumber = gamesToPlay[gameIndex].gameNumber - 1
+                scene.startNewGame(false)
+                scene.durationMultiplier = scene.durationMultiplierForAutoplayer
+            }
         }
     }
     
@@ -164,7 +168,7 @@ class AutoPlayer {
         if scene.cardCount > 0 /*&& scene.tippArray.count > 0*/ {
             switch autoPlayStatus {
             case .getTipp:
-                if scene.tippsButton!.alpha == 1 && scene.countMovingCards == 0 {  // if tipps are ready
+                if scene.tippsButton!.alpha == 1 && scene.countMovingCards <= 0 {  // if tipps are ready
                     bestTipp = Tipps()
                     if replay {
                         if indexForReplay < realm.objects(HistoryModel.self).filter("gameID = %d", scene.actGame!.ID).count {

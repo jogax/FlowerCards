@@ -46,7 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Migration of realm models if neaded
         #if REALM_V2
             Realm.Configuration.defaultConfiguration = Realm.Configuration(
-                schemaVersion: 3,
+                schemaVersion: 2,
                 migrationBlock: { migration, oldSchemaVersion in
                     if (oldSchemaVersion < 2) {
                         // migrate GameModel

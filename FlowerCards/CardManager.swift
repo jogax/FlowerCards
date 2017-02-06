@@ -26,8 +26,16 @@ class CardManager {
     struct ConnectablePair {
         var card1: MySKCard
         var card2: MySKCard
-        func convertCard(card: MySKCard)->String {
-            return "\(card.countTransitions)-\(card.minValue)-\(card.maxValue)-\(card.column)-\(card.row)-\(card.type)"
+        func convertCard(card: MySKCard)->Int {
+            var hash = card.countTransitions << 0
+            hash |= card.minValue << 2
+            hash |= card.maxValue << 6
+            hash |= card.maxValue << 10
+            hash |= card.column << 14
+            hash |= card.row << 18
+            hash |= card.type.rawValue << 22
+            return hash
+//            return "\(card.countTransitions)-\(card.minValue)-\(card.maxValue)-\(card.column)-\(card.row)-\(card.type)"
         }
         var printValue: String {
             get {
@@ -35,14 +43,14 @@ class CardManager {
                 return value
             }
         }
-        var hashValue : String {
+        var hashValue : Int {
             get {
-                return  convertCard(card: card1) + "-" + convertCard(card: card2)
+                return  convertCard(card: card1) << 32 | convertCard(card: card2)
             }
         }
-        var hashValue1 : String {
+        var hashValue1 : Int {
             get {
-                return convertCard(card: card2) + "-" + convertCard(card: card1)
+                return convertCard(card: card2) << 32 | convertCard(card: card1)
             }
         }
         static func ==(left: ConnectablePair, right: ConnectablePair) -> Bool {
@@ -290,39 +298,7 @@ class CardManager {
             }
         }
         func setOtherCardBelonging(cardWithTransition: MySKCard)->Int {
-            func findCardValues(card: MySKCard)->(upper:[Int], mid: [Int], lower: [Int]) {
-                var upperValues: [Int] = []
-                var midValues: [Int] = []
-                var lowerValues: [Int] = []
-                var value = card.maxValue
-                var countUpperValues = 0
-                var countMidValues = 0
-                var countLowerValues = 0
-                if card.countTransitions == 0 {
-                    countUpperValues = card.maxValue - card.minValue + 1
-                } else {
-                    countUpperValues = card.maxValue + 1
-                    countMidValues = (card.countTransitions - 1) * MaxCardValue
-                    countLowerValues = LastCardValue - card.minValue + 1
-                }
-                for _ in 0..<countUpperValues {
-                    upperValues.append(value)
-                    value -= 1
-                }
-                value = LastCardValue
-                for _ in 0..<countMidValues {
-                    midValues.append(value)
-                    value -= 1
-                }
-                value = LastCardValue
-                for _ in 0..<countLowerValues {
-                    lowerValues.append(value)
-                    value -= 1
-                }
-                return (upper: upperValues, mid: midValues, lower: lowerValues)
-            }
-            
-            
+
             let (upperValues, _, lowerValues) = findCardValues(card: cardWithTransition)
             var countChanges = 0
             var switchValue: UInt8 = 0
@@ -331,40 +307,48 @@ class CardManager {
                 func doAction(toDo: UInt8) {
                     let savedBelongsToPackageMin = otherCard.belongsToPackageMin
                     let savedBelongsToPackageMax = otherCard.belongsToPackageMax
-                    switch toDo {
-                    case 0b0000:
-                        break
-                    case 0b0001:
-                        set0b0001()
-                    case 0b0010:
-                        set0b0010()
-                    case 0b0011:
-                        set0b0011()
-                    case 0b0100:
-                        set0b0100()
-                    case 0b0101:
-                        set0b0101()
-                    case 0b0110:
-                        set0b0110()
-                    case 0b0111:
-                        set0b0111()
-                    case 0b1000:
-                        set0b1000()
-                    case 0b1001:
-                        set0b1001()
-                    case 0b1010:
-                        set0b1010()
-                    case 0b1011:
-                        set0b1011()
-                    case 0b1100:
-                        set0b1100()
-                    case 0b1101:
-                        set0b1101()
-                    case 0b1110:
-                        set0b1110()
-                    case 0b1111:
-                        set0b1111()
-                    default: break
+                    if otherCard.maxValue == LastCardValue && data.countTransitions == countPackages - 1 {
+                        otherCard.belongsToPackageMax = maxPackage
+                        otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
+                    } else if otherCard.minValue == FirstCardValue && data.countTransitions == countPackages - 1 {
+                        otherCard.belongsToPackageMin = minPackage
+                        otherCard.belongsToPackageMax = otherCard.belongsToPackageMin << UInt8(otherCard.countTransitions)
+                    } else {
+                        switch toDo {
+                        case 0b0000:
+                            break
+                        case 0b0001:
+                            set0b0001()
+                        case 0b0010:
+                            set0b0010()
+                        case 0b0011:
+                            set0b0011()
+                        case 0b0100:
+                            set0b0100()
+                        case 0b0101:
+                            set0b0101()
+                        case 0b0110:
+                            set0b0110()
+                        case 0b0111:
+                            set0b0111()
+                        case 0b1000:
+                            set0b1000()
+                        case 0b1001:
+                            set0b1001()
+                        case 0b1010:
+                            set0b1010()
+                        case 0b1011:
+                            set0b1011()
+                        case 0b1100:
+                            set0b1100()
+                        case 0b1101:
+                            set0b1101()
+                        case 0b1110:
+                            set0b1110()
+                        case 0b1111:
+                            set0b1111()
+                        default: break
+                        }
                     }
                     if otherCard.belongsToPackageMin == 0 || otherCard.belongsToPackageMax == 0 {
                         otherCard.belongsToPackageMin = savedBelongsToPackageMin
@@ -453,8 +437,8 @@ class CardManager {
 //                }
                 index = ind
                 if cardWithTransition != otherCard &&
-                    cardWithTransition.belongsToPackageMax.countOnes() == 1 &&
-                    cardWithTransition.belongsToPackageMin.countOnes() == 1 &&
+                    cardWithTransition.belongsToPackageMax.countOnes() <= 2 &&
+                    cardWithTransition.belongsToPackageMin.countOnes() <= 2 &&
                     otherCard.belongsToPackageMax.countOnes() > 1 &&
                     otherCard.belongsToPackageMin.countOnes() > 1 {
                     
@@ -522,7 +506,9 @@ class CardManager {
             if data.pairsToRemove.count > 0 {
                 for index in data.pairsToRemove.reversed() {
 //                    print(data.connectablePairs[index].printValue)
-                    data.connectablePairs.remove(at: index)
+                    if index < data.pairsToRemove.count {
+                        data.connectablePairs.remove(at: index)
+                    }
                 }
             }
         }

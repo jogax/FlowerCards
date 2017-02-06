@@ -140,14 +140,47 @@ class MySKCard: SKSpriteNode {
     let modelConstantLocal = UIDevice.current.modelName
     var printValue: String {
         get {
-            var value = String(type == .cardType ? "Card:" : "Container:") + "color: " + MySKCard.colorNames[colorIndex]
-            value += ", column: " + String(column) + ", row: " + String(row)
-            value += ", max: " + cardLib[maxValue]! + ", min: " + cardLib[minValue]!
+            var value = String(type == .cardType ? "Card:" : "Cont:") + "color: " + MySKCard.colorNames[colorIndex]
+            value += ", col: " + String(column) + ", row: " + String(row)
+            value += ", max: " + cardLib[maxValue]! + ", min: " + cardLib[minValue]! + " (" + String(countCards) + ")"
             value += ", belongs: " + String(belongsToPackageMax) + "/" + String(belongsToPackageMin)
-            value += ", transitions: " + String(countTransitions)
+            value += ", trans: " + String(countTransitions)
             return value
         }
     }
+    
+    func findCardValues(card: MySKCard)->(upper:[Int], mid: [Int], lower: [Int]) {
+        var upperValues: [Int] = []
+        var midValues: [Int] = []
+        var lowerValues: [Int] = []
+        var value = card.maxValue
+        var countUpperValues = 0
+        var countMidValues = 0
+        var countLowerValues = 0
+        if card.countTransitions == 0 {
+            countUpperValues = card.maxValue - card.minValue + 1
+        } else {
+            countUpperValues = card.maxValue + 1
+            countMidValues = (card.countTransitions - 1) * MaxCardValue
+            countLowerValues = LastCardValue - card.minValue + 1
+        }
+        for _ in 0..<countUpperValues {
+            upperValues.append(value)
+            value -= 1
+        }
+        value = LastCardValue
+        for _ in 0..<countMidValues {
+            midValues.append(value)
+            value -= 1
+        }
+        value = LastCardValue
+        for _ in 0..<countLowerValues {
+            lowerValues.append(value)
+            value -= 1
+        }
+        return (upper: upperValues, mid: midValues, lower: lowerValues)
+    }
+
     var countCards: Int {
         get {
             if countTransitions == 0 {
@@ -279,37 +312,39 @@ class MySKCard: SKSpriteNode {
         }
         if self.type == .containerType && self.colorIndex != NoValue {
             if upper {
-                switch MySKCard.countPackages {
-                case 2:
-                    return "2"
-                case 3:
-                    return "3"
-                case 4:
-                    return "4"
-                default: return ""
-                }
+                return String(MySKCard.countPackages)
+//                switch MySKCard.countPackages {
+//                case 2:
+//                    return "2"
+//                case 3:
+//                    return "3"
+//                case 4:
+//                    return "4"
+//                default: return ""
+//                }
             } else {
-                switch (MySKCard.countPackages, self.countTransitions) {
-                case (2, 0):
-                    return "2"
-                case (2, 1):
-                    return "1"
-                case (3, 0):
-                    return "3"
-                case (3, 1):
-                    return "2"
-                case (3, 2):
-                    return "1"
-                case (4, 0):
-                    return "4"
-                case (4, 1):
-                    return "3"
-                case (4, 2):
-                    return "2"
-                case (4, 3):
-                    return "1"
-                default: return ""
-                }
+                return String(MySKCard.countPackages - self.countTransitions)
+//                switch (MySKCard.countPackages, self.countTransitions) {
+//                case (2, 0):
+//                    return "2"
+//                case (2, 1):
+//                    return "1"
+//                case (3, 0):
+//                    return "3"
+//                case (3, 1):
+//                    return "2"
+//                case (3, 2):
+//                    return "1"
+//                case (4, 0):
+//                    return "4"
+//                case (4, 1):
+//                    return "3"
+//                case (4, 2):
+//                    return "2"
+//                case (4, 3):
+//                    return "1"
+//                default: return ""
+//                }
             }
         }
         let belongsTo: UInt8 = upper ? belongsToPackageMax : belongsToPackageMin

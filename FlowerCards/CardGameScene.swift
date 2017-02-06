@@ -485,7 +485,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var replaying = false
     var durationMultiplier = 0.001
     let durationMultiplierForPlayer = 0.001
-    let durationMultiplierForAutoplayer = 0.0001
+    let durationMultiplierForAutoplayer = 0.00001
     var cardManager: CardManager?
     
     override func didMove(to view: SKView) {
