@@ -1041,8 +1041,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             if generateSpecial {
                 var counter = cardStack.count(.MySKCardType)
                 while true {
-                    if findPairForCard(card.colorIndex, minValue: card.minValue, maxValue: card.maxValue) {
-                        break
+                    if (cardManager?.checkIfCardUsable(card: card))! {
+                        if findPairForCard(card.colorIndex, minValue: card.minValue, maxValue: card.maxValue) {
+                            break
+                        }
                     }
                     cardStack.pushLast(card)
                     card = cardStack.pull()!
@@ -1208,7 +1210,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             }
             self.generatingTipps = false
     }
-    
     
     func deleteEmptyCard(column: Int, row: Int) {
         //printFunc(function: "deleteEmptyCard", start: true)

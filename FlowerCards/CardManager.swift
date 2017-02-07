@@ -78,61 +78,12 @@ class CardManager {
             self.colorIndex = colorIndex
         }
     }
-//    enum ToDoValues: Int {
-//        case NothingToDo = 0,
-//        MaxInUpper,
-//        MaxInLower,
-//        MinInUpper,
-//        MinInLower,
-//        MinInUpperLower,
-//        SecondMinMaxToMaxPackage,
-//        SecondMinMaxToMinPackage
-//    }
     private let colorNames = ["Purple", "Blue", "Green", "Red"]
     private let purple = 0
     private let blue = 1
     private let green = 2
     private let red = 3
     private var colorArray: [DataForColor] = []
-//    let ToDoTable: [UInt16:ToDoValues] = [
-//        0b0100000000: .NothingToDo,
-//        0b1000000000: .NothingToDo,
-//        0b0100000100: .SecondMaxInFirstMax,         // 2 Packages, e.g. cwt: 6-0-A (1/1) other: 8-0-4
-//        0b0100001000: .SecondMaxInFirstMax,         // 2 Packages, e.g. cwt: K-0-K (2/2) other: K-0-Q
-//        0b0100001100: .SecondMaxInFirstMax,         // 2 Packages, e.g. cwt: K-0-10, other: Q-0-Q
-//        0b0101000000: .NothingToDo,                 // 2 Packages, e.g. cwt: A-1-K, other: 9-0-9 --> break, nothing to do
-//        0b0101000010: .SecondMaxInFirstMin,         // 2 Packages, e.g. cwt: 2-1-Q, other: Q-0-9
-//        0b0101000011: .SecondMaxInFirstMin,         // 2 Packages, e.g. cwt: A-1-K, other: K-0-K
-//        0b0101000100: .SecondMaxInFirstMax,         // 2 Packages, e.g. cwt: A-1-K, other: 2-0-A
-//        0b0101001100: .SecondMaxInFirstMax,         // 2 Packages, e.g. cwt: A-1-K, other: A-0-A
-//
-//        0b1001000000: .NothingToDo,                 // 2 Packages, e.g. cwt: A-1-K, other: 9-0-9 --> break, nothing to do
-//        0b1000000100: .SecondMaxInFirstMax,         // 3 Packages, e.g. cwt: 7-0-2 (1/1) other: 8-0-7 (3/3)
-//        0b1000001100: .SecondMaxInFirstMax,         // 3 Packages, e.g. cwt: K-0-Q (4/4, container) other: K-0-K
-//        0b1000001000: .SecondMaxInFirstMax,         // 3 Packages, e.g. cwt: K-0-Q (4/4, container) other: Q-0-J
-//        0b1000010100: .SecondMinInFirstMaxShift1,   // 3 Packages, e.g. cwt: K-0-Q (4/4, container) other: 3-1-Q
-//        0b1000011000: .SecondMaxInFirstMaxShift1,   // 3 Packages, e.g. cwt: K-0-K (4/4, container) other: K-1-J (6/3)
-//        0b1000011100: .SecondMaxInFirstMaxShift1,   // 3 Packages, e.g. cwt: K-0-4 (4/4, container) other: 8-1-10 (6/3)
-//        0b1001000011: .SecondMinInFirstMin,         // 3 Packages, e.g. cwt: A-1-Q (6/3) other: K-0-K (7/7) nothing to do
-//        0b1001000100: .SecondMinInFirstMax,         // 3 Packages, e.g. cwt: 6-1-K (2/1) other: 7-0-2 (3/3)
-//        0b1001001100: .SecondMaxInFirstMax,         // 3 Packages, e.g. cwt: A-1-K (6/3) other: A-0-A (7/7)
-//        0b1001001110: .SecondMaxInFirstMaxAndFirstMin, // 3 Packages, e.g. cwt: K-1-3 (4/2, container) other: 3-0-2 (7/7)
-//        0b1001001111: .SecondMaxInFirstMaxAndFirstMin, // 3 Packages, e.g. cwt: K-1-10 (4/2) other: 10-0-10 (7/7)
-//        0b1001011100: .SecondMaxInFirstMaxShift1,   // 3 Packages, e.g. cwt: K-1-10 (4/2) other: 5-1-9 (6/3)
-//        0b1001011101: .SecondMaxInFirstMaxShift1,   // 3 Packages, e.g. cwt: K-1-10 (4/2) other: 6-1-K (6/3)
-//        0b1010000000: .NothingToDo,                 // 3 Packages, e.g. cwt: 2-2-Q (4/1) other: 6-0-6 (7/7) --> nothing to do
-//        0b1010000010: .SecondMinMaxToMaxPackage,    // 3 Packages, e.g. cwt: 4-2-Q (4/1) other: Q-0-6 (7/7)
-//        0b1010000011: .SecondMinMaxToMaxPackage,    // 3 Packages, e.g. cwt: 2-2-Q (4/1) other: K-0-Q (7/7)
-//        0b1010001100: .SecondMinMaxToMinPackage,    // 3 Packages, e.g. cwt: 2-2-Q (4/1) other: 2-0-2 (7/7)
-//        0b1000010000: .NothingToDo,                 // 3 Packages, e.g. cwt: K-0-K (6/3) other: K-0-K (7/7) --> nothing to do
-//        0b1100000000: .NothingToDo,
-//        0b1100001000: .SecondMaxInFirstMax,         // 4 Packages, e.g. cwt: 8-0-2 other: 5-0-1
-//        0b1100010000: .NothingToDo,                 // 4 Packages, e.g. cwt: K-0-5 other: 3-1-J
-//        0b1100011000: .NothingToDo,                 // 4 Packages, e.g. cwt: K-0-10 other: 8-1-J
-//    ]
-//
-//    private let toDoTable: [UInt16:ToDoValues] = [:]
-//    
 
     init () {
         for _ in 1...4 {
@@ -144,17 +95,14 @@ class CardManager {
         }
         maxPackage = bitMaskForPackages[countPackages - 1]
         minPackage = bitMaskForPackages[0]
-//        fillToDoTable()
     }
 
-//    func check() {
-//        for colorIndex in 0..<MaxColorValue {
-//            analyzeColor(data: &colorArray[colorIndex])
-//        }
-//    }
-    
     func check(color: Int) {
-        analyzeColor(data: &colorArray[color])
+        _ = analyzeColor(data: &colorArray[color])
+    }
+    
+    func checkIfCardUsable(card: MySKCard)->Bool {
+        return analyzeColor(data: &colorArray[card.colorIndex], cardToCheck: card)
     }
     
     func areConnectable(first: MySKCard, second: MySKCard)->Bool {
@@ -175,40 +123,8 @@ class CardManager {
         }
         return false
     }
-    
-//    private func fillToDoTable() {
-//        for packageIndex in 2...maxPackageCount {
-//            for cwtCountTransitions in 0...maxPackageCount - 1 {
-//                for otherCountTransitions in 0...maxPackageCount - 1 {
-//                    for upperIndex in 0...3 {
-//                        for lowerIndex in 0...3 {
-//                            if cwtCountTransitions + otherCountTransitions < packageIndex {
-//                                if otherCountTransitions > 0 || lowerIndex == 0 {
-//                                    var switchValue: UInt16 = UInt16(packageIndex - 1) << 8
-//                                        switchValue += UInt16(cwtCountTransitions << 6)
-//                                        switchValue += UInt16(otherCountTransitions << 4)
-//                                        switchValue += UInt16(upperIndex << 2)
-//                                        switchValue += UInt16(lowerIndex)
-//                                    var toDo: ToDoValues
-//                                    switch upperIndex << 2 + lowerIndex {
-////                                    case 0b0001: toDo = .SecondMinInFirstMin
-////                                    case 0b0100:
-//                                    default: toDo = .NothingToDo
-//                                    }
-//                                    print("\(switchValue.toBinary(len: 12))")
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-    
-    private func analyzeColor(data: inout DataForColor) {
-        data.connectablePairs.removeAll()
-        data.cardsWithTransitions.removeAll()
-        data.countTransitions = 0
+        
+    private func analyzeColor(data: inout DataForColor, cardToCheck: MySKCard? = nil)->Bool {
         func findContainer() {
             for container in containers {
                 if container.colorIndex == data.colorIndex {
@@ -427,14 +343,6 @@ class CardManager {
                     }
                     return mask
                 }
-//                func setSecondMinMaxToMaxPackage() {
-//                    otherCard.belongsToPackageMax = maxPackage
-//                    otherCard.belongsToPackageMin = maxPackage
-//                }
-//                func setSecondMinMaxToMinPackage() {
-//                    otherCard.belongsToPackageMax = minPackage
-//                    otherCard.belongsToPackageMin = minPackage
-//                }
                 index = ind
                 if cardWithTransition != otherCard &&
                     cardWithTransition.belongsToPackageMax.countOnes() <= 2 &&
@@ -453,71 +361,72 @@ class CardManager {
                     //switchValue = b1 + b2 + b3
                     switchValue = c1 + c2 + c3 + c4
                     doAction(toDo: switchValue)
-//                    if !setOfBinarys.contains(switchValue.toBinary(len:12)) {
-//                        setOfBinarys.append(switchValue.toBinary(len:12))
-//                    }
-//                    if cardWithTransition.belongsToPackageMax.countOnes() == 1 { // check only if belongs to 1 concrete Package
-//                        if let toDoValue = ToDoTable[switchValue] {
-//                            doAction(toDo: toDoValue)
-//                        } else {
-//                            print("not Implemented: \(switchValue)")
-//                        }
-//                    }
                 }
             }
             return countChanges
         }
         
+        if let checkCard = cardToCheck {
+            if data.container != nil {
+                
+            }
+            return true
+        } else {
+            data.connectablePairs.removeAll()
+            data.cardsWithTransitions.removeAll()
+            data.countTransitions = 0
 
-        findContainer()
-        fillAllCards()
-        
-        var countChanges = 0
-        if let container = data.container {
-            // set the belongingsFlags by all other Cards
-            countChanges += setOtherCardBelonging(cardWithTransition: container)
-        }
-        for card in data.cardsWithTransitions {
-            countChanges += setOtherCardBelonging(cardWithTransition: card)
-        }
-        var counter = data.allCards.count
-        while countChanges > 0 && counter > 0 {
-            countChanges = 0
-            for card in data.allCards {
-                if card.belongsToPackageMax.countOnes() == 1 {  // if more then one possible connections
-                    countChanges += setOtherCardBelonging(cardWithTransition: card)
+            findContainer()
+            fillAllCards()
+            
+            var countChanges = 0
+            if let container = data.container {
+                // set the belongingsFlags by all other Cards
+                countChanges += setOtherCardBelonging(cardWithTransition: container)
+            }
+            for card in data.cardsWithTransitions {
+                countChanges += setOtherCardBelonging(cardWithTransition: card)
+            }
+            var counter = data.allCards.count
+            while countChanges > 0 && counter > 0 {
+                countChanges = 0
+                for card in data.allCards {
+                    if card.belongsToPackageMax.countOnes() == 1 {  // if more then one possible connections
+                        countChanges += setOtherCardBelonging(cardWithTransition: card)
+                    }
                 }
+                counter -= 1
             }
-            counter -= 1
-        }
 
-        if data.container != nil {
-            findPair(card: data.container!)
-        }
-        for index in 0..<data.allCards.count {
-            findPair(card: data.allCards[index], startIndex: index)
-        }
-        
-        if data.connectablePairs.count > 0 {
-            data.pairsToRemove.removeAll()
-            for pair in data.connectablePairs {
-                checkPair(data: &data, actPair: pair)
+            if data.container != nil {
+                findPair(card: data.container!)
             }
-            if data.pairsToRemove.count > 0 {
-                for index in data.pairsToRemove.reversed() {
-//                    print(data.connectablePairs[index].printValue)
-                    if index < data.pairsToRemove.count {
-                        data.connectablePairs.remove(at: index)
+            for index in 0..<data.allCards.count {
+                findPair(card: data.allCards[index], startIndex: index)
+            }
+            
+            if data.connectablePairs.count > 0 {
+                data.pairsToRemove.removeAll()
+                for pair in data.connectablePairs {
+                    checkPair(data: &data, actPair: pair)
+                }
+                if data.pairsToRemove.count > 0 {
+                    for index in data.pairsToRemove.reversed() {
+    //                    print(data.connectablePairs[index].printValue)
+                        if index < data.pairsToRemove.count {
+                            data.connectablePairs.remove(at: index)
+                        }
                     }
                 }
             }
+            if data.container != nil {
+                data.container!.setBelongsLabels()
+            }
+            for card in data.allCards {
+                card.setBelongsLabels()
+            }
         }
-        if data.container != nil {
-            data.container!.setBelongsLabels()
-        }
-        for card in data.allCards {
-            card.setBelongsLabels()
-        }
+        return true
     }
     
     private func checkPair(data: inout DataForColor, actPair: ConnectablePair) {
