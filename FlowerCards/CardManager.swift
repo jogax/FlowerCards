@@ -98,11 +98,7 @@ class CardManager {
     }
 
     func check(color: Int) {
-        _ = analyzeColor(data: &colorArray[color])
-    }
-    
-    func checkIfCardUsable(card: MySKCard)->Bool {
-        return analyzeColor(data: &colorArray[card.colorIndex], cardToCheck: card)
+        analyzeColor(data: &colorArray[color])
     }
     
     func areConnectable(first: MySKCard, second: MySKCard)->Bool {
@@ -123,8 +119,40 @@ class CardManager {
         }
         return false
     }
-        
-    private func analyzeColor(data: inout DataForColor, cardToCheck: MySKCard? = nil)->Bool {
+    
+//    private func fillToDoTable() {
+//        for packageIndex in 2...maxPackageCount {
+//            for cwtCountTransitions in 0...maxPackageCount - 1 {
+//                for otherCountTransitions in 0...maxPackageCount - 1 {
+//                    for upperIndex in 0...3 {
+//                        for lowerIndex in 0...3 {
+//                            if cwtCountTransitions + otherCountTransitions < packageIndex {
+//                                if otherCountTransitions > 0 || lowerIndex == 0 {
+//                                    var switchValue: UInt16 = UInt16(packageIndex - 1) << 8
+//                                        switchValue += UInt16(cwtCountTransitions << 6)
+//                                        switchValue += UInt16(otherCountTransitions << 4)
+//                                        switchValue += UInt16(upperIndex << 2)
+//                                        switchValue += UInt16(lowerIndex)
+//                                    var toDo: ToDoValues
+//                                    switch upperIndex << 2 + lowerIndex {
+////                                    case 0b0001: toDo = .SecondMinInFirstMin
+////                                    case 0b0100:
+//                                    default: toDo = .NothingToDo
+//                                    }
+//                                    print("\(switchValue.toBinary(len: 12))")
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+    
+    private func analyzeColor(data: inout DataForColor) {
+        data.connectablePairs.removeAll()
+        data.cardsWithTransitions.removeAll()
+        data.countTransitions = 0
         func findContainer() {
             for container in containers {
                 if container.colorIndex == data.colorIndex {
@@ -366,67 +394,56 @@ class CardManager {
             return countChanges
         }
         
-        if let checkCard = cardToCheck {
-            if data.container != nil {
-                
-            }
-            return true
-        } else {
-            data.connectablePairs.removeAll()
-            data.cardsWithTransitions.removeAll()
-            data.countTransitions = 0
 
-            findContainer()
-            fillAllCards()
-            
-            var countChanges = 0
-            if let container = data.container {
-                // set the belongingsFlags by all other Cards
-                countChanges += setOtherCardBelonging(cardWithTransition: container)
-            }
-            for card in data.cardsWithTransitions {
-                countChanges += setOtherCardBelonging(cardWithTransition: card)
-            }
-            var counter = data.allCards.count
-            while countChanges > 0 && counter > 0 {
-                countChanges = 0
-                for card in data.allCards {
-                    if card.belongsToPackageMax.countOnes() == 1 {  // if more then one possible connections
-                        countChanges += setOtherCardBelonging(cardWithTransition: card)
-                    }
-                }
-                counter -= 1
-            }
-
-            if data.container != nil {
-                findPair(card: data.container!)
-            }
-            for index in 0..<data.allCards.count {
-                findPair(card: data.allCards[index], startIndex: index)
-            }
-            
-            if data.connectablePairs.count > 0 {
-                data.pairsToRemove.removeAll()
-                for pair in data.connectablePairs {
-                    checkPair(data: &data, actPair: pair)
-                }
-                if data.pairsToRemove.count > 0 {
-                    for index in data.pairsToRemove.reversed() {
-    //                    print(data.connectablePairs[index].printValue)
-                        if index < data.pairsToRemove.count {
-                            data.connectablePairs.remove(at: index)
-                        }
-                    }
-                }
-            }
-            if data.container != nil {
-                data.container!.setBelongsLabels()
-            }
+        findContainer()
+        fillAllCards()
+        
+        var countChanges = 0
+        if let container = data.container {
+            // set the belongingsFlags by all other Cards
+            countChanges += setOtherCardBelonging(cardWithTransition: container)
+        }
+        for card in data.cardsWithTransitions {
+            countChanges += setOtherCardBelonging(cardWithTransition: card)
+        }
+        var counter = data.allCards.count
+        while countChanges > 0 && counter > 0 {
+            countChanges = 0
             for card in data.allCards {
-                card.setBelongsLabels()
+                if card.belongsToPackageMax.countOnes() == 1 {  // if more then one possible connections
+                    countChanges += setOtherCardBelonging(cardWithTransition: card)
+                }
+            }
+            counter -= 1
+        }
+
+        if data.container != nil {
+            findPair(card: data.container!)
+        }
+        for index in 0..<data.allCards.count {
+            findPair(card: data.allCards[index], startIndex: index)
+        }
+        
+        if data.connectablePairs.count > 0 {
+            data.pairsToRemove.removeAll()
+            for pair in data.connectablePairs {
+                checkPair(data: &data, actPair: pair)
+            }
+            if data.pairsToRemove.count > 0 {
+                for index in data.pairsToRemove.reversed() {
+//                    print(data.connectablePairs[index].printValue)
+                    if index < data.pairsToRemove.count {
+                        data.connectablePairs.remove(at: index)
+                    }
+                }
             }
         }
-        return true
+        if data.container != nil {
+            data.container!.setBelongsLabels()
+        }
+        for card in data.allCards {
+            card.setBelongsLabels()
+        }
     }
     
     private func checkPair(data: inout DataForColor, actPair: ConnectablePair) {
