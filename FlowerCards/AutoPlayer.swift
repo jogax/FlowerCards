@@ -85,6 +85,7 @@ class AutoPlayer {
         if self.replay {
             scene.startNewGame(false)
             scene.durationMultiplier = scene.durationMultiplierForAutoplayer
+            scene.waitForStartConst = scene.waitForStartForAutoplayer
             indexForReplay = 0
         } else {
             switch testType {
@@ -118,6 +119,7 @@ class AutoPlayer {
             if self.testType != .runOnce {
                 startNextGame()
                 scene.durationMultiplier = scene.durationMultiplierForAutoplayer
+                scene.waitForStartConst = scene.waitForStartForAutoplayer
             }
         }
         scene.isUserInteractionEnabled = false
@@ -159,6 +161,7 @@ class AutoPlayer {
                 scene.gameNumber = gamesToPlay[gameIndex].gameNumber - 1
                 scene.startNewGame(false)
                 scene.durationMultiplier = scene.durationMultiplierForAutoplayer
+                scene.waitForStartConst = scene.waitForStartForAutoplayer
             }
         }
     }
@@ -266,7 +269,7 @@ class AutoPlayer {
             if stopTimer {
                 timer.invalidate()
             } else {
-                let interval = autoPlayStatus == .getTipp || autoPlayStatus == .touchesBegan ? 0.1 : 0.01
+                let interval = autoPlayStatus == .getTipp || autoPlayStatus == .touchesBegan ? 0.01 : 0.0001
                 timer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }
         } else {

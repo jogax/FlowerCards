@@ -485,7 +485,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var replaying = false
     var durationMultiplier = 0.001
     let durationMultiplierForPlayer = 0.001
-    let durationMultiplierForAutoplayer = 0.00001
+    let durationMultiplierForAutoplayer = 0.000001
+    var waitForStartConst = 0.1
+    let waitForStartForPlayer = 0.1
+    let waitForStartForAutoplayer = 0.001
     var cardManager: CardManager?
     
     override func didMove(to view: SKView) {
@@ -545,6 +548,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         labelFontSize = GV.onIpad ? self.size.height / 50 : self.size.height / 70
 
         durationMultiplier = durationMultiplierForPlayer
+        waitForStartConst = waitForStartForPlayer
         levelIndex = GV.player!.levelID
         GV.levelsForPlay.setAktLevel(levelIndex)
         if newGame {
@@ -1077,7 +1081,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             let actionMove = SKAction.move(to: zielPosition, duration: duration)
             
             let waitingAction = SKAction.wait(forDuration: waitForStart)
-            waitForStart += 0.1
+            waitForStart += waitForStartConst
             
             let zPositionPlus = SKAction.run({
                 card.zPosition += 100
@@ -1122,6 +1126,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func startAutoplay(testType: AutoPlayer.TestType) {
         autoPlayerActive = true
         durationMultiplier = durationMultiplierForAutoplayer
+        waitForStartConst = waitForStartForAutoplayer
         autoPlayer?.startPlay(replay: false, testType: testType)
     }
     
@@ -1154,10 +1159,36 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     
+//    func startCreateTippsInBackground() {
+//        {
+//            self.generatingTipps = true
+////            self.stopTimer(&self.showTippAtTimer)
+//            _ = self.createTipps()
+//            
+//            repeat {
+//                if self.tippArray.count <= 2 && self.checkGameArray() > 2 {
+//                    if cardStack.count(.MySKCardType) > 0 {
+//                        self.generateCards(.special)
+//                        _ = self.createTipps()
+//                    } else {
+//                        break
+//                    }
+//                }
+//            } while !(self.tippArray.count > 2 || self.countColumns * self.countRows - self.checkGameArray() == 0 || self.checkGameArray() < 2)
+//            
+//            if self.tippArray.count == 0 && self.cardCount > 0 {
+//                
+//                print ("You have lost!")
+//            }
+//            self.generatingTipps = false
+//        } ~>
+//        {
+//            self.generatingTipps = false
+//        }
+//    }
     func startCreateTippsInBackground() {
-        {
             self.generatingTipps = true
-//            self.stopTimer(&self.showTippAtTimer)
+            //            self.stopTimer(&self.showTippAtTimer)
             _ = self.createTipps()
             
             repeat {
@@ -1169,17 +1200,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         break
                     }
                 }
-            } while !(self.tippArray.count > 2 || self.countColumns * self.countRows - self.checkGameArray() == 0 || self.checkGameArray() < 2)
+            } while !(self.tippArray.count > 2 || self.countColumns * self.countRows - self.checkGameArray() == 0 || self.checkGameArray() < 5)
             
             if self.tippArray.count == 0 && self.cardCount > 0 {
                 
                 print ("You have lost!")
             }
             self.generatingTipps = false
-        } ~>
-        {
-            self.generatingTipps = false
-        }
     }
     
     
