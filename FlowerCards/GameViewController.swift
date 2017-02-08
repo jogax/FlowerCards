@@ -157,7 +157,7 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
             scene.scaleMode = .resizeFill
             skView!.presentScene(scene)
             cardsScene = scene
-            GV.mainScene = scene // global for the whole app
+//            GV.mainScene = scene // global for the whole app
     }
     func printFonts() {
         let fontFamilyNames = UIFont.familyNames

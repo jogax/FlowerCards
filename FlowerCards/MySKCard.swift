@@ -109,12 +109,12 @@ class MySKCard: SKSpriteNode {
                 if BGPictureAdded {
                     BGPicture.size = size
                 }
+//                print ("\(self.printValue), size: \(size)")
 //              print("name: \(name), type: \(type), size: \(size), self.position: \(position), minValueLabel.position: \(minValueLabel.position)")
             }
         }
     }
     private static let bitMaskForPackages: [UInt8] = [1, 2, 4, 8]
-    private static let colorNames = ["Purple", "Blue  ", "Green ", "Red   "]
     var type: MySKCardType
     var colorIndex = NoColor
     var column = 0
@@ -140,7 +140,7 @@ class MySKCard: SKSpriteNode {
     let modelConstantLocal = UIDevice.current.modelName
     var printValue: String {
         get {
-            var value = String(type == .cardType ? "Card:" : "Cont:") + "color: " + MySKCard.colorNames[colorIndex]
+            var value = String(type == .cardType ? "Card:" : "Cont:") + "color: " + MySKCard.colorNames[colorIndex]!
             value += ", col: " + String(column) + ", row: " + String(row)
             value += ", max: " + cardLib[maxValue]! + ", min: " + cardLib[minValue]! + " (" + String(countCards) + ")"
             value += ", belongs: " + String(belongsToPackageMax) + "/" + String(belongsToPackageMin)
@@ -183,6 +183,9 @@ class MySKCard: SKSpriteNode {
 
     var countCards: Int {
         get {
+            if minValue == NoValue {
+                return 0
+            }
             if countTransitions == 0 {
                 return maxValue - minValue + 1
             } else {
@@ -221,6 +224,7 @@ class MySKCard: SKSpriteNode {
     var BGPictureAdded = false
     private var standardFontSize: CGFloat = 0
     private var fontSize10: CGFloat = 0
+    private static let colorNames: [Int:String] = [0: "Purple", 1:"Blue  ", 2: "Green ", 3: "Red   ", 1000: ""]
     
     let cardLib: [Int:String] = [
         0:"A", 1:"2", 2:"3", 3:"4", 4:"5", 5:"6", 6:"7", 7:"8", 8:"9", 9:"10", 10: GV.language.getText(.tcj), 11: GV.language.getText(.tcd), 12: GV.language.getText(.tck), NoColor: ""]
@@ -310,7 +314,7 @@ class MySKCard: SKSpriteNode {
         if MySKCard.countPackages == 1 {
             return ""
         }
-        if self.type == .containerType && self.colorIndex != NoValue {
+        if self.type == .containerType && self.colorIndex != NoColor {
             if upper {
                 return String(MySKCard.countPackages)
 //                switch MySKCard.countPackages {
@@ -421,6 +425,7 @@ class MySKCard: SKSpriteNode {
             }
             let BGPicturePosition = CGPoint(x: self.size.width * BGOffsetMultiplier.x, y: self.size.height * BGOffsetMultiplier.y)
             let bgPictureName = "BGPicture"
+            setBelongsLabels()
             if minValue != maxValue  || countTransitions > 0  {
                 if !BGPictureAdded {
                     if self.childNode(withName: bgPictureName) == nil {
@@ -467,15 +472,19 @@ class MySKCard: SKSpriteNode {
     }
 
     func setLabelText(upper: Bool) {
+        let valueLabel = upper ? maxValueLabel : minValueLabel
+        let packageLabel = upper ? maxPackageLabel : minPackageLabel
+        valueLabel.text = ""
+        packageLabel.text = ""
         if colorIndex != NoColor && (type == .cardType || type == .containerType) {
-            let valueLabel = upper ? maxValueLabel : minValueLabel
-            let packageLabel = upper ? maxPackageLabel : minPackageLabel
+//            let valueLabel = upper ? maxValueLabel : minValueLabel
+//            let packageLabel = upper ? maxPackageLabel : minPackageLabel
             let value = upper ? maxValue : minValue
             guard let text = cardLib[minValue == NoColor ? NoColor : value % MaxCardValue] else {
                 return
             }
             valueLabel.text = "\(text)"
-            valueLabel.fontSize = value == 9 ? fontSize10 : standardFontSize // 9 is on card 10
+            valueLabel.fontSize = standardFontSize // value == 9 ? fontSize10 : standardFontSize // 9 is on card 10
             let packageLabelText = generateBelongsToPackageString(upper: upper)
             packageLabel.text = packageLabelText
         }

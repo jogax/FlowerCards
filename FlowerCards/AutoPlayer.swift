@@ -40,7 +40,8 @@ class AutoPlayer {
     var testType: TestType = .runOnce //.test
     var testerType: TesterType = .expert
     var gamesToPlay: [GameToPlay] = [
-        GameToPlay(level: 72, gameNumber: 962, stopAt: 161),
+        GameToPlay(level: 12, gameNumber: 1),
+//        GameToPlay(level: 72, gameNumber: 962, stopAt: 161),
 //        GameToPlay(level: 72, gameNumber: 466),
 //        GameToPlay(level: 11, gameNumber: 66, stopAt: 114), // test example 3 Packages
 //        GameToPlay(level: 11, gameNumber: 3, stopAt: 60), //You have lost ===> now too!!!
@@ -185,13 +186,13 @@ class AutoPlayer {
                     } else {
                         switch testerType {
                         case .beginner:
-                            for tipp in scene.tippArray {
+                            for tipp in tippArray {
                                 if bestTipp.value < tipp.value {
                                     bestTipp = tipp
                                 }
                             }
                         case .medium:
-                            for tipp in scene.tippArray {
+                            for tipp in tippArray {
                                 if tipp.toRow != NoValue  { // first check only Cards
                                     if bestTipp.value < tipp.value {
                                         bestTipp = tipp
@@ -199,7 +200,7 @@ class AutoPlayer {
                                 }
                             }
                             if bestTipp.points.count == 0 {
-                                for tipp in scene.tippArray {
+                                for tipp in tippArray {
                                     if tipp.toRow == NoValue  { // first check only Cards
                                         if bestTipp.value < tipp.value {
                                             bestTipp = tipp
@@ -209,7 +210,7 @@ class AutoPlayer {
                             }
                             
                         case .expert:
-                            for tipp in scene.tippArray {
+                            for tipp in tippArray {
                                 if tipp.toRow != NoValue  { // first check only Cards
                                     if bestTipp.value < tipp.value {
                                         bestTipp = tipp
@@ -217,7 +218,7 @@ class AutoPlayer {
                                 }
                             }
                             if bestTipp.points.count == 0 {
-                                for tipp in scene.tippArray {
+                                for tipp in tippArray {
                                     if tipp.toRow == NoValue  { // first check only Cards
                                         if bestTipp.value < tipp.value {
                                             bestTipp = tipp
