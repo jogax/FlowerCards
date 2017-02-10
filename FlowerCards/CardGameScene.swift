@@ -26,30 +26,6 @@ struct GameArrayPositions {
     }
 }
 
-struct Tipps {
-    var removed: Bool
-    var fromColumn: Int
-    var fromRow: Int
-    var toColumn: Int
-    var toRow: Int
-    var twoArrows: Bool
-    var points:[CGPoint]
-    var value: Int
-    var lineLength: CGFloat
-    
-    init() {
-        removed = false
-        fromColumn = 0
-        fromRow = 0
-        toColumn = 0
-        toRow = 0
-        points = [CGPoint]()
-        twoArrows = false
-        value = 0
-        lineLength = 0
-    }
-}
-
 struct PairStatus {
     var color: MyColors
     var pair: FromToColumnRow
@@ -117,31 +93,6 @@ enum MyColors: Int {
 }
 
 
-struct Founded {
-    let maxDistance: CGFloat = 100000.0
-    var point: CGPoint
-    var column: Int
-    var row: Int
-    var foundContainer: Bool
-    var distanceToP1: CGFloat
-    var distanceToP0: CGFloat
-    init(column: Int, row: Int, foundContainer: Bool, point: CGPoint, distanceToP1: CGFloat, distanceToP0: CGFloat) {
-        self.distanceToP1 = distanceToP1
-        self.distanceToP0 = distanceToP0
-        self.column = column
-        self.row = row
-        self.foundContainer = foundContainer
-        self.point = point
-    }
-    init() {
-        self.distanceToP1 = maxDistance
-        self.distanceToP0 = maxDistance
-        self.point = CGPoint(x: 0, y: 0)
-        self.column = 0
-        self.row = 0
-        self.foundContainer = false
-    }
-}
 
 struct DrawHelpLinesParameters {
     var points: [CGPoint]
@@ -171,6 +122,16 @@ var gameArray = [[GameArrayPositions]]()
 var containers = [MySKCard]()
 var cardStack:Stack<MySKCard> = Stack()
 var countPackages = 1
+var lastPair = PairStatus() {
+    didSet {
+        if oldValue.color != lastPair.color {
+            lastPair.startTime = Date()
+            lastPair.changeTime = lastPair.startTime
+        }
+    }
+}
+
+
 
 class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, PeerToPeerServiceManagerDelegate { //,  JGXLineDelegate { //MyGameScene {
 
@@ -260,6 +221,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
         return len
     }
+    
 
     
     let answerYes = "YES"
@@ -559,9 +521,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             buttonYPos = self.size.height * 0.07
             buttonXPosNormalized = self.size.width / 10
             self.name = "CardGameScene"
-            autoPlayer = AutoPlayer(scene: self)
             prepareNextGame(true)
             generateCards(.first)
+            autoPlayer = AutoPlayer(scene: self)
         } else {
             playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
             
@@ -1189,7 +1151,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func startCreateTippsInBackground() {
         tippsButton!.activateButton(false)
-        cardManager!.check()
+//        cardManager!.check()
         self.generatingTipps = true
         //            self.stopTimer(&self.showTippAtTimer)
         _ = cardManager?.createTipps()
@@ -1198,7 +1160,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             if tippArray.count <= 2 && self.checkGameArray() > 2 {
                 if cardStack.count(.MySKCardType) > 0 {
                     self.generateCards(.special)
-                    cardManager!.check()
+//                    cardManager!.check()
                     _ = cardManager?.createTipps()
                 } else {
                     break
@@ -1251,193 +1213,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
 
     func specialButtonPressed(_ buttonName: String) {
-//        //printFunc(function: "specialButtonPressed", start: true)
         if buttonName == "tipps" {
             if !generatingTipps {
                 cardManager!.getTipps()
-//                if showTippCounter > 0 {
-//                    showTippCounter -= 1
-//                } else {
-//                    freeTippCounter -= 1
-//                    let modifyer = freeTippCounter > 0 ? 0 : freeTippCounter > -freeAmount ? penalty : 2 * penalty
-//                    scoreModifyer -= modifyer
-//                    levelScore -= modifyer
-//                    if modifyer > 0 {
-//                        self.addChild(showCountScore("-\(modifyer)", position: undoButton!.position))
-//                    }
-//                }
             }
         }
-//        //printFunc(function: "specialButtonPressed", start: false)
     }
     
     func startTippTimer(){
     }
     
-//    func getTipps() {
-//        //printFunc(function: "getTipps", start: true)
-//        if tippArray.count > 0 && !generatingTipps {
-//                stopTrembling()
-//                drawHelpLines(tippArray[tippIndex].points, lineWidth: cardSize.width, twoArrows: tippArray[tippIndex].twoArrows, color: .green)
-//                var position = CGPoint.zero
-//                if tippArray[tippIndex].fromRow == NoValue {
-//                    position = containers[tippArray[tippIndex].fromColumn].position
-//                } else {
-//                    position = gameArray[tippArray[tippIndex].fromColumn][tippArray[tippIndex].fromRow].position
-//                }
-//                addCardToTremblingCards(position)
-//                if tippArray[tippIndex].toRow == NoValue {
-//                    position = containers[tippArray[tippIndex].toColumn].position
-//                } else {
-//                    position = gameArray[tippArray[tippIndex].toColumn][tippArray[tippIndex].toRow].position
-//                }
-//                addCardToTremblingCards(position)
-////            }
-//            tippIndex += 1
-//            tippIndex %= tippArray.count
-//        }
-//        
-//        //printFunc(function: "getTipps", start: false)
-//    }
-    
-//    func createTipps()->Bool {
-//        //printFunc(function: "createTipps", start: true)
-////        printGameArrayInhalt("from createTipps")
-//        tippArray.removeAll()
-////        while gameArray.count < countColumns * countRows {
-////            sleep(1) //wait until gameArray is filled!!
-////        }
-////        cardManager!.check()
-//
-//        tippsButton!.activateButton(false)
-//        var pairsToCheck = [FromToColumnRow]()
-//        for column1 in 0..<countColumns {
-//            for row1 in 0..<countRows {
-//                if gameArray[column1][row1].used {
-//                    for column2 in 0..<countColumns {
-//                        for row2 in 0..<countRows {
-//                            if gameArray[column2][row2].used {
-//                                if stopCreateTippsInBackground {
-//    //                                print("stopped while searching pairs")
-//                                    stopCreateTippsInBackground = false
-//                                    return false
-//                                }
-//                                let first = gameArray[column2][row2].card
-//                                let second = gameArray[column1][row1].card
-//                                let connectable = cardManager?.areConnectable(first: first, second: second)
-//                                if (column1 != column2 || row1 != row2) && connectable! {
-////                                    MySKCard.areConnectable(first: first, second: second) {
-//                                    let aktPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: column2, row: row2))
-//                                    if !pairExists(pairsToCheck: pairsToCheck, aktPair: aktPair) {
-//                                        pairsToCheck.append(aktPair)
-//                                        pairsToCheck.append(FromToColumnRow(fromColumnRow: aktPair.toColumnRow, toColumnRow: aktPair.fromColumnRow))
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                    var thisColorHasContainer = false
-//                    for container in containers {
-//                        if gameArray[column1][row1].card.colorIndex == container.colorIndex {
-//                            thisColorHasContainer = true
-//                        }
-//                    }
-//                    let cardToCheck = gameArray[column1][row1].card
-//                    for (index, container) in containers.enumerated() {
-//                        if cardToCheck.belongsToPackageMax & container.belongsToPackageMin != 0 || cardToCheck.maxValue == LastCardValue && container.minValue == FirstCardValue {
-//                            if !thisColorHasContainer && container.minValue == NoColor && cardToCheck.maxValue == LastCardValue {
-//                                let actContainerPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: index, row: NoValue))
-//                                pairsToCheck.append(actContainerPair)
-//                            } else  if container.colorIndex == cardToCheck.colorIndex &&
-//                                (container.minValue == cardToCheck.maxValue + 1 ||
-//                                (container.minValue ==  FirstCardValue && cardToCheck.maxValue == LastCardValue))   {
-//                                let actContainerPair = FromToColumnRow(fromColumnRow: ColumnRow(column: column1, row: row1), toColumnRow: ColumnRow(column: index, row: NoValue))
-//                                pairsToCheck.append(actContainerPair)
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        
-////        let startCheckTime = NSDate()
-//        for ind in 0..<pairsToCheck.count {
-//            checkPathToFoundedCards(pairsToCheck[ind])
-//            if stopCreateTippsInBackground {
-//                stopCreateTippsInBackground = false
-//                return false
-//            }
-//        }
-//
-//        var removeIndex = [Int]()
-//        if tippArray.count > 0 {
-//            for ind in 0..<tippArray.count - 1 {
-//                if !tippArray[ind].removed {
-//                    let fromColumn = tippArray[ind].fromColumn
-//                    let toColumn = tippArray[ind].toColumn
-//                    let fromRow = tippArray[ind].fromRow
-//                    let toRow = tippArray[ind].toRow
-//                    if fromColumn == tippArray[ind + 1].toColumn &&
-//                       fromRow == tippArray[ind + 1].toRow &&
-//                       toColumn == tippArray[ind + 1].fromColumn  &&
-//                       toRow == tippArray[ind + 1].fromRow {
-////                            removeIndex.insert(ind + 1, at: 0)
-//                    }
-//                    if gameArray[fromColumn][fromRow].card.maxValue == LastCardValue && toRow == NoValue && containers[toColumn].minValue == NoColor {
-//                        // King to empty Container
-//                        var index = 1
-//                        while (ind + index) < tippArray.count && index < 4 {
-//                            let fromColumn1 = tippArray[ind + index].fromColumn
-//                            let toColumn1 = tippArray[ind + index].toColumn
-//                            let fromRow1 = tippArray[ind + index].fromRow
-//                            let toRow1 = tippArray[ind + index].toRow
-//                            
-//                            if fromColumn == fromColumn1 && fromRow == fromRow1 && toRow1 == NoValue && containers[toColumn1].minValue == NoColor
-//                                && toColumn != toColumn1 {
-//                                if tippArray[ind].lineLength < tippArray[ind + index].lineLength {
-//                                    let tippArchiv = tippArray[ind]
-//                                    tippArray[ind] = tippArray[ind + index]
-//                                    tippArray[ind + index] = tippArchiv
-//                                }
-//                                tippArray[ind + index].removed = true
-////                                removeIndex.insert(ind + index, at: 0)
-//                            }
-//                            index += 1
-//                        }
-//                        dummy = 0
-//                    }
-//                }
-//            }
-//            
-//            
-//            for ind in 0..<removeIndex.count {
-//                tippArray.remove(at: removeIndex[ind])
-//            }
-//            
-//            
-//            if stopCreateTippsInBackground {
-////                print("stopped before sorting Tipp pairs")
-//
-//                stopCreateTippsInBackground = false
-//                //printFunc(function: "createTipps", start: false)
-//                return false
-//            }
-//            tippArray.sort(by: {checkForSort(t0: $0, t1: $1) })
-//            
-//        }
-////        let tippCountText: String = GV.language.getText(.TCTippCount)
-////        print("Tippcount:", tippArray.count, tippArray)
-//        showTippCount()
-////        if tippArray.count > 0 {
-//            tippsButton!.activateButton(true)
-////        } else {
-////            print("No Tipps")
-////        }
-//
-//        tippIndex = 0  // set tipps to first
-//        //printFunc(function: "createTipps", start: false)
-//        return true
-//     }
     
     func findPairForCard (_ colorIndex: Int, minValue: Int, maxValue: Int)->Bool {
         var founded = false
@@ -1463,614 +1248,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         return founded
     }
     
-//    func checkForSort(t0: Tipps, t1:Tipps)->Bool {
-//        let returnValue = gameArray[t0.fromColumn][t0.fromRow].card.colorIndex < gameArray[t1.fromColumn][t1.fromRow].card.colorIndex
-//            || (gameArray[t0.fromColumn][t0.fromRow].card.colorIndex == gameArray[t1.fromColumn][t1.fromRow].card.colorIndex &&
-//                (gameArray[t0.fromColumn][t0.fromRow].card.maxValue < gameArray[t1.fromColumn][t1.fromRow].card.minValue
-//            || (t0.toRow != NoValue && t1.toRow != NoValue && gameArray[t0.toColumn][t0.toRow].card.maxValue < gameArray[t1.toColumn][t1.toRow].card.minValue)))
-//        return returnValue
-//    }
-    
-//    func pairExists(pairsToCheck:[FromToColumnRow], aktPair: FromToColumnRow)->Bool {
-//        for pair in pairsToCheck {
-//            if pair.fromColumnRow.column == aktPair.fromColumnRow.column && pair.fromColumnRow.row == aktPair.fromColumnRow.row &&
-//                pair.toColumnRow.column == aktPair.toColumnRow.column && pair.toColumnRow.row == aktPair.toColumnRow.row {
-//                return true
-//            }
-//        }
-//        return false
-//    }
-
-    
-//    func checkPathToFoundedCards(_ actPair:FromToColumnRow) {
-//        var targetPoint = CGPoint.zero
-//        var myTipp = Tipps()
-//        let firstValue: CGFloat = 10000
-//        var distanceToLine = firstValue
-//       let startPoint = gameArray[actPair.fromColumnRow.column][actPair.fromColumnRow.row].position
-////        let name = gameArray[index.card1.column][index.card1.row].name
-//        if actPair.toColumnRow.row == NoValue {
-//            targetPoint = containers[actPair.toColumnRow.column].position
-//        } else {
-//            targetPoint = gameArray[actPair.toColumnRow.column][actPair.toColumnRow.row].position
-//        }
-//        let startAngle = calculateAngle(startPoint, point2: targetPoint).angleRadian - GV.oneGrad
-//        let stopAngle = startAngle + 360 * GV.oneGrad // + 360°
-////        let startNode = self.childNodeWithName(name)! as! MySKCard
-//        var founded = false
-//        var angle = startAngle
-//        let multiplierForSearch = CGFloat(3.0)
-////        let fineMultiplier = CGFloat(1.0)
-//        let multiplier:CGFloat = multiplierForSearch
-//        while angle <= stopAngle && !founded {
-//            let toPoint = GV.pointOfCircle(1.0, center: startPoint, angle: angle)
-//            let (foundedPoint, myPoints) = createHelpLines(actPair.fromColumnRow, toPoint: toPoint, inFrame: self.frame, lineSize: cardSize.width, showLines: false)
-//            if foundedPoint != nil {
-//                if foundedPoint!.foundContainer && actPair.toColumnRow.row == NoValue && foundedPoint!.column == actPair.toColumnRow.column ||
-//                    (foundedPoint!.column == actPair.toColumnRow.column && foundedPoint!.row == actPair.toColumnRow.row) {
-//                    if distanceToLine == firstValue ||
-//                    myPoints.count > myTipp.points.count ||
-//                    (myTipp.points.count == myPoints.count && foundedPoint!.distanceToP0 > distanceToLine) {
-//                        myTipp.fromColumn = actPair.fromColumnRow.column
-//                        myTipp.fromRow = actPair.fromColumnRow.row
-//                        myTipp.toColumn = actPair.toColumnRow.column
-//                        myTipp.toRow = actPair.toColumnRow.row
-//                        myTipp.points = myPoints
-//                        distanceToLine = foundedPoint!.distanceToP0
-//                        
-//                    }
-//                    if distanceToLine != firstValue && distanceToLine < foundedPoint!.distanceToP0 && myTipp.points.count == 2 {
-//                        founded = true
-//                    }
-//                }
-//            } else {
-////                print("in else zweig von checkPathToFoundedCards !")
-//            }
-//            angle += GV.oneGrad * multiplier
-//        }
-//
-//        if distanceToLine.between(0, max: firstValue - 0.1) {
-//            
-//            for ind in 0..<myTipp.points.count - 1 {
-//                myTipp.lineLength += (myTipp.points[ind] - myTipp.points[ind + 1]).length()
-//            }
-//            // calculate the value for this tipp
-////            myTipp.value = (self.childNode(withName: gameArray[myTipp.fromColumn][myTipp.fromRow].name) as! MySKCard).countScore * (myTipp.points.count - 1)
-//            myTipp.value = gameArray[myTipp.fromColumn][myTipp.fromRow].card.countScore * (myTipp.points.count - 1)
-//            tippArray.append(myTipp)
-//        }
-//     }
-//    
-    
-//    func createHelpLines(_ movedFrom: ColumnRow, toPoint: CGPoint, inFrame: CGRect, lineSize: CGFloat, showLines: Bool)->(foundedPoint: Founded?, [CGPoint]) {
-//        var pointArray = [CGPoint]()
-//        var foundedPoint: Founded?
-//        var founded = false
-//        //        var myLine: SKShapeNode?
-//        let fromPosition = gameArray[movedFrom.column][movedFrom.row].position
-//        let line = JGXLine(fromPoint: fromPosition, toPoint: toPoint, inFrame: inFrame, lineSize: lineSize) //, delegate: self)
-//        let pointOnTheWall = line.line.toPoint
-//        pointArray.append(fromPosition)
-//        (founded, foundedPoint) = findEndPoint(movedFrom, fromPoint: fromPosition, toPoint: pointOnTheWall, lineWidth: lineSize, showLines: showLines)
-//        //        linesArray.append(myLine)
-//        //        if showLines {self.addChild(myLine)}
-//        if founded {
-//            pointArray.append(foundedPoint!.point)
-//        } else {
-//            pointArray.append(pointOnTheWall)
-//            let mirroredLine1 = line.createMirroredLine()
-//            (founded, foundedPoint) = findEndPoint(movedFrom, fromPoint: mirroredLine1.line.fromPoint, toPoint: mirroredLine1.line.toPoint, lineWidth: lineSize, showLines: showLines)
-//            
-//            //            linesArray.append(myLine)
-//            //            if showLines {self.addChild(myLine)}
-//            if founded {
-//                pointArray.append(foundedPoint!.point)
-//            } else {
-//                pointArray.append(mirroredLine1.line.toPoint)
-//                let mirroredLine2 = mirroredLine1.createMirroredLine()
-//                (founded, foundedPoint) = findEndPoint(movedFrom, fromPoint: mirroredLine2.line.fromPoint, toPoint: mirroredLine2.line.toPoint, lineWidth: lineSize, showLines: showLines)
-//                //                linesArray.append(myLine)
-//                //                if showLines {self.addChild(myLine)}
-//                if founded {
-//                    pointArray.append(foundedPoint!.point)
-//                } else {
-//                    pointArray.append(mirroredLine2.line.toPoint)
-//                    let mirroredLine3 = mirroredLine2.createMirroredLine()
-//                    (founded, foundedPoint) = findEndPoint(movedFrom, fromPoint: mirroredLine3.line.fromPoint, toPoint: mirroredLine3.line.toPoint, lineWidth: lineSize, showLines: showLines)
-//                    //                    linesArray.append(myLine)
-//                    //                    if showLines {self.addChild(myLine)}
-//                    if founded {
-//                        pointArray.append(foundedPoint!.point)
-//                    } else {
-//                        pointArray.append(mirroredLine3.line.toPoint)
-//                        let mirroredLine4 = mirroredLine3.createMirroredLine()
-//                        (founded, foundedPoint) = findEndPoint(movedFrom, fromPoint: mirroredLine4.line.fromPoint, toPoint: mirroredLine4.line.toPoint, lineWidth: lineSize, showLines: showLines)
-//                        //                    linesArray.append(myLine)
-//                        //                    if showLines {self.addChild(myLine)}
-//                        if founded {
-//                            pointArray.append(foundedPoint!.point)
-//                        } else {
-//                            pointArray.append(mirroredLine4.line.toPoint)
-//                            let mirroredLine5 = mirroredLine4.createMirroredLine()
-//                            (founded, foundedPoint) = findEndPoint(movedFrom, fromPoint: mirroredLine5.line.fromPoint, toPoint: mirroredLine5.line.toPoint, lineWidth: lineSize, showLines: showLines)
-//                            //                    linesArray.append(myLine)
-//                            //                    if showLines {self.addChild(myLine)}
-//                            if founded {
-//                                pointArray.append(foundedPoint!.point)
-//                            } else {
-//                                pointArray.append(mirroredLine5.line.toPoint)
-//                            }
-//                        }
-//
-//                    }
-//                    
-//                }
-//            }
-//        }
-//        
-//        if showLines {
-//            let color = calculateLineColor(foundedPoint!, movedFrom:  movedFrom)
-//            drawHelpLines(pointArray, lineWidth: lineSize, twoArrows: false, color: color)
-//        }
-//        
-//        return (foundedPoint, pointArray)
-//    }
-//    
-//    func calculateLineColor(_ foundedPoint: Founded, movedFrom: ColumnRow) -> MyColors {
-//        
-//        var color = MyColors.red
-//        var foundedPosition = GameArrayPositions()
-//        
-//        if foundedPoint.distanceToP0 == foundedPoint.maxDistance {
-//            return color
-//        }
-//        
-//        var actColorHasContainer = false
-//        for container in containers {
-//            if container.colorIndex == gameArray[movedFrom.column][movedFrom.row].card.colorIndex {
-//                actColorHasContainer = true
-//            }
-//        }
-//        
-//        if foundedPoint.foundContainer {
-//            foundedPosition.card = containers[foundedPoint.column]
-////            foundedPosition.card.colorIndex = containers[foundedPoint.column].colorIndex
-//            foundedPosition.card.maxValue = containers[foundedPoint.column].maxValue
-//            foundedPosition.card.minValue = containers[foundedPoint.column].minValue
-//        } else {
-//            foundedPosition = gameArray[foundedPoint.column][foundedPoint.row]
-//        }
-//        let first = gameArray[movedFrom.column][movedFrom.row].card
-//        let second = foundedPosition.card
-//        let connectable = cardManager!.areConnectable(first: first, second: second)
-//        if connectable //MySKCard.areConnectable(first: first, second: second)
-//                ||
-//            (foundedPosition.card.minValue == NoColor && !actColorHasContainer) &&
-//                (gameArray[movedFrom.column][movedFrom.row].card.maxValue == LastCardValue) {
-//                color = .green
-//        }
-//        return color
-//    }
-//    
-//    func findEndPoint(_ movedFrom: ColumnRow, fromPoint: CGPoint, toPoint: CGPoint, lineWidth: CGFloat, showLines: Bool)->(pointFounded:Bool, closestPoint: Founded?) {
-//        var foundedPoint = Founded()
-//        let toPoint = toPoint
-//        var pointFounded = false
-////        var closestCardfast = Founded()
-//        if let closestCard = fastFindClosestPoint(fromPoint, P2: toPoint, lineWidth: lineWidth, movedFrom: movedFrom) {
-//            if showLines {
-//                makeTrembling(closestCard)
-//            }
-//           foundedPoint = closestCard
-//            pointFounded = true
-//        }
-//        return (pointFounded, foundedPoint)
-//    }
-//    
-//    func findClosestPoint(_ P1: CGPoint, P2: CGPoint, lineWidth: CGFloat, movedFrom: ColumnRow) -> Founded? {
-//        
-//        /*
-//        Ax+By=C  - Equation of a line
-//        Line is given with 2 Points (x1, y1) and (x2, y2)
-//        A = y2-y1
-//        B = x1-x2
-//        C = A*x1+B*y1
-//        */
-//        //let offset = P1 - P2
-//        var founded = Founded()
-//        for column in 0..<countColumns {
-//            for row in 0..<countRows {
-//                if gameArray[column][row].used {
-//                    let P0 = gameArray[column][row].position
-//                    //                    if (P0 - P1).length() > lineWidth { // check all others but not me!!!
-//                    if !(movedFrom.column == column && movedFrom.row == row) {
-//                        let intersectionPoint = findIntersectionPoint(P1, b:P2, c:P0)
-//                        
-//                        let distanceToP0 = (intersectionPoint - P0).length()
-//                        let distanceToP1 = (intersectionPoint - P1).length()
-//                        let distanceToP2 = (intersectionPoint - P2).length()
-//                        let lengthOfLineSegment = (P1 - P2).length()
-//                        
-//                        if distanceToP0 < lineWidth && distanceToP2 < lengthOfLineSegment {
-//                            if founded.distanceToP1 > distanceToP1 {
-//                                founded.point = intersectionPoint
-//                                founded.distanceToP1 = distanceToP1
-//                                founded.distanceToP0 = distanceToP0
-//                                founded.column = column
-//                                founded.row = row
-//                                founded.foundContainer = false
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        
-//        for index in 0..<countContainers {
-//            let P0 = containers[index].position
-//            if (P0 - P1).length() > lineWidth { // check all others but not me!!!
-//                let intersectionPoint = findIntersectionPoint(P1, b:P2, c:P0)
-//                
-//                let distanceToP0 = (intersectionPoint - P0).length()
-//                let distanceToP1 = (intersectionPoint - P1).length()
-//                let distanceToP2 = (intersectionPoint - P2).length()
-//                let lengthOfLineSegment = (P1 - P2).length()
-//                
-//                if distanceToP0 < lineWidth && distanceToP2 < lengthOfLineSegment {
-//                    if founded.distanceToP1 > distanceToP1 {
-//                        founded.point = intersectionPoint
-//                        founded.distanceToP1 = distanceToP1
-//                        founded.distanceToP0 = distanceToP0
-//                        founded.column = index
-//                        founded.row = NoValue
-//                        founded.foundContainer = true
-//                    }
-//                }
-//            }
-//            
-//        }
-//        if founded.distanceToP1 != founded.maxDistance {
-//            return founded
-//        } else {
-//            return nil
-//        }
-//    }
-//    func fastFindClosestPoint(_ P1: CGPoint, P2: CGPoint, lineWidth: CGFloat, movedFrom: ColumnRow) -> Founded? {
-//        
-//        /*
-//        Ax+By=C  - Equation of a line
-//        Line is given with 2 Points (x1, y1) and (x2, y2)
-//        A = y2-y1
-//        B = x1-x2
-//        C = A*x1+B*y1
-//        */
-//        //let offset = P1 - P2
-//        
-//        var fromToColumnRowFirst = FromToColumnRow()
-//        var fromToColumnRow = FromToColumnRow()
-//        var fromWall = false
-//        
-//        fromToColumnRowFirst.fromColumnRow = calculateColumnRowFromPosition(P1)
-//        fromToColumnRowFirst.toColumnRow = calculateColumnRowFromPosition(P2)
-//        fromToColumnRow = calculateColumnRowWhenPointOnTheWall(fromToColumnRowFirst)
-//        
-//        fromWall = !(fromToColumnRowFirst == fromToColumnRow)
-//            
-//        var actColumnRow = fromToColumnRow.fromColumnRow
-//        var founded = Founded()
-//        var stopCycle = false
-//        while !stopCycle {
-//            if fromWall {
-//                (actColumnRow, stopCycle) = (actColumnRow, false)
-//                fromWall = false
-//            } else {
-//                (actColumnRow, stopCycle) = findNextPointToCheck(actColumnRow, fromToColumnRow: fromToColumnRow)
-//            }
-//            if gameArray[actColumnRow.column][actColumnRow.row].used {
-//                let P0 = gameArray[actColumnRow.column][actColumnRow.row].position
-//                //                    if (P0 - P1).length() > lineWidth { // check all others but not me!!!
-//                if !(movedFrom.column == actColumnRow.column && movedFrom.row == actColumnRow.row) {
-//                    let intersectionPoint = findIntersectionPoint(P1, b:P2, c:P0)
-//                    
-//                    let distanceToP0 = (intersectionPoint - P0).length()
-//                    let distanceToP1 = (intersectionPoint - P1).length()
-//                    let distanceToP2 = (intersectionPoint - P2).length()
-//                    let lengthOfLineSegment = (P1 - P2).length()
-//                    
-//                    if distanceToP0 < lineWidth && distanceToP2 < lengthOfLineSegment {
-//                        if founded.distanceToP1 > distanceToP1 {
-//                            founded.point = intersectionPoint
-//                            founded.distanceToP1 = distanceToP1
-//                            founded.distanceToP0 = distanceToP0
-//                            founded.column = actColumnRow.column
-//                            founded.row = actColumnRow.row
-//                            founded.foundContainer = false
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        for index in 0..<countContainers {
-//            let P0 = containers[index].position
-//            if (P0 - P1).length() > lineWidth { // check all others but not me!!!
-//                let intersectionPoint = findIntersectionPoint(P1, b:P2, c:P0)
-//                
-//                let distanceToP0 = (intersectionPoint - P0).length()
-//                let distanceToP1 = (intersectionPoint - P1).length()
-//                let distanceToP2 = (intersectionPoint - P2).length()
-//                let lengthOfLineSegment = (P1 - P2).length()
-//                
-//                if distanceToP0 < lineWidth && distanceToP2 < lengthOfLineSegment {
-//                    if founded.distanceToP1 > distanceToP1 {
-//                        founded.point = intersectionPoint
-//                        founded.distanceToP1 = distanceToP1
-//                        founded.distanceToP0 = distanceToP0
-//                        founded.column = index
-//                        founded.row = NoValue
-//                        founded.foundContainer = true
-//                    }
-//                }
-//            }
-//            
-//        }
-//        if founded.distanceToP1 != founded.maxDistance {
-//            return founded
-//        } else {
-//            return nil
-//        }
-//    }
-    
-//    func calculateColumnRowWhenPointOnTheWall(_ fromToColumnRow: FromToColumnRow)->FromToColumnRow {
-//        var myFromToColumnRow = fromToColumnRow
-//        if fromToColumnRow.fromColumnRow.column <= NoValue {
-//           myFromToColumnRow.fromColumnRow.column = 0
-//        }
-//        if fromToColumnRow.fromColumnRow.row <= NoValue {
-//            myFromToColumnRow.fromColumnRow.row = 0
-//        }
-//        if fromToColumnRow.fromColumnRow.column >= countColumns {
-//            myFromToColumnRow.fromColumnRow.column = countColumns - 1
-//        }
-//        if fromToColumnRow.fromColumnRow.row >= countRows {
-//            myFromToColumnRow.fromColumnRow.row = countRows - 1
-//        }
-//        if fromToColumnRow.toColumnRow.column <= NoValue {
-//            myFromToColumnRow.toColumnRow.column = 0
-//        }
-//        if fromToColumnRow.toColumnRow.row <= NoValue {
-//            myFromToColumnRow.toColumnRow.row = 0
-//        }
-//        if fromToColumnRow.toColumnRow.column >= countColumns {
-//            myFromToColumnRow.toColumnRow.column = countColumns - 1
-//        }
-//        if fromToColumnRow.toColumnRow.row >= countRows {
-//            myFromToColumnRow.toColumnRow.row = countRows - 1
-//        }
-//        
-//        return myFromToColumnRow
-//    }
-//    
-//    func findNextPointToCheck(_ actColumnRow: ColumnRow, fromToColumnRow: FromToColumnRow)->(ColumnRow, Bool) {
-//
-//        var myActColumnRow = actColumnRow
-//        let columnAdder = fromToColumnRow.fromColumnRow.column < fromToColumnRow.toColumnRow.column ? 1 : -1
-//        let rowAdder = fromToColumnRow.fromColumnRow.row < fromToColumnRow.toColumnRow.row ? 1 : -1
-//        
-//        if myActColumnRow.column != fromToColumnRow.toColumnRow.column {
-//            myActColumnRow.column += columnAdder
-//        } else {
-//            myActColumnRow.column = fromToColumnRow.fromColumnRow.column
-//            if myActColumnRow.row != fromToColumnRow.toColumnRow.row {
-//                myActColumnRow.row += rowAdder
-//            }
-//        }
-//            
-//
-//        if myActColumnRow == fromToColumnRow.toColumnRow {
-//            return (myActColumnRow, true) // toPoint reached
-//        }
-//        return (myActColumnRow, false)
-//    }
-    
-//    func findIntersectionPoint(_ a:CGPoint, b:CGPoint, c:CGPoint) ->CGPoint {
-//        let x1 = a.x
-//        let y1 = a.y
-//        let x2 = b.x
-//        let y2 = b.y
-//        let x3 = c.x
-//        let y3 = c.y
-//        let px = x2-x1
-//        let py = y2-y1
-//        let dAB = px * px + py * py
-//        let u = ((x3 - x1) * px + (y3 - y1) * py) / dAB
-//        let x = x1 + u * px
-//        let y = y1 + u * py
-//        return CGPoint(x: x, y: y)
-//    }
-//    
-    
-    
-
-    
-//    func drawHelpLines(_ points: [CGPoint], lineWidth: CGFloat, twoArrows: Bool, color: MyColors) {
-//        lastDrawHelpLinesParameters.points = points
-//        lastDrawHelpLinesParameters.lineWidth = lineWidth
-//        lastDrawHelpLinesParameters.twoArrows = twoArrows
-//        lastDrawHelpLinesParameters.color = color
-//        drawHelpLinesSpec()
-//    }
-//    
-//    func drawHelpLinesSpec() {
-//        let points = lastDrawHelpLinesParameters.points
-//        var lineWidth = cardSize.width
-//        if showHelpLines == .green {
-//            lineWidth = lastDrawHelpLinesParameters.lineWidth
-//        }
-//
-//        let twoArrows = lastDrawHelpLinesParameters.twoArrows
-//        let color = lastDrawHelpLinesParameters.color
-//        let arrowLength = cardSize.width * 0.30
-//    
-//        let pathToDraw:CGMutablePath = CGMutablePath()
-//        let myLine:SKShapeNode = SKShapeNode(path:pathToDraw)
-//        removeNodesWithName(myLineName)
-//        myLine.lineWidth = lineWidth * lineWidthMultiplier!
-//        myLine.name = myLineName
-//        
-//        // check if valid data
-//        for index in 0..<points.count {
-//            if points[index].x.isNaN || points[index].y.isNaN {
-//                print("isNan")
-//                return
-//            }
-//        }
-//        
-////        CGPathMoveToPoint(pathToDraw, nil, points[0].x, points[0].y)
-//        pathToDraw.move(to: points[0])
-//        for index in 1..<points.count {
-////            CGPathAddLineToPoint(pathToDraw, nil, points[index].x, points[index].y)
-//            pathToDraw.addLine(to: points[index])
-//        }
-//        
-//        let lastButOneIndex = points.count - 2
-//        
-//        let offset = points.last! - points[lastButOneIndex]
-//        var angleR:CGFloat = 0.0
-//        
-//        if offset.x > 0 {
-//            angleR = asin(offset.y / offset.length())
-//        } else {
-//            if offset.y > 0 {
-//                angleR = acos(offset.x / offset.length())
-//            } else {
-//                angleR = -acos(offset.x / offset.length())
-//                
-//            }
-//        }
-//        
-//        let p1 = GV.pointOfCircle(arrowLength, center: points.last!, angle: angleR - (150 * GV.oneGrad))
-//        let p2 = GV.pointOfCircle(arrowLength, center: points.last!, angle: angleR + (150 * GV.oneGrad))
-//        
-//        
-//        
-////        CGPathAddLineToPoint(pathToDraw, nil, p1.x, p1.y)
-////        CGPathMoveToPoint(pathToDraw, nil, points.last!.x, points.last!.y)
-////        CGPathAddLineToPoint(pathToDraw, nil, p2.x, p2.y)
-//        pathToDraw.addLine(to: p1)
-//        pathToDraw.move(to: points.last!)
-//        pathToDraw.addLine(to: p2)
-//        
-//        
-//        if twoArrows {
-//            let offset = points.first! - points[1]
-//            var angleR:CGFloat = 0.0
-//            
-//            if offset.x > 0 {
-//                angleR = asin(offset.y / offset.length())
-//            } else {
-//                if offset.y > 0 {
-//                    angleR = acos(offset.x / offset.length())
-//                } else {
-//                    angleR = -acos(offset.x / offset.length())
-//                    
-//                }
-//            }
-//            
-//            let p1 = GV.pointOfCircle(arrowLength, center: points.first!, angle: angleR - (150 * GV.oneGrad))
-//            let p2 = GV.pointOfCircle(arrowLength, center: points.first!, angle: angleR + (150 * GV.oneGrad))
-//            
-//            
-////            CGPathMoveToPoint(pathToDraw, nil, points[0].x, points[0].y)
-////            CGPathAddLineToPoint(pathToDraw, nil, p1.x, p1.y)
-////            CGPathMoveToPoint(pathToDraw, nil, points[0].x, points[0].y)
-////            CGPathAddLineToPoint(pathToDraw, nil, p2.x, p2.y)
-//            pathToDraw.move(to: points[0])
-//            pathToDraw.addLine(to: p1)
-//            pathToDraw.move(to: points[0])
-//            pathToDraw.addLine(to: p2)
-//        }
-//        
-//        myLine.path = pathToDraw
-//
-//        switch self.showHelpLines {
-//        case .green:
-//            if color == .red {
-//                myLine.strokeColor = SKColor(red: 1.0, green: 0.0, blue: 0.0, alpha: 0.8) // GV.colorSets[GV.colorSetIndex][colorIndex + 1]
-//            } else {
-//                myLine.strokeColor = SKColor(red: 0.0, green: 1.0, blue: 0.0, alpha: 0.8) // GV.colorSets[GV.colorSetIndex][colorIndex + 1]
-//            }
-//        case .cyan:
-//            myLine.strokeColor = SKColor.cyan
-//        case .hidden:
-//            myLine.strokeColor = SKColor(colorLiteralRed: 0, green: 0, blue: 0, alpha: 0)
-//        }
-//        myLine.zPosition = 100
-//        myLine.lineCap = .round
-//        
-//        self.addChild(myLine)
-//        
-//    }
-    
-//    func makeTrembling(_ nextPoint: Founded) {
-//        var tremblingCardPosition = CGPoint.zero
-//        if lastNextPoint != nil && ((lastNextPoint!.column != nextPoint.column) ||  (lastNextPoint!.row != nextPoint.row)) {
-//            if lastNextPoint!.foundContainer {
-//                tremblingCardPosition = containers[lastNextPoint!.column].position
-//            } else {
-//                tremblingCardPosition = gameArray[lastNextPoint!.column][lastNextPoint!.row].position
-//            }
-//            let nodes = self.nodes(at: tremblingCardPosition)
-//            
-//            for index in 0..<nodes.count {
-//                if nodes[index] is MySKCard {
-//                    (nodes[index] as! MySKCard).tremblingType = .noTrembling
-//
-//                    tremblingCards.removeAll()
-//                }
-//            }
-//            lastNextPoint = nil
-//        }
-//
-////        stopTrembling()
-//        if lastNextPoint == nil {
-//            if nextPoint.foundContainer {
-//                tremblingCardPosition = containers[nextPoint.column].position
-//            } else {
-//                tremblingCardPosition = gameArray[nextPoint.column][nextPoint.row].position
-//            }
-//            addCardToTremblingCards(tremblingCardPosition)
-//            lastNextPoint = nextPoint
-//        }
-//        
-//    }
-//    
-//    func addCardToTremblingCards(_ position: CGPoint) {
-//        let nodes = self.nodes(at: position)
-//        for index in 0..<nodes.count {
-//            if nodes[index] is MySKCard {
-//                tremblingCards.append(nodes[index] as! MySKCard)
-//                (nodes[index] as! MySKCard).tremblingType = .changeSize
-//            }
-//        }
-//        
-//    }
-//    
-//    func calculateAngle(_ point1: CGPoint, point2: CGPoint) -> (angleRadian:CGFloat, angleDegree: CGFloat) {
-//        //        let pointOfCircle = CGPoint (x: center.x + radius * cos(angle), y: center.y + radius * sin(angle))
-//        let offset = point2 - point1
-//        let length = offset.length()
-//        let sinAlpha = offset.y / length
-//        let angleRadian = asin(sinAlpha);
-//        let angleDegree = angleRadian * 180.0 / CGFloat(M_PI)
-//        return (angleRadian, angleDegree)
-//    }
-
-//    func pointOfCircle(radius: CGFloat, center: CGPoint, angle: CGFloat) -> CGPoint {
-//        let pointOfCircle = CGPoint (x: center.x + radius * cos(angle), y: center.y + radius * sin(angle))
-//        return pointOfCircle
-//    }
-
-
     override func update(_ currentTime: TimeInterval) {
         let sec10: Int = Int(currentTime * 10) % 3
         if sec10 != lastUpdateSec && sec10 == 0 {
@@ -2218,12 +1395,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let movingCard = node1
         let container = node2
         
-//        var containerColorIndex = container.colorIndex
-//        let movingCardColorIndex = movingCard.colorIndex
-//        let movingCardCompareValue = GameArrayPositions(colorIndex: movingCard.colorIndex, minValue: movingCard.minValue, maxValue: movingCard.maxValue, origValue: movingCard.origValue)
-//        var containerCompareValue = GameArrayPositions(colorIndex: container.colorIndex, minValue: container.minValue, maxValue: container.maxValue, origValue: container.origValue)
-//        
-        
         if container.minValue == container.maxValue && container.maxValue == NoColor && movingCard.maxValue == LastCardValue {
             var containerNotFound = true
             for index in 0..<countContainers {
@@ -2244,10 +1415,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let OK = movingCard.colorIndex == container.colorIndex &&
         (
             container.minValue == NoColor || connectable!
-//            MySKCard.areConnectable(first: movingCard, second: container)
-//            movingCard.maxValue + 1 == container.minValue ||
-//            movingCard.minValue - 1 == container.maxValue ||
-//            (container.minValue == FirstCardValue && movingCard.maxValue == LastCardValue && container.belongsToPackage < countPackages)
         )
 
         
@@ -2256,19 +1423,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             push(container, status: .unification)
             push(movingCard, status: .removed)
             container.connectWith(otherCard: movingCard)
-//            cardManager!.check(color: movingCard.colorIndex)
             saveHistoryRecord(colorIndex: movingCard.colorIndex, points:  points,
                               fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
                               toColumn: container.column,   toRow: container.row,   toMinValue: container.minValue,   toMaxValue: container.maxValue)
 
             self.addChild(showCountScore("+\(movingCard.countScore)", position: movingCard.position))
             
-//            movingCard.countScore += mirroredScore
             levelScore += movingCard.countScore
             levelScore += movingCard.getMirroredScore()
             
             container.reload()
-            //gameArray[movingCard.column][movingCard.row] = false
             resetGameArrayCell(movingCard)
             movingCard.removeFromParent()
             playSound("Container", volume: GV.player!.soundVolume)
@@ -2813,6 +1977,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             containers[index].name = "\(index)"
             containers[index].position = CGPoint(x: centerX, y: centerY)
             containers[index].size = CGSize(width: containerSize.width, height: containerSize.height)
+            containers[index].column = index
+            containers[index].row = NoValue
             
             containers[index].colorIndex = NoColor
             countColorsProContainer.append(countCardsProContainer!)
@@ -3169,12 +2335,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     movedFrom.column = movedFromNode.column
                     movedFrom.row = movedFromNode.row
                     
-                    let (foundedPoint, myPoints) = cardManager!.createHelpLines(movedFrom, toPoint: touchLocation, inFrame: self.frame, lineSize: movedFromNode.size.width, showLines: true)
+                    let (foundedPoint, myPoints) = cardManager!.createHelpLines(movedFrom: movedFromNode, toPoint: touchLocation, inFrame: self.frame, lineSize: movedFromNode.size.width, showLines: true)
                     var actFromToColumnRow = FromToColumnRow()
                     actFromToColumnRow.fromColumnRow = movedFrom
                     actFromToColumnRow.toColumnRow.column = foundedPoint!.column
                     actFromToColumnRow.toColumnRow.row = foundedPoint!.row
-                    let color = cardManager!.calculateLineColor(foundedPoint!, movedFrom: movedFrom)
+                    let color = cardManager!.calculateLineColor(foundedPoint: foundedPoint!, movedFrom: movedFromNode)
                     switch color {
                     case .green :
                         if lastPair.color == .none || lastPair.color == .red {
@@ -3284,13 +2450,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             if startNode!.type == .cardType && (aktNode == nil || aktNode! != movedFromNode) {
                 let card = movedFromNode// as! SKSpriteNode
                 let movedFrom = ColumnRow(column: movedFromNode.column, row: movedFromNode.row)
-                var (foundedPoint, myPoints) = cardManager!.createHelpLines(movedFrom, toPoint: touchLocation, inFrame: self.frame, lineSize: movedFromNode.size.width, showLines: false)
+                var (foundedPoint, myPoints) = cardManager!.createHelpLines(movedFrom: movedFromNode, toPoint: touchLocation, inFrame: self.frame, lineSize: movedFromNode.size.width, showLines: false)
                 var actFromToColumnRow = FromToColumnRow()
                 actFromToColumnRow.fromColumnRow = movedFrom
                 actFromToColumnRow.toColumnRow.column = foundedPoint!.column
                 actFromToColumnRow.toColumnRow.row = foundedPoint!.row
                 
-                var color = cardManager!.calculateLineColor(foundedPoint!, movedFrom: movedFrom)
+                var color = cardManager!.calculateLineColor(foundedPoint: foundedPoint!, movedFrom: movedFromNode)
                 
                 if lastPair.fixed {
                     actFromToColumnRow.toColumnRow.column = lastPair.pair.toColumnRow.column

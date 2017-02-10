@@ -32,7 +32,7 @@ class AutoPlayer {
     var scene: CardGameScene
 //    @objc let nextStepSelector = "nextStep:"
     var timer: Timer = Timer()
-    var bestTipp = Tipps()
+    var bestTipp = Tipp()
     var autoPlayStatus: runStatus = .getTipp
     var replay: Bool
     var indexForReplay: Int = 0
@@ -40,7 +40,8 @@ class AutoPlayer {
     var testType: TestType = .runOnce //.test
     var testerType: TesterType = .expert
     var gamesToPlay: [GameToPlay] = [
-        GameToPlay(level: 12, gameNumber: 1),
+        GameToPlay(level:9, gameNumber: 273),
+//        GameToPlay(level: 24, gameNumber: 30), //Crash!!!!!!!!!!!!!!
 //        GameToPlay(level: 72, gameNumber: 962, stopAt: 161),
 //        GameToPlay(level: 72, gameNumber: 466),
 //        GameToPlay(level: 11, gameNumber: 66, stopAt: 114), // test example 3 Packages
@@ -173,7 +174,7 @@ class AutoPlayer {
             switch autoPlayStatus {
             case .getTipp:
                 if scene.tippsButton!.alpha == 1 && scene.countMovingCards <= 0 {  // if tipps are ready
-                    bestTipp = Tipps()
+                    bestTipp = Tipp()
                     if replay {
                         if indexForReplay < realm.objects(HistoryModel.self).filter("gameID = %d", scene.actGame!.ID).count {
                             let historyRecord = realm.objects(HistoryModel.self).filter("gameID = %d", scene.actGame!.ID)[indexForReplay]
@@ -193,7 +194,7 @@ class AutoPlayer {
                             }
                         case .medium:
                             for tipp in tippArray {
-                                if tipp.toRow != NoValue  { // first check only Cards
+                                if tipp.card2.type != .containerType  { // first check only Cards
                                     if bestTipp.value < tipp.value {
                                         bestTipp = tipp
                                     }
@@ -201,7 +202,7 @@ class AutoPlayer {
                             }
                             if bestTipp.points.count == 0 {
                                 for tipp in tippArray {
-                                    if tipp.toRow == NoValue  { // first check only Cards
+                                    if tipp.card2.type == .containerType  { // first check only Cards
                                         if bestTipp.value < tipp.value {
                                             bestTipp = tipp
                                         }
@@ -211,7 +212,7 @@ class AutoPlayer {
                             
                         case .expert:
                             for tipp in tippArray {
-                                if tipp.toRow != NoValue  { // first check only Cards
+                                if tipp.card2.type != .containerType  { // first check only Cards
                                     if bestTipp.value < tipp.value {
                                         bestTipp = tipp
                                     }
@@ -219,14 +220,14 @@ class AutoPlayer {
                             }
                             if bestTipp.points.count == 0 {
                                 for tipp in tippArray {
-                                    if tipp.toRow == NoValue  { // first check only Cards
+                                    if tipp.card2.type == .containerType  { // first check only Cards
                                         if bestTipp.value < tipp.value {
                                             bestTipp = tipp
                                         }
                                     }
                                 }
                             }
-
+                            
                         }
                     }
                     if bestTipp.points.count > 0 {
