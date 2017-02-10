@@ -122,6 +122,8 @@ var gameArray = [[GameArrayPositions]]()
 var containers = [MySKCard]()
 var cardStack:Stack<MySKCard> = Stack()
 var countPackages = 1
+var random: MyRandom?
+
 var lastPair = PairStatus() {
     didSet {
         if oldValue.color != lastPair.color {
@@ -179,6 +181,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //    }
 //    
 
+    enum CongratulationsType: Int {
+        case No = 0, Won, Lost
+    }
     enum PlayerType: Int {
         case singlePlayer = 0, multiPlayer, bestPlayer
     }
@@ -281,7 +286,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var labelFontSize = CGFloat(0)
     
 //    var tremblingCards: [MySKCard] = []
-    var random: MyRandom?
     // Values from json File
     var params = ""
     var countCardsProContainer: Int?
@@ -879,8 +883,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        #if REALM_V1
             countPackages = GV.levelsForPlay.aktLevel.countPackages
 //        #endif
-        maxCardCount = countPackages * countContainers * MaxCardValue
-        countCardsProContainer = MaxCardValue //levelsForPlay.aktLevel.countCardsProContainer
+        maxCardCount = countPackages * countContainers * CountCardsInPackage
+        countCardsProContainer = CountCardsInPackage //levelsForPlay.aktLevel.countCardsProContainer
         countColumns = GV.levelsForPlay.aktLevel.countColumns
         countRows = GV.levelsForPlay.aktLevel.countRows
         minUsedCells = GV.levelsForPlay.aktLevel.minProzent * countColumns * countRows / 100
@@ -1009,59 +1013,50 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
 
     func generateCards(_ generatingType: CardGeneratingType) {
-        //printFunc(function: "generateCards", start: true)
+//        //printFunc(function: "generateCards", start: true)
         var waitForStart: TimeInterval = 0.0
-        var generateSpecial = generatingType ==  .special
-        var positionsTab = [(Int, Int)]()
-        var runFlag = true
-//        countMovingCards = 0
-        // search all available Positions in gameArray
-        for column in 0..<countColumns {
-            for row in 0..<countRows {
-                if !gameArray[column][row].used {
-                    let appendValue = (column, row)
-                    positionsTab.append(appendValue)
-                }
-            }
-       }
-        
-        while runFlag && cardStack.count(.MySKCardType) > 0 && (checkGameArray() < maxUsedCells || (generateSpecial && positionsTab.count > 0)) {
-            var card: MySKCard = cardStack.pull()!
-            
-            if generateSpecial {
-                var counter = cardStack.count(.MySKCardType)
-                while true {
-                    if findPairForCard(card.colorIndex, minValue: card.minValue, maxValue: card.maxValue) {
-                        break
-                    }
-                    cardStack.pushLast(card)
-                    card = cardStack.pull()!
-                    counter -= 1
-                    if counter == 0 {
-                        runFlag = false
-                        break
-                    }
-                }
-                generateSpecial = false
-            }
-            showCardCount()
-            let index = random!.getRandomInt(0, max: positionsTab.count - 1)
-            let (actColumn, actRow) = positionsTab[index]
-            
-            let zielPosition = gameArray[actColumn][actRow].position
+//        var generateSpecial = generatingType ==  .special
+//        var positionsTab = [(Int, Int)]()
+//        var runFlag = true
+////        countMovingCards = 0
+//        // search all available Positions in gameArray
+//        for column in 0..<countColumns {
+//            for row in 0..<countRows {
+//                if !gameArray[column][row].used {
+//                    let appendValue = (column, row)
+//                    positionsTab.append(appendValue)
+//                }
+//            }
+//       }
+//        
+//        while runFlag && cardStack.count(.MySKCardType) > 0 && (checkGameArray() < maxUsedCells || (generateSpecial && positionsTab.count > 0)) {
+//            var card: MySKCard = cardStack.pull()!
+//            
+//            if generateSpecial {
+//                var counter = cardStack.count(.MySKCardType)
+//                while true {
+//                    if findPairForCard(card.colorIndex, minValue: card.minValue, maxValue: card.maxValue) {
+//                        break
+//                    }
+//                    cardStack.pushLast(card)
+//                    card = cardStack.pull()!
+//                    counter -= 1
+//                    if counter == 0 {
+//                        runFlag = false
+//                        break
+//                    }
+//                }
+//                generateSpecial = false
+//            }
+        let cardArray = cardManager!.findNewCardsForGameArray()
+        showCardCount()
+        for card in cardArray {
+            let zielPosition = gameArray[card.column][card.row].position
             card.position = cardPackage!.position
             card.startPosition = zielPosition
             
-
-            positionsTab.remove(at: index)
-            
-            card.column = actColumn
-            card.row = actRow
-            
             card.size = CGSize(width: cardSize.width, height: cardSize.height)
             
-            updateGameArrayCell(card)
-
             push(card, status: .addedFromCardStack)
             
 //            cardManager!.check(color: card.colorIndex)
@@ -1082,7 +1077,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             })
 
             let actionHideEmptyCard = SKAction.run({
-                self.deleteEmptyCard(column: actColumn, row: actRow)
+                self.deleteEmptyCard(column: card.column, row: card.row)
             })
             
             let actionFadeAlpha = SKAction.fadeAlpha(to: 1, duration: 0.2)
@@ -1103,7 +1098,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(CardGameScene.checkCountMovingCards), userInfo: nil, repeats: false) // start timer for check
 
         if generatingType != .special {
-            gameArrayChanged = true
+            startCreateTippsInBackground()
+//            gameArrayChanged = true
+
         }
         if generatingType == .first {
             countUp = Timer.scheduledTimer(timeInterval: doCountUpSleepTime, target: self, selector: Selector(doCountUpSelector), userInfo: nil, repeats: true)
@@ -1111,6 +1108,17 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
         stopped = false
         //printFunc(function: "generateCards", start: false)
+    }
+    
+    func startCreateTippsInBackground() {
+        tippsButton!.activateButton(false)
+        cardManager!.startCreateTipps()
+        showTippCount()
+        if tippArray.count == 0 && self.cardCount > 0 {
+            print ("You have lost!")
+        }
+
+        tippsButton!.activateButton(true)
     }
     
     func startAutoplay(testType: AutoPlayer.TestType) {
@@ -1126,58 +1134,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         autoPlayer?.startPlay(replay: true)
     }
     
-    func printGameArrayInhalt(_ calledFrom: String) {
-        print(calledFrom, Date())
-        var string: String
-        for row in 0..<countRows {
-            let rowIndex = countRows - row - 1
-            string = ""
-            for column in 0..<countColumns {
-                let color = gameArray[column][rowIndex].card.colorIndex
-                if gameArray[column][rowIndex].used {
-                    let minInt = gameArray[column][rowIndex].card.minValue + 1
-                    let maxInt = gameArray[column][rowIndex].card.maxValue + 1
-                    string += " (" + String(color) + ")" +
-                    (minInt < 10 ? "0" : "") + String(minInt) + "-" +
-                    (maxInt < 10 ? "0" : "") + String(maxInt)
-                } else {
-                    string += " (N)" + "xx-xx"
-                }
-            }
-            print(string)
-        }
-    }
     
-    
-    func startCreateTippsInBackground() {
-        tippsButton!.activateButton(false)
-//        cardManager!.check()
-        self.generatingTipps = true
-        //            self.stopTimer(&self.showTippAtTimer)
-        _ = cardManager?.createTipps()
-        
-        repeat {
-            if tippArray.count <= 2 && self.checkGameArray() > 2 {
-                if cardStack.count(.MySKCardType) > 0 {
-                    self.generateCards(.special)
-//                    cardManager!.check()
-                    _ = cardManager?.createTipps()
-                } else {
-                    break
-                }
-            }
-        } while !(tippArray.count > 2 || countColumns * countRows - self.checkGameArray() == 0 || self.checkGameArray() < 5)
-        
-        if tippArray.count == 0 && self.cardCount > 0 {
-            
-            print ("You have lost!")
-        }
-        self.generatingTipps = false
-        tippsButton!.activateButton(true)
-        showTippCount()
-        cardManager!.tippIndex = 0  // set tipps to first
-
-    }
     
     func deleteEmptyCard(column: Int, row: Int) {
         //printFunc(function: "deleteEmptyCard", start: true)
@@ -1312,7 +1269,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         if startGetNextPlayArt {
             startGetNextPlayArt = false
-            let alert = getNextPlayArt(false)
+            let alert = getNextPlayArt(congratulations: .No)
             GV.mainViewController!.showAlert(alert)
         }
         
@@ -1433,7 +1390,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             levelScore += movingCard.getMirroredScore()
             
             container.reload()
-            resetGameArrayCell(movingCard)
+            cardManager!.resetGameArrayCell(movingCard)
             movingCard.removeFromParent()
             playSound("Container", volume: GV.player!.soundVolume)
             countMovingCards = 0
@@ -1456,16 +1413,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
      }
     
-    func resetGameArrayCell(_ card:MySKCard) {
-        gameArray[card.column][card.row].card = MySKCard()
-        gameArray[card.column][card.row].used = false
-    }
-    
-    func updateGameArrayCell(_ card:MySKCard) {
-        gameArray[card.column][card.row].card = card
-        gameArray[card.column][card.row].used = true
-    }
-
     func cardDidCollideWithMovingCard(node1:MySKCard, node2:MySKCard, points: [CGPoint]) {
         let movingCard = node1
         let card = node2
@@ -1493,8 +1440,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             playSound("OK", volume: GV.player!.soundVolume)
         
-            updateGameArrayCell(card)
-            resetGameArrayCell(movingCard)
+            cardManager!.updateGameArrayCell(card: card)
+            cardManager!.resetGameArrayCell(movingCard)
             
             movingCard.removeFromParent()
             countMovingCards = 0
@@ -1575,7 +1522,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func checkGameFinished() {
         
         
-        let usedCellCount = checkGameArray()
+        let usedCellCount = cardManager!.checkGameArray()
 //        let containersOK = checkContainers()
         
         let finishGame = cardCount == 0
@@ -1595,7 +1542,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             if playerType == .multiPlayer {
                 alertIHaveGameFinished()
             } else {
-                let alert = getNextPlayArt(true)
+                let alert = getNextPlayArt(congratulations: .Won)
                 GV.mainViewController!.showAlert(alert)
             }
         } else if usedCellCount <= minUsedCells && usedCellCount > 1 { //  && cardCount > maxUsedCells {
@@ -1669,7 +1616,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func restartButtonPressed() {
-        let alert = getNextPlayArt(false)
+        let alert = getNextPlayArt(congratulations: .No)
         GV.mainViewController!.showAlert(alert)
     }
     
@@ -1791,14 +1738,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         generateCards(.first)
     }
 
-    func getNextPlayArt(_ congratulations: Bool, firstStart: Bool = false)->UIAlertController {
+    func getNextPlayArt(congratulations: CongratulationsType, firstStart: Bool = false)->UIAlertController {
         let playerName = GV.player!.name + "!"
         let statisticsTxt = ""
-        var congratulationsTxt = ""
+        var congratulationsTxt = GV.language.getText(.tcChooseGame)
         
-        
-        if congratulations {
-            
+        switch congratulations {
+        case .Won, .Lost:
             let actGames = realm.objects(GameModel.self).filter("levelID = %d and gameNumber = %d", levelIndex, actGame!.gameNumber)
             
             let bestGameScore: Int = actGames.max(ofProperty: "playerScore")!
@@ -1824,8 +1770,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 congratulationsTxt += "\r\n" + GV.language.getText(.tcLevelScore, values: " \(bestGameScore)")
             }
             congratulationsTxt += "\r\n" + GV.language.getText(.tcActTime) + String(statistic.actTime.dayHourMinSec)
+        case .No:
+            break
         }
-        let alert = UIAlertController(title: congratulations ? congratulationsTxt : GV.language.getText(.tcChooseGame),
+        let alert = UIAlertController(title: congratulationsTxt,
             message: statisticsTxt,
             preferredStyle: .alert)
         
@@ -1938,7 +1886,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
     func checkContainers()->Bool {
         for index in 0..<containers.count {
-            if containers[index].minValue != FirstCardValue || containers[index].maxValue % MaxCardValue != LastCardValue {
+            if containers[index].minValue != FirstCardValue || containers[index].maxValue % CountCardsInPackage != LastCardValue {
                 return false
             }
             
@@ -1955,7 +1903,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         for cardIndex in 0..<countCardsProContainer! * countPackages {
             for containerIndex in 0..<countContainers {
                 let colorTabLine = ColorTabLine(colorIndex: containerIndex, cardName: "\(cardName)",
-                    cardValue: cardArray[containerIndex][cardIndex % MaxCardValue].cardValue) //generateValue(containerIndex) - 1)
+                    cardValue: cardArray[containerIndex][cardIndex % CountCardsInPackage].cardValue) //generateValue(containerIndex) - 1)
                 colorTab.append(colorTabLine)
                 cardName += 1
             }
@@ -2100,7 +2048,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         card.name = savedCardInCycle.name
                         levelScore = savedCardInCycle.countScore
      
-                        updateGameArrayCell(card)
+                        cardManager!.updateGameArrayCell(card: card)
 //                        cardManager!.check(color: card.colorIndex)
                         self.addChild(card)
                         updateCardCount(1)
@@ -2115,7 +2063,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     card.maxValue = savedCardInCycle.maxValue
                     card.BGPictureAdded = savedCardInCycle.BGPictureAdded
                     card.countTransitions = savedCardInCycle.countTransitions
-                    updateGameArrayCell(card)
+                    cardManager!.updateGameArrayCell(card: card)
 //                    cardManager!.check(color: card.colorIndex)
                     //card.hitLabel.text = "\(card.hitCounter)"
                     card.reload()
@@ -2138,7 +2086,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     card.minValue = savedCardInCycle.minValue
                     card.maxValue = savedCardInCycle.maxValue
 
-                    updateGameArrayCell(card)
+                    cardManager!.updateGameArrayCell(card: card)
 //                    cardManager!.check(color: card.colorIndex)
                     card.BGPictureAdded = savedCardInCycle.BGPictureAdded
                     card.countTransitions = savedCardInCycle.countTransitions
@@ -2556,8 +2504,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         startNode?.type = .cardType
                         foundedCard!.removeFromParent()
                         founded = true
-                        updateGameArrayCell(startNode!)
-//                        pullShowCard()
+                        cardManager!.updateGameArrayCell(card: startNode!)
                         gameArrayChanged = true
 
                         break
@@ -2578,7 +2525,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                             gameArray[(startNode?.column)!][(startNode?.row)!].card.minValue = foundedCard!.minValue
                             gameArray[(startNode?.column)!][(startNode?.row)!].card.maxValue = foundedCard!.maxValue
                             startNode?.removeFromParent()
-//                            pullShowCard()
                             founded = true
                             gameArrayChanged = true
 
@@ -2750,18 +2696,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         myWallLine.strokeColor = UIColor.green
         
         self.addChild(myWallLine)
-    }
-    
-    func checkGameArray() -> Int {
-        var usedCellCount = 0
-        for column in 0..<countColumns {
-            for row in 0..<countRows {
-                if gameArray[column][row].used {
-                    usedCellCount += 1
-                }
-            }
-        }
-        return usedCellCount
     }
     
     

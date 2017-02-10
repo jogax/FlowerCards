@@ -18,8 +18,8 @@ enum TremblingType: Int {
 let NoValue = -1
 let NoColor = 1000
 let MaxColorValue = 4
-let MaxCardValue = 13
-let LastCardValue = MaxCardValue - 1
+let CountCardsInPackage = 13
+let LastCardValue = CountCardsInPackage - 1
 let FirstCardValue = 0
 
 import SpriteKit
@@ -161,7 +161,7 @@ class MySKCard: SKSpriteNode {
             countUpperValues = card.maxValue - card.minValue + 1
         } else {
             countUpperValues = card.maxValue + 1
-            countMidValues = (card.countTransitions - 1) * MaxCardValue
+            countMidValues = (card.countTransitions - 1) * CountCardsInPackage
             countLowerValues = LastCardValue - card.minValue + 1
         }
         for _ in 0..<countUpperValues {
@@ -189,7 +189,7 @@ class MySKCard: SKSpriteNode {
             if countTransitions == 0 {
                 return maxValue - minValue + 1
             } else {
-                return maxValue + 1 + (countTransitions - 1) * MaxCardValue + LastCardValue - minValue + 1
+                return maxValue + 1 + (countTransitions - 1) * CountCardsInPackage + LastCardValue - minValue + 1
             }
         }
     }
@@ -480,7 +480,7 @@ class MySKCard: SKSpriteNode {
 //            let valueLabel = upper ? maxValueLabel : minValueLabel
 //            let packageLabel = upper ? maxPackageLabel : minPackageLabel
             let value = upper ? maxValue : minValue
-            guard let text = cardLib[minValue == NoColor ? NoColor : value % MaxCardValue] else {
+            guard let text = cardLib[minValue == NoColor ? NoColor : value % CountCardsInPackage] else {
                 return
             }
             valueLabel.text = "\(text)"
@@ -607,7 +607,7 @@ class MySKCard: SKSpriteNode {
         // generate all cards
         for pkgIndex in 0..<countPackages {
             for colorIndex in 0..<MaxColorValue {
-                for cardIndex in 0..<MaxCardValue {
+                for cardIndex in 0..<CountCardsInPackage {
                     let index = CardIndex(packageIndex: pkgIndex, colorIndex: colorIndex, origValue: cardIndex)
                     cardIndexArray.append(index)
                     let name = "\(pkgIndex)-\(colorIndex)-\(cardIndex)"

@@ -78,6 +78,26 @@ class Stack<T> {
         return cardStack[lastRandomIndex]
     }
     
+    func search(searchParameter: FoundedCardParameters)->[MySKCard] {
+        var returnCards: [MySKCard] = []
+        for card in cardStack {
+            if card.minValue == searchParameter.value1 && card.colorIndex == searchParameter.colorIndex {
+                returnCards.append(card)
+                if searchParameter.value2 == NoValue || returnCards.count == 2 {
+                    return returnCards
+                }
+            }
+            if card.minValue == searchParameter.value2 && card.colorIndex == searchParameter.colorIndex  {
+                returnCards.append(card)
+                if returnCards.count == 2 {
+                    return returnCards
+                }
+
+            }
+        }
+        return returnCards
+    }
+    
     func removeAtLastRandomIndex() {
         if lastRandomIndex >= 0 {
             cardStack.remove(at: lastRandomIndex)
