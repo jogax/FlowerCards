@@ -464,7 +464,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     var gameArrayChanged = false {
         didSet {
-            startCreateTippsInBackground()
+//            startCreateTippsInBackground()
         }
     }
     
@@ -1050,6 +1050,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //            }
         let cardArray = cardManager!.findNewCardsForGameArray()
         showCardCount()
+        showTippCount()
         for card in cardArray {
             let zielPosition = gameArray[card.column][card.row].position
             card.position = cardPackage!.position
@@ -1095,13 +1096,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
         }
         
-        self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(CardGameScene.checkCountMovingCards), userInfo: nil, repeats: false) // start timer for check
+        self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.checkCountMovingCards), userInfo: nil, repeats: false) // start timer for check
 
-        if generatingType != .special {
-            startCreateTippsInBackground()
-//            gameArrayChanged = true
-
-        }
+//        if generatingType != .special {
+//            cardManager!.startCreateTipps()
+////            gameArrayChanged = true
+//
+//        }
         if generatingType == .first {
             countUp = Timer.scheduledTimer(timeInterval: doCountUpSleepTime, target: self, selector: Selector(doCountUpSelector), userInfo: nil, repeats: true)
             doTimeCount = true
@@ -1110,16 +1111,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         //printFunc(function: "generateCards", start: false)
     }
     
-    func startCreateTippsInBackground() {
-        tippsButton!.activateButton(false)
-        cardManager!.startCreateTipps()
-        showTippCount()
-        if tippArray.count == 0 && self.cardCount > 0 {
-            print ("You have lost!")
-        }
-
-        tippsButton!.activateButton(true)
-    }
+//    func startCreateTippsInBackground() {
+//        tippsButton!.activateButton(false)
+//        cardManager!.startCreateTipps()
+//        showTippCount()
+//        if tippArray.count == 0 && self.cardCount > 0 {
+//            print ("You have lost!")
+//        }
+//
+//        tippsButton!.activateButton(true)
+//    }
     
     func startAutoplay(testType: AutoPlayer.TestType) {
         autoPlayerActive = true
@@ -1407,10 +1408,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             push(movingCard, status: .removed)
             pull(false) // no createTipps
             startTippTimer()
-            tippsButton!.activateButton(true)
 
         }
-        
+        tippsButton!.activateButton(true)
      }
     
     func cardDidCollideWithMovingCard(node1:MySKCard, node2:MySKCard, points: [CGPoint]) {
@@ -1456,9 +1456,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             push(movingCard, status: .removed)
             pull(false) // no createTipps
             startTippTimer()
-            tippsButton!.activateButton(true)
             
         }
+        tippsButton!.activateButton(true)
     }
     
     func showCountScore(_ text: String, position: CGPoint)->SKLabelNode {
@@ -1522,7 +1522,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func checkGameFinished() {
         
         
-        let usedCellCount = cardManager!.checkGameArray()
+        let usedCellCount = cardManager!.countGameArrayItems
 //        let containersOK = checkContainers()
         
         let finishGame = cardCount == 0
@@ -1549,7 +1549,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             generateCards(.normal)  // Nachgenerierung
         } else {
             if cardCount > 0 /*&& cardStack.count(.MySKCardType) > 0*/ {
-                gameArrayChanged = true
+                generateCards(.normal)
+//                gameArrayChanged = true
             }
         }
     }
@@ -2283,12 +2284,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     movedFrom.column = movedFromNode.column
                     movedFrom.row = movedFromNode.row
                     
-                    let (foundedPoint, myPoints) = cardManager!.createHelpLines(movedFrom: movedFromNode, toPoint: touchLocation, inFrame: self.frame, lineSize: movedFromNode.size.width, showLines: true)
+                    let (foundedPoint, myPoints) = cardManager!.createHelpLines(movedFrom: movedFrom, toPoint: touchLocation, inFrame: self.frame, lineSize: movedFromNode.size.width, showLines: true)
                     var actFromToColumnRow = FromToColumnRow()
                     actFromToColumnRow.fromColumnRow = movedFrom
                     actFromToColumnRow.toColumnRow.column = foundedPoint!.column
                     actFromToColumnRow.toColumnRow.row = foundedPoint!.row
-                    let color = cardManager!.calculateLineColor(foundedPoint: foundedPoint!, movedFrom: movedFromNode)
+                    let color = cardManager!.calculateLineColor(foundedPoint: foundedPoint!, movedFrom: movedFrom)
                     switch color {
                     case .green :
                         if lastPair.color == .none || lastPair.color == .red {
@@ -2398,13 +2399,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             if startNode!.type == .cardType && (aktNode == nil || aktNode! != movedFromNode) {
                 let card = movedFromNode// as! SKSpriteNode
                 let movedFrom = ColumnRow(column: movedFromNode.column, row: movedFromNode.row)
-                var (foundedPoint, myPoints) = cardManager!.createHelpLines(movedFrom: movedFromNode, toPoint: touchLocation, inFrame: self.frame, lineSize: movedFromNode.size.width, showLines: false)
+                var (foundedPoint, myPoints) = cardManager!.createHelpLines(movedFrom: movedFrom, toPoint: touchLocation, inFrame: self.frame, lineSize: movedFromNode.size.width, showLines: false)
                 var actFromToColumnRow = FromToColumnRow()
                 actFromToColumnRow.fromColumnRow = movedFrom
                 actFromToColumnRow.toColumnRow.column = foundedPoint!.column
                 actFromToColumnRow.toColumnRow.row = foundedPoint!.row
                 
-                var color = cardManager!.calculateLineColor(foundedPoint: foundedPoint!, movedFrom: movedFromNode)
+                var color = cardManager!.calculateLineColor(foundedPoint: foundedPoint!, movedFrom: movedFrom)
                 
                 if lastPair.fixed {
                     actFromToColumnRow.toColumnRow.column = lastPair.pair.toColumnRow.column

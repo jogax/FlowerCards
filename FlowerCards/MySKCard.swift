@@ -102,6 +102,8 @@ class MySKCard: SKSpriteNode {
                 let packageOffsetMultiplier = CGPoint(x: -0.10, y: 0.48)
                 let positionOffset = CGPoint(x: self.size.width * valueOffsetMultiplier.x,  y: self.size.height * valueOffsetMultiplier.y)
                 let packageOffset = CGPoint(x:self.size.width * packageOffsetMultiplier.x,  y: self.size.height * packageOffsetMultiplier.y)
+                minValueLabel.fontSize = standardFontSize
+                maxValueLabel.fontSize = standardFontSize
                 minValueLabel.position = positionOffset
                 maxValueLabel.position = positionOffset
                 minPackageLabel.position = packageOffset
@@ -123,7 +125,7 @@ class MySKCard: SKSpriteNode {
     var minValue: Int
     var belongsToPackageMax: UInt8 = 0
     var belongsToPackageMin: UInt8 = 0
-    var countTransitions = 0
+    var countTransitions = 0 // how many A-K transitions in this card
     
     var startPosition = CGPoint.zero
     var countScore: Int {
@@ -286,11 +288,11 @@ class MySKCard: SKSpriteNode {
             
         }
         
-        setLabel(hitLabel, fontSize: 15)
-        setLabel(maxValueLabel, fontSize: size.width * fontSizeMultiplier)
-        setLabel(minValueLabel, fontSize: size.width * fontSizeMultiplier)
-        setLabel(maxPackageLabel, fontSize: size.width * packageFontSizeMultiplier)
-        setLabel(minPackageLabel, fontSize: size.width * packageFontSizeMultiplier)
+        setLabel(hitLabel)//, fontSize: 15)
+        setLabel(maxValueLabel)//, fontSize: size.width * fontSizeMultiplier)
+        setLabel(minValueLabel)//, fontSize: size.width * fontSizeMultiplier)
+        setLabel(maxPackageLabel)//, fontSize: size.width * packageFontSizeMultiplier)
+        setLabel(minPackageLabel)//, fontSize: size.width * packageFontSizeMultiplier)
         
 
         
@@ -402,7 +404,7 @@ class MySKCard: SKSpriteNode {
         }
     }
     
-    func setLabel(_ label: SKLabelNode, fontSize: CGFloat) {
+    func setLabel(_ label: SKLabelNode/*, fontSize: CGFloat*/) {
         label.fontName = "ArialMT"
         label.fontColor = SKColor.black
         label.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.left
@@ -480,7 +482,7 @@ class MySKCard: SKSpriteNode {
 //            let valueLabel = upper ? maxValueLabel : minValueLabel
 //            let packageLabel = upper ? maxPackageLabel : minPackageLabel
             let value = upper ? maxValue : minValue
-            guard let text = cardLib[minValue == NoColor ? NoColor : value % CountCardsInPackage] else {
+            guard let text = cardLib[minValue == NoColor ? NoColor : value/* % CountCardsInPackage*/] else {
                 return
             }
             valueLabel.text = "\(text)"

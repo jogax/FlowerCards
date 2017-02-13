@@ -40,7 +40,7 @@ class AutoPlayer {
     var testType: TestType = .runOnce //.test
     var testerType: TesterType = .expert
     var gamesToPlay: [GameToPlay] = [
-        GameToPlay(level:9, gameNumber: 273),
+        GameToPlay(level:12, gameNumber: 2, stopAt: 63),
 //        GameToPlay(level: 24, gameNumber: 30), //Crash!!!!!!!!!!!!!!
 //        GameToPlay(level: 72, gameNumber: 962, stopAt: 161),
 //        GameToPlay(level: 72, gameNumber: 466),

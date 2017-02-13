@@ -102,13 +102,11 @@ struct Founded {
 struct FoundedCardParameters {
     
     var colorIndex: Int = NoColor
-    var value1: Int = NoValue
-    var value2: Int = NoValue
-    var hashValue: Int {
+    var value: Int = NoValue
+    private var hashValue: Int {
         get {
             var hash = colorIndex
-            hash |= (value1 & 0xf) << 4
-            hash |= (value1 & 0xf) << 4
+            hash |= (value & 0xf) << 4
             return hash
         }
     }
@@ -119,9 +117,6 @@ struct FoundedCardParameters {
 
 }
 
-
-
-let EmptyValue = 0xf
 var allPackages: UInt8 = 0
 var maxPackage: UInt8 = 0
 var minPackage: UInt8 = 0
@@ -156,7 +151,7 @@ class CardManager {
 
 
     struct DataForColor {
-        let colorNames = ["Purple", "Blue", "Green", "Red"]
+        let colorNames = ["Purple", "Blue  ", "Green ", "Red   "]
         var colorIndex: Int
         var container: MySKCard?
         var allCards: [MySKCard] = []
@@ -190,13 +185,27 @@ class CardManager {
             }
         }
     }
-    private let colorNames = ["Purple", "Blue", "Green", "Red"]
+    private let colorNames = ["Purple", "Blue  ", "Green ", "Red   "]
     private let purple = 0
     private let blue = 1
     private let green = 2
     private let red = 3
     private var colorArray: [DataForColor] = []
     private var lastDrawHelpLinesParameters = DrawHelpLinesParameters()
+    var countGameArrayItems: Int {
+        get {
+            var usedCellCount = 0
+            for column in 0..<countColumns {
+                for row in 0..<countRows {
+                    if gameArray[column][row].used {
+                        usedCellCount += 1
+                    }
+                }
+            }
+            return usedCellCount
+        }
+    }
+
 
     init () {
         for _ in 1...4 {
@@ -241,30 +250,14 @@ class CardManager {
     
     func startCreateTipps() {
         _ = createTipps()
-        
-        repeat {
-            if tippArray.count <= 2 && self.checkGameArray() > 2 {
-                if cardStack.count(.MySKCardType) > 0 {
-//                    generateCards(.special)
-                    //                    cardManager!.check()
-                    _ = createTipps()
-                } else {
-                    break
-                }
-            }
-        } while !(tippArray.count > 2 || countColumns * countRows - self.checkGameArray() == 0 || self.checkGameArray() < 5)
-        
-//        self.generatingTipps = false
-        tippIndex = 0  // set tipps to first
-        
     }
     
     func findNewCardsForGameArray()->[MySKCard] {
-//        func generateCards(_ generatingType: CardGeneratingType) {
+        createTipps()
         var cardArray: [MySKCard] = []
         let gameArraySize = countColumns * countRows
-        var actFillingsProcent = Double(checkGameArray() / gameArraySize)
-        if actFillingsProcent > 0.60 {
+        var actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
+        if actFillingsProcent > 0.40 && tippArray.count > 3 {
             return cardArray
         }
         var positionsTab = [(column: Int, row:Int)]()
@@ -286,58 +279,49 @@ class CardManager {
             positionsTab.remove(at: index)
             updateGameArrayCell(card: card)
             cardArray.append(card)
-            actFillingsProcent = Double(checkGameArray()) / Double(gameArraySize)
+            actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
         }
+        updateColorArray()
+        
         
         while actFillingsProcent < 0.80 && cardStack.count(.MySKCardType) > 0 {
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
             var suitableCards: [FoundedCardParameters] = findSuitableCardsForGameArrayPosition(gameArrayPos: positionsTab[index])
-            var cards: [MySKCard] = []
-            for _ in suitableCards {
-                let cardIndex = random!.getRandomInt(0, max: suitableCards.count - 1)
-                var go = true
-                var countSearches = cardStack.count(.MySKCardType)
-                while go && countSearches > 0 {
-                    let cards = cardStack.search(searchParameter: suitableCards[cardIndex])
-                    if cards.count > 0 {
-                        go = false
+            var go = true
+            var countSearches = suitableCards.count
+            while go {
+                while countSearches > 0 {
+                    let cardIndex = random!.getRandomInt(0, max: suitableCards.count - 1)
+                    let cardToSearch = suitableCards[cardIndex]
+                    if let card = cardStack.search(colorIndex: cardToSearch.colorIndex, value: cardToSearch.value) {
+                        card.column = positionsTab[index].column
+                        card.row = positionsTab[index].row
+                        card.belongsToPackageMax = allPackages
+                        card.belongsToPackageMin = allPackages
+                        positionsTab.remove(at: index)
+                        updateGameArrayCell(card: card)
+                        cardArray.append(card)
+                        actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
+                        break
                     } else {
-                        suitableCards.remove(at: cardIndex)
+                        
                     }
                     countSearches -= 1
                 }
-                if cards.count > 0 {
-                    let card = cards[random!.getRandomInt(0, max: 1)]
-                    card.column = positionsTab[index].column
-                    card.row = positionsTab[index].row
-                    card.belongsToPackageMax = allPackages
-                    card.belongsToPackageMin = allPackages
-                    updateGameArrayCell(card: card)
-                    cardArray.append(card)
-                    break
-                }
+                
+                go = false
             }
         }
+        _ = createTipps()
         return cardArray
     }
     
-    func checkGameArray() -> Int {
-        var usedCellCount = 0
-        for column in 0..<countColumns {
-            for row in 0..<countRows {
-                if gameArray[column][row].used {
-                    usedCellCount += 1
-                }
-            }
-        }
-        return usedCellCount
-    }
     
     private func findSuitableCardsForGameArrayPosition(gameArrayPos: (column: Int, row: Int))->[FoundedCardParameters] {
         var foundedCards: [FoundedCardParameters] = []
 //        let firstValue: CGFloat = 10000
 //        var distanceToLine = firstValue
-        let startCard = gameArray[gameArrayPos.column][gameArrayPos.row].card
+        let startCard = ColumnRow(column:gameArrayPos.column, row: gameArrayPos.row)
         let startPoint = gameArray[gameArrayPos.column][gameArrayPos.row].position
         let startAngle: CGFloat = 0
         let stopAngle = startAngle + 360 * GV.oneGrad // + 360°
@@ -346,59 +330,79 @@ class CardManager {
         let multiplierForSearch = CGFloat(2.0)
         //        let fineMultiplier = CGFloat(1.0)
         let multiplier:CGFloat = multiplierForSearch
+        //==========================================
+        func appendCardParameter(cardParameter: FoundedCardParameters) {
+            var cardNotFound = true
+            for card in foundedCards {
+                if card == cardParameter {
+                    cardNotFound = false
+                }
+            }
+            if cardNotFound {
+                var usable = true
+                for card in colorArray[cardParameter.colorIndex].allCards {
+                    if card.countCards == 1 && card.minValue == cardParameter.value {
+                        usable = false
+                        break
+                    }
+                }
+                if usable {
+                    foundedCards.append(cardParameter)
+                }
+            }
+        }
+        //==========================================
         while angle <= stopAngle {
-            let toPoint = GV.pointOfCircle(1.0, center: startPoint, angle: angle)
+            let toPoint = GV.pointOfCircle(10.0, center: startPoint, angle: angle)
             let (foundedPoint, myPoints) = createHelpLines(movedFrom: startCard, toPoint: toPoint, inFrame: GV.mainScene!.frame, lineSize: cardSize.width, showLines: false)
             if foundedPoint != nil {
                 var foundedCard: MySKCard
                 var cardParameter = FoundedCardParameters()
+
                 if foundedPoint!.foundContainer {
                     foundedCard = containers[foundedPoint!.column]
+                    cardParameter.colorIndex = foundedCard.colorIndex
                     if foundedCard.minValue == NoColor { //empty Container
-                        cardParameter.value1 = EmptyValue
+                        cardParameter.value = LastCardValue
+                        var usedContainerColors: [Int] = []
+                        for container in containers {
+                            if container.colorIndex != NoColor {
+                                usedContainerColors.append(container.colorIndex)
+                            }
+                        }
+                        for colorIndex in 0...3 {
+                            cardParameter.colorIndex = colorIndex
+                            if !usedContainerColors.contains(cardParameter.colorIndex) {
+                                appendCardParameter(cardParameter: cardParameter)
+                            }
+                        }
                     } else if foundedCard.minValue > 0 {
-                        cardParameter.value1 = foundedCard.minValue - 1
-                    } else if foundedCard.belongsToPackageMin & minPackage == 0 {
-                        cardParameter.value1 = LastCardValue
+                        cardParameter.value = foundedCard.minValue - 1
+                        appendCardParameter(cardParameter: cardParameter)
+                    } else if foundedCard.belongsToPackageMin & minPackage == 0 && countPackages > 1 {
+                        cardParameter.value = LastCardValue
+                        appendCardParameter(cardParameter: cardParameter)
                     }
                 } else {
                     foundedCard = gameArray[foundedPoint!.column][foundedPoint!.row].card
+                    cardParameter.colorIndex = foundedCard.colorIndex
                     if foundedCard.type == .cardType {
-                        if foundedCard.maxValue == LastCardValue {
+                        if foundedCard.maxValue == LastCardValue && countPackages > 1 {
                             if foundedCard.belongsToPackageMax & maxPackage == 0 {
-                                cardParameter.value1 = FirstCardValue
+                                cardParameter.value = FirstCardValue
+                                appendCardParameter(cardParameter: cardParameter)
                             }
-                        } else if foundedCard.minValue == FirstCardValue {
+                        } else if foundedCard.minValue == FirstCardValue  && countPackages > 1 {
                             if foundedCard.belongsToPackageMin & minPackage == 0 {
-                                cardParameter.value1 = LastCardValue
+                                cardParameter.value = LastCardValue
+                                appendCardParameter(cardParameter: cardParameter)
                             }
-                        } else {
-                            cardParameter.value1 = foundedCard.minValue - 1
-                            cardParameter.value2 = foundedCard.maxValue + 1
-                        }
-                    }
-                }
-                func appendCardParameter(cardParameter: FoundedCardParameters) {
-                    var cardNotFound = true
-                    for card in foundedCards {
-                        if card == cardParameter {
-                            cardNotFound = false
-                        }
-                    }
-                    if cardNotFound {
-                        foundedCards.append(cardParameter)
-                    }
-                }
-                if cardParameter.value1 != NoValue {
-                    if cardParameter.value1 == EmptyValue {
-                        for colorIndex in 0...3 {
-                            cardParameter.colorIndex = colorIndex
-                            cardParameter.value1 = LastCardValue
+                        } else if foundedCard.minValue != FirstCardValue && foundedCard.maxValue != LastCardValue {
+                            cardParameter.value = foundedCard.minValue - 1
+                            appendCardParameter(cardParameter: cardParameter)
+                            cardParameter.value = foundedCard.maxValue + 1
                             appendCardParameter(cardParameter: cardParameter)
                         }
-                    } else {
-                        cardParameter.colorIndex = foundedCard.colorIndex
-                        appendCardParameter(cardParameter: cardParameter)
                     }
                 }
             }
@@ -702,6 +706,7 @@ class CardManager {
                 }
             }
         }
+        
         if data.container != nil {
             data.container!.setBelongsLabels()
         }
@@ -807,7 +812,7 @@ class CardManager {
         return true
     }
     
-    func createHelpLines(movedFrom: MySKCard, toPoint: CGPoint, inFrame: CGRect, lineSize: CGFloat, showLines: Bool)->(foundedPoint: Founded?, [CGPoint]) {
+    func createHelpLines(movedFrom: ColumnRow, toPoint: CGPoint, inFrame: CGRect, lineSize: CGFloat, showLines: Bool)->(foundedPoint: Founded?, [CGPoint]) {
         var pointArray = [CGPoint]()
         var foundedPoint: Founded?
         var founded = false
@@ -904,7 +909,8 @@ class CardManager {
         let multiplier:CGFloat = multiplierForSearch
         while angle <= stopAngle && !founded {
             let toPoint = GV.pointOfCircle(1.0, center: startPoint, angle: angle)
-            let (foundedPoint, myPoints) = createHelpLines(movedFrom: pair.card1, toPoint: toPoint, inFrame: GV.mainScene!.frame, lineSize: cardSize.width, showLines: false)
+            let movedFrom = ColumnRow(column: pair.card1.column, row: pair.card1.row)
+            let (foundedPoint, myPoints) = createHelpLines(movedFrom: movedFrom, toPoint: toPoint, inFrame: GV.mainScene!.frame, lineSize: cardSize.width, showLines: false)
             if foundedPoint != nil {
                 if foundedPoint!.foundContainer && pair.card2.type == .containerType && foundedPoint!.column == pair.card2.column ||
                     (foundedPoint!.column == pair.card2.column && foundedPoint!.row == pair.card2.row) {
@@ -1093,7 +1099,7 @@ class CardManager {
         
     }
 
-    private func findEndPoint(movedFrom: MySKCard, fromPoint: CGPoint, toPoint: CGPoint, lineWidth: CGFloat, showLines: Bool)->(pointFounded:Bool, closestPoint: Founded?) {
+    private func findEndPoint(movedFrom: ColumnRow, fromPoint: CGPoint, toPoint: CGPoint, lineWidth: CGFloat, showLines: Bool)->(pointFounded:Bool, closestPoint: Founded?) {
         var foundedPoint = Founded()
         let toPoint = toPoint
         var pointFounded = false
@@ -1108,7 +1114,7 @@ class CardManager {
         return (pointFounded, foundedPoint)
     }
     
-    private func fastFindClosestPoint(_ P1: CGPoint, P2: CGPoint, lineWidth: CGFloat, movedFrom: MySKCard) -> Founded? {
+    private func fastFindClosestPoint(_ P1: CGPoint, P2: CGPoint, lineWidth: CGFloat, movedFrom: ColumnRow) -> Founded? {
         
         /*
          Ax+By=C  - Equation of a line
@@ -1193,7 +1199,7 @@ class CardManager {
         }
     }
     
-    func calculateLineColor(foundedPoint: Founded, movedFrom: MySKCard) -> MyColors {
+    func calculateLineColor(foundedPoint: Founded, movedFrom: ColumnRow) -> MyColors {
         
         var color = MyColors.red
         var foundedPosition = GameArrayPositions()
@@ -1368,8 +1374,8 @@ class CardManager {
         return (myActColumnRow, false)
     }
     
-    func printGameArrayInhalt(_ calledFrom: String) {
-        print(calledFrom, Date())
+    func printGameArrayInhalt() {
+        print(Date())
         var string: String
         for row in 0..<countRows {
             let rowIndex = countRows - row - 1
@@ -1377,13 +1383,12 @@ class CardManager {
             for column in 0..<countColumns {
                 let color = gameArray[column][rowIndex].card.colorIndex
                 if gameArray[column][rowIndex].used {
-                    let minInt = gameArray[column][rowIndex].card.minValue + 1
-                    let maxInt = gameArray[column][rowIndex].card.maxValue + 1
-                    string += " (" + String(color) + ")" +
-                        (minInt < 10 ? "0" : "") + String(minInt) + "-" +
-                        (maxInt < 10 ? "0" : "") + String(maxInt)
+                    let minStr = gameArray[column][rowIndex].card.cardLib[gameArray[column][rowIndex].card.minValue]
+                    let maxStr = gameArray[column][rowIndex].card.cardLib[gameArray[column][rowIndex].card.maxValue]
+                    string += " (" + String(colorNames[color]) + ")"
+                    string += maxStr! + "-" + minStr!
                 } else {
-                    string += " (N)" + "xx-xx"
+                    string += " (Empty )" + "---"
                 }
             }
             print(string)
