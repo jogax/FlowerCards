@@ -143,15 +143,22 @@ let fixationTime = 0.1
 // for managing of connectibility of gameArray members
 class CardManager {
     
-    var setOfBinarys: [String] = []
-    var tremblingCards: [MySKCard] = []
 
-    var tippIndex = 0
-    var lastNextPoint: Founded?
-
-
+    struct UsedCard {
+        var countFree: Int
+        var countAll: Int
+        var countInStack: Int {
+            get {
+                return countPackages - countAll
+            }
+        }
+        init() {
+            countFree = 0
+            countAll = 0
+        }
+    }
+    
     struct DataForColor {
-        let colorNames = ["Purple", "Blue  ", "Green ", "Red   "]
         var colorIndex: Int
         var container: MySKCard?
         var allCards: [MySKCard] = []
@@ -159,12 +166,25 @@ class CardManager {
         var connectablePairs: [ConnectablePair] = []
         var pairsToRemove: [Int] = []
         var countTransitions = 0
+        var usedCards: [Int:UsedCard] = [:]
         init(colorIndex: Int) {
-//            allCards = []
-//            cardsWithTransitions = []
-//            connectablePairs = []
             
             self.colorIndex = colorIndex
+            for index in FirstCardValue...LastCardValue {
+                usedCards[index] = UsedCard()
+            }
+        }
+        mutating func addCardToUsedCards(card: MySKCard) {
+            var index = 0
+            while index < card.countCards {
+                let value = (card.minValue + index) % CountCardsInPackage
+                usedCards[value]!.countAll += 1
+                index += 1
+            }
+            usedCards[card.minValue]!.countFree += 1
+            if card.minValue != card.maxValue || card.countTransitions > 0 {
+                usedCards[card.maxValue]?.countFree += 1
+            }
         }
         func printValue() {
             print("color: \(colorNames[colorIndex]), countTransitions: \(countTransitions)")
@@ -185,7 +205,12 @@ class CardManager {
             }
         }
     }
-    private let colorNames = ["Purple", "Blue  ", "Green ", "Red   "]
+    var setOfBinarys: [String] = []
+    var tremblingCards: [MySKCard] = []
+    
+    var tippIndex = 0
+    var lastNextPoint: Founded?
+    static let colorNames = ["P", "B", "G", "R"]
     private let purple = 0
     private let blue = 1
     private let green = 2
@@ -257,36 +282,40 @@ class CardManager {
         var cardArray: [MySKCard] = []
         let gameArraySize = countColumns * countRows
         var actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
-        if actFillingsProcent > 0.40 && tippArray.count > 3 {
+        if actFillingsProcent > 0.20 && tippArray.count > 1 {
             return cardArray
         }
-        var positionsTab = [(column: Int, row:Int)]()
+        var positionsTab = [ColumnRow]()
         for column in 0..<countColumns {
             for row in 0..<countRows {
                 if !gameArray[column][row].used {
-                    let appendValue = (column, row)
+                    let appendValue = ColumnRow(column:column, row:row)
                     positionsTab.append(appendValue)
                 }
             }
         }
-        while actFillingsProcent < 0.50 && cardStack.count(.MySKCardType) > 0 {
+        while actFillingsProcent < 0.40 && cardStack.count(.MySKCardType) > 0 {
             let card: MySKCard = cardStack.pull()!
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
             card.column = positionsTab[index].column
             card.row = positionsTab[index].row
+            colorArray[card.colorIndex].addCardToUsedCards(card: card)
             card.belongsToPackageMax = allPackages
             card.belongsToPackageMin = allPackages
-            positionsTab.remove(at: index)
+            positionsTab.remove(at: index)            
             updateGameArrayCell(card: card)
             cardArray.append(card)
             actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
         }
         updateColorArray()
         
+        print ("fill until 80%")
         
-        while actFillingsProcent < 0.80 && cardStack.count(.MySKCardType) > 0 {
+        while actFillingsProcent < 0.90 && cardStack.count(.MySKCardType) > 0 && positionsTab.count > 0 {
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
-            var suitableCards: [FoundedCardParameters] = findSuitableCardsForGameArrayPosition(gameArrayPos: positionsTab[index])
+            let gameArrayPos = positionsTab[index]
+            positionsTab.remove(at: index)
+            var suitableCards: [FoundedCardParameters] = findSuitableCardsForGameArrayPosition(gameArrayPos: gameArrayPos)
             var go = true
             var countSearches = suitableCards.count
             while go {
@@ -294,11 +323,11 @@ class CardManager {
                     let cardIndex = random!.getRandomInt(0, max: suitableCards.count - 1)
                     let cardToSearch = suitableCards[cardIndex]
                     if let card = cardStack.search(colorIndex: cardToSearch.colorIndex, value: cardToSearch.value) {
-                        card.column = positionsTab[index].column
-                        card.row = positionsTab[index].row
+                        card.column = gameArrayPos.column
+                        card.row = gameArrayPos.row
+                        colorArray[card.colorIndex].addCardToUsedCards(card: card)
                         card.belongsToPackageMax = allPackages
                         card.belongsToPackageMin = allPackages
-                        positionsTab.remove(at: index)
                         updateGameArrayCell(card: card)
                         cardArray.append(card)
                         actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
@@ -317,7 +346,7 @@ class CardManager {
     }
     
     
-    private func findSuitableCardsForGameArrayPosition(gameArrayPos: (column: Int, row: Int))->[FoundedCardParameters] {
+    private func findSuitableCardsForGameArrayPosition(gameArrayPos: ColumnRow)->[FoundedCardParameters] {
         var foundedCards: [FoundedCardParameters] = []
 //        let firstValue: CGFloat = 10000
 //        var distanceToLine = firstValue
@@ -332,6 +361,10 @@ class CardManager {
         let multiplier:CGFloat = multiplierForSearch
         //==========================================
         func appendCardParameter(cardParameter: FoundedCardParameters) {
+            let foundedCardUsing = colorArray[cardParameter.colorIndex].usedCards[cardParameter.value]!
+            if foundedCardUsing.countFree > 0 || foundedCardUsing.countInStack == 0 {
+                return
+            }
             var cardNotFound = true
             for card in foundedCards {
                 if card == cardParameter {
@@ -427,9 +460,13 @@ class CardManager {
         }
         func fillAllCards() {
             data.allCards.removeAll()
+            for index in FirstCardValue...LastCardValue {
+                data.usedCards[index] = UsedCard()
+            }
             for cardColumn in gameArray {
                 for card in cardColumn {
                     if card.used && card.card.colorIndex == data.colorIndex {
+                        data.addCardToUsedCards(card: card.card)
                         data.allCards.append(card.card)
                         if card.card.countTransitions > 0 {
                             data.countTransitions += card.card.countTransitions
@@ -1385,10 +1422,10 @@ class CardManager {
                 if gameArray[column][rowIndex].used {
                     let minStr = gameArray[column][rowIndex].card.cardLib[gameArray[column][rowIndex].card.minValue]
                     let maxStr = gameArray[column][rowIndex].card.cardLib[gameArray[column][rowIndex].card.maxValue]
-                    string += " (" + String(colorNames[color]) + ")"
+                    string += "(" + String(CardManager.colorNames[color]) + ")"
                     string += maxStr! + "-" + minStr!
                 } else {
-                    string += " (Empty )" + "---"
+                    string += "( )" + "---"
                 }
             }
             print(string)
