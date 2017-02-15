@@ -2064,7 +2064,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     card.maxValue = savedCardInCycle.maxValue
                     card.BGPictureAdded = savedCardInCycle.BGPictureAdded
                     card.countTransitions = savedCardInCycle.countTransitions
-                    cardManager!.updateGameArrayCell(card: card)
+                    if card.type == .cardType {
+                        cardManager!.updateGameArrayCell(card: card)
+                    }
 //                    cardManager!.check(color: card.colorIndex)
                     //card.hitLabel.text = "\(card.hitCounter)"
                     card.reload()
@@ -2128,6 +2130,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     run = false
                 }
             } while run
+            generateCards(.normal)  // Nachgenerierung
             showScore()
         }
         
