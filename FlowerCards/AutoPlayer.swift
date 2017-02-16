@@ -40,15 +40,12 @@ class AutoPlayer {
     var testType: TestType = .runOnce //.test
     var testerType: TesterType = .expert
     var gamesToPlay: [GameToPlay] = [
-        GameToPlay(level: 10, gameNumber: 12, stopAt: 77)
-//        GameToPlay(level:11, gameNumber: 7, stopAt: 112),
-//        GameToPlay(level: 10, gameNumber: 87, stopAt: 89),
-//        GameToPlay(level: 24, gameNumber: 30), //Crash!!!!!!!!!!!!!!
-//        GameToPlay(level: 72, gameNumber: 962, stopAt: 161),
-//        GameToPlay(level: 72, gameNumber: 466),
-//        GameToPlay(level: 11, gameNumber: 66, stopAt: 114), // test example 3 Packages
-//        GameToPlay(level: 11, gameNumber: 3, stopAt: 60), //You have lost ===> now too!!!
-//        GameToPlay(level: 35, gameNumber: 995, stopAt: 91), //You have lost ===> now too!!!
+        GameToPlay(level: 11, gameNumber: 66),
+        GameToPlay(level: 24, gameNumber: 30), //You have lost!
+        GameToPlay(level: 72, gameNumber: 962),
+        GameToPlay(level: 72, gameNumber: 466),
+        GameToPlay(level: 11, gameNumber: 66), // test example 3 Packages
+        GameToPlay(level: 35, gameNumber: 995), //You have lost ===> now too!!!
         ]
     var gameIndex = 0
     
@@ -69,13 +66,11 @@ class AutoPlayer {
             let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and levelID = %d", GV.player!.ID, levelID).sorted(byProperty: "gameNumber")
             for game in errorGames {
                 let countHistoryRecords = realm.objects(HistoryModel.self).filter("gameID = %d", game.ID).count
-                if countHistoryRecords > 80 {
-                    if game.levelID != oldLevelID {
-                        oldLevelID = game.levelID
-                    }
-                    let lineGameToPlay = "GameToPlay(level: \(game.levelID + 1), gameNumber: \(game.gameNumber + 1)), // at Step: \(countHistoryRecords)"
-                    print (lineGameToPlay)
+                if game.levelID != oldLevelID {
+                    oldLevelID = game.levelID
                 }
+                let lineGameToPlay = "GameToPlay(level: \(game.levelID + 1), gameNumber: \(game.gameNumber + 1)), // at Step: \(countHistoryRecords)"
+                print (lineGameToPlay)
             }
             levelID += 1
         }
@@ -112,10 +107,10 @@ class AutoPlayer {
                 scene.prepareHelpButtonForStepByStep(callBack: makeStep)
             case .fromDB:
                 gamesToPlay.removeAll()
-                let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID)
+                let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID).sorted(byProperty: "levelID")
                 for game in errorGames {
                     let countHistoryRecords = realm.objects(HistoryModel.self).filter("gameID = %d", game.ID).count
-                    if countHistoryRecords >= 20 {
+                    if countHistoryRecords >= 0 {
                         gamesToPlay.append(GameToPlay(level: game.levelID + 1 , gameNumber: game.gameNumber + 1))
                     }
                 }

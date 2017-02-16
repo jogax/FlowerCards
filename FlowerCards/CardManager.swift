@@ -238,7 +238,7 @@ class CardManager {
         var cardArray: [MySKCard] = []
         let gameArraySize = countColumns * countRows
         var actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
-        if actFillingsProcent > 0.20 && tippArray.count > 1 {
+        if actFillingsProcent > 0.30 && tippArray.count > 2 {
             return cardArray
         }
         var positionsTab = [ColumnRow]()
@@ -272,7 +272,7 @@ class CardManager {
         }
         updateColorArray()
         
-        while actFillingsProcent < 0.90 && cardStack.count(.MySKCardType) > 0 && positionsTab.count > 0 {
+        while actFillingsProcent < 0.80 && cardStack.count(.MySKCardType) > 0 && positionsTab.count > 0 {
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
             let gameArrayPos = positionsTab[index]
             positionsTab.remove(at: index)
@@ -311,6 +311,7 @@ class CardManager {
             }
         }
         _ = createTipps()
+//        print("countTipps: \(tippArray.count)")
         return cardArray
     }
     
@@ -1099,19 +1100,11 @@ class CardManager {
             }
             allCardsAndContainer.append(contentsOf: allCards)
             for masterCard in allCardsAndContainer {
-                let (upperValues, _, lowerValues) = findCardValues(card: masterCard)
-                var switchValue: UInt8 = 0
                 if masterCard != card &&
                     masterCard.belongsToPackageMax.countOnes() <= 2 &&
                     masterCard.belongsToPackageMin.countOnes() <= 2 {
                     
-                    let c1 = UInt8(upperValues.contains(card.maxValue) ? 8 : 0)
-                    let c2 = UInt8(upperValues.contains(card.minValue) ? 4 : 0)
-                    let c3 = UInt8(lowerValues.contains(card.maxValue) ? 2 : 0)
-                    let c4 = UInt8(lowerValues.contains(card.minValue) ? 1 : 0)
-                    
-                    switchValue = c1 + c2 + c3 + c4
-                    let _ = doAction(toDo: switchValue, masterCard: masterCard, otherCard: card)
+                    let _ = doAction(masterCard: masterCard, otherCard: card)
                 }
             }
             allCards.append(card)
@@ -1202,7 +1195,7 @@ class CardManager {
             }
         }
         
-        func doAction(toDo: UInt8, masterCard: MySKCard, otherCard: MySKCard)->Int {
+        func doAction(masterCard: MySKCard, otherCard: MySKCard)->Int {
             func createMask(withMinPackage: Bool = true)->UInt8 {
                 var bit = masterCard.belongsToPackageMax
                 var mask = masterCard.belongsToPackageMax | (withMinPackage ? masterCard.belongsToPackageMin : 0)
@@ -1213,7 +1206,27 @@ class CardManager {
                 return mask
             }
             
+            func findUpperAndLowerMask(belongs: UInt8)->(UInt8, UInt8) {
+                var oper = belongs
+                var shiftedBy: UInt8 = 0
+                while oper & 1 == 0 {
+                    oper >>= 1
+                    shiftedBy += 1
+                }
+                let upperMask: UInt8 = 2 << shiftedBy
+                let lowerMask: UInt8 = 1 << shiftedBy
+                return (upperMask, lowerMask)
+            }
+            
             var countChanges = 0
+            let (cwtUpperValues, _, cwtLowerValues) = findCardValues(card: masterCard)
+            let (ocUpperValues, _, ocLowerValues) = findCardValues(card: otherCard)
+            let c1 = UInt8(cwtUpperValues.contains(otherCard.maxValue) ? 8 : 0)
+            let c2 = UInt8(cwtUpperValues.contains(otherCard.minValue) ? 4 : 0)
+            let c3 = UInt8(cwtLowerValues.contains(otherCard.maxValue) ? 2 : 0)
+            let c4 = UInt8(cwtLowerValues.contains(otherCard.minValue) ? 1 : 0)
+            
+            let toDo = c1 + c2 + c3 + c4
             let savedBelongsToPackageMin = otherCard.belongsToPackageMin
             let savedBelongsToPackageMax = otherCard.belongsToPackageMax
             if otherCard.maxValue == LastCardValue && countTransitions == countPackages - 1 {
@@ -1222,6 +1235,27 @@ class CardManager {
             } else if otherCard.minValue == FirstCardValue && countTransitions == countPackages - 1 {
                 otherCard.belongsToPackageMin = minPackage
                 otherCard.belongsToPackageMax = otherCard.belongsToPackageMin << UInt8(otherCard.countTransitions)
+            } else if masterCard.belongsToPackageMax.countOnes() == 2 &&
+                        otherCard.belongsToPackageMax.countOnes() == 2 &&
+                        (masterCard.countTransitions > 0 || otherCard.countTransitions > 0) {
+                var stop = false
+                for cwtValue in cwtUpperValues {
+                    for ocValue in ocLowerValues {
+                        if cwtValue == ocValue && masterCard.belongsToPackageMax != 0 {
+                            var (upperMask, lowerMask) = findUpperAndLowerMask(belongs: masterCard.belongsToPackageMax)
+                            masterCard.belongsToPackageMax = upperMask
+                            masterCard.belongsToPackageMin = masterCard.belongsToPackageMax >> UInt8(masterCard.countTransitions)
+                            (upperMask, lowerMask) = findUpperAndLowerMask(belongs: otherCard.belongsToPackageMax)
+                            otherCard.belongsToPackageMax = lowerMask
+                            otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
+                            stop = true
+                            break
+                        }
+                    }
+                    if stop {
+                        break
+                    }
+                }
             } else {
                 switch toDo {
                 case 0b0000:
@@ -1288,25 +1322,17 @@ class CardManager {
         
         private func setOtherCardBelonging(cardWithTransition: MySKCard)->Int {
             
-            let (upperValues, _, lowerValues) = findCardValues(card: cardWithTransition)
             var countChanges = 0
             var switchValue: UInt8 = 0
 //            var index = 0
             for otherCard in allCards {
-//                index = ind
                 if cardWithTransition != otherCard &&
                     cardWithTransition.belongsToPackageMax.countOnes() <= 2 &&
                     cardWithTransition.belongsToPackageMin.countOnes() <= 2 &&
                     otherCard.belongsToPackageMax.countOnes() > 1 &&
-                    otherCard.belongsToPackageMin.countOnes() > 1 {
-                    
-                    let c1 = UInt8(upperValues.contains(otherCard.maxValue) ? 8 : 0)
-                    let c2 = UInt8(upperValues.contains(otherCard.minValue) ? 4 : 0)
-                    let c3 = UInt8(lowerValues.contains(otherCard.maxValue) ? 2 : 0)
-                    let c4 = UInt8(lowerValues.contains(otherCard.minValue) ? 1 : 0)
-                    
-                    switchValue = c1 + c2 + c3 + c4
-                    countChanges += doAction(toDo: switchValue, masterCard: cardWithTransition, otherCard: otherCard)
+                    otherCard.belongsToPackageMin.countOnes() > 1
+                {
+                    countChanges += doAction(masterCard: cardWithTransition, otherCard: otherCard)
                 }
             }
             return countChanges
