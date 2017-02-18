@@ -40,12 +40,12 @@ class AutoPlayer {
     var testType: TestType = .runOnce //.test
     var testerType: TesterType = .expert
     var gamesToPlay: [GameToPlay] = [
-        GameToPlay(level: 11, gameNumber: 66),
-        GameToPlay(level: 24, gameNumber: 30), //You have lost!
-        GameToPlay(level: 72, gameNumber: 962),
-        GameToPlay(level: 72, gameNumber: 466),
-        GameToPlay(level: 11, gameNumber: 66), // test example 3 Packages
-        GameToPlay(level: 35, gameNumber: 995), //You have lost ===> now too!!!
+        GameToPlay(level: 20, gameNumber: 87),
+//        GameToPlay(level: 24, gameNumber: 30), //You have lost!
+//        GameToPlay(level: 72, gameNumber: 962),
+//        GameToPlay(level: 72, gameNumber: 466),
+//        GameToPlay(level: 11, gameNumber: 66), // test example 3 Packages
+//        GameToPlay(level: 35, gameNumber: 995), //You have lost ===> now too!!!
         ]
     var gameIndex = 0
     
@@ -66,14 +66,24 @@ class AutoPlayer {
             let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and levelID = %d", GV.player!.ID, levelID).sorted(byProperty: "gameNumber")
             for game in errorGames {
                 let countHistoryRecords = realm.objects(HistoryModel.self).filter("gameID = %d", game.ID).count
-                if game.levelID != oldLevelID {
-                    oldLevelID = game.levelID
+                if countHistoryRecords == 0 {
+                    realm.beginWrite()
+                    realm.delete(realm.objects(HistoryModel.self).filter("gameID = %d", game.ID))
+                    realm.delete(game)
+                    try! realm.commitWrite()                    
+                } else {
+                    if game.levelID != oldLevelID {
+                        oldLevelID = game.levelID
+                    }
+                    let lineGameToPlay = "GameToPlay(level: \(game.levelID + 1), gameNumber: \(game.gameNumber + 1)), // at Step: \(countHistoryRecords)"
+                    print (lineGameToPlay)
                 }
-                let lineGameToPlay = "GameToPlay(level: \(game.levelID + 1), gameNumber: \(game.gameNumber + 1)), // at Step: \(countHistoryRecords)"
-                print (lineGameToPlay)
             }
             levelID += 1
         }
+        let allGamesCount = realm.objects(GameModel.self).filter("playerID = %d", GV.player!.ID).count
+        let errorGamesCount = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID).count
+        print ("Allgames: \(allGamesCount), Errorgames: \(errorGamesCount), Procent errorgames: \(errorGamesCount * 100 / allGamesCount)")
     }
     #endif
     func startPlay(replay: Bool, testType: TestType = .runOnce) {

@@ -319,38 +319,8 @@ class MySKCard: SKSpriteNode {
         if self.type == .containerType && self.colorIndex != NoColor {
             if upper {
                 return String(MySKCard.countPackages)
-//                switch MySKCard.countPackages {
-//                case 2:
-//                    return "2"
-//                case 3:
-//                    return "3"
-//                case 4:
-//                    return "4"
-//                default: return ""
-//                }
             } else {
                 return String(MySKCard.countPackages - self.countTransitions)
-//                switch (MySKCard.countPackages, self.countTransitions) {
-//                case (2, 0):
-//                    return "2"
-//                case (2, 1):
-//                    return "1"
-//                case (3, 0):
-//                    return "3"
-//                case (3, 1):
-//                    return "2"
-//                case (3, 2):
-//                    return "1"
-//                case (4, 0):
-//                    return "4"
-//                case (4, 1):
-//                    return "3"
-//                case (4, 2):
-//                    return "2"
-//                case (4, 3):
-//                    return "1"
-//                default: return ""
-//                }
             }
         }
         let belongsTo: UInt8 = upper ? belongsToPackageMax : belongsToPackageMin
@@ -410,6 +380,18 @@ class MySKCard: SKSpriteNode {
         label.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.left
         label.verticalAlignmentMode = SKLabelVerticalAlignmentMode.top
         label.isUserInteractionEnabled = false
+    }
+    
+    func containsValue(value: Int)->(Bool, Bool) {
+        if countTransitions == 0 {
+            if value.between(min: minValue, max: maxValue) {
+                return (true, true)
+            } else {
+                return (false, false)
+            }
+        } else {
+            return (value.between(min: 0, max: maxValue), value.between(min: minValue, max: LastCardValue))
+        }
     }
     
     func reload() {

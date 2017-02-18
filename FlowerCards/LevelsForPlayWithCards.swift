@@ -139,7 +139,7 @@ class LevelsForPlayWithCards {
     }
     
     func setAktLevel(_ level: Int) {
-        if !level.between(0, max: levelParam.count - 1) {
+        if !level.between(min: 0, max: levelParam.count - 1) {
             self.level = 0
         } else {
             self.level = level
