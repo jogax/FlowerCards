@@ -1234,9 +1234,15 @@ class CardManager {
                 case (false, false), (true, true):
                     return
                 case (false, true): // minValue of secondCard in upper of firstCard --> first is above, second is below
-                    return
+                    card0.belongsToPackageMax = findUpperBelongs(belongs: card0.belongsToPackageMax)
+                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
+                    card1.belongsToPackageMax = findLowerBelongs(belongs: card1.belongsToPackageMax)
+                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
                 case (true, false): // maxValue of secondCard is in lower of firstCard --> second is above, first is below
-                    return
+                    card1.belongsToPackageMax = findUpperBelongs(belongs: card1.belongsToPackageMax)
+                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
+                    card0.belongsToPackageMax = findLowerBelongs(belongs: card0.belongsToPackageMax)
+                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
                 }
                 
             case (4, 2):
@@ -1273,7 +1279,10 @@ class CardManager {
                     card1.belongsToPackageMax = findLowerBelongs(belongs: card1.belongsToPackageMax)
                     card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
                 case (true, false): // maxValue of secondCard is in lower of firstCard --> second is above, first is below
-                    break
+                    card1.belongsToPackageMax = findUpperBelongs(belongs: card1.belongsToPackageMax)
+                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
+                    card0.belongsToPackageMax = findLowerBelongs(belongs: card0.belongsToPackageMax)
+                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
                 }
                 switch (maxInLower20, minInUpper20) {
                 case (false, false), (true, true):
@@ -1284,7 +1293,10 @@ class CardManager {
                     card2.belongsToPackageMax = findLowerBelongs(belongs: card2.belongsToPackageMax)
                     card2.belongsToPackageMin = card2.belongsToPackageMax >> UInt8(card2.countTransitions)
                 case (true, false): // maxValue of secondCard is in lower of firstCard --> second is above, first is below
-                    break
+                    card2.belongsToPackageMax = findUpperBelongs(belongs: card2.belongsToPackageMax)
+                    card2.belongsToPackageMin = card2.belongsToPackageMax >> UInt8(card2.countTransitions)
+                    card0.belongsToPackageMax = findLowerBelongs(belongs: card0.belongsToPackageMax)
+                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
                 }
                 switch (maxInLower21, minInUpper21) {
                 case (false, false), (true, true):
