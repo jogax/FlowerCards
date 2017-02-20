@@ -144,7 +144,7 @@ class MySKCard: SKSpriteNode {
         get {
             var value = String(type == .cardType ? "Card:" : "Cont:") + "color: " + MySKCard.colorNames[colorIndex]!
             value += ", col: " + String(column) + ", row: " + String(row)
-            value += ", max: " + cardLib[maxValue]! + ", min: " + cardLib[minValue]! + " (" + String(countCards) + ")"
+            value += ", max: " + MySKCard.cardLib[maxValue]! + ", min: " + MySKCard.cardLib[minValue]! + " (" + String(countCards) + ")"
             value += ", belongs: " + String(belongsToPackageMax) + "/" + String(belongsToPackageMin)
             value += ", trans: " + String(countTransitions)
             return value
@@ -228,7 +228,7 @@ class MySKCard: SKSpriteNode {
     private var fontSize10: CGFloat = 0
     private static let colorNames: [Int:String] = [0: "Purple", 1:"Blue  ", 2: "Green ", 3: "Red   ", 1000: ""]
     
-    let cardLib: [Int:String] = [
+    static let cardLib: [Int:String] = [
         0:"A", 1:"2", 2:"3", 3:"4", 4:"5", 5:"6", 6:"7", 7:"8", 8:"9", 9:"10", 10: GV.language.getText(.tcj), 11: GV.language.getText(.tcd), 12: GV.language.getText(.tck), NoColor: ""]
     
     let fontSizeMultiplier: CGFloat = 0.38
@@ -383,6 +383,7 @@ class MySKCard: SKSpriteNode {
     }
     
     func containsValue(value: Int)->(Bool, Bool) {
+        // return if value in upperPart (first Bool) and in lowerPart (second Bool)
         if countTransitions == 0 {
             if value.between(min: minValue, max: maxValue) {
                 return (true, true)
@@ -464,7 +465,7 @@ class MySKCard: SKSpriteNode {
 //            let valueLabel = upper ? maxValueLabel : minValueLabel
 //            let packageLabel = upper ? maxPackageLabel : minPackageLabel
             let value = upper ? maxValue : minValue
-            guard let text = cardLib[minValue == NoColor ? NoColor : value/* % CountCardsInPackage*/] else {
+            guard let text = MySKCard.cardLib[minValue == NoColor ? NoColor : value/* % CountCardsInPackage*/] else {
                 return
             }
             valueLabel.text = "\(text)"
@@ -535,8 +536,8 @@ class MySKCard: SKSpriteNode {
     
     #if TEST
     func createCardText(card: MySKCard, from: Bool)->String {
-        let minValueText = (cardLib[card.minValue]! == "10" ? "" : " ") + cardLib[card.minValue]!
-        let maxValueText = (cardLib[card.maxValue]! == "10" ? "" : " ") + cardLib[card.maxValue]!
+        let minValueText = (MySKCard.cardLib[card.minValue]! == "10" ? "" : " ") + MySKCard.cardLib[card.minValue]!
+        let maxValueText = (MySKCard.cardLib[card.maxValue]! == "10" ? "" : " ") + MySKCard.cardLib[card.maxValue]!
         let betweenTxt = "-" + String(card.countTransitions) + "-"
         return "\(card.type == .containerType ? "Container" : "Card     ")(\(maxValueText)\(betweenTxt)\(minValueText)) \(from ? "from" : "at") [\(card.column):\(card.row)]"
     }

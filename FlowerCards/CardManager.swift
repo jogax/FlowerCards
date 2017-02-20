@@ -238,7 +238,7 @@ class CardManager {
         var cardArray: [MySKCard] = []
         let gameArraySize = countColumns * countRows
         var actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
-        if actFillingsProcent > 0.30 && tippArray.count > 2 {
+        if actFillingsProcent > 0.35 && tippArray.count > 2 {
             return cardArray
         }
         var positionsTab = [ColumnRow]()
@@ -250,7 +250,7 @@ class CardManager {
                 }
             }
         }
-        while actFillingsProcent < 0.40 && cardStack.count(.MySKCardType) > 0 {
+        while actFillingsProcent < 0.38 && cardStack.count(.MySKCardType) > 0 {
             let card: MySKCard = cardStack.pull()!
             let actColorData = colorArray[card.colorIndex]
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
@@ -272,7 +272,7 @@ class CardManager {
         }
         updateColorArray()
         
-        while actFillingsProcent < 0.70 && cardStack.count(.MySKCardType) > 0 && positionsTab.count > 0 {
+        while actFillingsProcent < 0.75 && cardStack.count(.MySKCardType) > 0 && positionsTab.count > 0 {
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
             let gameArrayPos = positionsTab[index]
             positionsTab.remove(at: index)
@@ -287,7 +287,6 @@ class CardManager {
                         let actColorData = colorArray[card.colorIndex]
                         card.column = gameArrayPos.column
                         card.row = gameArrayPos.row
-                        actColorData.addCardToUsedCards(card: card)
                         card.belongsToPackageMax = allPackages
                         card.belongsToPackageMin = allPackages
                         actColorData.addCardToUsedCards(card: card)
@@ -1037,8 +1036,8 @@ class CardManager {
             for column in 0..<countColumns {
                 let color = gameArray[column][rowIndex].card.colorIndex
                 if gameArray[column][rowIndex].used {
-                    let minStr = gameArray[column][rowIndex].card.cardLib[gameArray[column][rowIndex].card.minValue]
-                    let maxStr = gameArray[column][rowIndex].card.cardLib[gameArray[column][rowIndex].card.maxValue]
+                    let minStr = MySKCard.cardLib[gameArray[column][rowIndex].card.minValue]
+                    let maxStr = MySKCard.cardLib[gameArray[column][rowIndex].card.maxValue]
                     string += "(" + String(CardManager.colorNames[color]) + ")"
                     string += maxStr! + "-" + minStr!
                 } else {
@@ -1085,7 +1084,7 @@ class CardManager {
             }
             usedCards[card.minValue]!.countFree += 1
             if card.minValue != card.maxValue || card.countTransitions > 0 {
-                usedCards[card.maxValue]?.countFree += 1
+                usedCards[card.maxValue]?.countFree += card.type == .containerType ? 0 : 1
             }
         }
         
@@ -1115,6 +1114,16 @@ class CardManager {
             return true
         }
         
+        #if TEST
+        func printUsedCards() {
+            for index in 0..<usedCards.count {
+                if let cardName = MySKCard.cardLib[index] {
+                    print("card \(cardName). all: \(usedCards[index]!.countAll), free: \(usedCards[index]!.countFree), inStack: \(usedCards[index]!.countInStack)")
+                }
+            }
+        }
+        #endif
+        
 
         
         func printValue() {
@@ -1139,7 +1148,11 @@ class CardManager {
 
         func analyzeColor() {
             connectablePairs.removeAll()
+            pairsToRemove.removeAll()
             cardsWithTransitions.removeAll()
+            for index in FirstCardValue...LastCardValue {
+                usedCards[index] = UsedCard()
+            }
             countTransitions = 0
             findContainer()
             fillAllCards()
@@ -1172,10 +1185,12 @@ class CardManager {
             }
             
             if connectablePairs.count > 0 {
-                pairsToRemove.removeAll()
-                for pair in connectablePairs {
-                    checkPair(actPair: pair)
+                for (index, pair) in connectablePairs.enumerated() {
+                    if !pairsToRemove.contains(index) {
+                        checkPair(index: index, actPair: pair)
+                    }
                 }
+
                 if pairsToRemove.count > 0 {
                     for index in pairsToRemove.reversed() {
                         //                    print(connectablePairs[index].printValue)
@@ -1220,95 +1235,138 @@ class CardManager {
 
         
         private func checkCardsWithTransition() {
+            func setBelonging(first: MySKCard, second: MySKCard)->Bool {
+                let (_, maxInLower) = first.containsValue(value: second.maxValue)
+                let (minInUpper, _) = first.containsValue(value: second.minValue)
+                if maxInLower || minInUpper {
+                    switch (minInUpper, maxInLower) {
+                    case (false, true): // minValue of secondCard in upper of firstCard --> first is below, second is above
+                        first.belongsToPackageMax = findLowerBelongs(belongs: first.belongsToPackageMax)
+                        first.belongsToPackageMin = first.belongsToPackageMax >> UInt8(first.countTransitions)
+                        second.belongsToPackageMax = findUpperBelongs(belongs: second.belongsToPackageMax)
+                        second.belongsToPackageMin = second.belongsToPackageMax >> UInt8(second.countTransitions)
+                        return true
+                    case (true, false): // maxValue of secondCard is in lower of firstCard --> second is above, first is below
+                        second.belongsToPackageMax = findUpperBelongs(belongs: second.belongsToPackageMax)
+                        second.belongsToPackageMin = second.belongsToPackageMax >> UInt8(second.countTransitions)
+                        first.belongsToPackageMax = findLowerBelongs(belongs: first.belongsToPackageMax)
+                        first.belongsToPackageMin = first.belongsToPackageMax >> UInt8(first.countTransitions)
+                        return true
+                    default:
+                        return false
+                    }
+                }
+                return false
+            }
             if cardsWithTransitions.count < 2 {
                 return
             }
-            let card0 = cardsWithTransitions[0]
-            let card1 = cardsWithTransitions[1]
-            switch (countPackages, cardsWithTransitions.count) {
-            case (3, 2):
-                // [0] --> firstCard, [1] --> secondCard
-                let (_, maxInLower) = card0.containsValue(value: card1.maxValue)
-                let (minInUpper, _) = card0.containsValue(value: card1.minValue)
-                switch (maxInLower, minInUpper) {
-                case (false, false), (true, true):
-                    return
-                case (false, true): // minValue of secondCard in upper of firstCard --> first is above, second is below
-                    card0.belongsToPackageMax = findUpperBelongs(belongs: card0.belongsToPackageMax)
-                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
-                    card1.belongsToPackageMax = findLowerBelongs(belongs: card1.belongsToPackageMax)
-                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
-                case (true, false): // maxValue of secondCard is in lower of firstCard --> second is above, first is below
-                    card1.belongsToPackageMax = findUpperBelongs(belongs: card1.belongsToPackageMax)
-                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
-                    card0.belongsToPackageMax = findLowerBelongs(belongs: card0.belongsToPackageMax)
-                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
+            for index in 0..<cardsWithTransitions.count - 1 {
+                for index1 in index + 1..<cardsWithTransitions.count {
+                    let first = cardsWithTransitions[index]
+                    let second = cardsWithTransitions[index1]
+                    if !setBelonging(first: first, second: second) {
+                        if setBelonging(first: second, second: first) {
+                            return
+                        }
+                    } else {
+                        return
+                    }
+                    
                 }
-                
-            case (4, 2):
-                let (_, maxInLower) = card0.containsValue(value: card1.maxValue)
-                let (minInUpper, _) = card0.containsValue(value: card1.minValue)
-                switch (maxInLower, minInUpper) {
-                case (false, false), (true, true):
-                    return
-                case (false, true): // minValue of secondCard in upper of firstCard --> first is above, second is below
-                    card0.belongsToPackageMax = findUpperBelongs(belongs: card0.belongsToPackageMax)
-                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
-                    card1.belongsToPackageMax = findLowerBelongs(belongs: card1.belongsToPackageMax)
-                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
-                case (true, false): // maxValue of secondCard is in lower of firstCard --> second is above, first is below
-                    card1.belongsToPackageMax = findUpperBelongs(belongs: card1.belongsToPackageMax)
-                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
-                    card0.belongsToPackageMax = findLowerBelongs(belongs: card0.belongsToPackageMax)
-                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
-                }
-            case (4, 3):
-                let card2 = cardsWithTransitions[2]
-                let (_, maxInLower10) = card0.containsValue(value: card1.maxValue)
-                let (minInUpper10, _) = card0.containsValue(value: card1.minValue)
-                let (_, maxInLower20) = card0.containsValue(value: card2.maxValue)
-                let (minInUpper20, _) = card0.containsValue(value: card2.minValue)
-                let (_, maxInLower21) = card1.containsValue(value: card2.maxValue)
-                let (minInUpper21, _) = card1.containsValue(value: card2.minValue)
-                switch (maxInLower10, minInUpper10) {
-                case (false, false), (true, true):
-                    break
-                case (false, true): // minValue of secondCard in upper of firstCard --> first is above, second is below
-                    card0.belongsToPackageMax = findUpperBelongs(belongs: card0.belongsToPackageMax)
-                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
-                    card1.belongsToPackageMax = findLowerBelongs(belongs: card1.belongsToPackageMax)
-                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
-                case (true, false): // maxValue of secondCard is in lower of firstCard --> second is above, first is below
-                    card1.belongsToPackageMax = findUpperBelongs(belongs: card1.belongsToPackageMax)
-                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
-                    card0.belongsToPackageMax = findLowerBelongs(belongs: card0.belongsToPackageMax)
-                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
-                }
-                switch (maxInLower20, minInUpper20) {
-                case (false, false), (true, true):
-                    break
-                case (false, true): // minValue of secondCard in upper of firstCard --> first is above, second is below
-                    card0.belongsToPackageMax = findUpperBelongs(belongs: card0.belongsToPackageMax)
-                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
-                    card2.belongsToPackageMax = findLowerBelongs(belongs: card2.belongsToPackageMax)
-                    card2.belongsToPackageMin = card2.belongsToPackageMax >> UInt8(card2.countTransitions)
-                case (true, false): // maxValue of secondCard is in lower of firstCard --> second is above, first is below
-                    card2.belongsToPackageMax = findUpperBelongs(belongs: card2.belongsToPackageMax)
-                    card2.belongsToPackageMin = card2.belongsToPackageMax >> UInt8(card2.countTransitions)
-                    card0.belongsToPackageMax = findLowerBelongs(belongs: card0.belongsToPackageMax)
-                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
-                }
-                switch (maxInLower21, minInUpper21) {
-                case (false, false), (true, true):
-                    break
-                case (false, true): // minValue of secondCard in upper of firstCard --> first is above, second is below
-                    break
-                case (true, false): // maxValue of secondCard is in lower of firstCard --> second is above, first is below
-                    break
-                }
-           default:
-                return
             }
+//            let card0 = cardsWithTransitions[0]
+//            let card1 = cardsWithTransitions[1]
+//            switch (countPackages, cardsWithTransitions.count) {
+//            case (3, 2):
+//                // [0] --> firstCard, [1] --> secondCard
+//                let (_, maxInLower) = card0.containsValue(value: card1.maxValue)
+//                let (minInUpper, _) = card0.containsValue(value: card1.minValue)
+//                switch (maxInLower, minInUpper) {
+//                case (false, true): // minValue of secondCard in upper of firstCard --> first is above, second is below
+//                    card0.belongsToPackageMax = findUpperBelongs(belongs: card0.belongsToPackageMax)
+//                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
+//                    card1.belongsToPackageMax = findLowerBelongs(belongs: card1.belongsToPackageMax)
+//                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
+//                case (true, false): // maxValue of secondCard is in lower of firstCard --> second is above, first is below
+//                    card1.belongsToPackageMax = findUpperBelongs(belongs: card1.belongsToPackageMax)
+//                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
+//                    card0.belongsToPackageMax = findLowerBelongs(belongs: card0.belongsToPackageMax)
+//                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
+//                default:
+//                    return
+//                }
+//                
+//            case (4, 2):
+//                let (_, maxInLower) = card0.containsValue(value: card1.maxValue)
+//                let (minInUpper, _) = card0.containsValue(value: card1.minValue)
+//                switch (maxInLower, minInUpper) {
+//                case (false, false), (true, true):
+//                    return
+//                case (false, true): // minValue of secondCard in upper of firstCard --> first is above, second is below
+//                    card0.belongsToPackageMax = findUpperBelongs(belongs: card0.belongsToPackageMax)
+//                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
+//                    card1.belongsToPackageMax = findLowerBelongs(belongs: card1.belongsToPackageMax)
+//                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
+//                case (true, false): // maxValue of secondCard is in lower of firstCard --> second is above, first is below
+//                    card1.belongsToPackageMax = findUpperBelongs(belongs: card1.belongsToPackageMax)
+//                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
+//                    card0.belongsToPackageMax = findLowerBelongs(belongs: card0.belongsToPackageMax)
+//                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
+//                }
+//            case (4, 3):
+//                let card2 = cardsWithTransitions[2]
+//                let (_, maxInLower10) = card0.containsValue(value: card1.maxValue)
+//                let (minInUpper10, _) = card0.containsValue(value: card1.minValue)
+//                let (_, maxInLower20) = card0.containsValue(value: card2.maxValue)
+//                let (minInUpper20, _) = card0.containsValue(value: card2.minValue)
+//                let (_, maxInLower21) = card1.containsValue(value: card2.maxValue)
+//                let (minInUpper21, _) = card1.containsValue(value: card2.minValue)
+//                switch (maxInLower10, minInUpper10) {
+//                case (false, false), (true, true):
+//                    break
+//                case (false, true): // minValue of secondCard in upper of firstCard --> first is above, second is below
+//                    card0.belongsToPackageMax = findUpperBelongs(belongs: card0.belongsToPackageMax)
+//                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
+//                    card1.belongsToPackageMax = findLowerBelongs(belongs: card1.belongsToPackageMax)
+//                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
+//                case (true, false): // maxValue of secondCard is in lower of firstCard --> second is above, first is below
+//                    card1.belongsToPackageMax = findUpperBelongs(belongs: card1.belongsToPackageMax)
+//                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
+//                    card0.belongsToPackageMax = findLowerBelongs(belongs: card0.belongsToPackageMax)
+//                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
+//                }
+//                switch (maxInLower20, minInUpper20) {
+//                case (false, false), (true, true):
+//                    break
+//                case (false, true): // minValue of secondCard in upper of firstCard --> first is above, second is below
+//                    card0.belongsToPackageMax = findUpperBelongs(belongs: card0.belongsToPackageMax)
+//                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
+//                    card2.belongsToPackageMax = findLowerBelongs(belongs: card2.belongsToPackageMax)
+//                    card2.belongsToPackageMin = card2.belongsToPackageMax >> UInt8(card2.countTransitions)
+//                case (true, false): // maxValue of secondCard is in lower of firstCard --> second is above, first is below
+//                    card2.belongsToPackageMax = findUpperBelongs(belongs: card2.belongsToPackageMax)
+//                    card2.belongsToPackageMin = card2.belongsToPackageMax >> UInt8(card2.countTransitions)
+//                    card0.belongsToPackageMax = findLowerBelongs(belongs: card0.belongsToPackageMax)
+//                    card0.belongsToPackageMin = card0.belongsToPackageMax >> UInt8(card0.countTransitions)
+//                }
+//                switch (maxInLower21, minInUpper21) {
+//                case (false, false), (true, true):
+//                    break
+//                case (false, true): // minValue of secondCard in upper of firstCard --> first is above, second is below
+//                    card1.belongsToPackageMax = findUpperBelongs(belongs: card1.belongsToPackageMax)
+//                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
+//                    card2.belongsToPackageMax = findLowerBelongs(belongs: card2.belongsToPackageMax)
+//                    card2.belongsToPackageMin = card2.belongsToPackageMax >> UInt8(card2.countTransitions)
+//                case (true, false): // maxValue of secondCard is in lower of firstCard --> second is above, first is below
+//                    card2.belongsToPackageMax = findUpperBelongs(belongs: card2.belongsToPackageMax)
+//                    card2.belongsToPackageMin = card2.belongsToPackageMax >> UInt8(card2.countTransitions)
+//                    card1.belongsToPackageMax = findLowerBelongs(belongs: card1.belongsToPackageMax)
+//                    card1.belongsToPackageMin = card1.belongsToPackageMax >> UInt8(card1.countTransitions)
+//                }
+//           default:
+//                return
+//            }
         }
         
         func doAction(masterCard: MySKCard, otherCard: MySKCard)->Int {
@@ -1318,6 +1376,16 @@ class CardManager {
                 while bit != masterCard.belongsToPackageMin {
                     mask |= bit
                     bit = bit >> 1
+                }
+                return mask
+            }
+            
+            func createMaskUp()->UInt8 {
+                var shifter = masterCard.countTransitions - 1
+                var mask = masterCard.belongsToPackageMin
+                while shifter > 0 {
+                    mask |= mask << 1
+                    shifter -= 1
                 }
                 return mask
             }
@@ -1347,16 +1415,14 @@ class CardManager {
                     otherCard.belongsToPackageMin &= ~masterCard.belongsToPackageMin
                     otherCard.belongsToPackageMax = otherCard.belongsToPackageMin << UInt8(otherCard.countTransitions)
                 case 0b0010: // max in lower
-                    otherCard.belongsToPackageMax &= ~masterCard.belongsToPackageMin
+                    otherCard.belongsToPackageMax &= ~createMaskUp() & UInt8(allPackages)
                     otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
                 case 0b0011: // min & max in lower
-                    otherCard.belongsToPackageMax &= ~masterCard.belongsToPackageMin
+                    otherCard.belongsToPackageMax &= ~createMaskUp() & UInt8(allPackages)
                     otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
-                case 0b0100: // min in upper
-                    if masterCard.belongsToPackageMax.countOnes() == 1 {
-                        otherCard.belongsToPackageMin &= ~masterCard.belongsToPackageMax
-                        otherCard.belongsToPackageMax = otherCard.belongsToPackageMin << UInt8(otherCard.countTransitions)
-                    }
+                case 0b0100: // min in upper                    if masterCard.belongsToPackageMax.countOnes() == 1 {
+                    otherCard.belongsToPackageMin &= ~masterCard.belongsToPackageMax
+                    otherCard.belongsToPackageMax = otherCard.belongsToPackageMin << UInt8(otherCard.countTransitions)
                 case 0b0101:
                     otherCard.belongsToPackageMin &= ~masterCard.belongsToPackageMax & ~masterCard.belongsToPackageMin
                     otherCard.belongsToPackageMax = otherCard.belongsToPackageMin << UInt8(otherCard.countTransitions)
@@ -1409,13 +1475,19 @@ class CardManager {
             
             var countChanges = 0
             for otherCard in allCards {
-                if cardWithTransition != otherCard &&
-                    cardWithTransition.belongsToPackageMax.countOnes() <= 2 &&
-                    cardWithTransition.belongsToPackageMin.countOnes() <= 2 &&
-                    otherCard.belongsToPackageMax.countOnes() > 1 &&
-                    otherCard.belongsToPackageMin.countOnes() > 1
-                {
-                    countChanges += doAction(masterCard: cardWithTransition, otherCard: otherCard)
+                if cardWithTransition != otherCard {
+                     if cardWithTransition.belongsToPackageMax.countOnes() == 1 &&
+                        cardWithTransition.belongsToPackageMin.countOnes() == 1 &&
+                        otherCard.belongsToPackageMax.countOnes() > 1 &&
+                        otherCard.belongsToPackageMin.countOnes() > 1
+                    {
+                        countChanges += doAction(masterCard: cardWithTransition, otherCard: otherCard)
+                    } else {
+//                        if cardWithTransition.belongsToPackageMax.countOnes() < otherCard.belongsToPackageMax.countOnes() &&
+//                            cardWithTransition.belongsToPackageMin.countOnes() < otherCard.belongsToPackageMin.countOnes() {
+//                            countChanges += doAction(masterCard: cardWithTransition, otherCard: otherCard)
+//                        }
+                    }
                 }
             }
             return countChanges
@@ -1473,11 +1545,17 @@ class CardManager {
             return foundedPairs
         }
 
-        private func checkPair(actPair: ConnectablePair) {
+        private func checkPair(index: Int, actPair: ConnectablePair) {
             if actPair.card1.type == .cardType && actPair.card2.type == .cardType &&
                 (actPair.card1.minValue == FirstCardValue && actPair.card2.maxValue == LastCardValue ||
                     actPair.card2.minValue == FirstCardValue && actPair.card1.maxValue == LastCardValue) {
-                for (index, pair) in connectablePairs.enumerated() {
+                if checkIfNewCardCompatibleWithCWT(pairToCheck: actPair) {
+                    if !pairsToRemove.contains(index) {
+                        pairsToRemove.append(index)
+                    }
+                    return
+                }
+                for (ind, pair) in connectablePairs.enumerated() {
                     if pair != actPair {
                         if pair.card1.type == .cardType && pair.card2.type == .cardType &&
                             (pair.card1.minValue == FirstCardValue && pair.card2.maxValue == LastCardValue ||
@@ -1485,8 +1563,8 @@ class CardManager {
                             let actPairLen = actPair.card1.countCards + actPair.card2.countCards
                             let pairLen = pair.card1.countCards + pair.card2.countCards
                             if actPairLen >= CountCardsInPackage && pairLen < CountCardsInPackage {
-                                if !pairsToRemove.contains(index) {
-                                    pairsToRemove.append(index)
+                                if !pairsToRemove.contains(ind) {
+                                    pairsToRemove.append(ind)
                                 }
                             }
                         }
@@ -1495,32 +1573,31 @@ class CardManager {
             }
         }
         
-//        private func findCardValues(card: MySKCard)->([Int], [Int], [Int]) {
-//            var cardValuesAtLowerPackage: [Int] = []
-//            var cardValuesAtTheMid: [Int] = []
-//            var cardValuesAtHigherPackage: [Int] = []
-//            
-//            if card.countTransitions == 0 {
-//                for value in card.minValue...card.maxValue {
-//                    cardValuesAtHigherPackage.append(value)
-//                }
-//            } else {
-//                //            countValues = card.maxValue + CountCardsInPackage - card.minValue + 1 + (CountCardsInPackage * (card.countTransitions - 1))
-//                for value in 0...card.maxValue {
-//                    cardValuesAtHigherPackage.append(value)
-//                }
-//                if card.countTransitions > 1 {
-//                    for value in 0...LastCardValue {
-//                        cardValuesAtTheMid.append(value)
-//                    }
-//                }
-//                for value in card.minValue...LastCardValue {
-//                    cardValuesAtLowerPackage.append(value)
-//                }
-//            }
-//            return (cardValuesAtHigherPackage, cardValuesAtTheMid, cardValuesAtLowerPackage)
-//        }
-//        
+        func checkIfNewCardCompatibleWithCWT(pairToCheck: ConnectablePair)->Bool {
+            for cwt in cardsWithTransitions {
+                if cwt != pairToCheck.card1 && cwt != pairToCheck.card2 {
+                    var upperCardMaxIncwtUpper = false
+                    var upperCardMinIncwtLower = false
+                    var cwtMaxInUpperCardUpper = false
+                    var cwtMinInLowerCardLower = false
+                    var upperCard = pairToCheck.card1
+                    var lowerCard = pairToCheck.card2
+                    if pairToCheck.card1.maxValue == LastCardValue && pairToCheck.card2.minValue == FirstCardValue {
+                        upperCard = pairToCheck.card2
+                        lowerCard = pairToCheck.card1
+                    }
+                    (upperCardMaxIncwtUpper, _) = cwt.containsValue(value: upperCard.maxValue)
+                    (_, upperCardMinIncwtLower) = cwt.containsValue(value: lowerCard.minValue)
+                    (cwtMaxInUpperCardUpper, _) = upperCard.containsValue(value: cwt.maxValue)
+                    (_, cwtMinInLowerCardLower) = lowerCard.containsValue(value: cwt.minValue)
+                    if (upperCardMaxIncwtUpper && upperCardMinIncwtLower) || (cwtMaxInUpperCardUpper && cwtMinInLowerCardLower) {
+                        return true
+                    }
+                }
+            }
+            return false
+        }
+
         private func findContainer() {
             for container in containers {
                 if container.colorIndex == colorIndex {
@@ -1528,15 +1605,13 @@ class CardManager {
                     container.belongsToPackageMin = container.belongsToPackageMax >> UInt8(container.countTransitions)
                     self.container = container
                     countTransitions += container.countTransitions
+                    addCardToUsedCards(card: container)
                 }
             }
         }
 
         private func fillAllCards() {
             allCards.removeAll()
-            for index in FirstCardValue...LastCardValue {
-                usedCards[index] = UsedCard()
-            }
             for cardColumn in gameArray {
                 for card in cardColumn {
                     if card.used && card.card.colorIndex == colorIndex {

@@ -40,7 +40,9 @@ class AutoPlayer {
     var testType: TestType = .runOnce //.test
     var testerType: TesterType = .expert
     var gamesToPlay: [GameToPlay] = [
-        GameToPlay(level: 20, gameNumber: 87),
+        GameToPlay(level: 11, gameNumber: 14, stopAt:221),
+        GameToPlay(level: 11, gameNumber: 20, stopAt: 274),
+        GameToPlay(level: 11, gameNumber: 27, stopAt: 378),
 //        GameToPlay(level: 24, gameNumber: 30), //You have lost!
 //        GameToPlay(level: 72, gameNumber: 962),
 //        GameToPlay(level: 72, gameNumber: 466),
@@ -83,7 +85,9 @@ class AutoPlayer {
         }
         let allGamesCount = realm.objects(GameModel.self).filter("playerID = %d", GV.player!.ID).count
         let errorGamesCount = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID).count
-        print ("Allgames: \(allGamesCount), Errorgames: \(errorGamesCount), Procent errorgames: \(errorGamesCount * 100 / allGamesCount)")
+        if allGamesCount > 0 {
+            print ("Allgames: \(allGamesCount), Errorgames: \(errorGamesCount), Procent errorgames: \(errorGamesCount * 100 / allGamesCount)")
+        }
     }
     #endif
     func startPlay(replay: Bool, testType: TestType = .runOnce) {
@@ -100,10 +104,10 @@ class AutoPlayer {
             switch testType {
             case .newTest:
                 gamesToPlay.removeAll()
-                var levelIndex = 9
+                var levelIndex = 11
                 for _ in 0...21 {
                 for gameNumber in 1...100 {
-                    for levelAdder in 0...3 {
+                    for levelAdder in 0...1 {
                         gamesToPlay.append(GameToPlay(level: levelIndex + levelAdder, gameNumber: gameNumber))
                     }
                 }
