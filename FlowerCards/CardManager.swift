@@ -272,17 +272,36 @@ class CardManager {
         }
         updateColorArray()
         
-        while actFillingsProcent < 0.75 && cardStack.count(.MySKCardType) > 0 && positionsTab.count > 0 {
+        while actFillingsProcent < 0.70 && cardStack.count(.MySKCardType) > 0 && positionsTab.count > 0 && tippArray.count < 3 {
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
             let gameArrayPos = positionsTab[index]
             positionsTab.remove(at: index)
-            var suitableCards: [FoundedCardParameters] = findSuitableCardsForGameArrayPosition(gameArrayPos: gameArrayPos)
+            var suitableCards: [[FoundedCardParameters]] = findSuitableCardsForGameArrayPosition(gameArrayPos: gameArrayPos)
             var go = true
-            var countSearches = suitableCards.count
+            var searchColorIndexes: [Int] = []
+            for color in 0..<MaxColorValue {
+                searchColorIndexes.append(color)
+            }
+
             while go {
+                var searchColorIndex = 0
+                while true {
+                    searchColorIndex = random!.getRandomInt(0, max: searchColorIndexes.count - 1)
+                    if suitableCards[searchColorIndex].count > 0 {
+                        break
+                    }
+                    searchColorIndexes.remove(at: searchColorIndex)
+                    if searchColorIndexes.count == 0 {
+                        searchColorIndex = 0
+                        break
+                    }
+                }
+                
+                var countSearches = suitableCards[searchColorIndex].count
+
                 while countSearches > 0 {
-                    let cardIndex = random!.getRandomInt(0, max: suitableCards.count - 1)
-                    let cardToSearch = suitableCards[cardIndex]
+                    let cardIndex = random!.getRandomInt(0, max: suitableCards[searchColorIndex].count - 1)
+                    let cardToSearch = suitableCards[searchColorIndex][cardIndex]
                     if let card = cardStack.search(colorIndex: cardToSearch.colorIndex, value: cardToSearch.value) {
                         let actColorData = colorArray[card.colorIndex]
                         card.column = gameArrayPos.column
@@ -310,13 +329,12 @@ class CardManager {
             }
         }
         _ = createTipps()
-//        print("countTipps: \(tippArray.count)")
         return cardArray
     }
     
     
-    private func findSuitableCardsForGameArrayPosition(gameArrayPos: ColumnRow)->[FoundedCardParameters] {
-        var foundedCards: [FoundedCardParameters] = []
+    private func findSuitableCardsForGameArrayPosition(gameArrayPos: ColumnRow)->[[FoundedCardParameters]] {
+        var foundedCards: [[FoundedCardParameters]] = [[],[],[],[]] // one Array for each color
 //        let firstValue: CGFloat = 10000
 //        var distanceToLine = firstValue
         let startCard = ColumnRow(column:gameArrayPos.column, row: gameArrayPos.row)
@@ -335,7 +353,7 @@ class CardManager {
                 return
             }
             var cardNotFound = true
-            for card in foundedCards {
+            for card in foundedCards[cardParameter.colorIndex] {
                 if card == cardParameter {
                     cardNotFound = false
                 }
@@ -349,7 +367,7 @@ class CardManager {
                     }
                 }
                 if usable {
-                    foundedCards.append(cardParameter)
+                    foundedCards[cardParameter.colorIndex].append(cardParameter)
                 }
             }
         }
@@ -1029,19 +1047,37 @@ class CardManager {
     
     func printGameArrayInhalt() {
         print(Date())
-        var string: String
+        var string: String = ""
+        for container in containers {
+            if container.minValue != NoColor {
+                let minStr = (container.minValue != 9 ? " " : "") + MySKCard.cardLib[container.minValue]!
+                let maxStr = (container.maxValue != 9 ? " " : "") + MySKCard.cardLib[container.maxValue]!
+                if let colorName = String(CardManager.colorNames[container.colorIndex]) {
+                    string += "(" + colorName + ")"
+                }
+                string += maxStr + "-" + minStr
+            } else {
+                string += "( )" + " --- "
+                
+            }
+        }
+        print("======== Containers ========")
+        print(string)
+        print("======== GameArray ========")
         for row in 0..<countRows {
             let rowIndex = countRows - row - 1
             string = ""
             for column in 0..<countColumns {
-                let color = gameArray[column][rowIndex].card.colorIndex
                 if gameArray[column][rowIndex].used {
-                    let minStr = MySKCard.cardLib[gameArray[column][rowIndex].card.minValue]
-                    let maxStr = MySKCard.cardLib[gameArray[column][rowIndex].card.maxValue]
-                    string += "(" + String(CardManager.colorNames[color]) + ")"
-                    string += maxStr! + "-" + minStr!
+                    let card = gameArray[column][rowIndex].card
+                    let minStr = (card.minValue != 9 ? " " : "") + MySKCard.cardLib[card.minValue]!
+                    let maxStr = (card.minValue != 9 ? " " : "") + MySKCard.cardLib[card.maxValue]!
+                    if let colorName = String(CardManager.colorNames[card.colorIndex]) {
+                        string += "(" + colorName + ")"
+                    }
+                    string += maxStr + "-" + minStr
                 } else {
-                    string += "( )" + "---"
+                    string += "( )" + " --- "
                 }
             }
             print(string)

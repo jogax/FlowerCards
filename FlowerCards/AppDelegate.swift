@@ -44,16 +44,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         // Migration of realm models if neaded
-        #if REALM_V2
+//        #if REALM_V2
             Realm.Configuration.defaultConfiguration = Realm.Configuration(
-                schemaVersion: 2,
+                schemaVersion: 3,
                 migrationBlock: { migration, oldSchemaVersion in
-                    if (oldSchemaVersion < 2) {
+                    if (oldSchemaVersion < 3) {
                         // migrate GameModel
                         migration.enumerateObjects(ofType: GameModel.className()) { oldObject, newObject in
                             // The enumerateObjects(ofType:_:) method iterates
                             // over every Game object stored in the Realm file
-                           newObject!["gameFinished"] = true
+//                           newObject!["gameFinished"] = true
                         }
                         // migrate PlayerModel
                         migration.enumerateObjects(ofType: PlayerModel.className()) { oldObject, newObject in
@@ -126,7 +126,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //                }
 //            })
 //        #else
-        #endif
+//        #endif
         return true
     }
     

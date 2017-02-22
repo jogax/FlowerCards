@@ -64,9 +64,11 @@ class AutoPlayer {
         var oldLevelID: Int = -1
         let maxLevelID = GV.levelsForPlay.count()
         var levelID = 0
+        var lostGames: [String] = []
+        var couldNotEndGames: [String] = []
         while levelID < maxLevelID {
-            let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and levelID = %d", GV.player!.ID, levelID).sorted(byProperty: "gameNumber")
-            for game in errorGames {
+            let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and levelID = %d and ID != %d", GV.player!.ID, levelID, actGame!.ID).sorted(byProperty: "gameNumber")
+            for game in errorGames  {
                 let countHistoryRecords = realm.objects(HistoryModel.self).filter("gameID = %d", game.ID).count
                 if countHistoryRecords == 0 {
                     realm.beginWrite()
@@ -104,8 +106,8 @@ class AutoPlayer {
             switch testType {
             case .newTest:
                 gamesToPlay.removeAll()
-                var levelIndex = 11
-                for _ in 0...21 {
+                var levelIndex = 1
+                for _ in 0...25 {
                 for gameNumber in 1...100 {
                     for levelAdder in 0...1 {
                         gamesToPlay.append(GameToPlay(level: levelIndex + levelAdder, gameNumber: gameNumber))
@@ -187,8 +189,8 @@ class AutoPlayer {
                 if scene.tippsButton!.alpha == 1 && scene.countMovingCards <= 0 {  // if tipps are ready
                     bestTipp = Tipp()
                     if replay {
-                        if indexForReplay < realm.objects(HistoryModel.self).filter("gameID = %d", scene.actGame!.ID).count {
-                            let historyRecord = realm.objects(HistoryModel.self).filter("gameID = %d", scene.actGame!.ID)[indexForReplay]
+                        if indexForReplay < realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID).count {
+                            let historyRecord = realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID)[indexForReplay]
                             indexForReplay += 1
                             bestTipp.points.append(CGPoint(x: historyRecord.points[0].x, y: historyRecord.points[0].y))
                             bestTipp.points.append(CGPoint(x: historyRecord.points[1].x, y: historyRecord.points[1].y))

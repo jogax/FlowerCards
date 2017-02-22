@@ -123,6 +123,7 @@ var containers = [MySKCard]()
 var cardStack:Stack<MySKCard> = Stack()
 var countPackages = 1
 var random: MyRandom?
+var actGame: GameModel?
 
 var lastPair = PairStatus() {
     didSet {
@@ -451,8 +452,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     var doTimeCount: Bool = false
     
-//    var actGame: GameModel?
-    var actGame: GameModel?
     
     var playerType: PlayerType = .singlePlayer
     var opponent = Opponent()
@@ -545,6 +544,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         waitForStartConst = waitForStartForPlayer
         levelIndex = GV.player!.levelID
         GV.levelsForPlay.setAktLevel(levelIndex)
+        specialPrepareFuncFirst()
         if newGame {
             gameNumber = randomGameNumber()
             createGameRecord(gameNumber: gameNumber)
@@ -555,7 +555,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             realm.delete(realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID))
         try! realm.commitWrite()
         
-        specialPrepareFuncFirst()
         cardManager = CardManager()
         freeUndoCounter = freeAmount
         freeTippCounter = freeAmount
@@ -807,6 +806,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         gameNew.levelID = levelIndex
         gameNew.playerID = GV.player!.ID
         gameNew.played = false
+        gameNew.packages = countPackages
+        gameNew.countSteps = 0
         try! realm.write() {
             realm.add(gameNew)
         }
@@ -1483,7 +1484,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             if !replaying {
                 let historyRecord = HistoryModel()
                 historyRecord.ID = GV.createNewRecordID(.historyModel)
-                historyRecord.gameID = self.actGame!.ID
+                historyRecord.gameID = actGame!.ID
                 historyRecord.recordNr = realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID).count + 1
                 historyRecord.colorIndex = colorIndex
                 historyRecord.fromColumn = fromColumn
@@ -1588,7 +1589,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 statistic.bestScore = levelScore
             }
         }
-        
+        actGame!.countSteps = maxCardCount - cardCount
         actGame!.time = timeCount
         actGame!.playerScore = levelScore
         actGame!.played = true

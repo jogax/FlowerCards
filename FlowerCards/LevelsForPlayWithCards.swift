@@ -49,7 +49,8 @@ class LevelsForPlayWithCards {
     var CardPlay = false
     var level: Int
     var aktLevel: LevelParam
-    let maxCountPackages = 4
+//    let maxCountPackages = 4
+    let maxCountPackages = 2
     
 //    #if REALM_V1
     fileprivate var levelContent = [

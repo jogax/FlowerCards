@@ -66,9 +66,6 @@ class ChooseLevelAndOptions: MySKTable {
             var helpLineTextures = [greenRedTexture, purpleTexture, noColorTexture]
             if countStr != "0" {
                 let lastGame = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d", GV.player!.ID, levelID).sorted(byProperty: "created").last!
-//                #if REALM_V1
-                    helpLinesCount = lastGame.helpLines
-//                #endif
             }
             switch helpLinesCount {
                 case 2: helpLineTextures = [greenRedTexture, purpleTexture, noColorTexture]
