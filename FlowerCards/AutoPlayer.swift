@@ -106,14 +106,18 @@ class AutoPlayer {
             switch testType {
             case .newTest:
                 gamesToPlay.removeAll()
-                var levelIndex = 1
-                for _ in 0...25 {
-                for gameNumber in 1...100 {
-                    for levelAdder in 0...1 {
-                        gamesToPlay.append(GameToPlay(level: levelIndex + levelAdder, gameNumber: gameNumber))
-                    }
-                }
-                    levelIndex += 4
+//                var levelIndex = 1
+//                for _ in 0...2 {
+//                for gameNumber in 1...100 {
+//                    for levelAdder in 0...13 {
+//                        gamesToPlay.append(GameToPlay(level: levelIndex + levelAdder, gameNumber: gameNumber))
+//                    }
+//                }
+//                    levelIndex += 14
+//                }
+                let levelIndex = 2
+                for gameNumber in 1...1000 {
+                    gamesToPlay.append(GameToPlay(level: levelIndex, gameNumber: gameNumber))
                 }
             case .runOnce:
                 gamesToPlay.removeAll()

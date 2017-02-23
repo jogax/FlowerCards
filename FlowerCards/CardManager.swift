@@ -272,16 +272,19 @@ class CardManager {
         }
         updateColorArray()
         
-        while actFillingsProcent < 0.70 && cardStack.count(.MySKCardType) > 0 && positionsTab.count > 0 && tippArray.count < 3 {
+        while actFillingsProcent < 0.80 && cardStack.count(.MySKCardType) > 0 && positionsTab.count > 0 && tippArray.count < 4 {
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
             let gameArrayPos = positionsTab[index]
             positionsTab.remove(at: index)
             var suitableCards: [[FoundedCardParameters]] = findSuitableCardsForGameArrayPosition(gameArrayPos: gameArrayPos)
             var go = true
+//            var colorCounts: [Int:Int] = [:]
             var searchColorIndexes: [Int] = []
             for color in 0..<MaxColorValue {
                 searchColorIndexes.append(color)
+//                colorCounts[color] = colorArray[color].allCards.count
             }
+            
 
             while go {
                 var searchColorIndex = 0
@@ -293,6 +296,7 @@ class CardManager {
                     searchColorIndexes.remove(at: searchColorIndex)
                     if searchColorIndexes.count == 0 {
                         searchColorIndex = 0
+                        go = false
                         break
                     }
                 }
@@ -309,23 +313,25 @@ class CardManager {
                         card.belongsToPackageMax = allPackages
                         card.belongsToPackageMin = allPackages
                         actColorData.addCardToUsedCards(card: card)
-//                        let newPairs = actColorData.addCardToColor(card: card)
-//                        if newPairs.count > 0 {
-//                            for pair in newPairs {
-//                                checkPathToFoundedCards(pair: pair)
-//                            }
-//                        }
-                        updateGameArrayCell(card: card)
-                        cardArray.append(card)
-                        actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
-                        break
+                        let newPairs = actColorData.addCardToColor(card: card)
+                        if newPairs.count > 0 {
+                            updateGameArrayCell(card: card)
+                            cardArray.append(card)
+                            for pair in newPairs {
+                                checkPathToFoundedCards(pair: pair)
+                            }
+                            actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
+                            go = false
+                            break
+                        } else {
+                            cardStack.push(card)
+                        }
                     } else {
-                        
+                        suitableCards[searchColorIndex].remove(at: cardIndex)
                     }
                     countSearches -= 1
                 }
                 
-                go = false
             }
         }
         _ = createTipps()
@@ -1129,6 +1135,14 @@ class CardManager {
         }
         
         func addCardToColor(card: MySKCard)->[ConnectablePair] {
+            let savedGameArray = gameArray
+            let savedAllCards = allCards
+            let savedContainer = container
+            let savedCardsWithTransitions = cardsWithTransitions
+            let savedConnectablePairs = connectablePairs
+            let savedCountTransitions = countTransitions
+            let savedUsedCards = usedCards
+            
             var allCardsAndContainer:[MySKCard] = []
             if container != nil {
                 allCardsAndContainer.append(container!)
@@ -1143,7 +1157,21 @@ class CardManager {
                 }
             }
             allCards.append(card)
-            return findPair(card: card)
+            var pairs: [ConnectablePair] = []
+            if container != nil {
+                pairs.append(contentsOf: findPair(card: container!))
+            }
+            pairs.append(contentsOf: findPair(card: card))
+            if pairs.count == 0 {
+                gameArray = savedGameArray
+                allCards = savedAllCards
+                container = savedContainer
+                cardsWithTransitions = savedCardsWithTransitions
+                connectablePairs = savedConnectablePairs
+                countTransitions = savedCountTransitions
+                usedCards = savedUsedCards
+            }
+            return pairs
         }
         
         func cardHasConnection(card: MySKCard)->Bool {
