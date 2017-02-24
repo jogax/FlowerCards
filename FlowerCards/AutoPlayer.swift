@@ -33,6 +33,7 @@ class AutoPlayer {
 //    @objc let nextStepSelector = "nextStep:"
     var timer: Timer = Timer()
     var bestTipp = Tipp()
+    var choosedTipp: Tipp.InnerTipp = Tipp.InnerTipp()
     var autoPlayStatus: runStatus = .getTipp
     var replay: Bool
     var indexForReplay: Int = 0
@@ -193,35 +194,40 @@ class AutoPlayer {
                 if scene.tippsButton!.alpha == 1 && scene.countMovingCards <= 0 {  // if tipps are ready
                     bestTipp = Tipp()
                     if replay {
-                        if indexForReplay < realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID).count {
-                            let historyRecord = realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID)[indexForReplay]
-                            indexForReplay += 1
-                            bestTipp.points.append(CGPoint(x: historyRecord.points[0].x, y: historyRecord.points[0].y))
-                            bestTipp.points.append(CGPoint(x: historyRecord.points[1].x, y: historyRecord.points[1].y))
-                        } else {
-                            stopAutoplay()
-                        }
+//                        if indexForReplay < realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID).count {
+//                            let historyRecord = realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID)[indexForReplay]
+//                            indexForReplay += 1
+//                            bestTipp.points.append(CGPoint(x: historyRecord.points[0].x, y: historyRecord.points[0].y))
+//                            bestTipp.points.append(CGPoint(x: historyRecord.points[1].x, y: historyRecord.points[1].y))
+//                        } else {
+//                            stopAutoplay()
+//                        }
                     } else {
                         switch testerType {
                         case .beginner:
                             for tipp in tippArray {
-                                if bestTipp.value < tipp.value {
+                                if bestTipp.innerTipps.count == 0 || bestTipp.innerTipps.first!.value < tipp.innerTipps.first!.value {
                                     bestTipp = tipp
+                                    choosedTipp = tipp.innerTipps.first!
                                 }
                             }
                         case .medium:
                             for tipp in tippArray {
+                                
                                 if tipp.card2.type != .containerType  { // first check only Cards
-                                    if bestTipp.value < tipp.value {
+                                    if bestTipp.innerTipps.count == 0 || bestTipp.innerTipps.last!.value < tipp.innerTipps.last!.value {
                                         bestTipp = tipp
+                                        choosedTipp = tipp.innerTipps.last!
                                     }
                                 }
                             }
-                            if bestTipp.points.count == 0 {
+                            if bestTipp.innerTipps.count == 0 {
                                 for tipp in tippArray {
                                     if tipp.card2.type == .containerType  { // first check only Cards
-                                        if bestTipp.value < tipp.value {
+                                        if bestTipp.innerTipps.count == 0 || bestTipp.innerTipps.last!.value < tipp.innerTipps.last!.value {
                                             bestTipp = tipp
+                                            choosedTipp = tipp.innerTipps.last!
+
                                         }
                                     }
                                 }
@@ -230,16 +236,18 @@ class AutoPlayer {
                         case .expert:
                             for tipp in tippArray {
                                 if tipp.card2.type != .containerType  { // first check only Cards
-                                    if bestTipp.value < tipp.value {
+                                    if bestTipp.innerTipps.count == 0 || bestTipp.innerTipps.last!.value < tipp.innerTipps.last!.value {
                                         bestTipp = tipp
+                                        choosedTipp = tipp.innerTipps.last!
                                     }
                                 }
                             }
-                            if bestTipp.points.count == 0 {
+                            if bestTipp.innerTipps.count == 0 {
                                 for tipp in tippArray {
                                     if tipp.card2.type == .containerType  { // first check only Cards
-                                        if bestTipp.value < tipp.value {
+                                        if bestTipp.innerTipps.count == 0 || bestTipp.innerTipps.last!.value < tipp.innerTipps.last!.value {
                                             bestTipp = tipp
+                                            choosedTipp = tipp.innerTipps.last!
                                         }
                                     }
                                 }
@@ -247,7 +255,7 @@ class AutoPlayer {
                             
                         }
                     }
-                    if bestTipp.points.count > 0 {
+                    if choosedTipp.points.count > 0 {
                         autoPlayStatus = .touchesBegan
                     } else {
                         if gamesToPlay.count == 0 {
@@ -262,13 +270,13 @@ class AutoPlayer {
                     
                 }
             case .touchesBegan:
-                scene.myTouchesBegan(touchLocation: bestTipp.points[0])
+                scene.myTouchesBegan(touchLocation: choosedTipp.points[0])
                 autoPlayStatus = .touchesMoved
             case .touchesMoved:
-                scene.myTouchesMoved(touchLocation: bestTipp.points[1])
+                scene.myTouchesMoved(touchLocation: choosedTipp.points[1])
                 autoPlayStatus = .touchesEnded
             case .touchesEnded:
-                scene.myTouchesEnded(touchLocation: bestTipp.points[1])
+                scene.myTouchesEnded(touchLocation: choosedTipp.points[1])
                 switch testType {
                 case .runOnce:
                     break
