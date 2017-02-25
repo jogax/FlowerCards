@@ -76,9 +76,9 @@ struct Tipp {
         card1 = MySKCard()
         card2 = MySKCard()
     }
-    func hasThisInnerTipp(count:Int)->Bool {
+    func hasThisInnerTipp(count:Int, firstPoint: CGPoint)->Bool {
         for innerTipp in innerTipps {
-            if innerTipp.points.count == count {
+            if innerTipp.points.count == count && firstPoint == innerTipp.points.first! {
                 return true
             }
         }
@@ -222,6 +222,8 @@ class CardManager {
     var tippIndex = 0
     var lastNextPoint: Founded?
     static let colorNames = ["P", "B", "G", "R"]
+    private let multiplierForSearch = CGFloat(2.0)
+
     private let purple = 0
     private let blue = 1
     private let green = 2
@@ -306,7 +308,7 @@ class CardManager {
                 }
             }
         }
-        while actFillingsProcent < 0.38 && cardStack.count(.MySKCardType) > 0 {
+        while actFillingsProcent < 0.30 && cardStack.count(.MySKCardType) > 0 {
             let card: MySKCard = cardStack.pull()!
             let actColorData = colorArray[card.colorIndex]
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
@@ -405,9 +407,6 @@ class CardManager {
         let stopAngle = startAngle + 360 * GV.oneGrad // + 360°
         //        let startNode = self.childNodeWithName(name)! as! MySKCard
         var angle = startAngle
-        let multiplierForSearch = CGFloat(2.0)
-        //        let fineMultiplier = CGFloat(1.0)
-        let multiplier:CGFloat = multiplierForSearch
         //==========================================
         func appendCardParameter(cardParameter: FoundedCardParameters) {
             let foundedCardUsing = colorArray[cardParameter.colorIndex].usedCards[cardParameter.value]!
@@ -488,7 +487,7 @@ class CardManager {
                     }
                 }
             }
-            angle += GV.oneGrad * multiplier
+            angle += GV.oneGrad * multiplierForSearch
         }
         return foundedCards
     }
@@ -621,64 +620,63 @@ class CardManager {
     }
 
     
-    private func checkPathToFoundedCards(pair:ConnectablePair, myPoints: [CGPoint] = []) {
-        var myTipp = Tipp()
+    private func checkPathToFoundedCards(pair:ConnectablePair) {
         let firstValue: CGFloat = 10000
-        var distanceToLine = firstValue
-        let startPoint = gameArray[pair.card1.column][pair.card1.row].position
-        var targetPoint = CGPoint.zero
-        if pair.card2.type == .containerType {
-            targetPoint = containers[pair.card2.column].position
-        } else {
-            targetPoint = gameArray[pair.card2.column][pair.card2.row].position
-        }
-        let startAngle = calculateAngle(startPoint, point2: targetPoint).angleRadian - GV.oneGrad
-        let stopAngle = startAngle + 360 * GV.oneGrad // + 360°
-        //        let startNode = self.childNodeWithName(name)! as! MySKCard
-        var founded = false
-        var angle = startAngle
-        let multiplierForSearch = CGFloat(2.0)
-        //        let fineMultiplier = CGFloat(1.0)
-        let multiplier:CGFloat = multiplierForSearch
-        while angle <= stopAngle && !founded {
-            let toPoint = GV.pointOfCircle(1.0, center: startPoint, angle: angle)
-            let movedFrom = ColumnRow(column: pair.card1.column, row: pair.card1.row)
-            let (foundedPoint, myPoints) = createHelpLines(movedFrom: movedFrom, toPoint: toPoint, inFrame: GV.mainScene!.frame, lineSize: cardSize.width, showLines: false)
-            if foundedPoint != nil {
-                if foundedPoint!.foundContainer && pair.card2.type == .containerType && foundedPoint!.column == pair.card2.column ||
-                    (foundedPoint!.column == pair.card2.column && foundedPoint!.row == pair.card2.row) {
-                    let hasTipp = myTipp.hasThisInnerTipp(count: myPoints.count)
-                    if distanceToLine == firstValue ||
-                        !hasTipp ||
-                        (hasTipp && foundedPoint!.distanceToP0 > distanceToLine) {
-                        myTipp.card1 = pair.card1
-                        myTipp.card2 = pair.card2
-                        if hasTipp {
-                            
-                        } else {
-                            let innerTipp = Tipp.InnerTipp(points: myPoints, value: myTipp.card1.countScore * (myPoints.count - 1))
-                            myTipp.innerTipps.append(innerTipp)
-                        }
-                        distanceToLine = foundedPoint!.distanceToP0
-                        
-                    }
-//                    if distanceToLine != firstValue && distanceToLine < foundedPoint!.distanceToP0 && myTipp.points.count == 2 {
-//                        founded = true
-//                    }
-                }
+        func checkPath(card1: MySKCard, card2: MySKCard)->Tipp {
+            var myTipp = Tipp()
+            var distanceToLine = firstValue
+            let startPoint = gameArray[card1.column][card1.row].position
+            var targetPoint = CGPoint.zero
+            if card2.type == .containerType {
+                targetPoint = containers[card2.column].position
+            } else {
+                targetPoint = gameArray[card2.column][card2.row].position
             }
-            angle += GV.oneGrad * multiplier
+            let startAngle = calculateAngle(startPoint, point2: targetPoint).angleRadian - GV.oneGrad
+            let stopAngle = startAngle + 360 * GV.oneGrad // + 360°
+            //        let startNode = self.childNodeWithName(name)! as! MySKCard
+            var angle = startAngle
+            //        let fineMultiplier = CGFloat(1.0)
+            while angle <= stopAngle {
+                let toPoint = GV.pointOfCircle(1.0, center: startPoint, angle: angle)
+                let movedFrom = ColumnRow(column: card1.column, row: card1.row)
+                let (foundedPoint, myPoints) = createHelpLines(movedFrom: movedFrom, toPoint: toPoint, inFrame: GV.mainScene!.frame, lineSize: cardSize.width, showLines: false)
+                if foundedPoint != nil {
+                    if foundedPoint!.foundContainer && card2.type == .containerType && foundedPoint!.column == card2.column ||
+                        (foundedPoint!.column == card2.column && foundedPoint!.row == card2.row) {
+                        let hasTipp = myTipp.hasThisInnerTipp(count: myPoints.count, firstPoint: myPoints[0])
+                        if distanceToLine == firstValue ||
+                            !hasTipp ||
+                            (hasTipp && foundedPoint!.distanceToP0 > distanceToLine) {
+                            myTipp.card1 = card1
+                            myTipp.card2 = card2
+                            if hasTipp {
+                                
+                            } else {
+                                let innerTipp = Tipp.InnerTipp(points: myPoints, value: myTipp.card1.countScore * (myPoints.count - 1))
+                                myTipp.innerTipps.append(innerTipp)
+                            }
+                            distanceToLine = foundedPoint!.distanceToP0
+                            
+                        }
+                        //                    if distanceToLine != firstValue && distanceToLine < foundedPoint!.distanceToP0 && myTipp.points.count == 2 {
+                        //                        founded = true
+                        //                    }
+                    }
+                }
+                angle += GV.oneGrad * multiplierForSearch
+            }
+            return myTipp
         }
-        
-        if distanceToLine.between(0, max: firstValue - 0.1) {
-            
-//            for ind in 0..<myTipp.points.count - 1 {
-//                myTipp.lineLength += (myTipp.points[ind] - myTipp.points[ind + 1]).length()
-//            }
-            // calculate the value for this tipp
-            //            myTipp.value = (self.childNode(withName: gameArray[myTipp.fromColumn][myTipp.fromRow].name) as! MySKCard).countScore * (myTipp.points.count - 1)
-            let sortedInnerTipps = myTipp.innerTipps.sorted{$0.points.count < $1.points.count}
-            myTipp.innerTipps = sortedInnerTipps
+        var myTipp = Tipp()
+        var myTipp2 = Tipp()
+        myTipp = checkPath(card1: pair.card1, card2: pair.card2)
+        if pair.card2.type == .cardType {
+            myTipp2 = checkPath(card1: pair.card2, card2: pair.card1)
+        }
+        myTipp.innerTipps.append(contentsOf: myTipp2.innerTipps)
+        if myTipp.innerTipps.count > 0 {
+            myTipp.innerTipps = myTipp.innerTipps.sorted{$0.value < $1.value}
             tippArray.append(myTipp)
         }
     }

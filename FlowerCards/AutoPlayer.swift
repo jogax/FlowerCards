@@ -41,15 +41,8 @@ class AutoPlayer {
     var testType: TestType = .runOnce //.test
     var testerType: TesterType = .expert
     var gamesToPlay: [GameToPlay] = [
-        GameToPlay(level: 11, gameNumber: 14, stopAt:221),
-        GameToPlay(level: 11, gameNumber: 20, stopAt: 274),
-        GameToPlay(level: 11, gameNumber: 27, stopAt: 378),
-//        GameToPlay(level: 24, gameNumber: 30), //You have lost!
-//        GameToPlay(level: 72, gameNumber: 962),
-//        GameToPlay(level: 72, gameNumber: 466),
-//        GameToPlay(level: 11, gameNumber: 66), // test example 3 Packages
-//        GameToPlay(level: 35, gameNumber: 995), //You have lost ===> now too!!!
-        ]
+        GameToPlay(level: 2, gameNumber: 13, stopAt:5),
+    ]
     var gameIndex = 0
     
     init(scene: CardGameScene) {
@@ -65,8 +58,8 @@ class AutoPlayer {
         var oldLevelID: Int = -1
         let maxLevelID = GV.levelsForPlay.count()
         var levelID = 0
-        var lostGames: [String] = []
-        var couldNotEndGames: [String] = []
+//        var lostGames: [String] = []
+//        var couldNotEndGames: [String] = []
         while levelID < maxLevelID {
             let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and levelID = %d and ID != %d", GV.player!.ID, levelID, actGame!.ID).sorted(byProperty: "gameNumber")
             for game in errorGames  {
