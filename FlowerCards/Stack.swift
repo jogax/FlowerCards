@@ -60,6 +60,19 @@ class Stack<T> {
         }
     }
     
+    func pull (color: Int) -> MySKCard? {
+        if cardStack.count > 0 {
+            for index in 0..<cardStack.count {
+                if cardStack[index].colorIndex == color {
+                    let value = cardStack[index]
+                    cardStack.remove(at: index)
+                    return value
+                }
+            }
+        }
+        return nil
+    }
+    
     func get (index: Int)-> MySKCard {
         return cardStack[index]
     }

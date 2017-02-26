@@ -576,7 +576,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        createGameRecord(gameNumber)
 
         
-        random = MyRandom(gameNumber: gameNumber)
+        random = MyRandom(level: levelIndex, gameNumber: gameNumber)
         
         stopTimer(&countUp)
         

@@ -28,7 +28,7 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
     override func viewDidLoad() {
         super.viewDidLoad()
         GV.mainViewController = self
-        self.importGamePredefinitions()
+//        self.importGamePredefinitions()
         startScene()
 
 //        _ = CreateGamePredefinition(countGames: countGames)
@@ -49,23 +49,23 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
         _ = 0
     }
     
-    func importGamePredefinitions() {
-        let actCount = realm.objects(GamePredefinitionModel.self).count
-        if actCount < GamePredefinitions.gameArray.count {
-            for gameNumber in actCount..<GamePredefinitions.gameArray.count {
-                let game = GamePredefinitionModel()
-                game.gameNumber = gameNumber
-                game.seedData = GamePredefinitions.gameArray[gameNumber]!.dataFromHexadecimalString()!
-                try! realm.write({
-                    realm.add(game)
-                })
-
-            }
-        }
-
-
-    }
-    
+//    func importGamePredefinitions() {
+//        let actCount = realm.objects(GamePredefinitionModel.self).count
+//        if actCount < GamePredefinitions.gameArray.count {
+//            for gameNumber in actCount..<GamePredefinitions.gameArray.count {
+//                let game = GamePredefinitionModel()
+//                game.gameNumber = gameNumber
+//                game.seedData = GamePredefinitions.gameArray[gameNumber]!.dataFromHexadecimalString()!
+//                try! realm.write({
+//                    realm.add(game)
+//                })
+//
+//            }
+//        }
+//
+//
+//    }
+//    
     func copyDefaultRealmFileIfNotExistsYet() {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         let documentDirectory = paths[0] 
@@ -101,14 +101,14 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
 //        }
 //    }
 //    
-    func exportGames(_ countGames: Int) {
-        for gameNumber in 0..<countGames {
-            let random = GKARC4RandomSource()
-            let myNSData = random.seed
-            let quote = "\""
-            print("\(gameNumber):\(quote)\(myNSData.hexString!)\(quote),")
-        }
-    }
+//    func exportGames(_ countGames: Int) {
+//        for gameNumber in 0..<countGames {
+//            let random = GKARC4RandomSource()
+//            let myNSData = random.seed
+//            let quote = "\""
+//            print("\(gameNumber):\(quote)\(myNSData.hexString!)\(quote),")
+//        }
+//    }
     
     func startScene() {
         skView = self.view as? SKView

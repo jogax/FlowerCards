@@ -41,7 +41,7 @@ class AutoPlayer {
     var testType: TestType = .runOnce //.test
     var testerType: TesterType = .expert
     var gamesToPlay: [GameToPlay] = [
-        GameToPlay(level: 2, gameNumber: 13, stopAt:5),
+        GameToPlay(level: 2, gameNumber: 550, stopAt:87),
     ]
     var gameIndex = 0
     

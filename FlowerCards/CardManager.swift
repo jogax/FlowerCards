@@ -293,10 +293,25 @@ class CardManager {
     func findNewCardsForGameArray()->[MySKCard] {
         
         _ = createTipps()
+        struct ColorsByCounts {
+            var colorIndex: Int
+            var count: Int
+            init(colorIndex: Int, count: Int) {
+                self.colorIndex = colorIndex
+                self.count = count
+            }
+        }
+        var colorCounts: [ColorsByCounts] = []
+        for color in 0...MaxColorValue - 1 {
+            let colorData = colorArray[color]
+            colorCounts.append(ColorsByCounts(colorIndex: color, count: colorData.allCards.count + (colorData.container == nil ? 0 : 1)))
+        }
+        colorCounts = colorCounts.sorted(by: {$0.count < $1.count})
+        
         var cardArray: [MySKCard] = []
         let gameArraySize = countColumns * countRows
         var actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
-        if actFillingsProcent > 0.35 && tippArray.count > 2 {
+        if actFillingsProcent > 0.30 && tippArray.count > 2 {
             return cardArray
         }
         var positionsTab = [ColumnRow]()
@@ -308,8 +323,10 @@ class CardManager {
                 }
             }
         }
-        while actFillingsProcent < 0.30 && cardStack.count(.MySKCardType) > 0 {
-            let card: MySKCard = cardStack.pull()!
+        while actFillingsProcent < 0.40 && cardStack.count(.MySKCardType) > 0 {
+//            let minCount = colorCounts.min()
+//            let minColor = colorCounts.index(of: minCount!)
+            var card: MySKCard = cardStack.pull()!
             let actColorData = colorArray[card.colorIndex]
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
             card.column = positionsTab[index].column
@@ -472,11 +489,18 @@ class CardManager {
                             if foundedCard.belongsToPackageMax & maxPackage == 0 {
                                 cardParameter.value = FirstCardValue
                                 appendCardParameter(cardParameter: cardParameter)
+                                if foundedCard.minValue > FirstCardValue {
+                                    cardParameter.value = foundedCard.minValue - 1
+                                    appendCardParameter(cardParameter: cardParameter)
+                                }
                             }
                         } else if foundedCard.minValue == FirstCardValue  && countPackages > 1 {
                             if foundedCard.belongsToPackageMin & minPackage == 0 {
                                 cardParameter.value = LastCardValue
                                 appendCardParameter(cardParameter: cardParameter)
+                                if foundedCard.maxValue < LastCardValue {
+                                    cardParameter.value = foundedCard.maxValue + 1
+                                }
                             }
                         } else if foundedCard.minValue != FirstCardValue && foundedCard.maxValue != LastCardValue {
                             cardParameter.value = foundedCard.minValue - 1

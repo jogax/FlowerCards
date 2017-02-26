@@ -9,51 +9,220 @@
 import GameplayKit
 
 
-//struct SeedIndex: Hashable {
-//    var gameNumber: Int64
-//    var hashValue: Int {
-//        get {
-//            let hash = gameNumber
-//            return Int(hash)
-//        }
-//    }
-//    
-//}
-//
-//func == (lhs: SeedIndex, rhs: SeedIndex) -> Bool {
-//    return lhs.hashValue == rhs.hashValue
-//}
-//
 class MyRandom {
-//    static var seedLibrary = [SeedIndex:NSData]()
     var random: GKARC4RandomSource
-    var game: GamePredefinitionModel
-    //var seed: NSData
-    init(gameNumber: Int) {
+    init(level: Int, gameNumber: Int) {
         
-//        let (seedDataStruct, exists) = GV.dataStore.readSeedDataRecord(seedIndex)
-        if let gameData = realm.objects(GamePredefinitionModel.self).filter("gameNumber = %d", gameNumber).first {
-            game = gameData
-            random = GKARC4RandomSource(seed: gameData.seedData! as Data)
-            random.dropValues(2048)
-        } else {
-            random = GKARC4RandomSource()
-//            let foundedGame = realm.objects(GameModel).filter("gameNumber = %d", gameNumber).first!
-//            random = GKARC4RandomSource(seed: foundedGame.seedData)
-            game = GamePredefinitionModel()
-//            game.gameNumber = gameNumber
-//            game.seedData = random.seed
-//            try! realm.write({
-//                realm.add(game)
-//                foundedGame.played = true
-//            })
-//            random.dropValuesWithCount(2048)
-        }
+        let gameData = levelDataArray[level]!.dataFromHexadecimalString()!
+        random = GKARC4RandomSource(seed: gameData)
+        random.dropValues(2048 + gameNumber)
     }
     
     func getRandomInt(_ min: Int, max: Int) -> Int {
          return min + random.nextInt(upperBound: (max + 1 - min))
     }
 
+    private var levelDataArray = [
+        0:"5ff5310cc41380bf720ce9238f984730",
+        1:"c43d64fe101c1051f58927cd68717bf9",
+        2:"119db944bcf1fd22d64e5758fb1d70b3",
+        3:"61d4430034ac9a4aee4c4d7630736664",
+        4:"2753d55686501e3468bf2a0e29c59de4",
+        5:"82bd26db5190373a5dfb9042dceceb52",
+        6:"3b341d1122c7003f1d5369f31ea75dfa",
+        7:"22de5a0c83eb696fa6c134e14f9c2f41",
+        8:"50e40b23e3d82733e3ee8903a00ca7a4",
+        9:"7c5ad945f2127550dd7f3537a25f0d4f",
+        10:"293087f6a84111160a47b8c12cb058ea",
+        11:"ec22558acccd47f5bb1858cdabe37afb",
+        12:"a82e3f062bef8d6d1f8d7464a1f1736a",
+        13:"4571ccac484758c5a2ebd815738fc143",
+        14:"2beab6f5cfeb981c9a52dce21301a07a",
+        15:"f6a4ad76b4c45d46bd58d4a6e3788069",
+        16:"52b7401085a28fb66f931e8253ee79aa",
+        17:"74fe27bee30ad71d11de038b86518dc7",
+        18:"0f8aaa97f1fe49655204ed7844219e8b",
+        19:"9abc5cac64c83e4f19d24d66abb0cfbd",
+        20:"9867c819af0889b36b3c6b470f953ded",
+        21:"cfea96468e218e59ad35f7230afd5517",
+        22:"a9b99c7721e093961faa0b769cbd388f",
+        23:"66759ebdd6023e6a9c932a8ecc6d7e78",
+        24:"48e6e33f589736f105f80bf9d9141f53",
+        25:"b214f59e0af40696d84ce2843a73f143",
+        26:"0153036ade40f4a06f62b4dac6a5fd0b",
+        27:"fc513c3b8a34dfcc8e91c0791c8d8077",
+        28:"55d3143df299afdc55f1b5d20236211f",
+        29:"bfdff2ac3e02942a908d04448917ba37",
+        30:"8ea5d24a730e1d14f17323c18aefcdbe",
+        31:"9f51516952dffcd0e8fbe5f83424c32c",
+        32:"7517414c5cec674a61e56dbaff82b87f",
+        33:"10b8c933ce21705238b6e17c9ed6f9bc",
+        34:"3a5d1df9a40450a1b4f7c81e21bd6b13",
+        35:"31a085aa25640c7c23a3241073eea833",
+        36:"cec0ee1536c6a9110d1d910a49e67252",
+        37:"57ee0ee060ab840a414d76671d6ec4a5",
+        38:"63f055c698de4502471f29568adf0b89",
+        39:"cff3f1137765b0d103b9d48fe0d4e234",
+        40:"3d90823a6975313826d59c5461db4829",
+        41:"34fcc65f68eee42d19ae2cad96786b84",
+        42:"f54da4f4701f2ec90a2968403bd10459",
+        43:"1d5b09093be85df73b08ee8e178ba8b3",
+        44:"119282c245e66c197f4303bf28eb3c70",
+        45:"5db577b3c59f1a721de0039d42d78709",
+        46:"10fa790c74277a5cdfd7da7a5e8ad7c4",
+        47:"225c7d3d014b3dce9f1b88e15a01bd86",
+        48:"bbd91a0bef31e575ca2c6e07969fda0f",
+        49:"5c53bed64e6cb7dd698281d63c6aa9af",
+        50:"4f23147c4ff7a22496e8163a44ea5185",
+        51:"eeff2d8f5153e70644acbfe01fcf41fc",
+        52:"5fe2c06138b21f8dc848f2a2a8a4d594",
+        53:"5074fabc1625884fd983c23247695809",
+        54:"eff8aeeb3a9a4fb946db4ead6ae149ab",
+        55:"4d20abce2e384f86e85b992ff0a6edd5",
+        56:"ffcb08b8754c3bd80aa35b61a0f13121",
+        57:"7aa01c23fc860a9986d17b88bfb1b5ed",
+        58:"8c7718376e3af5618fa84375317ff04d",
+        59:"6db86ea68d1d0a56bbce61ae4ea32a17",
+        60:"b54ecd19e338e39538ea0bfd1a72928b",
+        61:"00b1811a5d5e103011cd91d9ec18ef8a",
+        62:"7ecd35ec1a72b4b5219727f0f52f0fbd",
+        63:"3a573423c19a6d372035fcbf3f307800",
+        64:"d0dd14c2511406f9cd0be8533be210e3",
+        65:"cb04ddd9030d2d538e4b344ac4c6a685",
+        66:"77a410d6b404f561a1f4780ce010b3ff",
+        67:"f38004000c1714c9f8fccbd4ce72e9aa",
+        68:"66989ef7ee12eab28f189a71041e37ea",
+        69:"8f9f26d60b06000814aa9cdeaba9fbda",
+        70:"0e4698d5713a00299d1e791edf9bcfa7",
+        71:"c6db1e38c75c4047d94bfab3d6f7ebe7",
+        72:"afeb32f8003216ff7d6323dd6d9075ae",
+        73:"f8bd3f7d228789fb169f15b9dd3addb0",
+        74:"3f9fea8ae7170218d7291ebc620cd1bd",
+        75:"a55d40e40328feb58adf21d7eb17f191",
+        76:"5a654bfad9c727e518190dc895d13a99",
+        77:"d29ca90d2d40b2a9961362b15eac1501",
+        78:"a7eff703794dde51a2be09dd971d781d",
+        79:"d5a976a1d2d8d2359181c5593659f28d",
+        80:"1af37e495cc74da8672e951ddbf68619",
+        81:"ed4f1f3820cd970f6b4c2d3b13f48bcb",
+        82:"fdab9011372c0d196ef38a1d89658b50",
+        83:"c670073fad0a5f916e331295baa6fdb9",
+        84:"2531029d1ea2d87fee2d665c96df125d",
+        85:"c661ee547e7521d8fae136c7e5071823",
+        86:"c28408696e16e62cd517ef905c881eca",
+        87:"2ba546b5a150d59919ae8ab5927ef992",
+        88:"7c594164477ea3a9d33436762dedc8b2",
+        89:"9400c235d7900517d1e33670bbb7c920",
+        90:"2474319edb02e93481ed6a87358ee36d",
+        91:"ebd3c6a9fdb02262b42c3460323f380b",
+        92:"c20fee7627c4b8ef762330d49a07fdc8",
+        93:"5d55f26ad955a4be3809162c98f64cb7",
+        94:"6c01b179bd36b2b0093b41d22964105e",
+        95:"c82c51ddb3b1b57fdacdfbf5fabf9df4",
+        96:"8390f9226ecbb734a04ed3fc98ed613c",
+        97:"87c3ae33011179e2a50deaafe93b02f5",
+        98:"5ba503ae15eb5ac946e4537e504f2020",
+        99:"0fa0aa38f2c7972772a6b1b9723789ba",
+        100:"be6773afcc740bb16936972559c5bea2",
+        101:"e77237bcc9520085b0834006bd5f2b4f",
+        102:"20b478c37da20090c97145868df02107",
+        103:"2889efb73318d65cc291007d7672ef6c",
+        104:"5c86b4fa1d85c3e5b5aa7332148cf16b",
+        105:"217db4e9d28dca6114a847659b815485",
+        106:"fdd33be8a333fd899777add59509cd4b",
+        107:"b5ae1fa499c006bf2138e60817ea8a3a",
+        108:"6bad197f9e3c1d090f4f99822a6e62be",
+        109:"275397ef3e9ac9666697759e3c3294d9",
+        110:"3c2f8b49c5fdb2b62939668b2578bd94",
+        111:"9cb8f2ac4ff38f49dc9cccb6e7866e35",
+        112:"3add73c10989156568f99c8f8e8059d3",
+        113:"8c3ca1200da143d3bb774096bbf0161b",
+        114:"a7875c81ef652a8eb603785f032f9391",
+        115:"ef0b3e1cdfb26f6162461f1c26fb99dd",
+        116:"a0ed267831a89da3248c2715fa397e49",
+        117:"45075641ac2f5830750c5ae108b0eb61",
+        118:"c9763d4bedb90529d441c752ffa2bf53",
+        119:"5b90621a17609cb43c79e089d6f98145",
+        120:"25ad5dff463e9462a20d0f5b426fb8c0",
+        121:"53fe39039059aaf00714194a2c4e6f52",
+        122:"774ec1ed0477e78ca12230aaa0f7ed4f",
+        123:"f975e274d81e23c46baa2f9896197f83",
+        124:"d543b726a29785a6f519cd8c5b43fdec",
+        125:"a7022d3f6d96336400d2e119851d4ca3",
+        126:"bb612f15e9abc04c87ea17a098769d06",
+        127:"e0279663ac8264a47d762e6955006a6e",
+        128:"8b3eee606c9e9f3b3bec5b8c536a1d29",
+        129:"7774e4b85a748e0de3e9ba11b38d2a8e",
+        130:"6cf0eb43bec9b5a060eeddce47e5d73a",
+        131:"9b52ca7dd2fad1a5c6dd229e3fdea1af",
+        132:"1f40ce338bae58f7930cb67da7269540",
+        133:"688be5bf44b933a2ec50105932d048ce",
+        134:"8d43793588bd13e437b437f2d1fce316",
+        135:"baf6b8e7d6d82926374e49125df0246c",
+        136:"d4fbf13853a2a213bfeb5088f832b300",
+        137:"d17e688cc38a8c62ac933f2e1b769970",
+        138:"ff818eb26aa391be9bc160b9c5cdd760",
+        139:"50bbc34ffd924f4c7d4715849bfb90d0",
+        140:"ebbc1ea6c9b795b995883646ceaaff63",
+        141:"03ba2060ecf6986da4e1a4f2d0043676",
+        142:"a04949f9364384b12c1dd2145edaac5d",
+        143:"5e68c75c5b5d3ff8379023d280fb1e46",
+        144:"3c4c840b7f952d7be35fdb4967898831",
+        145:"7ad02613e14cefff01809f6047d24b26",
+        146:"55772dfc93ae34140548a1166a0bc500",
+        147:"0aafb01a425378c47d9f504e578c0444",
+        148:"3349f87382610a85faf53cc51d8a7f36",
+        149:"0e064e53a659b97468537add7e32312b",
+        150:"97bab3a4f617a79050178f7fb2ba799a",
+        151:"44bfdb84e09d91e214ff345be66ca1c5",
+        152:"2b5020863526c2fb4c442121ef788b7d",
+        153:"601c7680fba360eb83721e8d0d660fdb",
+        154:"11f2fe03550876c0758153f4c1d2df4e",
+        155:"cb5c3edf68548c923625d30bc824ff10",
+        156:"2823bc8c476ee28fe3ac4cfe1144bd4a",
+        157:"e78974a9e7d92198e71e5f1c397c8a9e",
+        158:"58576571a96e4fbce62a0dbf1d6e57d1",
+        159:"7577f8ea595ebc92206722d26050dab4",
+        160:"92ded879fe168191f3ac658917dbd0c5",
+        161:"c608a50b5c8c2b6f264fbb90cd25483e",
+        162:"575e5d68ae55c112b087f1c9cd397716",
+        163:"5d250cd1c7cbce5cf66cbec9d73d4faa",
+        164:"d4b131c5ceac25d1166dc631d63bd8ec",
+        165:"86fea9165c9ae789d2f568f369a2f141",
+        166:"2d322b8944d9177e0f203cea78bd4fef",
+        167:"31b6509f36d923f83446ab48de818f9d",
+        168:"5ce765b025da7d22bf3c2b22db4da488",
+        169:"cedcc29f8ada012d8d78d56e8ca58978",
+        170:"3833d94a359872fb8bc521ec6d33a624",
+        171:"36b75d7af5c3743bb89af1f88f4e4883",
+        172:"81db6682bf3a6019573171cfb19ed42b",
+        173:"f07e23ad1c977e6b1767b56b639b2193",
+        174:"9208a95059028d829669c237f74f44b2",
+        175:"4b65005501d3c89154d0f8c9ec026423",
+        176:"25c65e4093c41fa23007b9e6cfc88f94",
+        177:"2222f98a428dbde613b2a7750c2197f9",
+        178:"e919f69d4597701da5b34a83c6c319bb",
+        179:"f72abbe35d5278e21ebc19a131f51184",
+        180:"a643877fb4216cc91952188791016501",
+        181:"aefd126b51173902ef536c8b98a6811e",
+        182:"8bc28356863999c79d0cbbd8f54e473f",
+        183:"84a69bfd47ad957636113348b4a2f1fa",
+        184:"6727d45ff77de4a2ddccf86855d7acc5",
+        185:"2a3c97ad10c6fcac48fee589624c48b7",
+        186:"df0bcd0bd7878d7dfdb58cecd4394ee7",
+        187:"d295bedcfe4f6dfe1b9f44141eb3dd45",
+        188:"eaa4fe83ece52cb442353a1fced2ee36",
+        189:"9b1500c70965f6d08522b1859c5bd7d5",
+        190:"c71decea264a155b023a64469057c489",
+        191:"dfafab7e69f0b0e3d6ae7311617f8ca3",
+        192:"638dbb34f678d096f75a5bc1580e54d6",
+        193:"cc2663d8cdc3fb16e85910850b7b6409",
+        194:"8799467b14f84b7fa253305880993e79",
+        195:"9046b84b08d22785ddf0ac09acd45175",
+        196:"0a0653aa9394e79adcd56cf2f8658b88",
+        197:"e7354725cd144ab7341e447700814d62",
+        198:"7334765198a3693ec4ed5278221afd50",
+        199:"91e39a2d1cea2315f6c422efc214cfe5",
+        ]
     
 }
