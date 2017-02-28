@@ -41,7 +41,7 @@ class AutoPlayer {
     var testType: TestType = .runOnce //.test
     var testerType: TesterType = .expert
     var gamesToPlay: [GameToPlay] = [
-        GameToPlay(level: 2, gameNumber: 112, stopAt:98),
+        GameToPlay(level: 2, gameNumber: 212, stopAt:97),
     ]
     var gameIndex = 0
     
@@ -100,16 +100,7 @@ class AutoPlayer {
             switch testType {
             case .newTest:
                 gamesToPlay.removeAll()
-//                var levelIndex = 1
-//                for _ in 0...2 {
-//                for gameNumber in 1...100 {
-//                    for levelAdder in 0...13 {
-//                        gamesToPlay.append(GameToPlay(level: levelIndex + levelAdder, gameNumber: gameNumber))
-//                    }
-//                }
-//                    levelIndex += 14
-//                }
-                let levelIndex = 2
+                let levelIndex = GV.player!.levelID + 1
                 for gameNumber in 1...1000 {
                     gamesToPlay.append(GameToPlay(level: levelIndex, gameNumber: gameNumber))
                 }

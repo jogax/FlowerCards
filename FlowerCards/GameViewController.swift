@@ -49,23 +49,6 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
         _ = 0
     }
     
-//    func importGamePredefinitions() {
-//        let actCount = realm.objects(GamePredefinitionModel.self).count
-//        if actCount < GamePredefinitions.gameArray.count {
-//            for gameNumber in actCount..<GamePredefinitions.gameArray.count {
-//                let game = GamePredefinitionModel()
-//                game.gameNumber = gameNumber
-//                game.seedData = GamePredefinitions.gameArray[gameNumber]!.dataFromHexadecimalString()!
-//                try! realm.write({
-//                    realm.add(game)
-//                })
-//
-//            }
-//        }
-//
-//
-//    }
-//    
     func copyDefaultRealmFileIfNotExistsYet() {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         let documentDirectory = paths[0] 
@@ -83,32 +66,6 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
         }
         realm = try! Realm()
     }
-    
-//    func loadGamePredefinitionIfNecessary(countGames: Int) {
-//        let realm = try! Realm()
-//        if realm.objects(GameModel).count < countGames {
-//            while Reachability.isConnectedToNetwork() == false {
-//                sleep(Double(5))
-//            }
-//            if Reachability.isConnectedToNetwork() == true {
-//                for gameNumber in 0..<countGames {
-//                    if realm.objects(GameModel).filter("gameNumber = %d", gameNumber).count == 0 {
-////                        GV.cloudStore.readRecord(gameNumber)
-//                        sleep(0.025)
-//                    }
-//                }
-//            }
-//        }
-//    }
-//    
-//    func exportGames(_ countGames: Int) {
-//        for gameNumber in 0..<countGames {
-//            let random = GKARC4RandomSource()
-//            let myNSData = random.seed
-//            let quote = "\""
-//            print("\(gameNumber):\(quote)\(myNSData.hexString!)\(quote),")
-//        }
-//    }
     
     func startScene() {
         skView = self.view as? SKView

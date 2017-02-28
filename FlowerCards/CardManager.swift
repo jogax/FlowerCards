@@ -417,6 +417,7 @@ class CardManager {
                             break
                         } else {
                             cardStack.push(card: card)
+                            suitableCards[actColorIndex].remove(at: cardIndex)
                         }
                     } else {
                         suitableCards[actColorIndex].remove(at: cardIndex)
@@ -449,7 +450,7 @@ class CardManager {
             }
             var cardNotFound = true
             for card in foundedCards[cardParameter.colorIndex] {
-                if card == cardParameter {
+                if card.value == cardParameter.value {
                     cardNotFound = false
                 }
             }

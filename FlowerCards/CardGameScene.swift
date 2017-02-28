@@ -1678,7 +1678,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
     
     func randomGameNumber()->Int {
-//        let gameNumberSet = realm.objects(GamePredefinitionModel.self)
         for _ in 0...MaxGameNumber {
             let gameNumber = Int(arc4random_uniform(UInt32(MaxGameNumber)))
             if realm.objects(GameModel.self).filter("playerID = %d and gameNumber = %d and levelID = %d and played = true", GV.player!.ID, gameNumber, levelIndex).count == 0

@@ -23,8 +23,8 @@ class DrawImages {
     var tippImage = UIImage()
     
     //let imageColor = GV.khakiColor.CGColor
-    let opaque = false
-    let scale: CGFloat = 1
+    static let opaque = false
+    static let scale: CGFloat = 1
     
     init() {
         self.pfeillinksImage = drawPfeillinks(CGRect(x: 0, y: 0, width: 100, height: 100))
@@ -34,7 +34,7 @@ class DrawImages {
         self.restartImage = drawRestart(CGRect(x: 0, y: 0, width: 100, height: 100))
         self.exchangeImage = drawExchange(CGRect(x: 0, y: 0, width: 100, height: 100))
         self.backImage = drawBack(CGRect(x: 0, y: 0, width: 100, height: 100))
-        self.cardPackage = drawCardPackage(CGRect(x: 0, y: 0, width: 100, height: 100))
+        self.cardPackage = drawCardPackage(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
         self.tippImage = drawTipps(CGRect(x: 0, y: 0, width: 100, height: 100))
         
     }
@@ -42,7 +42,7 @@ class DrawImages {
     func drawPfeillinks(_ frame: CGRect) -> UIImage {
         let multiplier = frame.width / frame.height
         let size = CGSize(width: frame.width * multiplier, height: frame.height)
-        UIGraphicsBeginImageContextWithOptions(size, opaque, scale)
+        UIGraphicsBeginImageContextWithOptions(size, DrawImages.opaque, DrawImages.scale)
         let ctx = UIGraphicsGetCurrentContext()
         ctx!.setStrokeColor(UIColor.black.cgColor)
         
@@ -90,10 +90,10 @@ class DrawImages {
         return image!
     }
 
-    func drawCardPackage(_ frame: CGRect) -> UIImage {
+    func drawCardPackage(frame: CGRect) -> UIImage {
         let multiplier = frame.width / frame.height
         let size = CGSize(width: frame.width * multiplier, height: frame.height)
-        UIGraphicsBeginImageContextWithOptions(size, opaque, scale)
+        UIGraphicsBeginImageContextWithOptions(size, DrawImages.opaque, DrawImages.scale)
         let ctx = UIGraphicsGetCurrentContext()
         ctx!.setStrokeColor(UIColor.blue.cgColor)
 
@@ -133,7 +133,7 @@ class DrawImages {
 
     func drawBack(_ frame: CGRect) -> UIImage {
         let size = CGSize(width: frame.width, height: frame.height)
-        UIGraphicsBeginImageContextWithOptions(size, opaque, scale)
+        UIGraphicsBeginImageContextWithOptions(size, DrawImages.opaque, DrawImages.scale)
         
         let ctx = UIGraphicsGetCurrentContext()
         ctx!.setStrokeColor(UIColor.black.cgColor)
@@ -165,7 +165,7 @@ class DrawImages {
         let size = CGSize(width: frame.width, height: frame.height)
         //let endAngle = CGFloat(2*M_PI)
         
-        UIGraphicsBeginImageContextWithOptions(size, opaque, scale)
+        UIGraphicsBeginImageContextWithOptions(size, DrawImages.opaque, DrawImages.scale)
         let ctx = UIGraphicsGetCurrentContext()
         ctx!.setStrokeColor(UIColor.black.cgColor)
         
@@ -229,7 +229,7 @@ class DrawImages {
         let size = CGSize(width: frame.width, height: frame.height)
         //let endAngle = CGFloat(2*M_PI)
         
-        UIGraphicsBeginImageContextWithOptions(size, opaque, scale)
+        UIGraphicsBeginImageContextWithOptions(size, DrawImages.opaque, DrawImages.scale)
         let ctx = UIGraphicsGetCurrentContext()
         ctx!.setStrokeColor(UIColor.black.cgColor)
         
@@ -294,7 +294,7 @@ class DrawImages {
         let size = CGSize(width: frame.width, height: frame.height)
         //let endAngle = CGFloat(2*M_PI)
         
-        UIGraphicsBeginImageContextWithOptions(size, opaque, scale)
+        UIGraphicsBeginImageContextWithOptions(size, DrawImages.opaque, DrawImages.scale)
         let ctx = UIGraphicsGetCurrentContext()
         ctx!.setStrokeColor(UIColor.black.cgColor)
         
@@ -358,7 +358,7 @@ class DrawImages {
         let size = CGSize(width: frame.width, height: frame.height)
         //let endAngle = CGFloat(2*M_PI)
         
-        UIGraphicsBeginImageContextWithOptions(size, opaque, scale)
+        UIGraphicsBeginImageContextWithOptions(size, DrawImages.opaque, DrawImages.scale)
         let ctx = UIGraphicsGetCurrentContext()
         ctx!.setStrokeColor(UIColor.black.cgColor)
         
@@ -466,7 +466,7 @@ class DrawImages {
         let size = CGSize(width: frame.width, height: frame.height)
         let endAngle = CGFloat(2*M_PI)
         
-        UIGraphicsBeginImageContextWithOptions(size, opaque, scale)
+        UIGraphicsBeginImageContextWithOptions(size, DrawImages.opaque, DrawImages.scale)
         let ctx = UIGraphicsGetCurrentContext()
         ctx!.beginPath()
         
@@ -977,8 +977,7 @@ class DrawImages {
         }
         return UIImage()
     }
-
-
+    
     static func getSetVolumeImage(_ size: CGSize, volumeValue: CGFloat) -> UIImage { // volumeValue 0 ... 100
         UIGraphicsBeginImageContextWithOptions(size, false, 1)
         let ctx = UIGraphicsGetCurrentContext()
@@ -1025,6 +1024,64 @@ class DrawImages {
             return image
         }
         return UIImage()
+    }
+    
+    static func getCardPackage(size: CGSize) -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(size, false, scale)
+        let frame = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+        let ctx = UIGraphicsGetCurrentContext()
+        ctx!.setStrokeColor(UIColor.blue.cgColor)
+        
+        ctx!.setLineWidth(0.2)
+        
+//        ctx!.stroke(frame)
+        
+        
+        ctx!.setLineWidth(0.5)
+        ctx!.beginPath()
+        
+        for index in 1...10 {
+            let p1 = CGPoint(x: frame.origin.x, y: size.height - frame.height / 10 * CGFloat(index))
+            let p2 = CGPoint(x: frame.origin.x + frame.width / 10 * CGFloat(index), y: frame.height)
+            let p3 = CGPoint(x: frame.width, y: frame.origin.y + frame.height / 10 * CGFloat(index))
+            let p4 = CGPoint(x: frame.width - frame.width / 10 * CGFloat(index), y: frame.origin.y)
+            let p5 = CGPoint(x: frame.width, y: frame.height - frame.height / 10 * CGFloat(index))
+            let p6 = CGPoint(x: frame.width - frame.width / 10 * CGFloat(index), y: frame.height)
+            
+            let p7 = CGPoint(x: frame.origin.x, y: frame.height - frame.height / 10 * CGFloat(index))
+            let p8 = CGPoint(x: frame.width - frame.width / 10 * CGFloat(index), y: frame.origin.y)
+            ctx!.move(to: CGPoint(x: p1.x, y: p1.y))
+            ctx!.addLine(to: CGPoint(x: p2.x, y: p2.y))
+            ctx!.move(to: CGPoint(x: p3.x, y: p3.y))
+            ctx!.addLine(to: CGPoint(x: p4.x, y: p4.y))
+            ctx!.move(to: CGPoint(x: p5.x, y: p5.y))
+            ctx!.addLine(to: CGPoint(x: p6.x, y: p6.y))
+            ctx!.move(to: CGPoint(x: p7.x, y: p7.y))
+            ctx!.addLine(to: CGPoint(x: p8.x, y: p8.y))
+            ctx!.strokePath()
+        }
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        return image!
+    }
+
+    
+    static func getPackage2Image(size: CGSize)->UIImage {
+        var bottomImage = getCardPackage(size: size)
+//        var topImage = UIImage(named: "top.png")
+//        
+//        var size = CGSize(width: 300, height: 300)
+//        UIGraphicsBeginImageContext(size)
+//        
+//        let areaSize = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+//        bottomImage!.drawInRect(areaSize)
+//        
+//        topImage!.drawInRect(areaSize, blendMode: kCGBlendModeNormal, alpha: 0.8)
+//        
+//        var newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()!
+//        UIGraphicsEndImageContext()
+        return bottomImage
     }
     
     static func pointOfCircle(_ radius: CGFloat, center: CGPoint, angle: CGFloat) -> CGPoint {
