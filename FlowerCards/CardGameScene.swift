@@ -124,6 +124,7 @@ var cardStack:Stack<MySKCard> = Stack()
 var countPackages = 1
 var random: MyRandom?
 var actGame: GameModel?
+let MaxGameNumber = 10000
 
 var lastPair = PairStatus() {
     didSet {
@@ -524,7 +525,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             buttonYPos = self.size.height * 0.07
             buttonXPosNormalized = self.size.width / 10
             self.name = "CardGameScene"
-            prepareNextGame(true)
+            prepareNextGame(newGame: true)
             generateCards(.first)
             autoPlayer = AutoPlayer(scene: self)
         } else {
@@ -534,10 +535,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        //printFunc(function: "didMove", start: false)
     }
     
-    func prepareNextGame(_ newGame: Bool) {
-//        //printFunc(function: "prepareNextGame", start: true)
-
-//        labelFontSize = GV.onIpad ? 20 : 15
+    func prepareNextGame(newGame: Bool) {
         labelFontSize = GV.onIpad ? self.size.height / 50 : self.size.height / 70
 
         durationMultiplier = durationMultiplierForPlayer
@@ -1219,7 +1217,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         lastUpdateSec = sec10
         if restartGame {
             restartGame = false
-            startNewGame(false)
+            startNewGame(next: false)
         }
         
         checkMultiplayer()
@@ -1675,21 +1673,18 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func callBackFromChooseLevelAndOptions() {
-        startNewGame(true)
+        startNewGame(next: true)
     }
 
     
     func randomGameNumber()->Int {
-        var freeGameNumbers = [Int]()
-        let gameNumberSet = realm.objects(GamePredefinitionModel.self)
-        for index in 0..<gameNumberSet.count {
-            if realm.objects(GameModel.self).filter("gameNumber = %d and levelID = %d and played = true", gameNumberSet[index].gameNumber, levelIndex).count == 0 {
-                freeGameNumbers.append(gameNumberSet[index].gameNumber)
+//        let gameNumberSet = realm.objects(GamePredefinitionModel.self)
+        for _ in 0...MaxGameNumber {
+            let gameNumber = Int(arc4random_uniform(UInt32(MaxGameNumber)))
+            if realm.objects(GameModel.self).filter("playerID = %d and gameNumber = %d and levelID = %d and played = true", GV.player!.ID, gameNumber, levelIndex).count == 0
+            {
+                return gameNumber
             }
-        }
-        if freeGameNumbers.count > 0 {
-            let foundedGameNumber = freeGameNumbers[GV.randomNumber(freeGameNumbers.count)]
-            return foundedGameNumber
         }
         return 0
     }
@@ -1697,10 +1692,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func callBackFromMySKTextField(_ gameNumber: Int) {
         self.gameNumber = gameNumber
         self.isUserInteractionEnabled = true
-        startNewGame(false)
+        startNewGame(next: false)
     }
     
-    func startNewGame(_ next: Bool) {
+    func startNewGame(next: Bool) {
         stopped = true
         if next {
             cardManager!.lastNextPoint = nil
@@ -1719,7 +1714,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         stopTimer(&countUp)
 //        print("stopCreateTippsInBackground from newGame")
 //
-        prepareNextGame(next)
+        prepareNextGame(newGame: next)
         generateCards(.first)
     }
 
@@ -1773,13 +1768,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             if !firstStart {
                 let againAction = UIAlertAction(title: GV.language.getText(.tcGameAgain), style: .default,
                     handler: {(paramAction:UIAlertAction!) in
-                        self.startNewGame(false)
+                        self.startNewGame(next: false)
                 })
                 alert.addAction(againAction)
             }
             let newGameAction = UIAlertAction(title: GV.language.getText(TextConstants.tcNewGame), style: .default,
                 handler: {(paramAction:UIAlertAction!) in
-                    self.startNewGame(true)
+                    self.startNewGame(next: true)
                     //self.gameArrayChanged = true
 
             })
@@ -2772,9 +2767,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 try! realm.write({ 
                     GV.player!.levelID = levelIndex
                 })
-                prepareNextGame(false) // start with choosed gamenumber
+                prepareNextGame(newGame: false) // start with choosed gamenumber
             } else {
-                prepareNextGame(true)  // start a random game
+                prepareNextGame(newGame: true)  // start a random game
             }
             generateCards(.first)
         } else {

@@ -41,7 +41,7 @@ class AutoPlayer {
     var testType: TestType = .runOnce //.test
     var testerType: TesterType = .expert
     var gamesToPlay: [GameToPlay] = [
-        GameToPlay(level: 2, gameNumber: 15, stopAt:86),
+        GameToPlay(level: 2, gameNumber: 112, stopAt:98),
     ]
     var gameIndex = 0
     
@@ -92,7 +92,7 @@ class AutoPlayer {
         stopTimer = false
         self.testType = testType
         if self.replay {
-            scene.startNewGame(false)
+            scene.startNewGame(next: false)
             scene.durationMultiplier = scene.durationMultiplierForAutoplayer
             scene.waitForStartConst = scene.waitForStartForAutoplayer
             indexForReplay = 0
@@ -172,7 +172,7 @@ class AutoPlayer {
                 GV.player!.levelID = gamesToPlay[gameIndex].level - 1
                 try! realm.commitWrite()
                 scene.gameNumber = gamesToPlay[gameIndex].gameNumber - 1
-                scene.startNewGame(false)
+                scene.startNewGame(next: false)
                 scene.durationMultiplier = scene.durationMultiplierForAutoplayer
                 scene.waitForStartConst = scene.waitForStartForAutoplayer
             }

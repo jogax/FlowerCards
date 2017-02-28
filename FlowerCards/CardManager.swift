@@ -308,7 +308,7 @@ class CardManager {
             colorCounts.removeAll()
             for color in 0...MaxColorValue - 1 {
                 let colorData = colorArray[color]
-                if cardStack.count(color: color) > 0 || colorData.allCards.count > 0 {
+                if cardStack.count(color: color) > 0 {
                     colorCounts.append(ColorsByCounts(colorIndex: color, count: colorData.allCards.count + (colorData.container == nil ? 0 : 1)))
                 }
             }
@@ -502,32 +502,23 @@ class CardManager {
                     foundedCard = gameArray[foundedPoint!.column][foundedPoint!.row].card
                     cardParameter.colorIndex = foundedCard.colorIndex
                     if foundedCard.type == .cardType {
-                        if foundedCard.maxValue == LastCardValue && countPackages > 1 {
-                            if foundedCard.belongsToPackageMax & maxPackage == 0 {
-                                cardParameter.value = FirstCardValue
-                                appendCardParameter(cardParameter: cardParameter)
-                                if foundedCard.minValue > FirstCardValue {
-                                    cardParameter.value = foundedCard.minValue - 1
-                                    appendCardParameter(cardParameter: cardParameter)
-                                }
-                            } else if foundedCard.minValue > FirstCardValue {
-                                cardParameter.value = foundedCard.minValue - 1
-                                appendCardParameter(cardParameter: cardParameter)
-                            }
-
-                        } else if foundedCard.minValue == FirstCardValue  && countPackages > 1 {
-                            if foundedCard.belongsToPackageMin & minPackage == 0 {
-                                cardParameter.value = LastCardValue
-                                appendCardParameter(cardParameter: cardParameter)
-                                if foundedCard.maxValue < LastCardValue {
-                                    cardParameter.value = foundedCard.maxValue + 1
-                                }
-                            }
-                        } else if foundedCard.minValue != FirstCardValue && foundedCard.maxValue != LastCardValue {
+                        if foundedCard.minValue != FirstCardValue {
                             cardParameter.value = foundedCard.minValue - 1
                             appendCardParameter(cardParameter: cardParameter)
+                        }
+                        if foundedCard.maxValue != LastCardValue {
                             cardParameter.value = foundedCard.maxValue + 1
                             appendCardParameter(cardParameter: cardParameter)
+                        }
+                        
+                        if foundedCard.maxValue == LastCardValue && countPackages > 1 {
+                            cardParameter.value = FirstCardValue
+                            appendCardParameter(cardParameter: cardParameter)
+                        }
+                        
+                        if foundedCard.minValue == FirstCardValue && countPackages > 1 {
+                                cardParameter.value = LastCardValue
+                                appendCardParameter(cardParameter: cardParameter)
                         }
                     }
                 }
@@ -1165,7 +1156,7 @@ class CardManager {
                 if let colorName = String(CardManager.colorNames[container.colorIndex]) {
                     string += "(" + colorName + ")"
                 }
-                string += maxStr + "-" + minStr
+                string += maxStr + "-\(container.countTransitions)-" + minStr
             } else {
                 string += "( )" + " --- "
                 
@@ -1185,7 +1176,7 @@ class CardManager {
                     if let colorName = String(CardManager.colorNames[card.colorIndex]) {
                         string += "(" + colorName + ")"
                     }
-                    string += maxStr + "-" + minStr
+                    string += maxStr + "-\(card.countTransitions)-" + minStr
                 } else {
                     string += "( )" + " --- "
                 }
