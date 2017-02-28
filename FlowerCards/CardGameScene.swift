@@ -695,7 +695,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         makeLineAroundGameboard(.leftVertical)
         //        self.inFirstGenerateCards = false
         cardCount = Int(CGFloat(countContainers * countCardsProContainer! * countPackages))
-        let cardCountText: String = String(cardStack.count(.MySKCardType))
+        let cardCountText: String = String(cardStack.count(type: .MySKCardType))
         let tippCountText: String = "\(tippArray.count)"
 //        let showScoreText: String = GV.language.getText(.TCGameScore, values: "\(levelScore)")
         let name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
@@ -922,7 +922,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func showCardCount() {
-        cardCountLabel.text = String(cardStack.count(.MySKCardType))
+        cardCountLabel.text = String(cardStack.count(type: .MySKCardType))
     }
 
     
@@ -977,30 +977,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
  
     func createCardStack() {
-        //printFunc(function: "createCardStack", start: true)
-        cardStack.removeAll(.MySKCardType)
-//        showCardStack.removeAll(.MySKCardType)
-//        MySKCard.cleanForNewGame(countPackages: countPackages)
-//        while colorTab.count > 0 && checkGameArray() < maxUsedCells {
-//            let colorTabIndex = random!.getRandomInt(0, max: colorTab.count - 1)//colorTab.count - 1 //
-//            let colorIndex = colorTab[colorTabIndex].colorIndex
-//            let cardName = colorTab[colorTabIndex].cardName
-//            let value = colorTab[colorTabIndex].cardValue
-//            colorTab.remove(at: colorTabIndex)
-//            let card = MySKCard(texture: getTexture(colorIndex), type: .cardType, value:value)
-//            card.name = cardName
-//            card.colorIndex = colorIndex
-//            cardStack.push(card)
-//            card.setCardValues(color: colorIndex)
-//            
-//        }
+        cardStack = Stack()
         var newCard: MySKCard
         var go = true
         while go {
             (newCard, go) = MySKCard.getRandomCard(random: random)
-            cardStack.push(newCard)
+            cardStack.push(card: newCard)
         }
-        //printFunc(function: "createCardStack", start: false)
     }
     
     func fillEmptyCards() {
@@ -1089,7 +1072,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             }
             countMovingCards += 1
             card.run(SKAction.sequence([waitingAction, zPositionPlus, actionMoveAndFadeIn, zPositionMinus, actionHideEmptyCard, actionCountMovingCards]))
-            if cardStack.count(.MySKCardType) == 0 {
+            if cardStack.count(type: .MySKCardType) == 0 {
                 cardPackage!.changeButtonPicture(SKTexture(imageNamed: "emptycard"))
                 cardPackage!.alpha = 0.3
             }
@@ -1988,7 +1971,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         let searchName = "\(cardName)"
                         let cardToPush = self.childNode(withName: searchName)! as! MySKCard
                         cardToPush.zPosition = 20
-                        cardStack.push(cardToPush)
+                        cardStack.push(card: cardToPush)
                         
                         gameArray[savedCardInCycle.column][savedCardInCycle.row].used = false
 //                        cardManager!.check(color: cardToPush.colorIndex)
@@ -2121,7 +2104,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 if let savedCard:SavedCard = stack.pull() {
                     savedCardInCycle = savedCard
                     if ((savedCardInCycle.status == .addedFromCardStack || savedCardInCycle.status == .addedFromShowCard) && stack.countChangesInStack() == 0) || stopSoon  || savedCardInCycle.status == .stopCycle {
-                        stack.push(savedCardInCycle)
+                        stack.push(card: savedCardInCycle)
                         run = false
                     }
                     if savedCardInCycle.status == .movingStarted {
@@ -2720,7 +2703,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         savedCard.countTransitions = card.countTransitions
         savedCard.column = card.column
         savedCard.row = card.row
-        stack.push(savedCard)
+        stack.push(card: savedCard)
     }
     
     func showScore() {

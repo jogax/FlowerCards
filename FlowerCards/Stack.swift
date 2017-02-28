@@ -13,30 +13,40 @@ enum StackType: Int {
 class Stack<T> {
     fileprivate var savedCardStack: Array<SavedCard>
     fileprivate var cardStack: Array<MySKCard>
-    var lastRandomIndex = -1
+    private var lastRandomIndex = -1
+    private var colorCounts:[Int] = []
     
     init() {
         savedCardStack = Array<SavedCard>()
         cardStack = Array<MySKCard>()
+        for _ in 0...MaxColorValue {
+            colorCounts.append(0)
+        }
     }
     
-    func push (_ value: SavedCard) {
-        savedCardStack.append(value)
+    func push (card: SavedCard) {
+        savedCardStack.append(card)
     }
     
-    func push (_ value: MySKCard) {
-        cardStack.append(value)
+    func push (card: MySKCard) {
+        cardStack.append(card)
+        colorCounts[card.colorIndex] += 1
     }
 
-    func pushLast (_ value: MySKCard) {
-        cardStack.insert(value, at: 0)
+    func pushLast (card: MySKCard) {
+        cardStack.insert(card, at: 0)
+        colorCounts[card.colorIndex] += 1
     }
 
-    func count(_ type: StackType)->Int {
+    func count(type: StackType)->Int {
         switch type {
             case .MySKCardType: return cardStack.count
             case .SavedCardType: return savedCardStack.count
         }
+    }
+    
+    func count(color: Int)->Int {
+        return colorCounts[color]
     }
     
     func pull () -> SavedCard? {
@@ -51,10 +61,10 @@ class Stack<T> {
     }
     
     func pull () -> MySKCard? {        
-        if cardStack.count > 0 {
-            let value = cardStack.last
+        if let card = cardStack.last {
             cardStack.removeLast()
-            return value!
+            colorCounts[card.colorIndex] -= 1
+            return card
         } else {
             return nil
         }
@@ -64,9 +74,10 @@ class Stack<T> {
         if cardStack.count > 0 {
             for index in 0..<cardStack.count {
                 if cardStack[index].colorIndex == color {
-                    let value = cardStack[index]
+                    let card = cardStack[index]
                     cardStack.remove(at: index)
-                    return value
+                    colorCounts[color] -= 1
+                    return card
                 }
             }
         }
@@ -97,6 +108,7 @@ class Stack<T> {
             if card.minValue == value && card.colorIndex == colorIndex {
                 returnCard = card
                 cardStack.remove(at: index)
+                colorCounts[colorIndex] -= 1
                 return returnCard
             }
         }
