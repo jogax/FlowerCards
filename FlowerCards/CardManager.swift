@@ -352,17 +352,15 @@ class CardManager {
         while actFillingsProcent < 0.40 && cardStack.count(type: .MySKCardType) > 0 {
 //            let minCount = colorCounts.min()
 //            let minColor = colorCounts.index(of: minCount!)
-            let colorIndex = chooseColorIndexes()
-            let card = cardStack.pull(color: colorIndex[0])!
-            let actColorData = colorArray[card.colorIndex]
+            let colorIndexes = chooseColorIndexes()
+            let card = cardStack.pull(color: colorIndexes[0])!
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
             card.column = positionsTab[index].column
             card.row = positionsTab[index].row
             card.belongsToPackageMax = allPackages
             card.belongsToPackageMin = allPackages
-            actColorData.addCardToUsedCards(card: card)
-//            addColorToColorCounts(colorIndex: card.colorIndex)
-//            let newPairs = actColorData.addCardToColor(card: card)
+            colorArray[card.colorIndex].addCardToUsedCards(card: card)
+            _ = colorArray[card.colorIndex].addCardToColor(card: card)
 //            if newPairs.count > 0 {
 //                for pair in newPairs {
 //                    checkPathToFoundedCards(pair: pair)
@@ -1252,9 +1250,9 @@ class CardManager {
                 
             }
             let pairs = findPair(card: card)
-            if pairs.count == 0 {
-                allCards.remove(at: allCards.count - 1)
-            }
+//            if pairs.count == 0 {
+//                allCards.remove(at: allCards.count - 1)
+//            }
             return pairs
         }
         
@@ -1342,7 +1340,7 @@ class CardManager {
                 if pairsToRemove.count > 0 {
                     for index in pairsToRemove.reversed() {
                         //                    print(connectablePairs[index].printValue)
-                        if index < pairsToRemove.count {
+                        if index < connectablePairs.count {
                             connectablePairs.remove(at: index)
                         }
                     }
@@ -1723,7 +1721,12 @@ class CardManager {
                                     pairsToRemove.append(ind)
                                 }
                             }
-                        }
+                            if pairLen >= CountCardsInPackage && actPairLen < CountCardsInPackage {
+                                if !pairsToRemove.contains(index) {
+                                    pairsToRemove.append(index)
+                                }
+                            }
+                       }
                     }
                 }
             }

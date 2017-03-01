@@ -2025,6 +2025,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         card.BGPictureAdded = savedCardInCycle.BGPictureAdded
                         card.countTransitions = savedCardInCycle.countTransitions
                         card.name = savedCardInCycle.name
+                        card.mirrored = 0
                         levelScore = savedCardInCycle.countScore
      
                         cardManager!.updateGameArrayCell(card: card)
@@ -2780,24 +2781,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func undoButtonPressed() {
-        //printFunc(function: "undoButtonPressed", start: true)
 
         pull(true)
-//        freeUndoCounter -= 1
-//        let modifyer = freeUndoCounter > 0 ? 0 : freeUndoCounter > -freeAmount ? penalty : 2 * penalty
-//        scoreModifyer -= modifyer
-//        levelScore -= modifyer
-//        if modifyer > 0 {
-//            self.addChild(showCountScore("-\(modifyer)", position: undoButton!.position))
-//        }
-        //printFunc(function: "undoButtonPressed", start: false)
     }
 
     
-//    func startDoCountUpTimer() {
-//        startTimer(&countUp, sleepTime: doCountUpSleepTime, selector: doCountUpSelector, repeats: true)
-//        countUpAdder = 1
-//    }
     
     func stopTimer( _ timer: inout Timer?) {
         if timer != nil {
@@ -2937,9 +2925,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func alertIHaveGameFinished() {
-//        let bonus = levelScore / 10
-//        let myScore = levelScore + bonus
-//        let IWon = myScore > opponent.score
         let (bonus, myScore, IWon) = calculateWinner()
         let wonText = IWon ? GV.language.getText(.tcYouWon, values: String(myScore), String(opponent.score)) : GV.language.getText(.tcHeWon, values: opponent.name, String(opponent.score), String(myScore) )
         let alert = UIAlertController(title: GV.language.getText(.tcYouHaveFinished,
