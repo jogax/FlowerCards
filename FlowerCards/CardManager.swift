@@ -300,6 +300,15 @@ class CardManager {
         _ = createTipps()
     }
     
+    struct FoundedCardsProColor {
+        var cards: [FoundedCardParameters] // for saving all usable cards
+        var countSpecial: Int // shows how many values are to use only if no others exists
+        init() {
+            cards = []
+            countSpecial = 0
+        }
+    }
+    
     func findNewCardsForGameArray()->[MySKCard] {
         // saves how many cards of each color are in gameArray and Containers
         var colorCounts: [ColorsByCounts] = []
@@ -373,29 +382,26 @@ class CardManager {
         }
         updateColorArray()
         updateCountColors()
-        while actFillingsProcent < 0.90 && cardStack.count(type: .MySKCardType) > 0 && positionsTab.count > 0 && tippArray.count < 6 {
+        while actFillingsProcent < 0.90 && cardStack.count(type: .MySKCardType) > 0 && positionsTab.count > 0 && tippArray.count < 10 {
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
             let gameArrayPos = positionsTab[index]
             positionsTab.remove(at: index)
-            var suitableCards: [[FoundedCardParameters]] = findSuitableCardsForGameArrayPosition(gameArrayPos: gameArrayPos)
+            var suitableCards = findSuitableCardsForGameArrayPosition(gameArrayPos: gameArrayPos)
             var go = true
-//            var colorCounts: [Int:Int] = [:]
-//            var searchColorIndexes: [Int] = []
-//            for color in 0..<MaxColorValue {
-//                searchColorIndexes.append(color)
-////                colorCounts[color] = colorArray[color].allCards.count
-//            }
-            
             var searchColorIndex = chooseColorIndexes()
 
             while go {
                 
                 let actColorIndex = searchColorIndex[0]
-                var countSearches = suitableCards[actColorIndex].count
+                var countSearches = suitableCards[actColorIndex].cards.count
 
                 while countSearches > 0 {
-                    let cardIndex = random!.getRandomInt(0, max: suitableCards[actColorIndex].count - 1)
-                    let cardToSearch = suitableCards[actColorIndex][cardIndex]
+                    var max = suitableCards[actColorIndex].cards.count - suitableCards[actColorIndex].countSpecial - 1
+                    if max == -1 {
+                        max = suitableCards[actColorIndex].cards.count - 1
+                    }
+                    let cardIndex = random!.getRandomInt(0, max: max)
+                    let cardToSearch = suitableCards[actColorIndex].cards[cardIndex]
                     if let card = cardStack.search(colorIndex: cardToSearch.colorIndex, value: cardToSearch.value) {
                         let actColorData = colorArray[card.colorIndex]
                         card.column = gameArrayPos.column
@@ -415,14 +421,17 @@ class CardManager {
                             break
                         } else {
                             cardStack.push(card: card)
-                            suitableCards[actColorIndex].remove(at: cardIndex)
+                            suitableCards[actColorIndex].cards.remove(at: cardIndex)
                         }
                     } else {
-                        suitableCards[actColorIndex].remove(at: cardIndex)
+                        suitableCards[actColorIndex].cards.remove(at: cardIndex)
                     }
                     countSearches -= 1
                 }
                 searchColorIndex.remove(at: 0)
+                if searchColorIndex.count == 0 {
+                    go = false
+                }
             }
         }
         _ = createTipps()
@@ -430,8 +439,9 @@ class CardManager {
     }
     
     
-    private func findSuitableCardsForGameArrayPosition(gameArrayPos: ColumnRow)->[[FoundedCardParameters]] {
-        var foundedCards: [[FoundedCardParameters]] = [[],[],[],[]] // one Array for each color
+    private func findSuitableCardsForGameArrayPosition(gameArrayPos: ColumnRow)->[FoundedCardsProColor] {
+        var foundedCards: [FoundedCardsProColor] = Array(repeating: FoundedCardsProColor(), count: MaxColorValue) // one Array for each color
+        
 //        let firstValue: CGFloat = 10000
 //        var distanceToLine = firstValue
         let startCard = ColumnRow(column:gameArrayPos.column, row: gameArrayPos.row)
@@ -443,26 +453,31 @@ class CardManager {
         //==========================================
         func appendCardParameter(cardParameter: FoundedCardParameters) {
             let foundedCardUsing = colorArray[cardParameter.colorIndex].usedCards[cardParameter.value]!
-            if /*foundedCardUsing.countFree > 0 ||*/ foundedCardUsing.countInStack == 0 {
+            let freeCardsOfColor = colorArray[cardParameter.colorIndex].getFreeConnectableCards()
+            if foundedCardUsing.countInStack == 0 {
                 return
             }
             var cardNotFound = true
-            for card in foundedCards[cardParameter.colorIndex] {
+            for card in foundedCards[cardParameter.colorIndex].cards {
                 if card.value == cardParameter.value {
                     cardNotFound = false
                 }
             }
             if cardNotFound {
-                var usable = true
-                for card in colorArray[cardParameter.colorIndex].allCards {
-                    if card.countCards == 1 && card.minValue == cardParameter.value {
-                        usable = false
-                        break
-                    }
-                }
-                if usable {
-                    foundedCards[cardParameter.colorIndex].append(cardParameter)
-                }
+//                var usable = true
+//                for card in colorArray[cardParameter.colorIndex].allCards {
+//                    if card.countCards == 1 && card.minValue == cardParameter.value {
+//                        usable = false
+//                        break
+//                    }
+//                }
+//                if usable {
+                if  freeCardsOfColor.contains(cardParameter.value) {
+                    foundedCards[cardParameter.colorIndex].cards.insert(cardParameter, at: foundedCards[cardParameter.colorIndex].cards.count)
+                    foundedCards[cardParameter.colorIndex].countSpecial += 1
+                } else {
+                    foundedCards[cardParameter.colorIndex].cards.insert(cardParameter, at: 0)
+              }
             }
         }
         //==========================================
@@ -1204,6 +1219,7 @@ class CardManager {
         var pairsToRemove: [Int] = []
         var countTransitions = 0
         var usedCards: [Int:UsedCard] = [:]
+        var freeConnectableCards: [Int] = []
         init(colorIndex: Int) {
             
             self.colorIndex = colorIndex
@@ -1212,7 +1228,9 @@ class CardManager {
             }
         }
         
-
+        func getFreeConnectableCards()->[Int] {
+            return freeConnectableCards
+        }
         
         func addCardToUsedCards(card: MySKCard) {
             var index = 0
@@ -1246,6 +1264,12 @@ class CardManager {
                 }
             }
             allCards.append(card)
+            if !freeConnectableCards.contains(card.maxValue) {
+                freeConnectableCards.append(card.maxValue)
+            }
+            if !freeConnectableCards.contains(card.minValue) {
+                freeConnectableCards.append(card.minValue)
+            }
             if container != nil {
                 
             }
@@ -1296,6 +1320,7 @@ class CardManager {
             connectablePairs.removeAll()
             pairsToRemove.removeAll()
             cardsWithTransitions.removeAll()
+            freeConnectableCards.removeAll()
             for index in FirstCardValue...LastCardValue {
                 usedCards[index] = UsedCard()
             }
@@ -1776,6 +1801,12 @@ class CardManager {
                     if card.used && card.card.colorIndex == colorIndex {
                         addCardToUsedCards(card: card.card)
                         allCards.append(card.card)
+                        if !freeConnectableCards.contains(card.card.maxValue) {
+                            freeConnectableCards.append(card.card.maxValue)
+                        }
+                        if !freeConnectableCards.contains(card.card.minValue) {
+                            freeConnectableCards.append(card.card.minValue)
+                        }
                         if card.card.countTransitions > 0 {
                             countTransitions += card.card.countTransitions
                             cardsWithTransitions.append(card.card)
