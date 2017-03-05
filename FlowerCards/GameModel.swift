@@ -12,11 +12,11 @@ import RealmSwift
 class GameModel: Object {
     dynamic var ID = 0
     dynamic var playerID = 0
-    dynamic var gameNumber = 0
     dynamic var levelID = 0
+    dynamic var packages = 0  // new in v1
+    dynamic var gameNumber = 0
     dynamic var played = false
     dynamic var countSteps = 0 // new in v1
-    dynamic var packages = 0  // new in v1
 
     #if REALM_V2
         dynamic var gameFinished = false // new in V2

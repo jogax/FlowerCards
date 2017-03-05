@@ -10,6 +10,9 @@ import Foundation
 import SpriteKit
 
 class AutoPlayer {
+    let gamesToPlayTable: [GameToPlay] = [
+        GameToPlay(level: 3, gameNumber: 5, stopAt: 49),
+    ]
     enum runStatus: Int {
         case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep
     }
@@ -40,10 +43,7 @@ class AutoPlayer {
     var stopTimer = false
     var testType: TestType = .runOnce //.test
     var testerType: TesterType = .expert
-    var gamesToPlay: [GameToPlay] = [
-        GameToPlay(level: 7, gameNumber: 285, stopAt: 72),
-//        GameToPlay(level: 40, gameNumber: 5414, stopAt:40),
-    ]
+    var gamesToPlay: [GameToPlay] = []
     var gameIndex = 0
     
     init(scene: CardGameScene) {
@@ -91,41 +91,37 @@ class AutoPlayer {
         self.replay = replay
         scene.replaying = replay
         stopTimer = false
+        gameIndex = 0
         self.testType = testType
-        if self.replay {
-            scene.startNewGame(next: false)
-            scene.durationMultiplier = scene.durationMultiplierForAutoplayer
-            scene.waitForStartConst = scene.waitForStartForAutoplayer
-            indexForReplay = 0
-        } else {
-            switch testType {
-            case .newTest:
-                gamesToPlay.removeAll()
-                let levelIndex = GV.player!.levelID + 1
-                for gameNumber in 1...1000 {
+        switch testType {
+        case .newTest:
+            gamesToPlay.removeAll()
+            let startLevelIndex = GV.player!.levelID + 1
+            for levelIndex in startLevelIndex...startLevelIndex + 40 {
+                for gameNumber in 1...100 {
                     gamesToPlay.append(GameToPlay(level: levelIndex, gameNumber: gameNumber))
                 }
-            case .runOnce:
-                gamesToPlay.removeAll()
-            case .fromTable:
-                break
-            case .stepByStep:
-                scene.prepareHelpButtonForStepByStep(callBack: makeStep)
-            case .fromDB:
-                gamesToPlay.removeAll()
-                let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID).sorted(byProperty: "levelID")
-                for game in errorGames {
-                    let countHistoryRecords = realm.objects(HistoryModel.self).filter("gameID = %d", game.ID).count
-                    if countHistoryRecords >= 0 {
-                        gamesToPlay.append(GameToPlay(level: game.levelID + 1 , gameNumber: game.gameNumber + 1))
-                    }
+            }
+        case .runOnce:
+            gamesToPlay.removeAll()
+        case .fromTable:
+            gamesToPlay = gamesToPlayTable
+        case .stepByStep:
+            scene.prepareHelpButtonForStepByStep(callBack: makeStep)
+        case .fromDB:
+            gamesToPlay.removeAll()
+            let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID).sorted(byProperty: "levelID")
+            for game in errorGames {
+                let countHistoryRecords = realm.objects(HistoryModel.self).filter("gameID = %d", game.ID).count
+                if countHistoryRecords >= 0 {
+                    gamesToPlay.append(GameToPlay(level: game.levelID + 1 , gameNumber: game.gameNumber + 1))
                 }
             }
-            if self.testType != .runOnce {
-                startNextGame()
-                scene.durationMultiplier = scene.durationMultiplierForAutoplayer
-                scene.waitForStartConst = scene.waitForStartForAutoplayer
-            }
+        }
+        if self.testType != .runOnce {
+            startNextGame()
+            scene.durationMultiplier = scene.durationMultiplierForAutoplayer
+            scene.waitForStartConst = scene.waitForStartForAutoplayer
         }
         scene.isUserInteractionEnabled = false
         timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
@@ -176,18 +172,10 @@ class AutoPlayer {
         if scene.cardCount > 0 /*&& scene.tippArray.count > 0*/ {
             switch autoPlayStatus {
             case .getTipp:
-                if scene.tippsButton!.alpha == 1 && scene.countMovingCards <= 0 {  // if tipps are ready
+                choosedTipp = Tipp.InnerTipp()
+                if scene.tippsButton!.alpha == 1 && scene.countMovingCards == 0 {  // if tipps are ready
                     bestTipp = Tipp()
-                    if replay {
-//                        if indexForReplay < realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID).count {
-//                            let historyRecord = realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID)[indexForReplay]
-//                            indexForReplay += 1
-//                            bestTipp.points.append(CGPoint(x: historyRecord.points[0].x, y: historyRecord.points[0].y))
-//                            bestTipp.points.append(CGPoint(x: historyRecord.points[1].x, y: historyRecord.points[1].y))
-//                        } else {
-//                            stopAutoplay()
-//                        }
-                    } else {
+                    if tippArray.count > 0 {
                         switch testerType {
                         case .beginner:
                             for tipp in tippArray {
@@ -240,7 +228,7 @@ class AutoPlayer {
                             
                         }
                     }
-                    if choosedTipp.points.count > 0 {
+                    if choosedTipp.points.count > 0 && tippArray.count > 0 {
                         autoPlayStatus = .touchesBegan
                     } else {
                         if gamesToPlay.count == 0 {

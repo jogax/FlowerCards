@@ -118,8 +118,11 @@ struct Founded {
 }
 
 struct FoundedCardParameters {
-    
+    enum MinOrMaxValue: Int {
+        case isMinValue = 0, isMaxValue
+    }
     var colorIndex: Int = NoColor
+    var minOrMax: MinOrMaxValue = .isMinValue
     var value: Int = NoValue
     var myPoints:[CGPoint] = []
     private var hashValue: Int {
@@ -397,8 +400,9 @@ class CardManager {
 
                 while countSearches > 0 {
                     var max = suitableCards[actColorIndex].cards.count - suitableCards[actColorIndex].countSpecial - 1
-                    if max == -1 {
+                    if max < 0 {
                         max = suitableCards[actColorIndex].cards.count - 1
+                        suitableCards[actColorIndex].countSpecial -= 1
                     }
                     let cardIndex = random!.getRandomInt(0, max: max)
                     let cardToSearch = suitableCards[actColorIndex].cards[cardIndex]
@@ -493,6 +497,7 @@ class CardManager {
                     cardParameter.colorIndex = foundedCard.colorIndex
                     if foundedCard.minValue == NoColor { //empty Container
                         cardParameter.value = LastCardValue
+                        cardParameter.minOrMax = .isMaxValue
                         var usedContainerColors: [Int] = []
                         for container in containers {
                             if container.colorIndex != NoColor {
@@ -507,9 +512,11 @@ class CardManager {
                         }
                     } else if foundedCard.minValue > 0 {
                         cardParameter.value = foundedCard.minValue - 1
+                        cardParameter.minOrMax = .isMaxValue
                         appendCardParameter(cardParameter: cardParameter)
                     } else if foundedCard.belongsToPackageMin & minPackage == 0 && countPackages > 1 {
                         cardParameter.value = LastCardValue
+                        cardParameter.minOrMax = .isMaxValue
                         appendCardParameter(cardParameter: cardParameter)
                     }
                 } else {
@@ -518,26 +525,30 @@ class CardManager {
                     if foundedCard.type == .cardType {
                         if foundedCard.minValue != FirstCardValue {
                             cardParameter.value = foundedCard.minValue - 1
+                            cardParameter.minOrMax = .isMaxValue
                             appendCardParameter(cardParameter: cardParameter)
                         }
                         if foundedCard.maxValue != LastCardValue {
                             cardParameter.value = foundedCard.maxValue + 1
+                            cardParameter.minOrMax = .isMinValue
                             appendCardParameter(cardParameter: cardParameter)
                         }
                         
                         if foundedCard.maxValue == LastCardValue && countPackages > 1 {
                             cardParameter.value = FirstCardValue
+                            cardParameter.minOrMax = .isMinValue
                             appendCardParameter(cardParameter: cardParameter)
                         }
                         
                         if foundedCard.minValue == FirstCardValue && countPackages > 1 {
-                                cardParameter.value = LastCardValue
-                                appendCardParameter(cardParameter: cardParameter)
+                            cardParameter.value = LastCardValue
+                            cardParameter.minOrMax = .isMaxValue
+                            appendCardParameter(cardParameter: cardParameter)
                         }
                     }
                 }
             }
-            angle += GV.oneGrad * multiplierForSearch
+            angle += GV.oneGrad * 1.0 //multiplierForSearch
         }
         return foundedCards
     }

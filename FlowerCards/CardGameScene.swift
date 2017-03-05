@@ -2824,12 +2824,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
 
-//    func removeNodesWithName(_ name: String) {
-//        while self.childNode(withName: name) != nil {
-//            self.childNode(withName: name)!.removeFromParent()
-//        }
-//    }
-//    
     func connectedDevicesChanged(_ manager : PeerToPeerServiceManager, connectedDevices: [String]) {
         
     }
