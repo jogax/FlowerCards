@@ -46,22 +46,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Migration of realm models if neaded
 //        #if REALM_V2
             Realm.Configuration.defaultConfiguration = Realm.Configuration(
-                schemaVersion: 3,
+                schemaVersion: 4,
                 migrationBlock: { migration, oldSchemaVersion in
-                    if (oldSchemaVersion < 3) {
+                    if (oldSchemaVersion < 4) {
                         // migrate GameModel
                         migration.enumerateObjects(ofType: GameModel.className()) { oldObject, newObject in
+                            newObject!["levelID"] = (oldObject!["levelID"] as! Int) / MaxColorValue
+                            newObject!["countPackages"] = ((oldObject!["levelID"] as! Int) % 4) + 1
                             // The enumerateObjects(ofType:_:) method iterates
                             // over every Game object stored in the Realm file
 //                           newObject!["gameFinished"] = true
                         }
                         // migrate PlayerModel
                         migration.enumerateObjects(ofType: PlayerModel.className()) { oldObject, newObject in
+                            newObject!["levelID"] = (oldObject!["levelID"] as! Int) / MaxColorValue
+                            newObject!["countPackages"] = ((oldObject!["levelID"] as! Int) % 4) + 1
                             // The enumerateObjects(ofType:_:) method iterates
                             // over every Game object stored in the Realm file
                         }
-                        // migrate PlayerModel
+                        // migrate StatisticModel
                         migration.enumerateObjects(ofType: StatisticModel.className()) { oldObject, newObject in
+                            newObject!["levelID"] = (oldObject!["levelID"] as! Int) / MaxColorValue
+                            newObject!["countPackages"] = ((oldObject!["levelID"] as! Int) % 4) + 1
                             // The enumerateObjects(ofType:_:) method iterates
                             // over every Game object stored in the Realm file
                         }

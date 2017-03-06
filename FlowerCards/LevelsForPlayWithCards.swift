@@ -110,7 +110,7 @@ class LevelsForPlayWithCards {
         //let sizeMultiplier: CGFloat = 1.0 //UIDevice.currentDevice().modelConstants[GV.deviceType] //GV.onIpad ? 1.0 : 0.6
 //        #if REALM_V1
             for index in 0..<levelContent.count {
-                for countPackages in 1...maxCountPackages {
+//                for countPackages in 1...maxCountPackages {
                     let paramString = levelContent[index]
                     let paramArr = paramString.components(separatedBy: ",")
                     var aktLevelParam: LevelParam = LevelParam()
@@ -121,7 +121,7 @@ class LevelsForPlayWithCards {
                     aktLevelParam.maxProzent = Int(paramArr[3])!
                     aktLevelParam.cardSize = Int(paramArr[4])!
                     levelParam.append(aktLevelParam)
-                }
+//                }
             }
 //        #else
 //            for index in 0..<levelContent.count {

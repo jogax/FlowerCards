@@ -13,7 +13,7 @@ class PlayerModel: Object {
     dynamic var ID = 0
     dynamic var name = ""
     dynamic var levelID = 0
-    dynamic var packages = 0  // new in v1
+    dynamic var countPackages = 1
     dynamic var isActPlayer = false
     dynamic var aktLanguageKey = GV.language.getAktLanguageKey()
     dynamic var soundVolume: Float = 0

@@ -13,7 +13,7 @@ import SpriteKit
 
 class ChooseLevelAndOptions: MySKTable {
     var callBack: () -> ()
-    let myDetailedColumnWidths: [CGFloat] = [20, 20, 40, 20] // in %
+    let myDetailedColumnWidths: [CGFloat] = [25, 15, 15, 15, 15, 15] // in %
     let chooseLevelColumn = 0
     let showPackageNrColumn = 2
 //    let chooseHelplineTypeColumn = 3
@@ -51,45 +51,30 @@ class ChooseLevelAndOptions: MySKTable {
     func showLevels() {
         let elements: [MultiVar] = [MultiVar(string: GV.language.getText(.tcLevel)),
                                     MultiVar(string: GV.language.getText(.tcSize)),
-                                    MultiVar(string: GV.language.getText(.tcPackages)),
+                                    MultiVar(string: GV.language.getText(.tcPackage, values: "1")),
+                                    MultiVar(string: GV.language.getText(.tcPackage, values: "2")),
+                                    MultiVar(string: GV.language.getText(.tcPackage, values: "3")),
+                                    MultiVar(string: GV.language.getText(.tcPackage, values: "4")),
 //                                    MultiVar(string: GV.language.getText(.tcHelpLines)),
-                                    MultiVar(string: GV.language.getText(.tcStart))
+//                                    MultiVar(string: GV.language.getText(.tcStart))
                                     ]
 //        showRowOfTable(rowOfTable: RowOfTable(elements: elements, selected: true), row: 0)
         tableOfRows.append(RowOfTable(elements: elements, selected: true))
-//        let greenRedTexture = atlas.textureNamed("greenRedButton")
-//        let purpleTexture = atlas.textureNamed("purpleButton")
-//        let noColorTexture = atlas.textureNamed("noColorButton")
-//        let packageTexture = SKTexture(image: DrawImages().getCardPackage())
-
-        let package2Texture = SKTexture(image: DrawImages.getPackage2Image(size: CGSize(width: 30, height: 50)))
-//        let package3Texture = SKTexture(image: DrawImages.getPackage3Image(imageSize))
-//        let package4Texture = SKTexture(image: DrawImages.getPackage4Image(imageSize))
         for levelID in 0..<countLevels {
             let countStr = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true", GV.player!.ID, levelID).count)
-            var actPackageCount = 1
-//            let helpLinesCount = 2
-//            var helpLineTextures = [greenRedTexture, purpleTexture, noColorTexture]
-//            var packageTextures = [package1Texture, package2Texture, package3Texture, package4Texture]
-//            if countStr != "0" {
-//                let lastGame = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d", GV.player!.ID, levelID).sorted(byProperty: "created").last!
-//            }
-//            switch helpLinesCount {
-//                case 2: helpLineTextures = [greenRedTexture, purpleTexture, noColorTexture]
-//                case 1: helpLineTextures = [greenRedTexture, purpleTexture, noColorTexture]
-//                case 0: helpLineTextures = [greenRedTexture, purpleTexture, noColorTexture]
-//                default: break
-//            }
-//            #if REALM_V1
+            let countStr1Pkg = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = 1", GV.player!.ID, levelID).count)
+            let countStr2Pkg = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = 2", GV.player!.ID, levelID).count)
+            let countStr3Pkg = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = 3", GV.player!.ID, levelID).count)
+            let countStr4Pkg = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = 4", GV.player!.ID, levelID).count)
+           var actPackageCount = 1
                 actPackageCount = GV.levelsForPlay.levelParam[levelID].countPackages
-//            #endif
             let elements: [MultiVar] = [MultiVar(string: (levelID < 10 ? " " : "") + String(levelID + 1) + ": (" + countStr + ")" ),
                                         MultiVar(string: GV.levelsForPlay.getLevelFormat(level: levelID)),
-                                        MultiVar(string: String(actPackageCount)),
-//                                        MultiVar(textures: helpLineTextures),
-                                        MultiVar(texture: SKTexture(image: startImage))
+                                        MultiVar(string: "(" + String(countStr1Pkg + ")")),
+                                        MultiVar(string: "(" + String(countStr2Pkg + ")")),
+                                        MultiVar(string: "(" + String(countStr3Pkg + ")")),
+                                        MultiVar(string: "(" + String(countStr4Pkg + ")")),
             ]
-//            showRowOfTable(rowOfTable: RowOfTable(elements: elements, selected: levelID == GV.player!.levelID ? true : false), row: levelID + 1)
             tableOfRows.append(RowOfTable(elements: elements, selected: levelID == GV.player!.levelID ? true : false))
         }
         // show the actLevel in the first line!
@@ -103,17 +88,9 @@ class ChooseLevelAndOptions: MySKTable {
         switch (row, column, element) {
         case (0, 0, _):
             removeFromParent()
-//        case (2..<1000, chooseLevelColumn...chooseHelplineTypeColumn, NoValue):
-//            setLevel(level: row - 2)
-//        case (2..<1000, chooseHelplineTypeColumn, 0...2):
-//            break
-        case (2..<1000, startPlayingLevel, _):
-            if tableOfRows[row - 1].selected {
-                callBack()  // start a new Game at this level
-            } else {
-                setLevel(level: row - 2)
-            }
-            
+        case (2..<1000, 2...5, _):
+            setLevel(level: row - 2, countPackages: column - 1)
+            callBack()  // start a new Game at this level            
             break
         default:
             break
@@ -121,9 +98,10 @@ class ChooseLevelAndOptions: MySKTable {
         
     }
     
-    func setLevel(level: Int) {
+    func setLevel(level: Int, countPackages: Int) {
         realm.beginWrite()
         GV.player!.levelID = level
+        GV.player!.countPackages = countPackages
         try! realm.commitWrite()
         setStartIndex()
         showTable()

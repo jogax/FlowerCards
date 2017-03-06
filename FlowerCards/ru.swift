@@ -121,6 +121,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcLevelAndGames:   "Уровень (сыграно)",
     .tcSize:            "Формат:",
     .tcPackages:        "Колоды:",
+    .tcPackage:         "Кол: %",
     .tcHelpLines:       "Тип помощи:",
     .tcAutoPlayNormal:  "Автовыполнение игры",
     .tcAutoPlayNewTest: "Автотестирование",

@@ -11,7 +11,7 @@ import SpriteKit
 
 class AutoPlayer {
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 3, gameNumber: 5, stopAt: 49),
+        GameToPlay(level: 3, countPackages: 2, gameNumber: 5, stopAt: 49),
     ]
     enum runStatus: Int {
         case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep
@@ -24,10 +24,12 @@ class AutoPlayer {
     }
     struct GameToPlay {
         var level: Int
+        var countPackages: Int
         var gameNumber: Int
         var stopAt: Int
-        init(level: Int, gameNumber: Int, stopAt: Int = 0) {
+        init(level: Int, countPackages: Int, gameNumber: Int, stopAt: Int = 0) {
             self.level = level
+            self.countPackages = countPackages
             self.gameNumber = gameNumber
             self.stopAt = stopAt
         }
@@ -64,17 +66,15 @@ class AutoPlayer {
         while levelID < maxLevelID {
             let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and levelID = %d and ID != %d", GV.player!.ID, levelID, actGame!.ID).sorted(byProperty: "gameNumber")
             for game in errorGames  {
-                let countHistoryRecords = realm.objects(HistoryModel.self).filter("gameID = %d", game.ID).count
-                if countHistoryRecords == 0 {
+                if game.countSteps == 0 {
                     realm.beginWrite()
-                    realm.delete(realm.objects(HistoryModel.self).filter("gameID = %d", game.ID))
                     realm.delete(game)
                     try! realm.commitWrite()                    
                 } else {
                     if game.levelID != oldLevelID {
                         oldLevelID = game.levelID
                     }
-                    let lineGameToPlay = "GameToPlay(level: \(game.levelID + 1), gameNumber: \(game.gameNumber + 1)), // at Step: \(countHistoryRecords)"
+                    let lineGameToPlay = "GameToPlay(level: \(game.levelID + 1), gameNumber: \(game.gameNumber + 1)), // at Step: \(game.countSteps)"
                     print (lineGameToPlay)
                 }
             }
@@ -97,10 +97,14 @@ class AutoPlayer {
         case .newTest:
             gamesToPlay.removeAll()
             let startLevelIndex = GV.player!.levelID + 1
-            for levelIndex in startLevelIndex...startLevelIndex + 40 {
-                for gameNumber in 1...100 {
-                    gamesToPlay.append(GameToPlay(level: levelIndex, gameNumber: gameNumber))
+            var startCountPackages = GV.player!.countPackages
+            for levelIndex in startLevelIndex...GV.levelsForPlay.count() {
+                for countPackages in startCountPackages...maxPackageCount {
+                    for gameNumber in 1...100 {
+                        gamesToPlay.append(GameToPlay(level: levelIndex, countPackages: countPackages, gameNumber: gameNumber))
+                    }
                 }
+                startCountPackages = 1
             }
         case .runOnce:
             gamesToPlay.removeAll()
@@ -112,9 +116,9 @@ class AutoPlayer {
             gamesToPlay.removeAll()
             let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID).sorted(byProperty: "levelID")
             for game in errorGames {
-                let countHistoryRecords = realm.objects(HistoryModel.self).filter("gameID = %d", game.ID).count
-                if countHistoryRecords >= 0 {
-                    gamesToPlay.append(GameToPlay(level: game.levelID + 1 , gameNumber: game.gameNumber + 1))
+                let countSteps = game.countSteps
+                if countSteps > 0 {
+                    gamesToPlay.append(GameToPlay(level: game.levelID + 1, countPackages: game.countPackages, gameNumber: game.gameNumber + 1))
                 }
             }
         }
@@ -140,9 +144,11 @@ class AutoPlayer {
             var go = true
             while true {
                 let levelIndex = gamesToPlay[gameIndex].level - 1
+                let countPackages = gamesToPlay[gameIndex].level
                 let gameNumber = gamesToPlay[gameIndex].gameNumber - 1
                 if self.testType == .newTest {
-                    if realm.objects(GameModel.self).filter("gameNumber = %d and levelID = %d and playerID = %d", gameNumber, levelIndex, GV.player!.ID).count > 0 {
+                    if realm.objects(GameModel.self).filter("gameNumber = %d and levelID = %d and playerID = %d and countPackages = %d",
+                        gameNumber, levelIndex, GV.player!.ID, countPackages).count > 0 {
                         gameIndex += 1
                         if gameIndex == gamesToPlay.count {
                             go = false
@@ -158,6 +164,7 @@ class AutoPlayer {
             if go {
                 realm.beginWrite()
                 GV.player!.levelID = gamesToPlay[gameIndex].level - 1
+                GV.player!.countPackages = gamesToPlay[gameIndex].countPackages
                 try! realm.commitWrite()
                 scene.gameNumber = gamesToPlay[gameIndex].gameNumber - 1
                 scene.startNewGame(next: false)

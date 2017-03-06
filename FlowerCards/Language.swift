@@ -112,6 +112,7 @@ enum TextConstants: Int {
     tcLevelAndGames,
     tcSize,
     tcPackages,
+    tcPackage,
     tcHelpLines,
     tcAutoPlayNormal,
     tcAutoPlayNewTest,

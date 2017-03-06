@@ -121,6 +121,7 @@ let enDictionary: [TextConstants: String] = [
     .tcLevelAndGames:   "Level (played)",
     .tcSize:            "Format:",
     .tcPackages:        "Packages:",
+    .tcPackage:         "Pck: %",
     .tcHelpLines:       "Helplines:",
     .tcAutoPlayNormal:  "Start autoplay this Game",
     .tcAutoPlayNewTest: "Start autoplay test",

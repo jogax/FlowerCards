@@ -549,9 +549,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         } else {
             getGameRecord(gameNumber: gameNumber)
         }
-        realm.beginWrite()
-            realm.delete(realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID))
-        try! realm.commitWrite()
+//        realm.beginWrite()
+//            realm.delete(realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID))
+//        try! realm.commitWrite()
         
         cardManager = CardManager()
         freeUndoCounter = freeAmount
@@ -804,7 +804,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         gameNew.levelID = levelIndex
         gameNew.playerID = GV.player!.ID
         gameNew.played = false
-        gameNew.packages = countPackages
+        gameNew.countPackages = GV.player!.countPackages
         gameNew.countSteps = 0
         try! realm.write() {
             realm.add(gameNew)
@@ -814,7 +814,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func getGameRecord(gameNumber: Int) {
-        actGame = realm.objects(GameModel.self).filter("gameNumber = %d and levelID = %d and playerID = %d", gameNumber, levelIndex, GV.player!.ID).first
+        actGame = realm.objects(GameModel.self).filter("gameNumber = %d and levelID = %d and playerID = %d and countPackages = %d", gameNumber, levelIndex, GV.player!.ID, GV.player!.countPackages).first
         if actGame == nil {
             createGameRecord(gameNumber: gameNumber)
         }
@@ -879,9 +879,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func specialPrepareFuncFirst() {
         //printFunc(function: "specialPrepareFuncFirst", start: true)
         stopCreateTippsInBackground = true
-//        #if REALM_V1
-            countPackages = GV.levelsForPlay.aktLevel.countPackages
-//        #endif
+//        countPackages = GV.levelsForPlay.aktLevel.countPackages
+        countPackages = GV.player!.countPackages
         maxCardCount = countPackages * countContainers * CountCardsInPackage
         countCardsProContainer = CountCardsInPackage //levelsForPlay.aktLevel.countCardsProContainer
         countColumns = GV.levelsForPlay.aktLevel.countColumns
@@ -1363,10 +1362,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             push(container, status: .unification)
             push(movingCard, status: .removed)
             container.connectWith(otherCard: movingCard)
-            saveHistoryRecord(colorIndex: movingCard.colorIndex, points:  points,
-                              fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
-                              toColumn: container.column,   toRow: container.row,   toMinValue: container.minValue,   toMaxValue: container.maxValue)
-
+//            saveHistoryRecord(colorIndex: movingCard.colorIndex, points:  points,
+//                              fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
+//                              toColumn: container.column,   toRow: container.row,   toMinValue: container.minValue,   toMaxValue: container.maxValue)
+//
             self.addChild(showCountScore("+\(movingCard.countScore)", position: movingCard.position))
             
             levelScore += movingCard.countScore
@@ -1409,11 +1408,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             card.connectWith(otherCard: movingCard)
 //            cardManager!.check(color: card.colorIndex)
-            saveHistoryRecord(colorIndex: movingCard.colorIndex, points: points,
-                              fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
-                              toColumn: card.column,   toRow: card.row,   toMinValue: card.minValue,   toMaxValue: card.maxValue)
-            
-            
+//            saveHistoryRecord(colorIndex: movingCard.colorIndex, points: points,
+//                              fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
+//                              toColumn: card.column,   toRow: card.row,   toMinValue: card.minValue,   toMaxValue: card.maxValue)
+//            
+//            
             self.addChild(showCountScore("+\(movingCard.countScore)", position: movingCard.position))
             levelScore += movingCard.countScore
             levelScore += movingCard.getMirroredScore()
@@ -1458,48 +1457,47 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         return score
     }
     
-    func saveHistoryRecord(colorIndex: Int, points: [CGPoint],
-                           fromColumn: Int, fromRow: Int, fromMinValue: Int, fromMaxValue: Int,
-                           toColumn: Int,   toRow: Int,   toMinValue: Int,   toMaxValue: Int) {
-        #if REALM_V2
-            if !replaying {
-                let historyRecord = HistoryModel()
-                historyRecord.ID = GV.createNewRecordID(.historyModel)
-                historyRecord.gameID = actGame!.ID
-                historyRecord.recordNr = realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID).count + 1
-                historyRecord.colorIndex = colorIndex
-                historyRecord.fromColumn = fromColumn
-                historyRecord.fromRow = fromRow
-                historyRecord.fromMinValue = fromMinValue
-                historyRecord.fromMaxValue = fromMaxValue
-                
-                historyRecord.toColumn = toColumn
-                historyRecord.toRow = toRow
-                historyRecord.toMinValue = toMinValue
-                historyRecord.toMaxValue = toMaxValue
-                try! realm.write() {
-                    for point in points {
-                        let realmPoint = PointModel()
-                        realmPoint.x = Double(point.x)
-                        realmPoint.y = Double(point.y)
-                        historyRecord.points.append(realmPoint)
-                        realm.add(realmPoint)
-                    }
-                    realm.add(historyRecord)
-                }
-            }
-        #endif
-    }
+//    func saveHistoryRecord(colorIndex: Int, points: [CGPoint],
+//                           fromColumn: Int, fromRow: Int, fromMinValue: Int, fromMaxValue: Int,
+//                           toColumn: Int,   toRow: Int,   toMinValue: Int,   toMaxValue: Int) {
+//            if !replaying {
+//                let historyRecord = HistoryModel()
+//                historyRecord.ID = GV.createNewRecordID(.historyModel)
+//                historyRecord.gameID = actGame!.ID
+//                historyRecord.recordNr = realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID).count + 1
+//                historyRecord.colorIndex = colorIndex
+//                historyRecord.fromColumn = fromColumn
+//                historyRecord.fromRow = fromRow
+//                historyRecord.fromMinValue = fromMinValue
+//                historyRecord.fromMaxValue = fromMaxValue
+//                
+//                historyRecord.toColumn = toColumn
+//                historyRecord.toRow = toRow
+//                historyRecord.toMinValue = toMinValue
+//                historyRecord.toMaxValue = toMaxValue
+//                try! realm.write() {
+//                    for point in points {
+//                        let realmPoint = PointModel()
+//                        realmPoint.x = Double(point.x)
+//                        realmPoint.y = Double(point.y)
+//                        historyRecord.points.append(realmPoint)
+//                        realm.add(realmPoint)
+//                    }
+//                    realm.add(historyRecord)
+//                }
+//            }
+//        #endif
+//    }
     
-    func deleteLastHistoryRecord() {
-        #if REALM_V2
-            try! realm.write() {
-                if let last = realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID).last {
-                    realm.delete(last)
-                }
-            }
-        #endif
-    }
+//    func deleteLastHistoryRecord() {
+//        #if REALM_V2
+//            try! realm.write() {
+//                if let last = realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID).last {
+//                    realm.delete(last)
+//                }
+//            }
+//        #endif
+//    }
 
     func checkGameFinished() {
         
@@ -2032,7 +2030,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //                        cardManager!.check(color: card.colorIndex)
                         self.addChild(card)
                         updateCardCount(1)
-                        deleteLastHistoryRecord()
+//                        deleteLastHistoryRecord()
                         card.reload()
                     }
                     
