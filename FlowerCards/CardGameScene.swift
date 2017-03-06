@@ -701,7 +701,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let gameNumberText = GV.language.getText(.tcGameNumber) + "\(gameNumber + 1)"
         let size = " \(GV.levelsForPlay.aktLevel.countColumns) x \(GV.levelsForPlay.aktLevel.countRows)"
         let sizeText = GV.language.getText(.tcSize) + size
-        let packageText = GV.language.getText(.tcPackages) + "\(countPackages)"
+        let packageText = GV.language.getText(.tcPackage, values: String(countPackages))
         
         let whoIsText = GV.language.getText(.tcWhoIs)
         let whoIsTypeText1 = GV.language.getText(.tcPlayerType)
@@ -939,7 +939,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         levelLabel.text = GV.language.getText(.tcLevel) + ": \(levelIndex + 1)"
         gameNumberLabel.text = GV.language.getText(.tcGameNumber) + "\(gameNumber + 1)"
         sizeLabel.text = GV.language.getText(.tcSize) + "\(GV.levelsForPlay.aktLevel.countColumns) x \(GV.levelsForPlay.aktLevel.countRows)"
-        packageLabel.text = GV.language.getText(.tcPackages) + "\(countPackages)"
+        packageLabel.text = GV.language.getText(.tcPackage, values: String(countPackages))
 
         showCardCount()
         showTippCount()
@@ -1536,19 +1536,21 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func saveStatisticAndGame () {
-        if realm.objects(StatisticModel.self).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).count == 0 {
+        if realm.objects(StatisticModel.self).filter("playerID = %d and levelID = %d and countPackages = %d",
+            GV.player!.ID, GV.player!.levelID, GV.player!.countPackages).count == 0 {
             // create a new Statistic record if required
             let statistic = StatisticModel()
             statistic.ID = GV.createNewRecordID(.statisticModel)
             statistic.playerID = GV.player!.ID
             statistic.levelID = GV.player!.levelID
+            statistic.countPackages = GV.player!.countPackages
             try! realm.write({
                 realm.add(statistic)
             })
         }
 
-        let statistic = realm.objects(StatisticModel.self).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).first!
-        
+        let statistic = realm.objects(StatisticModel.self).filter("playerID = %d and levelID = %d and countPackages = %d",
+            GV.player!.ID, GV.player!.levelID, GV.player!.countPackages).first!        
         realm.beginWrite()
         statistic.actTime = timeCount
         statistic.allTime += timeCount
@@ -1722,16 +1724,17 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         switch congratulations {
         case .Won, .Lost:
-            let actGames = realm.objects(GameModel.self).filter("levelID = %d and gameNumber = %d", levelIndex, actGame!.gameNumber)
+            let actGames = realm.objects(GameModel.self).filter("levelID = %d and gameNumber = %d and countPackages = %d",
+                levelIndex, actGame!.gameNumber, actGame!.countPackages)
             
             let bestGameScore: Int = actGames.max(ofProperty: "playerScore")!
             let bestScorePlayerID = actGames.filter("playerScore = %d", bestGameScore).first!.playerID
             let bestScorePlayerName = realm.objects(PlayerModel.self).filter("ID = %d",bestScorePlayerID).first!.name
             
             tippCountLabel.text = String(0)
-            let statistic = realm.objects(StatisticModel.self).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).first!
+            let statistic = realm.objects(StatisticModel.self).filter("playerID = %d and levelID = %d", GV.player!.ID, GV.player!.levelID).first!
 
-            congratulationsTxt = GV.language.getText(.tcLevel, values: " \(levelIndex + 1)")
+            congratulationsTxt = GV.language.getText(.tcLevelAndPackage, values: String(levelIndex + 1), String(countPackages), "\(countColumns)x\(countRows)")
             congratulationsTxt += "\r\n" + GV.language.getText(.tcGameComplete, values: String(gameNumber + 1))
             congratulationsTxt += "\r\n" + GV.language.getText(TextConstants.tcCongratulations) + playerName
             congratulationsTxt += "\r\n ============== \r\n"

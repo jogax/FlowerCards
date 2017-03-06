@@ -13,7 +13,7 @@ import SpriteKit
 
 class ChooseLevelAndOptions: MySKTable {
     var callBack: () -> ()
-    let myDetailedColumnWidths: [CGFloat] = [25, 15, 15, 15, 15, 15] // in %
+    let myDetailedColumnWidths: [CGFloat] = [20, 20, 20, 20, 20] // in %
     let chooseLevelColumn = 0
     let showPackageNrColumn = 2
 //    let chooseHelplineTypeColumn = 3
@@ -50,7 +50,7 @@ class ChooseLevelAndOptions: MySKTable {
     
     func showLevels() {
         let elements: [MultiVar] = [MultiVar(string: GV.language.getText(.tcLevel)),
-                                    MultiVar(string: GV.language.getText(.tcSize)),
+//                                    MultiVar(string: GV.language.getText(.tcSize)),
                                     MultiVar(string: GV.language.getText(.tcPackage, values: "1")),
                                     MultiVar(string: GV.language.getText(.tcPackage, values: "2")),
                                     MultiVar(string: GV.language.getText(.tcPackage, values: "3")),
@@ -68,12 +68,13 @@ class ChooseLevelAndOptions: MySKTable {
             let countStr4Pkg = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = 4", GV.player!.ID, levelID).count)
            var actPackageCount = 1
                 actPackageCount = GV.levelsForPlay.levelParam[levelID].countPackages
-            let elements: [MultiVar] = [MultiVar(string: (levelID < 10 ? " " : "") + String(levelID + 1) + ": (" + countStr + ")" ),
-                                        MultiVar(string: GV.levelsForPlay.getLevelFormat(level: levelID)),
-                                        MultiVar(string: "(" + String(countStr1Pkg + ")")),
-                                        MultiVar(string: "(" + String(countStr2Pkg + ")")),
-                                        MultiVar(string: "(" + String(countStr3Pkg + ")")),
-                                        MultiVar(string: "(" + String(countStr4Pkg + ")")),
+            let levelString = (levelID < 10 ? "0" : "") + String(levelID + 1) + "(" + GV.levelsForPlay.getLevelFormat(level: levelID) + "): " + countStr
+            let elements: [MultiVar] = [MultiVar(string: levelString),
+//                                        MultiVar(string: GV.levelsForPlay.getLevelFormat(level: levelID)),
+                                        MultiVar(string: "(" + String(countStr1Pkg + ") >")),
+                                        MultiVar(string: "(" + String(countStr2Pkg + ") >")),
+                                        MultiVar(string: "(" + String(countStr3Pkg + ") >")),
+                                        MultiVar(string: "(" + String(countStr4Pkg + ") >")),
             ]
             tableOfRows.append(RowOfTable(elements: elements, selected: levelID == GV.player!.levelID ? true : false))
         }
@@ -89,7 +90,7 @@ class ChooseLevelAndOptions: MySKTable {
         case (0, 0, _):
             removeFromParent()
         case (2..<1000, 2...5, _):
-            setLevel(level: row - 2, countPackages: column - 1)
+            setLevel(level: row - 2, countPackages: column)
             callBack()  // start a new Game at this level            
             break
         default:

@@ -48,6 +48,7 @@ class AutoPlayer {
     var gamesToPlay: [GameToPlay] = []
     var gameIndex = 0
     
+    
     init(scene: CardGameScene) {
         self.scene = scene
         self.replay = false
@@ -144,7 +145,7 @@ class AutoPlayer {
             var go = true
             while true {
                 let levelIndex = gamesToPlay[gameIndex].level - 1
-                let countPackages = gamesToPlay[gameIndex].level
+                let countPackages = gamesToPlay[gameIndex].countPackages
                 let gameNumber = gamesToPlay[gameIndex].gameNumber - 1
                 if self.testType == .newTest {
                     if realm.objects(GameModel.self).filter("gameNumber = %d and levelID = %d and playerID = %d and countPackages = %d",

@@ -25,13 +25,15 @@ class MySKGameStatistic: MySKTable {
     
     
     
-    init(playerID: Int, levelID: Int, parent: SKSpriteNode, callBack: @escaping (Bool, Int, Int)->()) {
+    init(playerID: Int, levelID: Int, countPackages: Int, parent: SKSpriteNode, callBack: @escaping (Bool, Int, Int)->()) {
         self.playerID = playerID
         self.levelID = levelID
         let playerName = realm.objects(PlayerModel.self).filter("ID = %d", playerID).first!.name
         self.callBack = callBack
-        let headLines = GV.language.getText(.tcPlayerStatisticLevel, values: playerName, String(levelID + 1))
-        gamesOfThisLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true", playerID, levelID).sorted(byProperty: "gameNumber")
+        let headLines = GV.language.getText(.tcPlayerStatisticLevel,
+                        values: playerName, String(levelID + 1), GV.levelsForPlay.getLevelFormat(level: levelID), String(countPackages))
+        gamesOfThisLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = %d",
+                        playerID, levelID, countPackages).sorted(byProperty: "gameNumber")
         super.init(columnWidths: myGameColumnWidths, countRows:gamesOfThisLevel.count + 1, headLines: [headLines], parent: parent, myName: "MySKDetailedStatistic", width: parent.parent!.frame.width * 0.9)
         self.showVerticalLines = true
         

@@ -111,7 +111,6 @@ enum TextConstants: Int {
     tcCompetitionShort,
     tcLevelAndGames,
     tcSize,
-    tcPackages,
     tcPackage,
     tcHelpLines,
     tcAutoPlayNormal,
@@ -119,7 +118,8 @@ enum TextConstants: Int {
     tcAutoPlayErrors,
     tcAutoPlayTable,
     tcReplay,
-    tcActivateAutoPlay
+    tcActivateAutoPlay,
+    tcLevelAndPackage
 
 }
 

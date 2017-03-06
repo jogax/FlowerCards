@@ -12,7 +12,7 @@ import RealmSwift
 class MySKDetailedStatistic: MySKTable {
     
     var callBack: (Bool, Int, Int)->()
-    let myDetailedColumnWidths: [CGFloat] = [15, 13, 20, 30, 12, 10] // in %
+    let myDetailedColumnWidths: [CGFloat] = [18, 14, 17, 17, 17, 17] // in %
 //    let myName = "MySKStatistic"
     let countLines = GV.levelsForPlay.count()
     let playerID: Int
@@ -43,10 +43,15 @@ class MySKDetailedStatistic: MySKTable {
     func showStatistic() {
         tableOfRows.removeAll()
         let elements: [MultiVar] = [MultiVar(string: GV.language.getText(.tcLevel)),
-                                    MultiVar(string: GV.language.getText(.tcCountPlays)),
-                                    MultiVar(string: GV.language.getText(.tcCountCompetitions)),
-                                    MultiVar(string: GV.language.getText(.tcCountVictorys)),
+//                                    MultiVar(string: GV.language.getText(.tcCountPlays)),
+//                                    MultiVar(string: GV.language.getText(.tcCountCompetitions)),
+//                                    MultiVar(string: GV.language.getText(.tcCountVictorys)),
                                     MultiVar(string: GV.language.getText(.tcAllTime)),
+                                    MultiVar(string: GV.language.getText(.tcPackage, values: "1")),
+                                    MultiVar(string: GV.language.getText(.tcPackage, values: "2")),
+                                    MultiVar(string: GV.language.getText(.tcPackage, values: "3")),
+                                    MultiVar(string: GV.language.getText(.tcPackage, values: "4")),
+                                    
                                     ]
         tableOfRows.append(RowOfTable(elements: elements, selected: true))
         // collect all lines in tableOfRows in parent
@@ -58,12 +63,22 @@ class MySKDetailedStatistic: MySKTable {
             }
             let formatter = NumberFormatter()
             formatter.numberStyle = NumberFormatter.Style.none // .DecimalStyle
-            let elements: [MultiVar] = [MultiVar(string: String(levelID + 1)),
-                                        MultiVar(string: "\(statistic!.countPlays)"),
-                                        MultiVar(string: "\(statistic!.countMultiPlays)"),
-                                        MultiVar(string: "\(statistic!.victorys) / \(statistic!.defeats)"),
+            let levelString = (levelID < 9 ? "0" : "") + String(levelID + 1) + " (" + GV.levelsForPlay.getLevelFormat(level: levelID) + "): \(statistic!.countPlays)"
+            let countStr1Pkg = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = 1", playerID, levelID).count)
+            let countStr2Pkg = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = 2", playerID, levelID).count)
+            let countStr3Pkg = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = 3", playerID, levelID).count)
+            let countStr4Pkg = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = 4", playerID, levelID).count)
+            let elements: [MultiVar] = [MultiVar(string: levelString),
                                         MultiVar(string: "\(statistic!.allTime.dayHourMinSec)"),
-                                        MultiVar(texture: SKTexture(image: DrawImages.getGoForwardImage(CGSize(width: 20, height: 20)))),
+                                        MultiVar(string: "(" + String(countStr1Pkg + ") >")),
+                                        MultiVar(string: "(" + String(countStr2Pkg + ") >")),
+                                        MultiVar(string: "(" + String(countStr3Pkg + ") >")),
+                                        MultiVar(string: "(" + String(countStr4Pkg + ") >")),
+
+//                                        MultiVar(string: "\(statistic!.countPlays)"),
+//                                        MultiVar(string: "\(statistic!.countMultiPlays)"),
+//                                        MultiVar(string: "\(statistic!.victorys) / \(statistic!.defeats)"),
+//                                        MultiVar(texture: SKTexture(image: DrawImages.getGoForwardImage(CGSize(width: 20, height: 20)))),
             ]
             tableOfRows.append(RowOfTable(elements: elements, selected: true))
         }
@@ -103,8 +118,8 @@ class MySKDetailedStatistic: MySKTable {
             myParent.run(fadeInAction)
             removeFromParent()
             callBack(false, 0, 0)
-        case (2..<10000, myDetailedColumnWidths.count - 1):
-            showDetailedPlayerStatistic(row - 2)
+        case (2..<10000, 2...5):
+            showDetailedPlayerStatistic(levelID: row - 2, countPackages: column - 1)
         default:
             break
         }
@@ -112,8 +127,8 @@ class MySKDetailedStatistic: MySKTable {
     }
     
     
-    func showDetailedPlayerStatistic(_ row: Int) {
-        _ = MySKGameStatistic(playerID: playerID, levelID: row, parent: self, callBack: callBackFromGameStatistic)
+    func showDetailedPlayerStatistic(levelID: Int, countPackages: Int) {
+        _ = MySKGameStatistic(playerID: playerID, levelID: levelID, countPackages: countPackages, parent: self, callBack: callBackFromGameStatistic)
     }
  
     func callBackFromGameStatistic(_ startGame: Bool = false, gameNumber: Int = 0, levelIndex: Int = 0) {

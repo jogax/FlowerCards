@@ -72,7 +72,7 @@ let deDictionary: [TextConstants: String] = [
     .tcAnonym:           "Anonymus",
     .tcStatistic:        "Statistiken",
     .tcPlayerStatisticHeader: "Statistiken für %",
-    .tcPlayerStatisticLevel: "Statistiken für %, Ebene %",
+    .tcPlayerStatisticLevel: "Statistiken für %, Ebene % (%), Pakete: %",
     .tcStatisticOfGame:  "Statistik des Spiels %:",
     .tcBestScoreOfGame:   "Beste Ergebnis % %",
     .tcYourScore:         "Dein Ergebnis %",
@@ -120,8 +120,7 @@ let deDictionary: [TextConstants: String] = [
     .tcChooseLevel:     "Wähle Ebene und Optionen",
     .tcLevelAndGames:   "Ebene (gespielt)",
     .tcSize:            "Format:",
-    .tcPackages:        "Pakete:",
-    .tcPackage:         "Pak: %",
+    .tcPackage:         "Pakete: %",
     .tcHelpLines:       "Hilfslinien:",
     .tcAutoPlayNormal:  "Start automatisches Abspielen dieses Spiels",
     .tcAutoPlayNewTest: "Start autoplay Test",
@@ -129,6 +128,7 @@ let deDictionary: [TextConstants: String] = [
     .tcAutoPlayTable:  "Start autoplay Tabelle",
     .tcReplay:          "Wiedergabe des Spiels",
     .tcActivateAutoPlay: "Autoplay aktivieren",
+    .tcLevelAndPackage: "Ebene:%, Pakete:%, Format:%",
 ]
 
 

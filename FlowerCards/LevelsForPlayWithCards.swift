@@ -169,7 +169,7 @@ class LevelsForPlayWithCards {
     }
     
     func getLevelFormat(level: Int)->String {
-        return "\(levelParam[level].countColumns) * \(levelParam[level].countRows)"
+        return "\(levelParam[level].countColumns)x\(levelParam[level].countRows)"
     }
     
     
