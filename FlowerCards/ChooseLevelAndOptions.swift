@@ -86,10 +86,10 @@ class ChooseLevelAndOptions: MySKTable {
     
     // called only when not after scrolling of the screen
     override func ownTouchesEnded(row: Int, column: Int, element: Int) {
-        switch (row, column, element) {
-        case (0, 0, _):
+        switch (row, column) {
+        case (0, 0):
             removeFromParent()
-        case (2..<1000, 2...5, _):
+        case (2..<1000, 1...4):
             setLevel(level: row - 2, countPackages: column)
             callBack()  // start a new Game at this level            
             break
