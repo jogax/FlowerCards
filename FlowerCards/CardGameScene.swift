@@ -1107,15 +1107,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         autoPlayerActive = true
         durationMultiplier = durationMultiplierForAutoplayer
         waitForStartConst = waitForStartForAutoplayer
-        autoPlayer?.startPlay(replay: false, testType: testType)
+        autoPlayer?.startPlay(testType: testType)
     }
-    
-    func replay() {
-        autoPlayerActive = true
-        durationMultiplier = durationMultiplierForAutoplayer
-        autoPlayer?.startPlay(replay: true)
-    }
-    
+        
     
     
     func deleteEmptyCard(column: Int, row: Int) {
@@ -1732,7 +1726,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             let bestScorePlayerName = realm.objects(PlayerModel.self).filter("ID = %d",bestScorePlayerID).first!.name
             
             tippCountLabel.text = String(0)
-            let statistic = realm.objects(StatisticModel.self).filter("playerID = %d and levelID = %d", GV.player!.ID, GV.player!.levelID).first!
+//            let statistic = realm.objects(StatisticModel.self).filter("playerID = %d and levelID = %d and countPackages = %d",
+//                            GV.player!.ID, GV.player!.levelID, GV.player!.countPackages).first!
 
             congratulationsTxt = GV.language.getText(.tcLevelAndPackage, values: String(levelIndex + 1), String(countPackages), "\(countColumns)x\(countRows)")
             congratulationsTxt += "\r\n" + GV.language.getText(.tcGameComplete, values: String(gameNumber + 1))
@@ -1749,7 +1744,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             } else {
                 congratulationsTxt += "\r\n" + GV.language.getText(.tcLevelScore, values: " \(bestGameScore)")
             }
-            congratulationsTxt += "\r\n" + GV.language.getText(.tcActTime) + String(statistic.actTime.dayHourMinSec)
+            congratulationsTxt += "\r\n" + GV.language.getText(.tcActTime) + String(timeCount.dayHourMinSec)
         case .No:
             break
         }

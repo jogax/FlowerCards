@@ -12,7 +12,7 @@ import SpriteKit
 struct ConnectablePair {
     var card1: MySKCard
     var card2: MySKCard
-    func convertCard(card: MySKCard)->Int {
+    func convertCard(card: MySKCard)->Int64 {
         var hash = card.countTransitions << 0
         hash |= card.minValue << 2
         hash |= card.maxValue << 6
@@ -20,7 +20,7 @@ struct ConnectablePair {
         hash |= card.column << 14
         hash |= card.row << 18
         hash |= card.type.rawValue << 22
-        return hash
+        return Int64(hash)
         //            return "\(card.countTransitions)-\(card.minValue)-\(card.maxValue)-\(card.column)-\(card.row)-\(card.type)"
     }
     var printValue: (String, String) {
@@ -30,12 +30,12 @@ struct ConnectablePair {
             return (value1, value2)
         }
     }
-    var hashValue : Int {
+    var hashValue : Int64 {
         get {
             return  convertCard(card: card1) << 32 | convertCard(card: card2)
         }
     }
-    var hashValue1 : Int {
+    var hashValue1 : Int64 {
         get {
             return convertCard(card: card2) << 32 | convertCard(card: card1)
         }
@@ -122,6 +122,7 @@ struct FoundedCardParameters {
         case isMinValue = 0, isMaxValue
     }
     var colorIndex: Int = NoColor
+    var fromPosition: ColumnRow = ColumnRow()
     var minOrMax: MinOrMaxValue = .isMinValue
     var value: Int = NoValue
     var myPoints:[CGPoint] = []
@@ -135,6 +136,14 @@ struct FoundedCardParameters {
     }
     static func ==(left: FoundedCardParameters, right: FoundedCardParameters) -> Bool {
         return left.hashValue == right.hashValue
+    }
+    var printValue: String {
+        get {
+            if let cardValue = MySKCard.cardLib[value] {
+                return "(\(fromPosition.column):\(fromPosition.row)) - \(minOrMax == .isMinValue ? "min" : "max") - \(cardValue))"
+            }
+            return ""
+        }
     }
 
 
@@ -235,7 +244,7 @@ class CardManager {
     var tippIndex = 0
     var lastNextPoint: Founded?
     static let colorNames = ["P", "B", "G", "R"]
-    private let multiplierForSearch = CGFloat(2.0)
+    private let multiplierForSearch = CGFloat(3.0)
 
     private let purple = 0
     private let blue = 1
@@ -305,10 +314,21 @@ class CardManager {
     
     struct FoundedCardsProColor {
         var cards: [FoundedCardParameters] // for saving all usable cards
-        var countSpecial: Int // shows how many values are to use only if no others exists
+        var specialCards: [FoundedCardParameters] // for saving special cards ==> to use only if no others exists
         init() {
-            cards = []
-            countSpecial = 0
+            self.cards = []
+            self.specialCards = []
+        }
+        func printValue() {
+            print("cards: \(cards.count)")
+            for (cardIndex, card) in cards.enumerated() {
+                print("\(cardIndex): Pos: \(card.printValue)")
+            }
+            print("specialCards: \(specialCards.count)")
+            for (cardIndex, specialCard) in specialCards.enumerated() {
+                print("\(cardIndex): Pos: \(specialCard.printValue)")
+            }
+
         }
     }
     
@@ -347,9 +367,10 @@ class CardManager {
 //        updateCountColors()
         
         var cardArray: [MySKCard] = []
+        var specialCards: [FoundedCardParameters] = []
         let gameArraySize = countColumns * countRows
         var actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
-        if actFillingsProcent > 0.30 && tippArray.count > 4 {
+        if actFillingsProcent > 0.20 && tippArray.count > 3 {
             return cardArray
         }
         var positionsTab = [ColumnRow]()
@@ -361,7 +382,7 @@ class CardManager {
                 }
             }
         }
-        while actFillingsProcent < 0.40 && cardStack.count(type: .MySKCardType) > 0 {
+        while actFillingsProcent < 0.35 && cardStack.count(type: .MySKCardType) > 0 && positionsTab.count > 0 {
 //            let minCount = colorCounts.min()
 //            let minColor = colorCounts.index(of: minCount!)
             let colorIndexes = chooseColorIndexes()
@@ -390,6 +411,11 @@ class CardManager {
             let gameArrayPos = positionsTab[index]
             positionsTab.remove(at: index)
             var suitableCards = findSuitableCardsForGameArrayPosition(gameArrayPos: gameArrayPos)
+            for index in 0..<suitableCards.count {
+                if suitableCards[index].specialCards.count > 0 {
+                    specialCards.append(contentsOf: suitableCards[index].specialCards)
+                }
+            }
             var go = true
             var searchColorIndex = chooseColorIndexes()
 
@@ -399,38 +425,36 @@ class CardManager {
                 var countSearches = suitableCards[actColorIndex].cards.count
 
                 while countSearches > 0 {
-                    var max = suitableCards[actColorIndex].cards.count - suitableCards[actColorIndex].countSpecial - 1
-                    if max < 0 {
-                        max = suitableCards[actColorIndex].cards.count - 1
-                        suitableCards[actColorIndex].countSpecial -= 1
-                    }
-                    let cardIndex = random!.getRandomInt(0, max: max)
-                    let cardToSearch = suitableCards[actColorIndex].cards[cardIndex]
-                    if let card = cardStack.search(colorIndex: cardToSearch.colorIndex, value: cardToSearch.value) {
-                        let actColorData = colorArray[card.colorIndex]
-                        card.column = gameArrayPos.column
-                        card.row = gameArrayPos.row
-                        card.belongsToPackageMax = allPackages
-                        card.belongsToPackageMin = allPackages
-                        let newPairs = actColorData.addCardToColor(card: card)
-                        if newPairs.count > 0 {
-                            actColorData.addCardToUsedCards(card: card)
-                            updateGameArrayCell(card: card)
-                            cardArray.append(card)
-                            for pair in newPairs {
-                                checkPathToFoundedCards(pair: pair)
+                    let max = suitableCards[actColorIndex].cards.count - 1
+                    if max >= 0 {
+                        let cardIndex = random!.getRandomInt(0, max: max)
+                        let cardToSearch = suitableCards[actColorIndex].cards[cardIndex]
+                        if let card = cardStack.search(colorIndex: cardToSearch.colorIndex, value: cardToSearch.value) {
+                            let actColorData = colorArray[card.colorIndex]
+                            card.column = gameArrayPos.column
+                            card.row = gameArrayPos.row
+                            card.belongsToPackageMax = allPackages
+                            card.belongsToPackageMin = allPackages
+                            let newPairs = actColorData.addCardToColor(card: card)
+                            if newPairs.count > 0 {
+                                actColorData.addCardToUsedCards(card: card)
+                                updateGameArrayCell(card: card)
+                                cardArray.append(card)
+                                for pair in newPairs {
+                                    checkPathToFoundedCards(pair: pair)
+                                }
+                                actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
+                                go = false
+                                break
+                            } else {
+                                cardStack.push(card: card)
+                                suitableCards[actColorIndex].cards.remove(at: cardIndex)
                             }
-                            actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
-                            go = false
-                            break
                         } else {
-                            cardStack.push(card: card)
                             suitableCards[actColorIndex].cards.remove(at: cardIndex)
                         }
-                    } else {
-                        suitableCards[actColorIndex].cards.remove(at: cardIndex)
+                        countSearches -= 1
                     }
-                    countSearches -= 1
                 }
                 searchColorIndex.remove(at: 0)
                 if searchColorIndex.count == 0 {
@@ -438,12 +462,42 @@ class CardManager {
                 }
             }
         }
+        while actFillingsProcent < 0.90 && cardStack.count(type: .MySKCardType) > 0 && specialCards.count > 0 && tippArray.count < 3 {
+            let cardIndex = random!.getRandomInt(0, max: specialCards.count - 1)
+            let cardToSearch = specialCards[cardIndex]
+            if !gameArray[cardToSearch.fromPosition.column][cardToSearch.fromPosition.row].used {
+                if let card = cardStack.search(colorIndex: cardToSearch.colorIndex, value: cardToSearch.value) {
+                    let actColorData = colorArray[card.colorIndex]
+                    card.column = cardToSearch.fromPosition.column
+                    card.row = cardToSearch.fromPosition.row
+                    card.belongsToPackageMax = allPackages
+                    card.belongsToPackageMin = allPackages
+                    let newPairs = actColorData.addCardToColor(card: card)
+                    if newPairs.count > 0 {
+                        actColorData.addCardToUsedCards(card: card)
+                        updateGameArrayCell(card: card)
+                        cardArray.append(card)
+                        for pair in newPairs {
+                            checkPathToFoundedCards(pair: pair)
+                        }
+                        actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
+                    } else {
+                        cardStack.push(card: card)
+                        specialCards.remove(at: cardIndex)
+                    }
+                } else {
+                    specialCards.remove(at: cardIndex)
+                }
+            } else {
+                specialCards.remove(at: cardIndex)
+            }
+        }
         _ = createTipps()
         return cardArray
     }
-    
-    
-    private func findSuitableCardsForGameArrayPosition(gameArrayPos: ColumnRow)->[FoundedCardsProColor] {
+
+
+    private func findSuitableCardsForGameArrayPosition(gameArrayPos: ColumnRow)->[FoundedCardsProColor]  {
         var foundedCards: [FoundedCardsProColor] = Array(repeating: FoundedCardsProColor(), count: MaxColorValue) // one Array for each color
         
 //        let firstValue: CGFloat = 10000
@@ -456,41 +510,60 @@ class CardManager {
         var angle = startAngle
         //==========================================
         func appendCardParameter(cardParameter: FoundedCardParameters) {
-            let foundedCardUsing = colorArray[cardParameter.colorIndex].usedCards[cardParameter.value]!
-            let freeCardsOfColor = colorArray[cardParameter.colorIndex].getFreeConnectableCards()
+            let color = cardParameter.colorIndex
+            let foundedCardUsing = colorArray[color].usedCards[cardParameter.value]!
+            let freeCardsOfColor = colorArray[color].getFreeConnectableCards()
             if foundedCardUsing.countInStack == 0 {
                 return
             }
-            var cardNotFound = true
-            for card in foundedCards[cardParameter.colorIndex].cards {
-                if card.value == cardParameter.value {
-                    cardNotFound = false
+            if  freeCardsOfColor.contains(cardParameter.value) {
+                var founded = false
+                for (index, specialCard) in foundedCards[color].specialCards.enumerated() {
+                    if specialCard.value == cardParameter.value {
+                        if specialCard.myPoints.count >= cardParameter.myPoints.count {
+                            founded = true
+                            break
+                        } else {
+                            foundedCards[color].specialCards[index].myPoints = cardParameter.myPoints
+                            founded = true
+                            break
+                        }
+                    }
                 }
-            }
-            if cardNotFound {
-//                var usable = true
-//                for card in colorArray[cardParameter.colorIndex].allCards {
-//                    if card.countCards == 1 && card.minValue == cardParameter.value {
-//                        usable = false
-//                        break
-//                    }
-//                }
-//                if usable {
-                if  freeCardsOfColor.contains(cardParameter.value) {
-                    foundedCards[cardParameter.colorIndex].cards.insert(cardParameter, at: foundedCards[cardParameter.colorIndex].cards.count)
-                    foundedCards[cardParameter.colorIndex].countSpecial += 1
-                } else {
-                    foundedCards[cardParameter.colorIndex].cards.insert(cardParameter, at: 0)
-              }
-            }
+                if !founded {
+                    foundedCards[color].specialCards.append(cardParameter)
+                }
+            } else {
+                var founded = false
+                for (index, card) in foundedCards[color].cards.enumerated() {
+                    if card.value == cardParameter.value {
+                        if card.myPoints.count >= cardParameter.myPoints.count {
+                            founded = true
+                            break
+                        } else {
+                            foundedCards[color].cards[index].myPoints = cardParameter.myPoints
+                            founded = true
+                            break
+                        }
+                        
+                        
+
+                    }
+                }
+                if !founded {
+                    foundedCards[color].cards.append(cardParameter)
+                }
+           }
         }
         //==========================================
+        
         while angle <= stopAngle {
             let toPoint = GV.pointOfCircle(10.0, center: startPoint, angle: angle)
             let (foundedPoint, myPoints) = createHelpLines(movedFrom: startCard, toPoint: toPoint, inFrame: GV.mainScene!.frame, lineSize: cardSize.width, showLines: false)
             if foundedPoint != nil {
                 var foundedCard: MySKCard
                 var cardParameter = FoundedCardParameters()
+                cardParameter.fromPosition = gameArrayPos
                 cardParameter.myPoints = myPoints
                 if foundedPoint!.foundContainer {
                     foundedCard = containers[foundedPoint!.column]
@@ -548,7 +621,7 @@ class CardManager {
                     }
                 }
             }
-            angle += GV.oneGrad * 1.0 //multiplierForSearch
+            angle += GV.oneGrad * multiplierForSearch
         }
         return foundedCards
     }
@@ -1801,6 +1874,7 @@ class CardManager {
                     self.container = container
                     countTransitions += container.countTransitions
                     addCardToUsedCards(card: container)
+                    freeConnectableCards.append(container.minValue)
                 }
             }
         }

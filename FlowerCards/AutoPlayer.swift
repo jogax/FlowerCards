@@ -11,6 +11,8 @@ import SpriteKit
 
 class AutoPlayer {
     let gamesToPlayTable: [GameToPlay] = [
+        GameToPlay(level: 1, countPackages: 4, gameNumber: 1, stopAt: 71),
+        GameToPlay(level: 2, countPackages: 3, gameNumber: 1, stopAt: 88),
         GameToPlay(level: 3, countPackages: 2, gameNumber: 5, stopAt: 49),
     ]
     enum runStatus: Int {
@@ -36,22 +38,22 @@ class AutoPlayer {
     }
     var scene: CardGameScene
 //    @objc let nextStepSelector = "nextStep:"
-    var timer: Timer = Timer()
-    var bestTipp = Tipp()
-    var choosedTipp: Tipp.InnerTipp = Tipp.InnerTipp()
-    var autoPlayStatus: runStatus = .getTipp
-    var replay: Bool
-    var indexForReplay: Int = 0
-    var stopTimer = false
-    var testType: TestType = .runOnce //.test
-    var testerType: TesterType = .expert
-    var gamesToPlay: [GameToPlay] = []
-    var gameIndex = 0
+    private var timer: Timer = Timer()
+    private var bestTipp = Tipp()
+    private var choosedTipp: Tipp.InnerTipp = Tipp.InnerTipp()
+    private var autoPlayStatus: runStatus = .getTipp
+    private var indexForReplay: Int = 0
+    private var stopTimer = false
+    private var testType: TestType = .runOnce //.test
+    private var testerType: TesterType = .expert
+    private var gamesToPlay: [GameToPlay] = []
+    private var gameIndex = 0
+    private let playerColors: [[Int]] = [[0, 1], [2, 3]]
+    private var actPlayer = 0
     
     
     init(scene: CardGameScene) {
         self.scene = scene
-        self.replay = false
         self.stopTimer = false
         #if TEST
             printOldGames()
@@ -75,7 +77,7 @@ class AutoPlayer {
                     if game.levelID != oldLevelID {
                         oldLevelID = game.levelID
                     }
-                    let lineGameToPlay = "GameToPlay(level: \(game.levelID + 1), gameNumber: \(game.gameNumber + 1)), // at Step: \(game.countSteps)"
+                    let lineGameToPlay = "GameToPlay(level: \(game.levelID + 1), countPackages: \(game.countPackages), gameNumber: \(game.gameNumber + 1)), // at Step: \(game.countSteps)"
                     print (lineGameToPlay)
                 }
             }
@@ -88,9 +90,7 @@ class AutoPlayer {
         }
     }
     #endif
-    func startPlay(replay: Bool, testType: TestType = .runOnce) {
-        self.replay = replay
-        scene.replaying = replay
+    func startPlay(testType: TestType = .runOnce) {
         stopTimer = false
         gameIndex = 0
         self.testType = testType
@@ -215,6 +215,10 @@ class AutoPlayer {
                             }
                             
                         case .expert:
+                            let colorIndex = Int(arc4random()%2)
+                            let color1 = playerColors[actPlayer][colorIndex]
+                            let color2 = playerColors[actPlayer][(colorIndex + 1)%2]
+                            
                             for tipp in tippArray {
                                 if tipp.card2.type != .containerType  { // first check only Cards
                                     if bestTipp.innerTipps.count == 0 || bestTipp.innerTipps.last!.value < tipp.innerTipps.last!.value {
@@ -277,7 +281,7 @@ class AutoPlayer {
             if stopTimer {
                 timer.invalidate()
             } else {
-                let interval = autoPlayStatus == .getTipp || autoPlayStatus == .touchesBegan ? 0.01 : 0.0001
+                let interval = autoPlayStatus == .getTipp || autoPlayStatus == .touchesBegan ? 0.001 : 0.0001
                 timer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }
         } else {
@@ -292,7 +296,7 @@ class AutoPlayer {
                     }
                 }
             if !stopTimer {
-                timer = Timer.scheduledTimer(timeInterval: 0.15, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+                timer = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }
         }
     }
