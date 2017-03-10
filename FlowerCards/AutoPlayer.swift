@@ -11,7 +11,7 @@ import SpriteKit
 
 class AutoPlayer {
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 1, countPackages: 4, gameNumber: 1, stopAt: 71),
+        GameToPlay(level: 1, countPackages: 4, gameNumber: 1, stopAt: 60),
         GameToPlay(level: 2, countPackages: 3, gameNumber: 1, stopAt: 88),
         GameToPlay(level: 3, countPackages: 2, gameNumber: 5, stopAt: 49),
     ]
@@ -86,7 +86,7 @@ class AutoPlayer {
         let allGamesCount = realm.objects(GameModel.self).filter("playerID = %d", GV.player!.ID).count
         let errorGamesCount = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID).count
         if allGamesCount > 0 {
-            print ("Allgames: \(allGamesCount), Errorgames: \(errorGamesCount), Procent errorgames: \(errorGamesCount * 100 / allGamesCount)")
+            print ("AllGames: \(allGamesCount), Errorgames: \(errorGamesCount), Procent errorgames: \((Double(errorGamesCount) * 100.0 / Double(allGamesCount)).twoDecimals)%")
         }
     }
     #endif
@@ -97,16 +97,22 @@ class AutoPlayer {
         switch testType {
         case .newTest:
             gamesToPlay.removeAll()
-            let startLevelIndex = GV.player!.levelID + 1
-            var startCountPackages = GV.player!.countPackages
-            for levelIndex in startLevelIndex...GV.levelsForPlay.count() {
-                for countPackages in startCountPackages...maxPackageCount {
-                    for gameNumber in 1...100 {
-                        gamesToPlay.append(GameToPlay(level: levelIndex, countPackages: countPackages, gameNumber: gameNumber))
-                    }
-                }
-                startCountPackages = 1
+//            let startLevelIndex = GV.player!.levelID + 1
+//            var startCountPackages = GV.player!.countPackages
+            for _ in 0..<1000 {
+                let levelIndex = Int(arc4random()) % GV.levelsForPlay.count()
+                let countPackages = 1 + Int(arc4random()) % maxPackageCount
+                let gameNumber = 1 + Int(arc4random()) % MaxGameNumber
+                gamesToPlay.append(GameToPlay(level: levelIndex, countPackages: countPackages, gameNumber: gameNumber))
             }
+//            for levelIndex in startLevelIndex...GV.levelsForPlay.count() {
+//                for countPackages in startCountPackages...maxPackageCount {
+//                    for gameNumber in 1...100 {
+//                        gamesToPlay.append(GameToPlay(level: levelIndex, countPackages: countPackages, gameNumber: gameNumber))
+//                    }
+//                }
+//                startCountPackages = 1
+//            }
         case .runOnce:
             gamesToPlay.removeAll()
         case .fromTable:
@@ -167,7 +173,7 @@ class AutoPlayer {
                 GV.player!.levelID = gamesToPlay[gameIndex].level - 1
                 GV.player!.countPackages = gamesToPlay[gameIndex].countPackages
                 try! realm.commitWrite()
-                scene.gameNumber = gamesToPlay[gameIndex].gameNumber - 1
+                scene.gameNumber = gamesToPlay[gameIndex].gameNumber
                 scene.startNewGame(next: false)
                 scene.durationMultiplier = scene.durationMultiplierForAutoplayer
                 scene.waitForStartConst = scene.waitForStartForAutoplayer
@@ -270,8 +276,8 @@ class AutoPlayer {
                     stopTimer = true
                     timer.invalidate()
                 default:
-                    if MySKCard.cardCount == gamesToPlay[gameIndex].stopAt {
-                        stopAutoplay()
+                    if gamesToPlay.count > 0 && MySKCard.cardCount == gamesToPlay[gameIndex].stopAt {
+                        self.stopAutoplay()
                     }
                 }
                 autoPlayStatus = .getTipp

@@ -339,6 +339,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var labelBackground = SKSpriteNode()
     let labelRowCorr = CGFloat(0.1)
     let countLabelRows = CGFloat(4.0)
+    let MaxCountGamesToPlayInARound = 5
+    var countGamesToPlay = 0
     
     var gameNumberLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var sizeLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
@@ -511,6 +513,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             let width:CGFloat = 64.0
             let height: CGFloat = 89.0
             let sizeMultiplierConstant = CGFloat(0.0020)
+            countGamesToPlay = MaxCountGamesToPlayInARound
 
             cardSizeMultiplier = CGSize(width: self.size.width * sizeMultiplierConstant,
                                     height: self.size.width * sizeMultiplierConstant * height / width)
@@ -540,7 +543,23 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
         durationMultiplier = durationMultiplierForPlayer
         waitForStartConst = waitForStartForPlayer
+        let playedGamesOnLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and countPackages = %d and played = true",
+                                GV.player!.ID, GV.player!.levelID, GV.player!.countPackages).count
+        if playedGamesOnLevel >= countGamesToPlay && newGame {
+            realm.beginWrite()
+            GV.player!.levelID += 1
+            GV.player!.levelID %= GV.levelsForPlay.count()
+            if GV.player!.levelID == 0 {
+                GV.player!.countPackages += 1
+                if GV.player!.countPackages > maxPackageCount {
+                    GV.player!.countPackages = 1
+                    countGamesToPlay += MaxCountGamesToPlayInARound
+                }
+            }
+            try! realm.commitWrite()
+        }
         levelIndex = GV.player!.levelID
+        countPackages = GV.player!.countPackages
         GV.levelsForPlay.setAktLevel(levelIndex)
         specialPrepareFuncFirst()
         if newGame {
@@ -573,7 +592,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        }
 //        createGameRecord(gameNumber)
 
-        
+        if levelIndex < 0 {
+            levelIndex = 0
+        }
         random = MyRandom(level: levelIndex, gameNumber: gameNumber)
         
         stopTimer(&countUp)
@@ -1218,20 +1239,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
     }
     
-//    func checkColoredLines() {
-//        if lastPair.color == MyColors.green { // Timer for check Green Line
-//            if Date().timeIntervalSince(lastPair.startTime) > fixationTime && !lastPair.fixed {
-//                lastPair.fixed = true
-//                if showHelpLines == .green {
-//                    lineWidthMultiplier = lineWidthMultiplierSpecial
-//                }
-//                drawHelpLinesSpec() // draw thick Line
-//            }
-//        }
-//        
-//
-//    }
-    
     func checkMultiplayer() {
         if playerType == .multiPlayer {
             opponentNameLabel.text = opponent.name
@@ -1705,8 +1712,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
         
         stopTimer(&countUp)
-//        print("stopCreateTippsInBackground from newGame")
-//
         prepareNextGame(newGame: next)
         generateCards(.first)
     }
