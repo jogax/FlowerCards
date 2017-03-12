@@ -312,6 +312,14 @@ class CardManager {
         _ = createTipps()
     }
     
+    func printTippArray() {
+        print("======== tippArray.count: \(tippArray.count) ========")
+        for tipp in tippArray {
+            print(tipp.printValue())
+            print("----------------------")
+        }
+    }
+    
     struct FoundedCardsProColor {
         var cards: [FoundedCardParameters] // for saving all usable cards
         var specialCards: [FoundedCardParameters] // for saving special cards ==> to use only if no others exists
@@ -320,11 +328,11 @@ class CardManager {
             self.specialCards = []
         }
         func printValue() {
-            print("cards: \(cards.count)")
+            print("======== cards: \(cards.count) ========")
             for (cardIndex, card) in cards.enumerated() {
                 print("\(cardIndex): Pos: \(card.printValue)")
             }
-            print("specialCards: \(specialCards.count)")
+            print("======== specialCards: \(specialCards.count) ========")
             for (cardIndex, specialCard) in specialCards.enumerated() {
                 print("\(cardIndex): Pos: \(specialCard.printValue)")
             }
@@ -362,9 +370,9 @@ class CardManager {
             return returnColors
         }
         
-        
+//        checkTippArrayPlausibility()
         _ = createTipps()
-//        updateCountColors()
+        updateCountColors()
         
         var cardArray: [MySKCard] = []
         var specialCards: [FoundedCardParameters] = []
@@ -382,30 +390,28 @@ class CardManager {
                 }
             }
         }
-//        while actFillingsProcent < 0.35 && cardStack.count(type: .MySKCardType) > 0 && positionsTab.count > 0 {
-////            let minCount = colorCounts.min()
-////            let minColor = colorCounts.index(of: minCount!)
-//            let colorIndexes = chooseColorIndexes()
-//            let card = cardStack.pull(color: colorIndexes[0])!
-//            let index = random!.getRandomInt(0, max: positionsTab.count - 1)
-//            card.column = positionsTab[index].column
-//            card.row = positionsTab[index].row
-//            card.belongsToPackageMax = allPackages
-//            card.belongsToPackageMin = allPackages
-//            colorArray[card.colorIndex].addCardToUsedCards(card: card)
-//            let newPairs = colorArray[card.colorIndex].addCardToColor(card: card)
-//            if newPairs.count > 0 {
-//                for pair in newPairs {
-//                    checkPathToFoundedCards(pair: pair)
-//                }
-//            }
-//            positionsTab.remove(at: index)
-//            updateGameArrayCell(card: card)
-//            cardArray.append(card)
-//            actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
-//        }
-//        updateColorArray()
-//        updateCountColors()
+        while actFillingsProcent < 0.35 && cardStack.count(type: .MySKCardType) > 0 && positionsTab.count > 0 {
+            let colorIndexes = chooseColorIndexes()
+            let card = cardStack.pull(color: colorIndexes[0])!
+            let index = random!.getRandomInt(0, max: positionsTab.count - 1)
+            card.column = positionsTab[index].column
+            card.row = positionsTab[index].row
+            card.belongsToPackageMax = allPackages
+            card.belongsToPackageMin = allPackages
+            colorArray[card.colorIndex].addCardToUsedCards(card: card)
+            let newPairs = colorArray[card.colorIndex].addCardToColor(card: card)
+            if newPairs.count > 0 {
+                for pair in newPairs {
+                    checkPathToFoundedCards(pair: pair)
+                }
+            }
+            positionsTab.remove(at: index)
+            updateGameArrayCell(card: card)
+            cardArray.append(card)
+            actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
+        }
+        updateColorArray()
+        updateCountColors()
         while actFillingsProcent < 0.8 && cardStack.count(type: .MySKCardType) > 0 && positionsTab.count > 0 && checkTippArray() < 20 /*tippArray.count < 10*/ {
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
             let gameArrayPos = positionsTab[index]
@@ -494,6 +500,24 @@ class CardManager {
         }
         _ = createTipps()
         return cardArray
+    }
+    
+    private func checkTippArrayPlausibility() {
+        for (index, tipp) in tippArray.enumerated().reversed() {
+            let pos1 = ColumnRow(column: tipp.card1.column, row: tipp.card1.row)
+            let pos2 = ColumnRow(column: tipp.card2.column, row: tipp.card2.row)
+            switch tipp.card2.type {
+            case .cardType:
+                if !(gameArray[pos1.column][pos1.row].used && gameArray[pos2.column][pos2.row].used) {
+                    tippArray.remove(at: index)
+                }
+            case .containerType:
+                if !gameArray[pos1.column][pos1.row].used {
+                    tippArray.remove(at:index)
+                }
+            default: break
+            }
+        }
     }
     
     private func checkTippArray()->Int {
@@ -1358,11 +1382,13 @@ class CardManager {
                 }
             }
             allCards.append(card)
-            if !freeConnectableCards.contains(card.maxValue) {
-                freeConnectableCards.append(card.maxValue)
-            }
-            if !freeConnectableCards.contains(card.minValue) {
-                freeConnectableCards.append(card.minValue)
+            if !(card.maxValue + 1 == card.minValue - 1) {
+                if !freeConnectableCards.contains(card.maxValue) {
+                    freeConnectableCards.append(card.maxValue)
+                }
+                if !freeConnectableCards.contains(card.minValue) {
+                    freeConnectableCards.append(card.minValue)
+                }
             }
             if container != nil {
                 
@@ -1749,10 +1775,10 @@ class CardManager {
                     {
                         countChanges += doAction(masterCard: cardWithTransition, otherCard: otherCard)
                     } else {
-//                        if cardWithTransition.belongsToPackageMax.countOnes() < otherCard.belongsToPackageMax.countOnes() &&
-//                            cardWithTransition.belongsToPackageMin.countOnes() < otherCard.belongsToPackageMin.countOnes() {
-//                            countChanges += doAction(masterCard: cardWithTransition, otherCard: otherCard)
-//                        }
+                        if cardWithTransition.belongsToPackageMax.countOnes() < otherCard.belongsToPackageMax.countOnes() &&
+                            cardWithTransition.belongsToPackageMin.countOnes() < otherCard.belongsToPackageMin.countOnes() {
+                            countChanges += doAction(masterCard: cardWithTransition, otherCard: otherCard)
+                        }
                     }
                 }
             }

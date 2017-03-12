@@ -487,15 +487,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var cardManager: CardManager?
     
     override func didMove(to view: SKView) {
-//        //printFunc(function: "didMove", start: true)
-        // generate Played Games when GamesModel empty
-//        #if REALM_V1
-//            
-//        #else
-//            if realm.objects(GameModel.self).count == 0 {
-//                generateGamesForTest(countRecordsProLevel: 10)
-//            }
-//        #endif
         
         if !settingsSceneStarted {
 //            let modelURL = NSBundle.mainBundle().URLForResource("FlowerCards", withExtension: "momd")!
@@ -540,7 +531,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func prepareNextGame(newGame: Bool) {
         labelFontSize = GV.onIpad ? self.size.height / 50 : self.size.height / 70
-
         durationMultiplier = durationMultiplierForPlayer
         waitForStartConst = waitForStartForPlayer
         let playedGamesOnLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and countPackages = %d and played = true",
@@ -599,8 +589,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         stopTimer(&countUp)
         
-        gameArray.removeAll(keepingCapacity: false)
-        containers.removeAll(keepingCapacity: false)
+        tippArray.removeAll()
+        gameArray.removeAll()
+        containers.removeAll()
         //undoCount = 3
         
         // fill gameArray
@@ -1015,41 +1006,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
 
     func generateCards(_ generatingType: CardGeneratingType) {
-//        //printFunc(function: "generateCards", start: true)
         var waitForStart: TimeInterval = 0.0
-//        var generateSpecial = generatingType ==  .special
-//        var positionsTab = [(Int, Int)]()
-//        var runFlag = true
-////        countMovingCards = 0
-//        // search all available Positions in gameArray
-//        for column in 0..<countColumns {
-//            for row in 0..<countRows {
-//                if !gameArray[column][row].used {
-//                    let appendValue = (column, row)
-//                    positionsTab.append(appendValue)
-//                }
-//            }
-//       }
-//        
-//        while runFlag && cardStack.count(.MySKCardType) > 0 && (checkGameArray() < maxUsedCells || (generateSpecial && positionsTab.count > 0)) {
-//            var card: MySKCard = cardStack.pull()!
-//            
-//            if generateSpecial {
-//                var counter = cardStack.count(.MySKCardType)
-//                while true {
-//                    if findPairForCard(card.colorIndex, minValue: card.minValue, maxValue: card.maxValue) {
-//                        break
-//                    }
-//                    cardStack.pushLast(card)
-//                    card = cardStack.pull()!
-//                    counter -= 1
-//                    if counter == 0 {
-//                        runFlag = false
-//                        break
-//                    }
-//                }
-//                generateSpecial = false
-//            }
         let cardArray = cardManager!.findNewCardsForGameArray()
         showCardCount()
         showTippCount()
@@ -1725,7 +1682,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         case .Won, .Lost:
             let actGames = realm.objects(GameModel.self).filter("levelID = %d and gameNumber = %d and countPackages = %d",
                 levelIndex, actGame!.gameNumber, actGame!.countPackages)
-            
             let bestGameScore: Int = actGames.max(ofProperty: "playerScore")!
             let bestScorePlayerID = actGames.filter("playerScore = %d", bestGameScore).first!.playerID
             let bestScorePlayerName = realm.objects(PlayerModel.self).filter("ID = %d",bestScorePlayerID).first!.name
@@ -2986,44 +2942,4 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
     }
     
-    func generateGamesForTest(countRecordsProLevel: Int) {
-        let playerID = GV.player!.ID
-        realm.beginWrite()
-        realm.delete(realm.objects(StatisticModel.self)) // delete the one generated statisticrecord
-        
-        for level in 0..<GV.levelsForPlay.count() { // create min 5 and max 35 games
-            for _ in 0..<(5 + Int(arc4random_uniform(30))) {
-                let game = GameModel()
-                game.gameNumber = Int(arc4random_uniform(999)) // get random gamenumber 0...999
-                game.levelID = level
-                game.ID = GV.createNewRecordID(.gameModel)
-                game.played = true
-                game.playerID = playerID
-                game.playerScore = 2000 + Int(arc4random_uniform(3000)) // get random score 2000...5000
-                game.time = 300 + Int(arc4random_uniform(1200)) // get random time 300...1500 sec (5...25 min)
-                realm.add(game)
-            }
-            let statistic = StatisticModel()
-            statistic.ID = GV.createNewRecordID(.statisticModel)
-            statistic.bestTime = 1000000
-            statistic.playerID = playerID
-            let games = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true", playerID, level)
-            statistic.countPlays = games.count
-            for game in games {
-                statistic.actScore += game.playerScore
-                statistic.actTime += game.time
-                statistic.levelID = level
-                if game.playerScore > statistic.bestScore {
-                    statistic.bestScore = game.playerScore
-                }
-                if game.time < statistic.bestTime {
-                    statistic.bestTime = game.time
-                }
-            }
-            realm.add(statistic)
-        }
-        try! realm.commitWrite()
-    }
-
-
 }

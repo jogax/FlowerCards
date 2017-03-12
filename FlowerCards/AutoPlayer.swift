@@ -10,10 +10,12 @@ import Foundation
 import SpriteKit
 
 class AutoPlayer {
+    // game to Play saves Games, Levels and CountPackages as the are displayed
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 1, countPackages: 4, gameNumber: 1, stopAt: 60),
-        GameToPlay(level: 2, countPackages: 3, gameNumber: 1, stopAt: 88),
-        GameToPlay(level: 3, countPackages: 2, gameNumber: 5, stopAt: 49),
+        GameToPlay(level: 23, countPackages: 3, gameNumber: 6415, stopAt: 95),
+//        GameToPlay(level: 1, countPackages: 4, gameNumber: 1, stopAt: 60),
+//        GameToPlay(level: 2, countPackages: 3, gameNumber: 1, stopAt: 88),
+//        GameToPlay(level: 3, countPackages: 2, gameNumber: 5, stopAt: 49),
     ]
     enum runStatus: Int {
         case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep
@@ -97,11 +99,10 @@ class AutoPlayer {
         switch testType {
         case .newTest:
             gamesToPlay.removeAll()
-//            let startLevelIndex = GV.player!.levelID + 1
-//            var startCountPackages = GV.player!.countPackages
+            let packageCountArray = [2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
             for _ in 0..<1000 {
-                let levelIndex = Int(arc4random()) % GV.levelsForPlay.count()
-                let countPackages = 1 + Int(arc4random()) % maxPackageCount
+                let levelIndex = 1 + Int(arc4random()) % GV.levelsForPlay.count()
+                let countPackages = packageCountArray[Int(arc4random()) % packageCountArray.count]
                 let gameNumber = 1 + Int(arc4random()) % MaxGameNumber
                 gamesToPlay.append(GameToPlay(level: levelIndex, countPackages: countPackages, gameNumber: gameNumber))
             }
@@ -173,7 +174,7 @@ class AutoPlayer {
                 GV.player!.levelID = gamesToPlay[gameIndex].level - 1
                 GV.player!.countPackages = gamesToPlay[gameIndex].countPackages
                 try! realm.commitWrite()
-                scene.gameNumber = gamesToPlay[gameIndex].gameNumber
+                scene.gameNumber = gamesToPlay[gameIndex].gameNumber - 1
                 scene.startNewGame(next: false)
                 scene.durationMultiplier = scene.durationMultiplierForAutoplayer
                 scene.waitForStartConst = scene.waitForStartForAutoplayer
