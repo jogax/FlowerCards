@@ -12,10 +12,7 @@ import SpriteKit
 class AutoPlayer {
     // game to Play saves Games, Levels and CountPackages as the are displayed
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 23, countPackages: 3, gameNumber: 6415, stopAt: 95),
-//        GameToPlay(level: 1, countPackages: 4, gameNumber: 1, stopAt: 60),
-//        GameToPlay(level: 2, countPackages: 3, gameNumber: 1, stopAt: 88),
-//        GameToPlay(level: 3, countPackages: 2, gameNumber: 5, stopAt: 49),
+        GameToPlay(level: 3, countPackages: 4, gameNumber: 640, stopAt: 130),
     ]
     enum runStatus: Int {
         case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep
@@ -86,7 +83,7 @@ class AutoPlayer {
             levelID += 1
         }
         let allGamesCount = realm.objects(GameModel.self).filter("playerID = %d", GV.player!.ID).count
-        let errorGamesCount = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID).count
+        let errorGamesCount = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID).count - 1
         if allGamesCount > 0 {
             print ("AllGames: \(allGamesCount), Errorgames: \(errorGamesCount), Procent errorgames: \((Double(errorGamesCount) * 100.0 / Double(allGamesCount)).twoDecimals)%")
         }
@@ -106,14 +103,6 @@ class AutoPlayer {
                 let gameNumber = 1 + Int(arc4random()) % MaxGameNumber
                 gamesToPlay.append(GameToPlay(level: levelIndex, countPackages: countPackages, gameNumber: gameNumber))
             }
-//            for levelIndex in startLevelIndex...GV.levelsForPlay.count() {
-//                for countPackages in startCountPackages...maxPackageCount {
-//                    for gameNumber in 1...100 {
-//                        gamesToPlay.append(GameToPlay(level: levelIndex, countPackages: countPackages, gameNumber: gameNumber))
-//                    }
-//                }
-//                startCountPackages = 1
-//            }
         case .runOnce:
             gamesToPlay.removeAll()
         case .fromTable:
@@ -122,7 +111,8 @@ class AutoPlayer {
             scene.prepareHelpButtonForStepByStep(callBack: makeStep)
         case .fromDB:
             gamesToPlay.removeAll()
-            let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID).sorted(byProperty: "levelID")
+            let searchString = "((countSteps < 190 and countPackages = 4) or (countSteps < 146 and countPackages = 3))"
+            let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and \(searchString)", GV.player!.ID).sorted(byProperty: "created", ascending: false)
             for game in errorGames {
                 let countSteps = game.countSteps
                 if countSteps > 0 {

@@ -118,12 +118,9 @@ struct Founded {
 }
 
 struct FoundedCardParameters {
-    enum MinOrMaxValue: Int {
-        case isMinValue = 0, isMaxValue
-    }
     var colorIndex: Int = NoColor
     var fromPosition: ColumnRow = ColumnRow()
-    var minOrMax: MinOrMaxValue = .isMinValue
+    var max: Bool = false
     var value: Int = NoValue
     var myPoints:[CGPoint] = []
     private var hashValue: Int {
@@ -140,7 +137,7 @@ struct FoundedCardParameters {
     var printValue: String {
         get {
             if let cardValue = MySKCard.cardLib[value] {
-                return "(\(fromPosition.column):\(fromPosition.row)) - \(minOrMax == .isMinValue ? "min" : "max") - \(cardValue))"
+                return "(\(fromPosition.column):\(fromPosition.row)) - \(max ? "max" : "min") - \(cardValue))"
             }
             return ""
         }
@@ -390,6 +387,7 @@ class CardManager {
                 }
             }
         }
+        var needColorArrayUpdate = false
         while actFillingsProcent < 0.35 && cardStack.count(type: .MySKCardType) > 0 && positionsTab.count > 0 {
             let colorIndexes = chooseColorIndexes()
             let card = cardStack.pull(color: colorIndexes[0])!
@@ -409,9 +407,12 @@ class CardManager {
             updateGameArrayCell(card: card)
             cardArray.append(card)
             actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
+            needColorArrayUpdate = true
         }
-        updateColorArray()
-        updateCountColors()
+        if needColorArrayUpdate {
+            updateColorArray()
+            updateCountColors()
+        }
         while actFillingsProcent < 0.8 && cardStack.count(type: .MySKCardType) > 0 && positionsTab.count > 0 && checkTippArray() < 20 /*tippArray.count < 10*/ {
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
             let gameArrayPos = positionsTab[index]
@@ -550,7 +551,8 @@ class CardManager {
             if foundedCardUsing.countInStack == 0 {
                 return
             }
-            if  freeCardsOfColor.contains(cardParameter.value) {
+            let searchCard = DataForColor.FreeConnectableCards(value: cardParameter.value, max: cardParameter.max)
+            if  freeCardsOfColor.contains(searchCard) {
                 var founded = false
                 for (index, specialCard) in foundedCards[color].specialCards.enumerated() {
                     if specialCard.value == cardParameter.value {
@@ -604,7 +606,7 @@ class CardManager {
                     cardParameter.colorIndex = foundedCard.colorIndex
                     if foundedCard.minValue == NoColor { //empty Container
                         cardParameter.value = LastCardValue
-                        cardParameter.minOrMax = .isMaxValue
+                        cardParameter.max = true
                         var usedContainerColors: [Int] = []
                         for container in containers {
                             if container.colorIndex != NoColor {
@@ -619,11 +621,11 @@ class CardManager {
                         }
                     } else if foundedCard.minValue > 0 {
                         cardParameter.value = foundedCard.minValue - 1
-                        cardParameter.minOrMax = .isMaxValue
+                        cardParameter.max = true
                         appendCardParameter(cardParameter: cardParameter)
                     } else if foundedCard.belongsToPackageMin & minPackage == 0 && countPackages > 1 {
                         cardParameter.value = LastCardValue
-                        cardParameter.minOrMax = .isMaxValue
+                        cardParameter.max = true
                         appendCardParameter(cardParameter: cardParameter)
                     }
                 } else {
@@ -632,24 +634,24 @@ class CardManager {
                     if foundedCard.type == .cardType {
                         if foundedCard.minValue != FirstCardValue {
                             cardParameter.value = foundedCard.minValue - 1
-                            cardParameter.minOrMax = .isMaxValue
+                            cardParameter.max = true
                             appendCardParameter(cardParameter: cardParameter)
                         }
                         if foundedCard.maxValue != LastCardValue {
                             cardParameter.value = foundedCard.maxValue + 1
-                            cardParameter.minOrMax = .isMinValue
+                            cardParameter.max = false
                             appendCardParameter(cardParameter: cardParameter)
                         }
                         
                         if foundedCard.maxValue == LastCardValue && countPackages > 1 {
                             cardParameter.value = FirstCardValue
-                            cardParameter.minOrMax = .isMinValue
+                            cardParameter.max = false
                             appendCardParameter(cardParameter: cardParameter)
                         }
                         
                         if foundedCard.minValue == FirstCardValue && countPackages > 1 {
                             cardParameter.value = LastCardValue
-                            cardParameter.minOrMax = .isMaxValue
+                            cardParameter.max = true
                             appendCardParameter(cardParameter: cardParameter)
                         }
                     }
@@ -1286,11 +1288,11 @@ class CardManager {
                 let minStr = (container.minValue != 9 ? " " : "") + MySKCard.cardLib[container.minValue]!
                 let maxStr = (container.maxValue != 9 ? " " : "") + MySKCard.cardLib[container.maxValue]!
                 if let colorName = String(CardManager.colorNames[container.colorIndex]) {
-                    string += "(" + colorName + ")"
+                    string += " (" + colorName + ")"
                 }
                 string += maxStr + "-\(container.countTransitions)-" + minStr
             } else {
-                string += "( )" + " --- "
+                string += " ( )" + " ---- "
                 
             }
         }
@@ -1306,11 +1308,11 @@ class CardManager {
                     let minStr = (card.minValue != 9 ? " " : "") + MySKCard.cardLib[card.minValue]!
                     let maxStr = (card.minValue != 9 ? " " : "") + MySKCard.cardLib[card.maxValue]!
                     if let colorName = String(CardManager.colorNames[card.colorIndex]) {
-                        string += "(" + colorName + ")"
+                        string += " (" + colorName + ")"
                     }
                     string += maxStr + "-\(card.countTransitions)-" + minStr
                 } else {
-                    string += "( )" + " --- "
+                    string += " ( )" + " ----- "
                 }
             }
             print(string)
@@ -1337,7 +1339,19 @@ class CardManager {
         var pairsToRemove: [Int] = []
         var countTransitions = 0
         var usedCards: [Int:UsedCard] = [:]
-        var freeConnectableCards: [Int] = []
+
+        struct FreeConnectableCards: Equatable {
+            var value: Int
+            var max: Bool
+            init(value: Int, max:Bool) {
+                self.value = value
+                self.max = max
+            }
+            static func == (left: FreeConnectableCards, right: FreeConnectableCards) -> Bool {
+                return left.value == right.value && left.max == right.max
+            }
+        }
+        var freeConnectableCards: [FreeConnectableCards] = []
         init(colorIndex: Int) {
             
             self.colorIndex = colorIndex
@@ -1346,7 +1360,7 @@ class CardManager {
             }
         }
         
-        func getFreeConnectableCards()->[Int] {
+        func getFreeConnectableCards()->[FreeConnectableCards] {
             return freeConnectableCards
         }
         
@@ -1383,11 +1397,13 @@ class CardManager {
             }
             allCards.append(card)
             if !(card.maxValue + 1 == card.minValue - 1) {
-                if !freeConnectableCards.contains(card.maxValue) {
-                    freeConnectableCards.append(card.maxValue)
+                let freeMax = FreeConnectableCards(value: card.maxValue, max: true)
+                let freeMin = FreeConnectableCards(value: card.minValue, max: false)
+                if !freeConnectableCards.contains(freeMax) {
+                    freeConnectableCards.append(freeMax)
                 }
-                if !freeConnectableCards.contains(card.minValue) {
-                    freeConnectableCards.append(card.minValue)
+                if !freeConnectableCards.contains(freeMin) {
+                    freeConnectableCards.append(freeMin)
                 }
             }
             if container != nil {
@@ -1737,8 +1753,10 @@ class CardManager {
                     otherCard.belongsToPackageMax &= ~createMask()
                     otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
                 case 0b1100:
-                    otherCard.belongsToPackageMax &= ~createMask(withMinPackage: false)
-                    otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
+                    if masterCard.belongsToPackageMax.countOnes() == 1 {
+                        otherCard.belongsToPackageMax &= ~createMask(withMinPackage: false)
+                        otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
+                    }
                 case 0b1101:
                     otherCard.belongsToPackageMax &= ~createMask(withMinPackage: false)
                     otherCard.belongsToPackageMin = otherCard.belongsToPackageMax >> UInt8(otherCard.countTransitions)
@@ -1769,14 +1787,11 @@ class CardManager {
             for otherCard in allCards {
                 if cardWithTransition != otherCard {
                      if cardWithTransition.belongsToPackageMax.countOnes() == 1 &&
-                        cardWithTransition.belongsToPackageMin.countOnes() == 1 &&
-                        otherCard.belongsToPackageMax.countOnes() > 1 &&
-                        otherCard.belongsToPackageMin.countOnes() > 1
+                        otherCard.belongsToPackageMax.countOnes() > 1
                     {
                         countChanges += doAction(masterCard: cardWithTransition, otherCard: otherCard)
                     } else {
-                        if cardWithTransition.belongsToPackageMax.countOnes() < otherCard.belongsToPackageMax.countOnes() &&
-                            cardWithTransition.belongsToPackageMin.countOnes() < otherCard.belongsToPackageMin.countOnes() {
+                        if cardWithTransition.belongsToPackageMax.countOnes() == 2  && otherCard.belongsToPackageMax.countOnes() > 2 {
                             countChanges += doAction(masterCard: cardWithTransition, otherCard: otherCard)
                         }
                     }
@@ -1913,7 +1928,8 @@ class CardManager {
                     self.container = container
                     countTransitions += container.countTransitions
                     addCardToUsedCards(card: container)
-                    freeConnectableCards.append(container.minValue)
+                    let freeMin = FreeConnectableCards(value: container.minValue, max: false)
+                    freeConnectableCards.append(freeMin)
                 }
             }
         }
@@ -1925,11 +1941,13 @@ class CardManager {
                     if card.used && card.card.colorIndex == colorIndex {
                         addCardToUsedCards(card: card.card)
                         allCards.append(card.card)
-                        if !freeConnectableCards.contains(card.card.maxValue) {
-                            freeConnectableCards.append(card.card.maxValue)
+                        let freeMax = FreeConnectableCards(value: card.card.maxValue, max: true)
+                        let freeMin = FreeConnectableCards(value: card.card.minValue, max: false)
+                        if !freeConnectableCards.contains(freeMax) {
+                            freeConnectableCards.append(freeMax)
                         }
-                        if !freeConnectableCards.contains(card.card.minValue) {
-                            freeConnectableCards.append(card.card.minValue)
+                        if !freeConnectableCards.contains(freeMin) {
+                            freeConnectableCards.append(freeMin)
                         }
                         if card.card.countTransitions > 0 {
                             countTransitions += card.card.countTransitions

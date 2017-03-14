@@ -226,7 +226,7 @@ class MySKCard: SKSpriteNode {
     var BGPictureAdded = false
     private var standardFontSize: CGFloat = 0
     private var fontSize10: CGFloat = 0
-    private static let colorNames: [Int:String] = [0: "Purple", 1:"Blue  ", 2: "Green ", 3: "Red   ", 1000: ""]
+    static let colorNames: [Int:String] = [0: "Purple", 1:"Blue  ", 2: "Green ", 3: "Red   ", 1000: ""]
     
     static let cardLib: [Int:String] = [
         0:"A", 1:"2", 2:"3", 3:"4", 4:"5", 5:"6", 6:"7", 7:"8", 8:"9", 9:"10", 10: GV.language.getText(.tcj), 11: GV.language.getText(.tcd), 12: GV.language.getText(.tck), NoColor: ""]

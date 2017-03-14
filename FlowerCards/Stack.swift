@@ -136,4 +136,27 @@ class Stack<T> {
             case .SavedCardType: savedCardStack.removeAll(keepingCapacity: false)
         }
     }
+    
+    private func countCardsInStack(color: Int, value: Int)->Int{
+        var counter = 0
+        for card in cardStack {
+            if card.colorIndex == color && card.minValue == value {
+                counter += 1
+            }
+        }
+        return counter
+    }
+    
+    func printValue() {
+        print("Color:| K | D | J | X | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | A |")
+        for color in 0...MaxColorValue {
+            if let colorName = MySKCard.colorNames[color] {
+                var countString = ("\(colorName)|")
+                for value in 0..<CountCardsInPackage {
+                    countString += " " + String(countCardsInStack(color: color, value: CountCardsInPackage - 1 - value)) + " |"
+                }
+                print(countString)
+            }
+        }
+    }
 }
