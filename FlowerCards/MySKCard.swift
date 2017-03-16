@@ -384,14 +384,19 @@ class MySKCard: SKSpriteNode {
     
     func containsValue(value: Int)->(Bool, Bool) {
         // return if value in upperPart (first Bool) and in lowerPart (second Bool)
-        if countTransitions == 0 {
+        switch countTransitions {
+        case 0:
             if value.between(min: minValue, max: maxValue) {
                 return (true, true)
             } else {
                 return (false, false)
             }
-        } else {
+        case 1:
             return (value.between(min: 0, max: maxValue), value.between(min: minValue, max: LastCardValue))
+        case 2...3:
+            return (true, true)
+        default:
+            return (false, false)
         }
     }
     
@@ -496,40 +501,29 @@ class MySKCard: SKSpriteNode {
     
     
     func connectWith(otherCard: MySKCard) {
-        #if TEST
-            let cardCountTxt = (MySKCard.cardCount > 100 ? "" : MySKCard.cardCount > 9 ? " " : "  ") + String(MySKCard.cardCount)
-            MySKCard.cardCount += 1
-            let text1 = "\(cardCountTxt) move \(MySKCard.colorNames[colorIndex]) \(createCardText(card: otherCard, from: true)) to \(createCardText(card: self, from: false))"
-        #endif
+        let cardCountTxt = (MySKCard.cardCount > 100 ? "" : MySKCard.cardCount > 9 ? " " : "  ") + String(MySKCard.cardCount)
+        MySKCard.cardCount += 1
+        var text = ""
+        if let colorName = MySKCard.colorNames[colorIndex] {
+            text = "\(cardCountTxt) move \(colorName) \(createCardText(card: otherCard, from: true)) to \(createCardText(card: self, from: false))"
+        }
         self.countTransitions += otherCard.countTransitions
         if self.minValue == otherCard.maxValue + 1  && self.belongsToPackageMin & otherCard.belongsToPackageMax != 0 {
             self.minValue = otherCard.minValue
-//            self.belongsToPackageMax = self.belongsToPackageMax & otherCard.belongsToPackageMax
-//            self.belongsToPackageMin = self.belongsToPackageMin & otherCard.belongsToPackageMin
-//            if self.type == .containerType {
-//                resetMaxPackageAtMyBrothers()
-//            }
         } else if self.maxValue == otherCard.minValue - 1 && self.belongsToPackageMax & otherCard.belongsToPackageMin != 0 {
             self.maxValue = otherCard.maxValue
-//            self.belongsToPackageMax = self.belongsToPackageMax & otherCard.belongsToPackageMax
-//            self.belongsToPackageMin = self.belongsToPackageMin & otherCard.belongsToPackageMin
         } else if self.minValue == FirstCardValue && otherCard.maxValue == LastCardValue {  // move K to A
             self.minValue = otherCard.minValue
             countTransitions += 1
-//            setMyBelongingFlags()
         } else if self.maxValue == LastCardValue && otherCard.minValue == FirstCardValue { // move A to K
             self.maxValue = otherCard.maxValue
             countTransitions += 1
-//            setMyBelongingFlags()
         } else if self.maxValue == NoColor {  // empty Container
             self.maxValue = otherCard.maxValue
             self.minValue = otherCard.minValue
-//            self.belongsToPackageMax = MySKCard.maxPackage
-//            self.belongsToPackageMin = self.belongsToPackageMax >> UInt8(self.countTransitions)
-//            resetMaxPackageAtMyBrothers()
         }
         #if TEST
-            print("\(text1): new \(createCardText(card: self, from: false))")
+            print("\(text): new \(createCardText(card: self, from: false))")
         #endif
         
     }

@@ -12,7 +12,8 @@ import SpriteKit
 class AutoPlayer {
     // game to Play saves Games, Levels and CountPackages as the are displayed
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 3, countPackages: 4, gameNumber: 640, stopAt: 130),
+        GameToPlay(level: 22, countPackages: 4, gameNumber: 1257, stopAt: 202), // 55
+//        GameToPlay(level: 3, countPackages: 4, gameNumber: 2351, stopAt: 90), // 96
     ]
     enum runStatus: Int {
         case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep
@@ -111,8 +112,8 @@ class AutoPlayer {
             scene.prepareHelpButtonForStepByStep(callBack: makeStep)
         case .fromDB:
             gamesToPlay.removeAll()
-            let searchString = "((countSteps < 190 and countPackages = 4) or (countSteps < 146 and countPackages = 3))"
-            let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and \(searchString)", GV.player!.ID).sorted(byProperty: "created", ascending: false)
+            let searchString = "" //"and ((countSteps < 190 and countPackages = 4) or (countSteps < 146 and countPackages = 3))"
+            let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false \(searchString)", GV.player!.ID).sorted(byProperty: "created", ascending: true)
             for game in errorGames {
                 let countSteps = game.countSteps
                 if countSteps > 0 {

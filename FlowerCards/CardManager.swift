@@ -221,19 +221,6 @@ func printGameArrayInhalt() {
 class CardManager {
     
 
-    struct UsedCard {
-        var countFree: Int
-        var countAll: Int
-        var countInStack: Int {
-            get {
-                return countPackages - countAll
-            }
-        }
-        init() {
-            countFree = 0
-            countAll = 0
-        }
-    }
     
     var setOfBinarys: [String] = []
     var tremblingCards: [MySKCard] = []
@@ -413,7 +400,7 @@ class CardManager {
             updateColorArray()
             updateCountColors()
         }
-        while actFillingsProcent < 0.8 && cardStack.count(type: .MySKCardType) > 0 && positionsTab.count > 0 && checkTippArray() < 20 /*tippArray.count < 10*/ {
+        while actFillingsProcent < 0.9 && cardStack.count(type: .MySKCardType) > 0 && positionsTab.count > 0 && checkTippArray() < 20 /*tippArray.count < 10*/ {
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
             let gameArrayPos = positionsTab[index]
             positionsTab.remove(at: index)
@@ -546,7 +533,7 @@ class CardManager {
         //==========================================
         func appendCardParameter(cardParameter: FoundedCardParameters) {
             let color = cardParameter.colorIndex
-            let foundedCardUsing = colorArray[color].usedCards[cardParameter.value]!
+            let foundedCardUsing = colorArray[color].usedCards[cardParameter.value]
             let freeCardsOfColor = colorArray[color].getFreeConnectableCards()
             if foundedCardUsing.countInStack == 0 {
                 return
@@ -1338,8 +1325,7 @@ class CardManager {
         var connectablePairs: [ConnectablePair] = []
         var pairsToRemove: [Int] = []
         var countTransitions = 0
-        var usedCards: [Int:UsedCard] = [:]
-
+        var usedCards: [UsedCard] = []
         struct FreeConnectableCards: Equatable {
             var value: Int
             var max: Bool
@@ -1351,13 +1337,32 @@ class CardManager {
                 return left.value == right.value && left.max == right.max
             }
         }
+        struct UsedCard {
+//            var freeCount: Int
+//            var allCount: Int
+            var freeMinMaxCount: Int
+            var freeMinCount: Int
+            var midCount: Int
+            var freeMaxCount: Int
+//            var minNeeded: Int
+//            var maxNeeded: Int
+            
+            var countInStack: Int {
+                get {
+                    return countPackages - freeMaxCount - freeMinCount - midCount - freeMinMaxCount
+                }
+            }
+            init() {
+                freeMinMaxCount = 0
+                freeMinCount = 0
+                midCount = 0
+                freeMaxCount = 0
+            }
+        }
+        
         var freeConnectableCards: [FreeConnectableCards] = []
         init(colorIndex: Int) {
-            
             self.colorIndex = colorIndex
-            for index in FirstCardValue...LastCardValue {
-                usedCards[index] = UsedCard()
-            }
         }
         
         func getFreeConnectableCards()->[FreeConnectableCards] {
@@ -1365,21 +1370,42 @@ class CardManager {
         }
         
         func addCardToUsedCards(card: MySKCard) {
-            var index = 0
-            while index < card.countCards {
-                let value = (card.minValue + index) % CountCardsInPackage
-                usedCards[value]!.countAll += 1
-                index += 1
-            }
-            usedCards[card.minValue]!.countFree += 1
-            if card.minValue != card.maxValue || card.countTransitions > 0 {
-                usedCards[card.maxValue]?.countFree += card.type == .containerType ? 0 : 1
+            if card.minValue == card.maxValue && card.countCards == 1 {
+                usedCards[card.minValue].freeMinMaxCount += 1
+            } else {
+                usedCards[card.minValue].freeMinCount += 1
+                if card.maxValue == LastCardValue && card.type == .containerType {
+                    usedCards[card.maxValue].midCount += 1
+                } else {
+                    usedCards[card.maxValue].freeMaxCount += 1
+                }
+                var index = 1
+                while index < card.countCards - 1 {
+                    let value = (card.minValue + index) % CountCardsInPackage
+                    usedCards[value].midCount += 1
+                    index += 1
+                }
             }
         }
         
         func addCardToTipps(card: MySKCard) {
             
         }
+        
+        func printCardArrays() {
+            print("==================== Container ====================")
+            if container == nil {
+                print ("empty")
+            } else {
+                print("\(container!.printValue)")
+            }
+            print("==================== CardArray ====================")
+            for (index, card) in allCards.enumerated() {
+                print("\(index): \(card.printValue)")
+            }
+        }
+        
+
         
         func addCardToColor(card: MySKCard)->[ConnectablePair] {
             var allCardsAndContainer:[MySKCard] = []
@@ -1424,7 +1450,12 @@ class CardManager {
         func printUsedCards() {
             for index in 0..<usedCards.count {
                 if let cardName = MySKCard.cardLib[index] {
-                    print("card \(cardName). all: \(usedCards[index]!.countAll), free: \(usedCards[index]!.countFree), inStack: \(usedCards[index]!.countInStack)")
+                    var printString = "card \(cardName). alone: \(usedCards[index].freeMinMaxCount), "
+                    printString += "freeMin: \(usedCards[index].freeMinCount), "
+                    printString += "freeMax: \(usedCards[index].freeMaxCount), "
+                    printString += "midCount: \(usedCards[index].midCount), "
+                    printString += "inStack: \(usedCards[index].countInStack)"
+                    print(printString)
                 }
             }
         }
@@ -1457,13 +1488,12 @@ class CardManager {
             pairsToRemove.removeAll()
             cardsWithTransitions.removeAll()
             freeConnectableCards.removeAll()
-            for index in FirstCardValue...LastCardValue {
-                usedCards[index] = UsedCard()
-            }
-            countTransitions = 0
+            usedCards = Array(repeating: UsedCard(), count: CountCardsInPackage)
+                countTransitions = 0
             findContainer()
             fillAllCards()
             checkCardsWithTransition()
+            findCardChains()
             
             var countChanges = 0
             if let container = container {
@@ -1517,6 +1547,22 @@ class CardManager {
 
         }
         
+        private func findCardChains() {
+            var valueIndex = 0
+            var cardChain: [MySKCard] = []
+            if container == nil {
+                valueIndex = LastCardValue
+            } else {
+                valueIndex = container!.minValue
+                cardChain.append(container!)
+            }
+            var go = usedCards[valueIndex].midCount == countPackages - 1
+            while go {
+                go = false
+            }
+            
+        }
+        
         private func findUpperBelongs(belongs: UInt8)->UInt8 {
             var oper = belongs
             var shiftedBy: UInt8 = 0
@@ -1539,9 +1585,6 @@ class CardManager {
             return lowerMask
         }
 
-        
-
-        
         private func checkCardsWithTransition() {
             func setBelonging(first: MySKCard, second: MySKCard)->Bool {
                 let (_, maxInLower) = first.containsValue(value: second.maxValue)
@@ -1559,6 +1602,12 @@ class CardManager {
                         second.belongsToPackageMin = second.belongsToPackageMax >> UInt8(second.countTransitions)
                         first.belongsToPackageMax = findLowerBelongs(belongs: first.belongsToPackageMax)
                         first.belongsToPackageMin = first.belongsToPackageMax >> UInt8(first.countTransitions)
+                        return true
+                    case (true, true): // second is above, first is below
+//                        second.belongsToPackageMax = findUpperBelongs(belongs: second.belongsToPackageMax)
+//                        second.belongsToPackageMin = second.belongsToPackageMax >> UInt8(second.countTransitions)
+//                        first.belongsToPackageMax = findLowerBelongs(belongs: first.belongsToPackageMax)
+//                        first.belongsToPackageMin = first.belongsToPackageMax >> UInt8(first.countTransitions)
                         return true
                     default:
                         return false
