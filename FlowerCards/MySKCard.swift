@@ -382,21 +382,21 @@ class MySKCard: SKSpriteNode {
         label.isUserInteractionEnabled = false
     }
     
-    func containsValue(value: Int)->(Bool, Bool) {
+    func containsValue(value: Int)->(Bool, Bool, Bool) {
         // return if value in upperPart (first Bool) and in lowerPart (second Bool)
         switch countTransitions {
         case 0:
             if value.between(min: minValue, max: maxValue) {
-                return (true, true)
+                return (true, false, true)
             } else {
-                return (false, false)
+                return (false, false, false)
             }
         case 1:
-            return (value.between(min: 0, max: maxValue), value.between(min: minValue, max: LastCardValue))
+            return (value.between(min: 0, max: maxValue), false, value.between(min: minValue, max: LastCardValue))
         case 2...3:
-            return (true, true)
+            return (value.between(min: 0, max: maxValue), true, value.between(min: minValue, max: LastCardValue))
         default:
-            return (false, false)
+            return (false, false, false)
         }
     }
     

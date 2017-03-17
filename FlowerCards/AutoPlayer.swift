@@ -12,7 +12,7 @@ import SpriteKit
 class AutoPlayer {
     // game to Play saves Games, Levels and CountPackages as the are displayed
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 22, countPackages: 4, gameNumber: 1257, stopAt: 202), // 55
+        GameToPlay(level: 24, countPackages: 4, gameNumber: 2298, stopAt: 124), // 55
 //        GameToPlay(level: 3, countPackages: 4, gameNumber: 2351, stopAt: 90), // 96
     ]
     enum runStatus: Int {
@@ -127,7 +127,7 @@ class AutoPlayer {
             scene.waitForStartConst = scene.waitForStartForAutoplayer
         }
         scene.isUserInteractionEnabled = false
-        timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+        timer = Timer.scheduledTimer(timeInterval: 0.001, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
     }
     
     func makeStep() {
@@ -135,7 +135,7 @@ class AutoPlayer {
         testType = .stepByStep
         autoPlayStatus = .getTipp
         stopTimer = false
-        timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+        timer = Timer.scheduledTimer(timeInterval: 0.001, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
     }
     
     func startNextGame() {

@@ -97,6 +97,15 @@ class Stack<T> {
         }
     }
     
+    func last() -> SavedCard? {
+        if savedCardStack.count > 0 {
+            let value = savedCardStack.last
+            return value!
+        } else {
+            return nil
+        }
+    }
+    
     func random(_ random: MyRandom?)->MySKCard? {
         lastRandomIndex = random!.getRandomInt(0, max: cardStack.count - 1)
         return cardStack[lastRandomIndex]

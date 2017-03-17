@@ -121,6 +121,8 @@ var countRows = 0
 var gameArray = [[GameArrayPositions]]()
 var containers = [MySKCard]()
 var cardStack:Stack<MySKCard> = Stack()
+var stack:Stack<SavedCard> = Stack()
+var lastColor = NoColor
 var countPackages = 1
 var random: MyRandom?
 var actGame: GameModel?
@@ -332,7 +334,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var myView = SKView()
     var levelIndex = GV.player!.levelID
     var maxLevelIndex = 0
-    var stack:Stack<SavedCard> = Stack()
     //var gameArray = [[Bool]]() // true if Cell used
     var colorTab = [ColorTabLine]()
     var countColorsProContainer = [Int]()
@@ -531,6 +532,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func prepareNextGame(newGame: Bool) {
         labelFontSize = GV.onIpad ? self.size.height / 50 : self.size.height / 70
+        lastColor = NoColor
         durationMultiplier = durationMultiplierForPlayer
         waitForStartConst = waitForStartForPlayer
         let playedGamesOnLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and countPackages = %d and played = true",
@@ -1319,6 +1321,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         if OK  {
             push(container, status: .unification)
             push(movingCard, status: .removed)
+            lastColor = movingCard.colorIndex
             container.connectWith(otherCard: movingCard)
 //            saveHistoryRecord(colorIndex: movingCard.colorIndex, points:  points,
 //                              fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
@@ -1339,7 +1342,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             collisionActive = false
             //movingCard.removeFromParent()
-            checkGameFinished()
+//            checkGameFinished()
         } else {
             updateCardCount(-1)
             movingCard.removeFromParent()
@@ -1363,6 +1366,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         if connectable {
             push(card, status: .unification)
             push(movingCard, status: .removed)
+            lastColor = movingCard.colorIndex
             
             card.connectWith(otherCard: movingCard)
 //            cardManager!.check(color: card.colorIndex)
@@ -1385,7 +1389,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             movingCard.removeFromParent()
             countMovingCards = 0
             updateCardCount(-1)
-            checkGameFinished()
+//            checkGameFinished()
             saveStatisticAndGame()
        } else {
 
@@ -1532,6 +1536,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         actGame!.time = timeCount
         actGame!.playerScore = levelScore
         actGame!.played = true
+        actGame!.created = Date()
         #if REALM_V2
             if cardCount > 0 {
                 actGame!.gameFinished = false
@@ -2406,6 +2411,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     })
                 }
                 let userInteractionEnablingAction = SKAction.run({
+                    self.checkGameFinished()
                     self.isUserInteractionEnabled = true
                 })
                 actionArray.append(collisionAction)
