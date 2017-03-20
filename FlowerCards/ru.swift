@@ -71,7 +71,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcGuest:            "Гость",
     .tcAnonym:           "Anonymus",
     .tcStatistic:        "Статистика",
-    .tcPlayerStatisticHeader: "Статистика игрока %",
+    .tcPlayerStatisticHeader: "Статистика игрока %%",
     .tcPlayerStatisticLevel: "Статистика игрока %, уровень: % (%), Колоды: %",
     .tcStatisticOfGame:  "Статистика %-й игры",
     .tcBestScoreOfGame:   "Лучший результат % %",

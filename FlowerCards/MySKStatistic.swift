@@ -32,25 +32,10 @@ class MySKStatistic: MySKTable {
         super.init(columnWidths: myColumnWidths, countRows:countLines, headLines: [""], parent: parent, myName: "MySKStatistic", width: parent.parent!.frame.width * 0.9)
         self.showVerticalLines = true
         
-//        let pSize = parent.parent!.scene!.size
-//        let myStartPosition = CGPointMake(-pSize.width, (pSize.height - size.height) / 2 - 10)
-//        let myZielPosition = CGPointMake(pSize.width / 2, pSize.height / 2) //(pSize.height - size.height) / 2 - 10)
-//        self.position = myStartPosition
-        
-//        self.zPosition = parent.zPosition + 200
-        
         
         showMe(showPlayerStatistic)
         
         
-//        self.alpha = 1.0
-//        //        self.userInteractionEnabled = true
-//        let actionMove = SKAction.moveTo(myTargetPosition, duration: 1.0)
-//        let alphaAction = SKAction.fadeOutWithDuration(1.0)
-//        parent.parent!.addChild(self)
-//        
-//        parent.runAction(alphaAction)
-//        self.runAction(actionMove)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -98,18 +83,6 @@ class MySKStatistic: MySKTable {
         }
         return name
     }
-    
-//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        let touchLocation = touches.first!.location(in: self)
-//        touchesBeganAtNode = atPoint(touchLocation)
-//        if !(touchesBeganAtNode is SKLabelNode || (touchesBeganAtNode is SKSpriteNode && touchesBeganAtNode!.name != self.name)) {
-//            touchesBeganAtNode = nil
-//        }
-//    }
-    
-//    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        _ = touches.first!.location(in: self)
-//    }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let (_, row, column, _) = checkTouches(touches, withEvent: event)

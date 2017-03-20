@@ -71,7 +71,7 @@ let huDictionary: [TextConstants: String] = [
     .tcGuest:            "Vendég",
     .tcAnonym:           "Anonymus",
     .tcStatistic:        "Statisztikák",
-    .tcPlayerStatisticHeader: "% statisztikái",
+    .tcPlayerStatisticHeader: "% statisztikái %",
     .tcPlayerStatisticLevel: "% statisztikái, szint: % (%), csomagok: %",
     .tcStatisticOfGame:  "%. játék statistikája",
     .tcBestScoreOfGame:   "Legjobb pontszám % %",

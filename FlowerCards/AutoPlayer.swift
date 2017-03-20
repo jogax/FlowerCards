@@ -10,10 +10,12 @@ import Foundation
 import SpriteKit
 
 class AutoPlayer {
-    // game to Play saves Games, Levels and CountPackages as the are displayed
+    // game to Play saves Games, Levels and CountPackages as they are displayed
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 24, countPackages: 4, gameNumber: 2298, stopAt: 124), // 55
-//        GameToPlay(level: 3, countPackages: 4, gameNumber: 2351, stopAt: 90), // 96
+        GameToPlay(level: 14, countPackages: 4, gameNumber: 8443, stopAt: 184),
+//        GameToPlay(level: 5, countPackages: 4, gameNumber: 9563, stopAt: 1141),
+//        GameToPlay(level: 17, countPackages: 4, gameNumber: 4279, stopAt: 2188), // 55
+//        GameToPlay(level: 16, countPackages: 3, gameNumber: 2162, stopAt: 1000)
     ]
     enum runStatus: Int {
         case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep
@@ -97,12 +99,20 @@ class AutoPlayer {
         switch testType {
         case .newTest:
             gamesToPlay.removeAll()
-            let packageCountArray = [2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
-            for _ in 0..<1000 {
-                let levelIndex = 1 + Int(arc4random()) % GV.levelsForPlay.count()
-                let countPackages = packageCountArray[Int(arc4random()) % packageCountArray.count]
-                let gameNumber = 1 + Int(arc4random()) % MaxGameNumber
-                gamesToPlay.append(GameToPlay(level: levelIndex, countPackages: countPackages, gameNumber: gameNumber))
+//            let packageCountArray = [1,1,1,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
+//            for _ in 0..<1000 {
+//                let levelIndex = 1 + Int(arc4random()) % GV.levelsForPlay.count()
+//                let countPackages = packageCountArray[Int(arc4random()) % packageCountArray.count]
+//                let gameNumber = 1 + Int(arc4random()) % MaxGameNumber
+//                gamesToPlay.append(GameToPlay(level: levelIndex, countPackages: countPackages, gameNumber: gameNumber))
+//            }
+            for countPackages in 1...4 {
+                for levelIndex in 1...26 {
+                    for _ in 1...5 {
+                        let gameNumber = 1 + Int(arc4random()) % MaxGameNumber
+                        gamesToPlay.append(GameToPlay(level: levelIndex, countPackages: countPackages, gameNumber: gameNumber))
+                    }
+                }
             }
         case .runOnce:
             gamesToPlay.removeAll()

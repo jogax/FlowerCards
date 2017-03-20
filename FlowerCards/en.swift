@@ -71,7 +71,7 @@ let enDictionary: [TextConstants: String] = [
     .tcGuest:            "Guest",
     .tcAnonym:           "Anonymus",
     .tcStatistic:        "Statistics",
-    .tcPlayerStatisticHeader: "Statistics for %",
+    .tcPlayerStatisticHeader: "Statistics for %%",
     .tcPlayerStatisticLevel: "Statistics for %, level: % (%), packages: %",
     .tcStatisticOfGame:  "Statistic of game Nr. %",
     .tcBestScoreOfGame:   "Best score %  %",

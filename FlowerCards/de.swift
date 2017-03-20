@@ -71,7 +71,7 @@ let deDictionary: [TextConstants: String] = [
     .tcGuest:            "Gast",
     .tcAnonym:           "Anonymus",
     .tcStatistic:        "Statistiken",
-    .tcPlayerStatisticHeader: "Statistiken für %",
+    .tcPlayerStatisticHeader: "Statistiken für %%",
     .tcPlayerStatisticLevel: "Statistiken für %, Ebene % (%), Pakete: %",
     .tcStatisticOfGame:  "Statistik des Spiels %:",
     .tcBestScoreOfGame:   "Beste Ergebnis % %",
