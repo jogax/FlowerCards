@@ -504,9 +504,11 @@ class MySKCard: SKSpriteNode {
         let cardCountTxt = (MySKCard.cardCount > 100 ? "" : MySKCard.cardCount > 9 ? " " : "  ") + String(MySKCard.cardCount)
         MySKCard.cardCount += 1
         var text = ""
+        #if TEST
         if let colorName = MySKCard.colorNames[colorIndex] {
             text = "\(cardCountTxt) move \(colorName) \(createCardText(card: otherCard, from: true)) to \(createCardText(card: self, from: false))"
         }
+        #endif
         self.countTransitions += otherCard.countTransitions
         if self.minValue == otherCard.maxValue + 1  && self.belongsToPackageMin & otherCard.belongsToPackageMax != 0 {
             self.minValue = otherCard.minValue
