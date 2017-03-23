@@ -2721,7 +2721,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
 
-    func comeBackFromSettings(_ restart: Bool, gameNumberChoosed: Bool, gameNumber: Int, levelIndex: Int) {
+    func comeBackFromSettings(_ restart: Bool, gameNumberChoosed: Bool, gameNumber: Int, levelIndex: Int, countPackages: Int) {
         inSettings = false
         
         if restart {
@@ -2729,6 +2729,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 self.gameNumber = gameNumber
                 try! realm.write({ 
                     GV.player!.levelID = levelIndex
+                    GV.player!.countPackages = countPackages
                 })
                 prepareNextGame(newGame: false) // start with choosed gamenumber
             } else {

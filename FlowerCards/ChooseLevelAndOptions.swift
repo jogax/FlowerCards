@@ -66,8 +66,8 @@ class ChooseLevelAndOptions: MySKTable {
             let countStr2Pkg = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = 2", GV.player!.ID, levelID).count)
             let countStr3Pkg = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = 3", GV.player!.ID, levelID).count)
             let countStr4Pkg = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = 4", GV.player!.ID, levelID).count)
-           var actPackageCount = 1
-                actPackageCount = GV.levelsForPlay.levelParam[levelID].countPackages
+//           var actPackageCount = 1
+//                actPackageCount = GV.levelsForPlay.levelParam[levelID].countPackages
             let levelString = (levelID < 10 ? "0" : "") + String(levelID + 1) + "(" + GV.levelsForPlay.getLevelFormat(level: levelID) + "): " + countStr
             let elements: [MultiVar] = [MultiVar(string: levelString),
 //                                        MultiVar(string: GV.levelsForPlay.getLevelFormat(level: levelID)),

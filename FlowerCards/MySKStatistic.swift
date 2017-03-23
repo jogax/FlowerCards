@@ -12,7 +12,7 @@ import RealmSwift
 
 class MySKStatistic: MySKTable {
     
-    var callBack: (Bool, Int, Int)->()
+    var callBack: (Bool, Int, Int, Int)->()
     var nameTable = [PlayerModel]()
     let myColumnWidths: [CGFloat] = [15, 13, 20, 30, 12, 10]  // in %
 //    let myName = "MySKPlayerStatistic"
@@ -20,7 +20,7 @@ class MySKStatistic: MySKTable {
     
     
     
-    init(parent: SKSpriteNode, callBack: @escaping (Bool, Int, Int)->()) {
+    init(parent: SKSpriteNode, callBack: @escaping (Bool, Int, Int, Int)->()) {
         nameTable = Array(realm.objects(PlayerModel.self).sorted(byProperty: "created", ascending: true))
         var countLines = nameTable.count
         if countLines == 1 {
@@ -91,7 +91,7 @@ class MySKStatistic: MySKTable {
             let fadeInAction = SKAction.fadeIn(withDuration: 0.5)
             myParent.run(fadeInAction)
             removeFromParent()
-            callBack(false, 0, 0)
+            callBack(false, 0, 0, 0)
         case (2..<10000, myColumnWidths.count - 1):
             addDetailedPlayerStatistic(row - 2)
         default:
@@ -106,8 +106,8 @@ class MySKStatistic: MySKTable {
         
     }
     
-    func backFromMySKDetailedStatistic(_ startGame: Bool, gameNumber: Int, levelIndex: Int) {
-        callBack(startGame, gameNumber, levelIndex)
+    func backFromMySKDetailedStatistic(_ startGame: Bool, gameNumber: Int, levelIndex: Int, countPackages: Int) {
+        callBack(startGame, gameNumber, levelIndex, countPackages)
     }
 //    override func setMyDeviceSpecialConstants() {
 //        fontSize = GV.onIpad ? 20 : 15

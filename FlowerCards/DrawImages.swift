@@ -1067,23 +1067,6 @@ class DrawImages {
     }
 
     
-    static func getPackage2Image(size: CGSize)->UIImage {
-        var bottomImage = getCardPackage(size: size)
-//        var topImage = UIImage(named: "top.png")
-//        
-//        var size = CGSize(width: 300, height: 300)
-//        UIGraphicsBeginImageContext(size)
-//        
-//        let areaSize = CGRect(x: 0, y: 0, width: size.width, height: size.height)
-//        bottomImage!.drawInRect(areaSize)
-//        
-//        topImage!.drawInRect(areaSize, blendMode: kCGBlendModeNormal, alpha: 0.8)
-//        
-//        var newImage:UIImage = UIGraphicsGetImageFromCurrentImageContext()!
-//        UIGraphicsEndImageContext()
-        return bottomImage
-    }
-    
     static func pointOfCircle(_ radius: CGFloat, center: CGPoint, angle: CGFloat) -> CGPoint {
         let pointOfCircle = CGPoint (x: center.x + radius * cos(angle), y: center.y + radius * sin(angle))
         return pointOfCircle

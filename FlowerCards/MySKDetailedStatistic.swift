@@ -11,19 +11,20 @@ import RealmSwift
 
 class MySKDetailedStatistic: MySKTable {
     
-    var callBack: (Bool, Int, Int)->()
+    var callBack: (Bool, Int, Int, Int)->()
     let myDetailedColumnWidths: [CGFloat] = [18, 14, 17, 17, 17, 17] // in %
 //    let myName = "MySKStatistic"
     let countLines = GV.levelsForPlay.count()
     let playerID: Int
     let parentNode: SKSpriteNode
+    var countPackages = 1
 //    var lastLocation = CGPoint.zero
 
     
     
     
     
-    init(playerID: Int, parent: SKSpriteNode, callBack: @escaping (Bool, Int, Int)->()) {
+    init(playerID: Int, parent: SKSpriteNode, callBack: @escaping (Bool, Int, Int, Int)->()) {
         self.playerID = playerID
         let playerName = realm.objects(PlayerModel.self).filter("ID = %d", playerID).first!.name
         self.parentNode = parent
@@ -123,8 +124,9 @@ class MySKDetailedStatistic: MySKTable {
             let fadeInAction = SKAction.fadeIn(withDuration: 0.5)
             myParent.run(fadeInAction)
             removeFromParent()
-            callBack(false, 0, 0)
+            callBack(false, 0, 0, 0)
         case (2..<10000, 2...5):
+            countPackages = column - 1
             showDetailedPlayerStatistic(levelID: row - 2, countPackages: column - 1)
         default:
             break
@@ -139,7 +141,7 @@ class MySKDetailedStatistic: MySKTable {
  
     func callBackFromGameStatistic(_ startGame: Bool = false, gameNumber: Int = 0, levelIndex: Int = 0) {
         if startGame {
-            callBack(startGame, gameNumber, levelIndex)
+            callBack(startGame, gameNumber, levelIndex, countPackages)
         }
     }
 

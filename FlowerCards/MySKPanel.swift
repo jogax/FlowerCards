@@ -33,7 +33,7 @@ class MySKPanel: SKSpriteNode {
     let setReturnFunc = "setReturn"
     var sizeMultiplier = CGSize(width: 0, height: 0)
     var fontSize:CGFloat = 0
-    var callBack: (Bool, Bool, Int, Int)->()
+    var callBack: (Bool, Bool, Int, Int, Int)->()
     var parentScene: SKScene?
     
     let playerLabel = SKLabelNode()
@@ -50,7 +50,7 @@ class MySKPanel: SKSpriteNode {
     var playerChanged = false
     var touchesBeganWithNode: SKNode?
     var shadow: SKSpriteNode?
-    init(view: UIView, frame: CGRect, type: PanelTypes, parent: SKScene, callBack: @escaping (Bool, Bool, Int, Int)->()) {
+    init(view: UIView, frame: CGRect, type: PanelTypes, parent: SKScene, callBack: @escaping (Bool, Bool, Int, Int, Int)->()) {
         let size = parent.size * 0.75 // / 2 //CGSizeMake(parent.size.width / 2, parent.s)
 //        let texture: SKTexture = SKTexture(imageNamed: "panel")
         let texture: SKTexture = SKTexture()
@@ -191,12 +191,12 @@ class MySKPanel: SKSpriteNode {
         let _ = MySKStatistic(parent: self, callBack: callIfMySKStatisticEnds)
     }
     
-    func goBack(_ restartGame: Bool, gameNumberChoosed: Bool = false, gameNumber: Int = 0, levelIndex: Int = 0) {
+    func goBack(_ restartGame: Bool, gameNumberChoosed: Bool = false, gameNumber: Int = 0, levelIndex: Int = 0, countPackages: Int = 0) {
         GV.language.removeCallback(callbackName)
         shadow?.removeFromParent()
         self.removeFromParent()
         parentScene!.isUserInteractionEnabled = true
-        callBack(restartGame, gameNumberChoosed, gameNumber, levelIndex)
+        callBack(restartGame, gameNumberChoosed, gameNumber, levelIndex, countPackages)
     }
     
     func callIfMySKSliderEnds() {
@@ -225,9 +225,9 @@ class MySKPanel: SKSpriteNode {
         returnLabel.text = GV.language.getText(.tcReturn)
     }
     
-    func callIfMySKStatisticEnds(_ startGame: Bool, gameNumber: Int, levelIndex: Int) {
+    func callIfMySKStatisticEnds(_ startGame: Bool, gameNumber: Int, levelIndex: Int, countPackages: Int) {
         if startGame {
-            goBack(true, gameNumberChoosed: true, gameNumber: gameNumber, levelIndex: levelIndex)
+            goBack(true, gameNumberChoosed: true, gameNumber: gameNumber, levelIndex: levelIndex, countPackages: countPackages)
         }
         self.isUserInteractionEnabled = true
         let name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name

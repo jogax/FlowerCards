@@ -12,9 +12,8 @@ import SpriteKit
 class AutoPlayer {
     // game to Play saves Games, Levels and CountPackages as they are displayed
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 14, countPackages: 4, gameNumber: 8443, stopAt: 184),
-//        GameToPlay(level: 5, countPackages: 4, gameNumber: 9563, stopAt: 1141),
-//        GameToPlay(level: 17, countPackages: 4, gameNumber: 4279, stopAt: 2188), // 55
+        GameToPlay(level: 17, countPackages: 4, gameNumber: 4279, stopAt: 120),
+//        GameToPlay(level: 17, countPackages: 4, gameNumber: 4279, stopAt: 90),
 //        GameToPlay(level: 16, countPackages: 3, gameNumber: 2162, stopAt: 1000)
     ]
     enum runStatus: Int {
@@ -89,6 +88,17 @@ class AutoPlayer {
         let errorGamesCount = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID).count - 1
         if allGamesCount > 0 {
             print ("AllGames: \(allGamesCount), Errorgames: \(errorGamesCount), Procent errorgames: \((Double(errorGamesCount) * 100.0 / Double(allGamesCount)).twoDecimals)%")
+            for countPkgs in 1...4 {
+                let gameCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d", GV.player!.ID, countPkgs).count
+                let errorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d and gameFinished = false", GV.player!.ID, countPkgs).count
+                if gameCount > 0 {
+                    print ("Pack \(countPkgs): \(gameCount), Errorgames: \(errorCount), Procent errorgames: \((Double(errorCount) * 100.0 / Double(gameCount)).twoDecimals)%")
+                } else {
+                    print ("Pack \(countPkgs): \(gameCount), Errorgames: \(errorCount), Procent errorgames: 0%")
+                }
+            }
+        } else {
+            print ("AllGames: \(allGamesCount), Errorgames: \(errorGamesCount), Procent errorgames: 0%")
         }
     }
     #endif
@@ -106,14 +116,35 @@ class AutoPlayer {
 //                let gameNumber = 1 + Int(arc4random()) % MaxGameNumber
 //                gamesToPlay.append(GameToPlay(level: levelIndex, countPackages: countPackages, gameNumber: gameNumber))
 //            }
-            for countPackages in 1...4 {
-                for levelIndex in 1...26 {
-                    for _ in 1...5 {
-                        let gameNumber = 1 + Int(arc4random()) % MaxGameNumber
-                        gamesToPlay.append(GameToPlay(level: levelIndex, countPackages: countPackages, gameNumber: gameNumber))
+            var gameCounts: [[Int]] = Array(repeating: Array(repeating: 0, count: 26), count: 4)
+            var maxCount = 0
+            var countMaxValues = 0
+            for countPkgs in 0...3 {
+                for levelId in 0...25 {
+                    let count = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d and levelID = %d", GV.player!.ID, countPkgs + 1, levelId).count
+                    gameCounts[countPkgs][levelId] = count
+                    if maxCount < count {
+                        maxCount = count
+                        countMaxValues = 0
+                    } else if maxCount == count {
+                        countMaxValues += 1
                     }
                 }
             }
+            var calculateCount = true
+            if countMaxValues == 4 * 26 {
+                calculateCount = false
+            }
+            for countPkgs in 0...3 {
+                for levelId in 0...25 {
+                    let count = calculateCount ? maxCount - gameCounts[countPkgs][levelId] : 1
+                    for _ in 0..<count {
+                        let gameToPlay = GameToPlay(level: levelId + 1, countPackages: countPkgs + 1, gameNumber: 1 + Int(arc4random()) % MaxGameNumber)
+                        gamesToPlay.append(gameToPlay)
+                    }
+                }
+            }
+
         case .runOnce:
             gamesToPlay.removeAll()
         case .fromTable:
@@ -223,9 +254,9 @@ class AutoPlayer {
                             }
                             
                         case .expert:
-                            let colorIndex = Int(arc4random()%2)
-                            let color1 = playerColors[actPlayer][colorIndex]
-                            let color2 = playerColors[actPlayer][(colorIndex + 1)%2]
+//                            let colorIndex = Int(arc4random()%2)
+//                            let color1 = playerColors[actPlayer][colorIndex]
+//                            let color2 = playerColors[actPlayer][(colorIndex + 1)%2]
                             
                             for tipp in tippArray {
                                 if tipp.card2.type != .containerType  { // first check only Cards
