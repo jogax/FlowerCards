@@ -164,6 +164,7 @@ let maxPackageCount = 4
 
 var stopCreateTippsInBackground = false
 var tippArray = [Tipp]()
+var tippArrayCreatedInSeconds = 0.0
 var showHelpLines: ShowHelpLine = .green
 var cardSize:CGSize = CGSize(width: 0, height: 0)
 
@@ -301,7 +302,7 @@ class CardManager {
     }
     
     func printTippArray() {
-        print("======== tippArray.count: \(tippArray.count) ========")
+        print("======== \(tippArray.count) tipps created in: \(tippArrayCreatedInSeconds) seconds  ========")
         for tipp in tippArray {
             print(tipp.printValue())
             print("----------------------")
@@ -359,6 +360,7 @@ class CardManager {
         }
         
 //        checkTippArrayPlausibility()
+        let generatingCardArrayStarted = Date()
         _ = createTipps()
         updateCountColors()
         
@@ -366,7 +368,7 @@ class CardManager {
         var specialCards: [FoundedCardParameters] = []
         let gameArraySize = countColumns * countRows
         var actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
-        if actFillingsProcent > 0.30 && checkTippArray() > 3 {
+        if actFillingsProcent > 0.25 && checkCardTippCountInTippArray() > 2 {
             return cardArray
         }
         var positionsTab = [ColumnRow]()
@@ -380,7 +382,7 @@ class CardManager {
         }
         lastColor = NoColor
         var needColorArrayUpdate = false
-        while actFillingsProcent < 0.35 && cardStack.count(type: .MySKCardType) > 0 && positionsTab.count > 0 {
+        while actFillingsProcent < 0.40 && cardStack.count(type: .MySKCardType) > 0 && positionsTab.count > 0 {
             let colorIndexes = chooseColorIndexes()
             let card = cardStack.pull(color: colorIndexes[0])!
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
@@ -405,7 +407,7 @@ class CardManager {
             updateColorArray()
             updateCountColors()
         }
-        while actFillingsProcent < 0.9 && cardStack.count(type: .MySKCardType) > 0 && positionsTab.count > 0 && checkTippArray() < 20 /*tippArray.count < 10*/ {
+        while actFillingsProcent < 0.9 && cardStack.count(type: .MySKCardType) > 0 && positionsTab.count > 0 && checkCardTippCountInTippArray() < 20 /*tippArray.count < 10*/ {
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
             let gameArrayPos = positionsTab[index]
             positionsTab.remove(at: index)
@@ -461,7 +463,7 @@ class CardManager {
                 }
             }
         }
-        while actFillingsProcent < 0.90 && cardStack.count(type: .MySKCardType) > 0 && specialCards.count > 0 && checkTippArray() < 20 {
+        while actFillingsProcent < 0.90 && cardStack.count(type: .MySKCardType) > 0 && specialCards.count > 0 && checkCardTippCountInTippArray() < 20 {
             let cardIndex = random!.getRandomInt(0, max: specialCards.count - 1)
             let cardToSearch = specialCards[cardIndex]
             if !gameArray[cardToSearch.fromPosition.column][cardToSearch.fromPosition.row].used {
@@ -492,6 +494,8 @@ class CardManager {
             }
         }
         _ = createTipps()
+        let generatingCardArrayEnded = Date()
+        let cardArrayGeneratingTime = CFDateGetTimeIntervalSinceDate(generatingCardArrayStarted as CFDate!, generatingCardArrayEnded as CFDate!)
         return cardArray
     }
     
@@ -513,7 +517,7 @@ class CardManager {
         }
     }
     
-    private func checkTippArray()->Int {
+    private func checkCardTippCountInTippArray()->Int {
         var count = 0
         for tipp in tippArray {
             if tipp.card2.type == .cardType {
@@ -685,7 +689,7 @@ class CardManager {
 
 
     private func createTipps()->Bool {
-        
+        let createTippsStartedAt = Date()
         updateColorArray()
         tippArray.removeAll()
         let pairsToCheck = getPairsToCheck()
@@ -702,7 +706,8 @@ class CardManager {
             return false
         }
         tippArray.sort(by: {checkForSort(t0: $0, t1: $1) })
-            
+        let createTippsEndedAt = Date()
+        tippArrayCreatedInSeconds = CFDateGetTimeIntervalSinceDate(createTippsEndedAt as CFDate!, createTippsStartedAt as CFDate!)
         return true
     }
     
@@ -1565,13 +1570,27 @@ class CardManager {
             var actMinPackage = minPackage
             var actSearchValue = LastCardValue
             
-            func findActSearchValue(searchValue: Int)->MySKCard? {
+            func findActSearchValue(searchValue: Int, findMinValue: Bool)->MySKCard? {
+                var cardArray: [MySKCard] = []
                 for card in allCards {
-                    if card.maxValue == searchValue && card.belongsToPackageMax.countOnes() > 1 {
-                       return card
+                    let value = findMinValue ? card.minValue : card.maxValue
+                    if value == searchValue && card.belongsToPackageMax.countOnes() > 1 {
+                       cardArray.append(card)
                     }
                 }
-                return nil
+                if cardArray.count == 0 {
+                    return nil
+                } else if cardArray.count == 1 {
+                    return cardArray[0]
+                } else {
+                    var returnCard = cardArray[0]
+                    for card in cardArray {
+                        if card.belongsToPackageMin.countOnes() > returnCard.belongsToPackageMin.countOnes() {
+                            returnCard = card
+                        }
+                    }
+                    return returnCard
+                }
             }
             if container != nil {
                 if container!.minValue == FirstCardValue {
@@ -1583,10 +1602,10 @@ class CardManager {
             }
             var running = true
             if usedCards[FirstCardValue].midCount == countPackages - 1 { // check from lower side
-                actSearchValue = FirstCardValue
+                var actMinSearchValue = FirstCardValue
                 var running = true
                 while running {
-                    if let foundedCard = findActSearchValue(searchValue: actSearchValue) {
+                    if let foundedCard = findActSearchValue(searchValue: actMinSearchValue, findMinValue: true) {
                         let usedCard = usedCards[foundedCard.minValue]
                         if (usedCard.midCount == countPackages - 1 && usedCard.freeMaxCount == 1) ||
                             (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMinCount == 1 && usedCard.freeMaxCount == 1) ||
@@ -1595,7 +1614,7 @@ class CardManager {
                             foundedCard.belongsToPackageMin = actMinPackage
                             foundedCard.belongsToPackageMax = foundedCard.belongsToPackageMin << UInt8(foundedCard.countTransitions)
                             actMinPackage = foundedCard.belongsToPackageMax
-                            actSearchValue = (foundedCard.maxValue + 1) % CountCardsInPackage
+                            actMinSearchValue = (foundedCard.maxValue + 1) % CountCardsInPackage
                         } else {
                             running = false
                         }
@@ -1605,7 +1624,7 @@ class CardManager {
                 }
             }
             while running {  // check from upper side
-                if let foundedCard = findActSearchValue(searchValue: actSearchValue) {
+                if let foundedCard = findActSearchValue(searchValue: actSearchValue, findMinValue: false) {
                     if foundedCard.belongsToPackageMax.countOnes() > 1 {
                         let usedCard = usedCards[foundedCard.maxValue]
                         if (usedCard.midCount == countPackages - 1 && usedCard.freeMaxCount == 1) ||

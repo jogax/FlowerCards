@@ -12,9 +12,19 @@ import SpriteKit
 class AutoPlayer {
     // game to Play saves Games, Levels and CountPackages as they are displayed
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 17, countPackages: 4, gameNumber: 4279, stopAt: 120),
-//        GameToPlay(level: 17, countPackages: 4, gameNumber: 4279, stopAt: 90),
-//        GameToPlay(level: 16, countPackages: 3, gameNumber: 2162, stopAt: 1000)
+        GameToPlay(level: 11, countPackages: 3, gameNumber: 1762, stopAt: 150),
+        /*
+        GameToPlay(level: 4, countPackages: 3, gameNumber: 6271), // at Step: 150
+        GameToPlay(level: 4, countPackages: 3, gameNumber: 6597), // at Step: 150
+        GameToPlay(level: 5, countPackages: 3, gameNumber: 5949), // at Step: 150
+        GameToPlay(level: 6, countPackages: 3, gameNumber: 1416), // at Step: 151
+        GameToPlay(level: 7, countPackages: 3, gameNumber: 9769), // at Step: 151
+        GameToPlay(level: 8, countPackages: 3, gameNumber: 4649), // at Step: 150
+        GameToPlay(level: 10, countPackages: 3, gameNumber: 5416), // at Step: 151
+        GameToPlay(level: 10, countPackages: 3, gameNumber: 9423), // at Step: 151
+        GameToPlay(level: 11, countPackages: 3, gameNumber: 2810), // at Step: 150
+        GameToPlay(level: 17, countPackages: 4, gameNumber: 4279), // at Step: 202 
+*/
     ]
     enum runStatus: Int {
         case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep
@@ -85,12 +95,12 @@ class AutoPlayer {
             levelID += 1
         }
         let allGamesCount = realm.objects(GameModel.self).filter("playerID = %d", GV.player!.ID).count
-        let errorGamesCount = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", GV.player!.ID).count - 1
+        let errorGamesCount = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and ID != %d", GV.player!.ID, actGame!.ID).count
         if allGamesCount > 0 {
             print ("AllGames: \(allGamesCount), Errorgames: \(errorGamesCount), Procent errorgames: \((Double(errorGamesCount) * 100.0 / Double(allGamesCount)).twoDecimals)%")
             for countPkgs in 1...4 {
                 let gameCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d", GV.player!.ID, countPkgs).count
-                let errorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d and gameFinished = false", GV.player!.ID, countPkgs).count
+                let errorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d and gameFinished = false and (ID != %d or levelID != %d)", GV.player!.ID, countPkgs, actGame!.ID, actGame!.levelID).count
                 if gameCount > 0 {
                     print ("Pack \(countPkgs): \(gameCount), Errorgames: \(errorCount), Procent errorgames: \((Double(errorCount) * 100.0 / Double(gameCount)).twoDecimals)%")
                 } else {
@@ -121,7 +131,7 @@ class AutoPlayer {
             var countMaxValues = 0
             for countPkgs in 0...3 {
                 for levelId in 0...25 {
-                    let count = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d and levelID = %d", GV.player!.ID, countPkgs + 1, levelId).count
+                    let count = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d and levelID = %d and countSteps > 3", GV.player!.ID, countPkgs + 1, levelId).count
                     gameCounts[countPkgs][levelId] = count
                     if maxCount < count {
                         maxCount = count
@@ -137,9 +147,9 @@ class AutoPlayer {
             }
             for countPkgs in 0...3 {
                 for levelId in 0...25 {
-                    let count = calculateCount ? maxCount - gameCounts[countPkgs][levelId] : 1
+                    let count = calculateCount ? maxCount - gameCounts[3 - countPkgs][levelId] : 1
                     for _ in 0..<count {
-                        let gameToPlay = GameToPlay(level: levelId + 1, countPackages: countPkgs + 1, gameNumber: 1 + Int(arc4random()) % MaxGameNumber)
+                        let gameToPlay = GameToPlay(level: levelId + 1, countPackages: 4 - countPkgs, gameNumber: 1 + Int(arc4random()) % MaxGameNumber)
                         gamesToPlay.append(gameToPlay)
                     }
                 }
