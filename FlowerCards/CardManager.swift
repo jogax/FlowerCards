@@ -309,6 +309,16 @@ class CardManager {
         }
     }
     
+    func delay(time: Double, closure:@escaping ()->()) {
+        let delayTime = DispatchTime.now() + Double(Int64(time * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+        DispatchQueue.main.asyncAfter(deadline: delayTime)  {
+            closure()
+        }
+        
+    }
+    
+
+    
     struct FoundedCardsProColor {
         var cards: [FoundedCardParameters] // for saving all usable cards
         var specialCards: [FoundedCardParameters] // for saving special cards ==> to use only if no others exists
@@ -343,7 +353,6 @@ class CardManager {
             }
             colorCounts = colorCounts.sorted(by: {$0.count < $1.count})
         }
-        
         
         func chooseColorIndexes()->[Int] {
             var returnColors: [Int] = []
@@ -528,11 +537,16 @@ class CardManager {
     }
 
 
-    private func findSuitableCardsForGameArrayPosition(gameArrayPos: ColumnRow)->[FoundedCardsProColor]  {
+    enum MyStates: Int {
+        case FirstState = 0, SecondState
+    }
+    
+    private func findSuitableCardsForGameArrayPosition(gameArrayPos: ColumnRow, inState: MyStates = .FirstState)->[FoundedCardsProColor]  {
         var foundedCards: [FoundedCardsProColor] = Array(repeating: FoundedCardsProColor(), count: MaxColorValue) // one Array for each color
         
 //        let firstValue: CGFloat = 10000
 //        var distanceToLine = firstValue
+        
         let startCard = ColumnRow(column:gameArrayPos.column, row: gameArrayPos.row)
         let startPoint = gameArray[gameArrayPos.column][gameArrayPos.row].position
         let startAngle: CGFloat = 0
@@ -590,6 +604,7 @@ class CardManager {
         //==========================================
         
         while angle <= stopAngle {
+            delay(time: 0.000001, closure: {})
             let toPoint = GV.pointOfCircle(10.0, center: startPoint, angle: angle)
             let (foundedPoint, myPoints) = createHelpLines(movedFrom: startCard, toPoint: toPoint, inFrame: GV.mainScene!.frame, lineSize: cardSize.width, showLines: false)
             if foundedPoint != nil {
@@ -808,6 +823,7 @@ class CardManager {
                 let toPoint = GV.pointOfCircle(1.0, center: startPoint, angle: angle)
                 let movedFrom = ColumnRow(column: card1.column, row: card1.row)
                 let (foundedPoint, myPoints) = createHelpLines(movedFrom: movedFrom, toPoint: toPoint, inFrame: GV.mainScene!.frame, lineSize: cardSize.width, showLines: false)
+                delay(time: 0.000001, closure: {})
                 if foundedPoint != nil {
                     if foundedPoint!.foundContainer && card2.type == .containerType && foundedPoint!.column == card2.column ||
                         (foundedPoint!.column == card2.column && foundedPoint!.row == card2.row) {
@@ -1578,18 +1594,10 @@ class CardManager {
                        cardArray.append(card)
                     }
                 }
-                if cardArray.count == 0 {
-                    return nil
-                } else if cardArray.count == 1 {
+                if cardArray.count == 1 {
                     return cardArray[0]
                 } else {
-                    var returnCard = cardArray[0]
-                    for card in cardArray {
-                        if card.belongsToPackageMin.countOnes() > returnCard.belongsToPackageMin.countOnes() {
-                            returnCard = card
-                        }
-                    }
-                    return returnCard
+                    return nil
                 }
             }
             if container != nil {
@@ -1623,6 +1631,7 @@ class CardManager {
                     }
                 }
             }
+            running = true
             while running {  // check from upper side
                 if let foundedCard = findActSearchValue(searchValue: actSearchValue, findMinValue: false) {
                     if foundedCard.belongsToPackageMax.countOnes() > 1 {

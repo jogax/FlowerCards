@@ -1133,8 +1133,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     
-    func startTippTimer(){
-    }
+//    func startTippTimer(){
+//    }
     
     
     func findPairForCard (_ colorIndex: Int, minValue: Int, maxValue: Int)->Bool {
@@ -1290,7 +1290,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         card.run(action)
     }
     
-    func cardDidCollideWithContainer(_ node1:MySKCard, node2:MySKCard, points: [CGPoint]) {
+    func cardDidCollideWithContainer(_ node1:MySKCard, node2:MySKCard) {
         let movingCard = node1
         let container = node2
         
@@ -1342,20 +1342,20 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             collisionActive = false
             //movingCard.removeFromParent()
-//            checkGameFinished()
+            checkGameFinished()
         } else {
             updateCardCount(-1)
             movingCard.removeFromParent()
             countMovingCards = 0
             push(movingCard, status: .removed)
             pull(false) // no createTipps
-            startTippTimer()
+//            startTippTimer()
 
         }
         tippsButton!.activateButton(true)
      }
     
-    func cardDidCollideWithMovingCard(node1:MySKCard, node2:MySKCard, points: [CGPoint]) {
+    func cardDidCollideWithMovingCard(node1:MySKCard, node2:MySKCard) {
         let movingCard = node1
         let card = node2
         collisionActive = false
@@ -1389,7 +1389,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             movingCard.removeFromParent()
             countMovingCards = 0
             updateCardCount(-1)
-//            checkGameFinished()
+            checkGameFinished()
             saveStatisticAndGame()
        } else {
 
@@ -1398,7 +1398,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             countMovingCards = 0
             push(movingCard, status: .removed)
             pull(false) // no createTipps
-            startTippTimer()
+//            startTippTimer()
             
         }
         tippsButton!.activateButton(true)
@@ -2399,7 +2399,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 if actFromToColumnRow.toColumnRow.row == NoValue {
                     let containerNode = containers[actFromToColumnRow.toColumnRow.column] //self.childNode(withName: containers[actFromToColumnRow.toColumnRow.column].name!) as! MySKCard
                     collisionAction = SKAction.run({
-                        self.cardDidCollideWithContainer(self.movedFromNode, node2: containerNode, points: myPoints)
+                        self.cardDidCollideWithContainer(self.movedFromNode, node2: containerNode)
                     })
                 } else {
                     let cardNode = gameArray[actFromToColumnRow.toColumnRow.column][actFromToColumnRow.toColumnRow.row].card
@@ -2407,11 +2407,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //                    let cardNode = self.childNode(withName: gameArray[actFromToColumnRow.toColumnRow.column][actFromToColumnRow.toColumnRow.row].name) as! MySKCard
 //                    let startNode = gameArray[movedFromNode.column][movedFromNode.row].card
                     collisionAction = SKAction.run({
-                        self.cardDidCollideWithMovingCard(node1: self.movedFromNode, node2: cardNode, points: myPoints)
+                        self.cardDidCollideWithMovingCard(node1: self.movedFromNode, node2: cardNode)
                     })
                 }
                 let userInteractionEnablingAction = SKAction.run({
-                    self.checkGameFinished()
+//                    self.checkGameFinished()
                     self.isUserInteractionEnabled = true
                 })
                 actionArray.append(collisionAction)
@@ -2433,7 +2433,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 movedFromNode.run(SKAction.sequence(actionArray))
                 
             } else if startNode!.type == .cardType && aktNode == movedFromNode {
-                startTippTimer()
+//                startTippTimer()
             } else if startNode?.type == .showCardType {
                 var foundedCard: MySKCard?
                 let nodes = self.nodes(at: touchLocation)
@@ -2487,11 +2487,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     startNode?.run(SKAction.sequence([actionMove, actionDropShowCardFromStack]))
                 }
             } else {
-                startTippTimer()
+//                startTippTimer()
             }
             
         } else {
-            startTippTimer()
+//            startTippTimer()
         }
         
     }
