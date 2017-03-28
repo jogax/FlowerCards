@@ -2511,24 +2511,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         return actions
     }
     
-//    func stopTrembling() {
-//        for index in 0..<tremblingCards.count {
-//            tremblingCards[index].tremblingType = .noTrembling
-//        }
-//        tremblingCards.removeAll()
-//    }
-//    func pullShowCard() {
-//        showCard = nil
-//        if showCardStack.count(.MySKCardType) > 0 {
-//            removeShowCardFromStack()
-//            showCard = showCardStack.pull()
-//            self.addChild(showCard!)
-//        } else if !cardPlaceButtonAddedToParent {
-//            addChild(cardPlaceButton!)
-//            cardPlaceButtonAddedToParent = true
-//        }
-//    }
-    
     func removeShowCardFromStack() {
         if showCardFromStackAddedToParent {
             showCardFromStack!.removeFromParent()

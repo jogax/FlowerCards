@@ -1615,8 +1615,9 @@ class CardManager {
                 while running {
                     if let foundedCard = findActSearchValue(searchValue: actMinSearchValue, findMinValue: true) {
                         let usedCard = usedCards[foundedCard.minValue]
-                        if (usedCard.midCount == countPackages - 1 && usedCard.freeMaxCount == 1) ||
+                        if (usedCard.midCount == countPackages - 1 && usedCard.freeMinCount == 1) ||
                             (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMinCount == 1 && usedCard.freeMaxCount == 1) ||
+                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMinMaxCount == 1 && usedCard.freeMaxCount == 1) ||
                             (usedCard.midCount == countPackages - 1 && usedCard.freeMinMaxCount == 1)
                         {
                             foundedCard.belongsToPackageMin = actMinPackage
