@@ -1313,7 +1313,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
         let OK = movingCard.colorIndex == container.colorIndex &&
         (
-            container.minValue == NoColor || connectable!
+            container.minValue == NoColor || connectable! != .NotConnectable
         )
 
         
@@ -1322,7 +1322,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             push(container, status: .unification)
             push(movingCard, status: .removed)
             lastColor = movingCard.colorIndex
-            container.connectWith(otherCard: movingCard)
+            container.connectWith(otherCard: movingCard, upperOnly: connectable == CardManager.ConnectableType.UpperOnlyConnectable)
 //            saveHistoryRecord(colorIndex: movingCard.colorIndex, points:  points,
 //                              fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
 //                              toColumn: container.column,   toRow: container.row,   toMinValue: container.minValue,   toMaxValue: container.maxValue)
@@ -1363,12 +1363,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let connectable = cardManager!.areConnectable(first: movingCard, second: card)
 
 //        let OK = connectable //MySKCard.areConnectable(first: movingCard, second: card)
-        if connectable {
+        if connectable != .NotConnectable {
             push(card, status: .unification)
             push(movingCard, status: .removed)
             lastColor = movingCard.colorIndex
             
-            card.connectWith(otherCard: movingCard)
+            card.connectWith(otherCard: movingCard, upperOnly: connectable == .UpperOnlyConnectable)
 //            cardManager!.check(color: card.colorIndex)
 //            saveHistoryRecord(colorIndex: movingCard.colorIndex, points: points,
 //                              fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,

@@ -500,7 +500,7 @@ class MySKCard: SKSpriteNode {
     }
     
     
-    func connectWith(otherCard: MySKCard) {
+    func connectWith(otherCard: MySKCard, upperOnly: Bool) {
         let cardCountTxt = (MySKCard.cardCount > 100 ? "" : MySKCard.cardCount > 9 ? " " : "  ") + String(MySKCard.cardCount)
         MySKCard.cardCount += 1
         var text = ""
@@ -510,7 +510,8 @@ class MySKCard: SKSpriteNode {
         }
         #endif
         self.countTransitions += otherCard.countTransitions
-        if self.minValue == otherCard.maxValue + 1  && self.belongsToPackageMin & otherCard.belongsToPackageMax != 0 {
+        
+        if self.minValue == otherCard.maxValue + 1  && self.belongsToPackageMin & otherCard.belongsToPackageMax != 0 && !upperOnly {
             self.minValue = otherCard.minValue
         } else if self.maxValue == otherCard.minValue - 1 && self.belongsToPackageMax & otherCard.belongsToPackageMin != 0 {
             self.maxValue = otherCard.maxValue

@@ -12,7 +12,7 @@ import SpriteKit
 class AutoPlayer {
     // game to Play saves Games, Levels and CountPackages as they are displayed
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 4, countPackages: 4, gameNumber: 9576, stopAt: 100),
+        GameToPlay(level: 10, countPackages: 4, gameNumber: 8912, stopAt: 170),
         /*
         GameToPlay(level: 11, countPackages: 4, gameNumber: 3788, stopAt: 180),
         GameToPlay(level: 4, countPackages: 3, gameNumber: 6271), // at Step: 150

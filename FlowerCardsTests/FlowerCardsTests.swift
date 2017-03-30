@@ -24,9 +24,9 @@ class FlowerCardsTests: XCTestCase {
         super.tearDown()
     }
     
-    func test_startAutoPlay() {
-        let autoPlayer = AutoPlayer()
-        autoPlayer.play(gameNumber: 1)
-        
-    }
+//    func test_startAutoPlay() {
+//        let autoPlayer = AutoPlayer(scene: <#T##CardGameScene#>)
+//        autoPlayer.play(gameNumber: 1)
+//        
+//    }
 }
