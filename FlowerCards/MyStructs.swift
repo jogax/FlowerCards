@@ -40,7 +40,7 @@ struct GV {
     static var showHelpLines = 0
     static var dummyName = GV.language.getText(.tcGuest)
     static var initName = false
-    static let oneGrad:CGFloat = CGFloat(M_PI) / 180
+    static let oneGrad:CGFloat = CGFloat(Double.pi) / 180
     static let timeOut = "TimeOut"
     static let IAmBusy = "Busy"
 

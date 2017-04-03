@@ -464,7 +464,7 @@ class DrawImages {
     
     func drawSettings(_ frame: CGRect) -> UIImage {
         let size = CGSize(width: frame.width, height: frame.height)
-        let endAngle = CGFloat(2*M_PI)
+        let endAngle = CGFloat(2 * Double.pi)
         
         UIGraphicsBeginImageContextWithOptions(size, DrawImages.opaque, DrawImages.scale)
         let ctx = UIGraphicsGetCurrentContext()

@@ -214,7 +214,7 @@ extension PeerToPeerServiceManager : MCSessionDelegate {
     }
 
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        let receivedString = NSString(data: data, encoding: String.Encoding.utf8.rawValue) as! String
+        let receivedString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
         let stringTable = receivedString.components(separatedBy: separator)
         let command = PeerToPeerCommands.decodeCommand(stringTable[0])
         let messageNr = Int(stringTable[1])

@@ -12,14 +12,22 @@ import SpriteKit
 struct ConnectablePair {
     var card1: MySKCard
     var card2: MySKCard
+    var connectedValues: (Int, Int) {
+        get {
+            if (card1.minValue - 1 == card2.maxValue) || (card1.minValue == FirstCardValue && card2.maxValue == LastCardValue) {
+                return (card1.minValue, card2.maxValue)
+            } else {
+                return (card1.maxValue, card2.minValue)
+            }
+        }
+    }
     func convertCard(card: MySKCard)->Int64 {
         var hash = card.countTransitions << 0
         hash |= card.minValue << 2
         hash |= card.maxValue << 6
-        hash |= card.maxValue << 10
-        hash |= card.column << 14
-        hash |= card.row << 18
-        hash |= card.type.rawValue << 22
+        hash |= card.column << 10
+        hash |= card.row << 14
+        hash |= card.type.rawValue << 18
         return Int64(hash)
         //            return "\(card.countTransitions)-\(card.minValue)-\(card.maxValue)-\(card.column)-\(card.row)-\(card.type)"
     }
@@ -384,7 +392,7 @@ class CardManager {
         }
         
 //        checkTippArrayPlausibility()
-        let generatingCardArrayStarted = Date()
+//        let generatingCardArrayStarted = Date()
         _ = createTipps()
         updateCountColors()
         
@@ -518,8 +526,8 @@ class CardManager {
             }
         }
         _ = createTipps()
-        let generatingCardArrayEnded = Date()
-        let cardArrayGeneratingTime = CFDateGetTimeIntervalSinceDate(generatingCardArrayStarted as CFDate!, generatingCardArrayEnded as CFDate!)
+//        let generatingCardArrayEnded = Date()
+//        let cardArrayGeneratingTime = CFDateGetTimeIntervalSinceDate(generatingCardArrayStarted as CFDate!, generatingCardArrayEnded as CFDate!)
         return cardArray
     }
     
@@ -885,7 +893,7 @@ class CardManager {
         let length = offset.length()
         let sinAlpha = offset.y / length
         let angleRadian = asin(sinAlpha);
-        let angleDegree = angleRadian * 180.0 / CGFloat(M_PI)
+        let angleDegree = angleRadian * 180.0 / CGFloat(Double.pi)
         return (angleRadian, angleDegree)
     }
     
@@ -1541,7 +1549,7 @@ class CardManager {
             findContainer()
             fillAllCards()
             checkAllCards()
-//            checkCardsWithTransition()
+            checkCardsWithTransitions()
             
             var countChanges = 0
             if let container = container {
@@ -1594,6 +1602,32 @@ class CardManager {
                 card.setBelongsLabels()
             }
 
+        }
+        
+        private func checkCardsWithTransitions() {
+            if countTransitions == countPackages - 1 {
+                switch (countPackages, cardsWithTransitions.count) {
+                case (2, 1), (3, 1), (4, 1):
+                    cardsWithTransitions[0].belongsToPackageMax = maxPackage
+                    cardsWithTransitions[0].belongsToPackageMin = minPackage
+                case (3, 2), (4, 2):
+                    if cardsWithTransitions[0].minValue <= cardsWithTransitions[1].maxValue {
+                        cardsWithTransitions[0].belongsToPackageMin = minPackage
+                        cardsWithTransitions[0].belongsToPackageMax = minPackage << UInt8(cardsWithTransitions[0].countTransitions)
+                        cardsWithTransitions[1].belongsToPackageMax = maxPackage
+                        cardsWithTransitions[1].belongsToPackageMin = maxPackage >> UInt8(cardsWithTransitions[1].countTransitions)
+                    } else if cardsWithTransitions[1].minValue <= cardsWithTransitions[0].maxValue {
+                        cardsWithTransitions[1].belongsToPackageMin = minPackage
+                        cardsWithTransitions[1].belongsToPackageMax = minPackage << UInt8(cardsWithTransitions[1].countTransitions)
+                        cardsWithTransitions[0].belongsToPackageMax = maxPackage
+                        cardsWithTransitions[0].belongsToPackageMin = maxPackage >> UInt8(cardsWithTransitions[0].countTransitions)
+                    }
+                case (4, 3):
+                    break
+                default:
+                    break
+                }
+            }
         }
         
         private func checkAllCards() {
@@ -1694,50 +1728,6 @@ class CardManager {
             return lowerMask
         }
         
-        private func checkCardPairWithTransition(card1: MySKCard, card2: MySKCard)->Bool {
-            var returnValue = true
-            func checkCardsBothWithTransitions(card1: MySKCard, card2: MySKCard)->Bool {
-                let ind1 = card1 == cardsWithTransitions[0] ? 0 : (card1 == cardsWithTransitions[1] ? 1 : 2)
-                let ind2 = card2 == cardsWithTransitions[0] ? 0 : (card2 == cardsWithTransitions[1] ? 1 : 2)
-                var ind3 = 0
-                switch (ind1, ind2) {
-                case (0,1), (1,0): ind3 = 2
-                case (0,2), (2,0): ind3 = 1
-                case (1,2), (2,1): ind3 = 0
-                default: break
-                }
-                let card1 = cardsWithTransitions[ind1]
-                let card2 = cardsWithTransitions[ind2]
-                let card3 = cardsWithTransitions[ind3]
-                if  card1.minValue - 1 == card2.maxValue ||
-                    card1.minValue == FirstCardValue && card2.maxValue == LastCardValue && countTransitions < countPackages - 1 {
-                    if card3.minValue <= card1.maxValue || card3.maxValue >= card2.minValue {
-                        return false
-                    }
-                    
-                }
-                if card1.maxValue + 1 == card2.minValue ||
-                   card1.maxValue == LastCardValue && card2.minValue == FirstCardValue && countTransitions < countPackages - 1 {
-                    if card3.minValue <= card2.maxValue || card3.maxValue >= card1.minValue {
-                        return false
-                    }
-                }
-                return true
-            }
-            func checkCardsOnlyOneWithTransitions(card1: MySKCard, card2: MySKCard)->Bool {
-                return true
-            }
-
-            if countPackages == 4 && countTransitions == 3 {
-                if card1.countTransitions == 1 && card2.countTransitions == 1 {
-                    return checkCardsBothWithTransitions(card1: card1, card2: card2)
-                } else {
-                    return checkCardsOnlyOneWithTransitions(card1: card1, card2: card2)
-                }
-            }
-            return returnValue
-        }
-
         func doAction(masterCard: MySKCard, otherCard: MySKCard)->Int {
             func createMask(withMinPackage: Bool = true)->UInt8 {
                 var bit = masterCard.belongsToPackageMax
@@ -1931,13 +1921,10 @@ class CardManager {
                         }
                     }
                 }
-                if actPair.card1.countTransitions > 1 && actPair.card2.countTransitions == 0 {
-                    if !checkCardPairWithTransition(card1:actPair.card1, card2: actPair.card2) {
-                        if !pairsToRemove.contains(index) {
-                            pairsToRemove.append(index)
-                        }
-                    }
-                }
+//                if (actPair.card1.countTransitions > 0 && actPair.card2.countTransitions == 0) ||
+//                    (actPair.card2.countTransitions > 0 && actPair.card1.countTransitions == 0) {
+//                    checkCardPairWithOneTransition(actPair:actPair)
+//                }
                 if (actPair.card1.minValue == FirstCardValue && actPair.card2.maxValue == LastCardValue ||
                         actPair.card2.minValue == FirstCardValue && actPair.card1.maxValue == LastCardValue) {
                     if checkIfNewCardCompatibleWithCWT(pairToCheck: actPair) {
@@ -1949,9 +1936,9 @@ class CardManager {
                     for (ind, pair) in connectablePairs.enumerated() {
                         if pair != actPair {
                             if pair.card1.type == .cardType && pair.card2.type == .cardType &&
-                                (actPair.card1 == pair.card1 || actPair.card1 == pair.card2 || actPair.card2 == pair.card1 || actPair.card2 == pair.card2) &&
+                                (actPair.card1 == pair.card1 || actPair.card1 == pair.card2 || actPair.card2 == pair.card1 || actPair.card2 == pair.card2) /*&&
                                 (pair.card1.minValue == FirstCardValue && pair.card2.maxValue == LastCardValue ||
-                                    pair.card2.minValue == FirstCardValue && pair.card1.maxValue == LastCardValue) {
+                                    pair.card2.minValue == FirstCardValue && pair.card1.maxValue == LastCardValue)*/ {
                                 let actPairLen = actPair.card1.countCards + actPair.card2.countCards
                                 let pairLen = pair.card1.countCards + pair.card2.countCards
                                 if actPairLen >= CountCardsInPackage && actPairLen > pairLen && pairLen < CountCardsInPackage {
@@ -1970,6 +1957,78 @@ class CardManager {
                 }
             }
         }
+        
+        private func checkCardPairWithOneTransition(actPair: ConnectablePair) {
+            func findOtherPairWithSearchCard(searchCard: MySKCard)->(ConnectablePair?, Int) {
+                for (index, pair) in connectablePairs.enumerated() {
+                    if pair != actPair && (pair.card1 == searchCard || pair.card2 == searchCard)  {
+                        let (value1, value2) = pair.connectedValues
+                        let (actValue1, actValue2) = actPair.connectedValues
+                        if value1 == actValue1 && value2 == actValue2 {
+                            return (pair, index)
+                        }
+                    }
+                }
+                return (nil, NoValue)
+            }
+            
+            if countTransitions == countPackages - 1 {
+                let otherCard: MySKCard = actPair.card1.countTransitions == 0 ? actPair.card1 : actPair.card2
+                let cardWithTransition: MySKCard = actPair.card1.countTransitions == 0 ? actPair.card2 : actPair.card1
+                let (otherPair, index) = findOtherPairWithSearchCard(searchCard: cardWithTransition)
+                if otherPair != nil {
+                    let otherCard1 = otherPair?.card1 == cardWithTransition ? otherPair?.card2 : actPair.card1
+                    if cardWithTransition.colorIndex == 1 {
+                        print(cardWithTransition.printValue)
+                        print(otherCard.printValue)
+                        print(otherCard1!.printValue)
+                    }
+                }
+            }
+        }
+        
+        private func checkCardPairWithTransition(card1: MySKCard, card2: MySKCard)->Bool {
+            var returnValue = true
+            func checkCardsBothWithTransitions(card1: MySKCard, card2: MySKCard)->Bool {
+                let ind1 = card1 == cardsWithTransitions[0] ? 0 : (card1 == cardsWithTransitions[1] ? 1 : 2)
+                let ind2 = card2 == cardsWithTransitions[0] ? 0 : (card2 == cardsWithTransitions[1] ? 1 : 2)
+                var ind3 = 0
+                switch (ind1, ind2) {
+                case (0,1), (1,0): ind3 = 2
+                case (0,2), (2,0): ind3 = 1
+                case (1,2), (2,1): ind3 = 0
+                default: break
+                }
+                let card1 = cardsWithTransitions[ind1]
+                let card2 = cardsWithTransitions[ind2]
+                let card3 = cardsWithTransitions[ind3]
+                if  card1.minValue - 1 == card2.maxValue ||
+                    card1.minValue == FirstCardValue && card2.maxValue == LastCardValue && countTransitions < countPackages - 1 {
+                    if card3.minValue <= card1.maxValue || card3.maxValue >= card2.minValue {
+                        return false
+                    }
+                    
+                }
+                if card1.maxValue + 1 == card2.minValue ||
+                    card1.maxValue == LastCardValue && card2.minValue == FirstCardValue && countTransitions < countPackages - 1 {
+                    if card3.minValue <= card2.maxValue || card3.maxValue >= card1.minValue {
+                        return false
+                    }
+                }
+                return true
+            }
+            
+            
+            
+            if countPackages == 4 && countTransitions == countPackages - 1 {
+                if card1.countTransitions == 1 && card2.countTransitions == 1 {
+                    return checkCardsBothWithTransitions(card1: card1, card2: card2)
+                }
+            }
+            return returnValue
+        }
+        
+
         
         func checkIfNewCardCompatibleWithCWT(pairToCheck: ConnectablePair)->Bool {
             if countTransitions < countPackages - 1 {  // check only if all possible transitions are used

@@ -11,7 +11,7 @@ import SpriteKit
 import RealmSwift
 import GameplayKit
 
-var Pi = CGFloat(M_PI)
+var Pi = Double.pi
 let DegreesToRadians = Pi / 180
 let RadiansToDegrees = 180 / Pi
 let countGames = 10000

@@ -1177,7 +1177,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     case .noTrembling: break
                     case .changeSize:  aktCard.size = CGSize(width: aktCard.origSize.width + aktCard.trembling, height: aktCard.origSize.height +  aktCard.trembling)
                     case .changePos: break
-                    case .changeDirection: aktCard.zRotation = CGFloat(CGFloat(M_PI)/CGFloat(aktCard.trembling == 0 ? 16 : aktCard.trembling * CGFloat(8)))
+                    case .changeDirection: aktCard.zRotation = CGFloat(CGFloat(Double.pi)/CGFloat(aktCard.trembling == 0 ? 16 : aktCard.trembling * CGFloat(8)))
                     case .changeSizeOnce:
                         if aktCard.size == aktCard.origSize {
                             aktCard.size.width += adder
