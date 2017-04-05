@@ -1366,7 +1366,6 @@ class CardManager {
     }
     
     class DataForColor {
-        
         var colorIndex: Int
         var container: MySKCard?
         var allCards: [MySKCard] = []
@@ -1506,7 +1505,7 @@ class CardManager {
         func printUsedCards() {
             for index in 0..<usedCards.count {
                 if let cardName = MySKCard.cardLib[index] {
-                    var printString = "card \(cardName). alone: \(usedCards[index].freeMinMaxCount), "
+                    var printString = "card \(cardName.length == 1 ? " " : "" + cardName). alone: \(usedCards[index].freeMinMaxCount), "
                     printString += "freeMin: \(usedCards[index].freeMinCount), "
                     printString += "freeMax: \(usedCards[index].freeMaxCount), "
                     printString += "midCount: \(usedCards[index].midCount), "
@@ -1540,16 +1539,18 @@ class CardManager {
         
 
         func analyzeColor() {
+            container = nil
             connectablePairs.removeAll()
             pairsToRemove.removeAll()
             cardsWithTransitions.removeAll()
             freeConnectableCards.removeAll()
             usedCards = Array(repeating: UsedCard(), count: CountCardsInPackage)
                 countTransitions = 0
+            
             findContainer()
             fillAllCards()
-            checkAllCards()
             checkCardsWithTransitions()
+            checkAllCards()
             
             var countChanges = 0
             if let container = container {
@@ -1605,6 +1606,13 @@ class CardManager {
         }
         
         private func checkCardsWithTransitions() {
+            func setBelonging(upperIndex: Int, lowerIndex: Int) {
+                cardsWithTransitions[lowerIndex].belongsToPackageMin = minPackage
+                cardsWithTransitions[lowerIndex].belongsToPackageMax = minPackage << UInt8(cardsWithTransitions[lowerIndex].countTransitions)
+                cardsWithTransitions[upperIndex].belongsToPackageMax = maxPackage
+                cardsWithTransitions[upperIndex].belongsToPackageMin = maxPackage >> UInt8(cardsWithTransitions[upperIndex].countTransitions)
+            }
+
             if countTransitions == countPackages - 1 {
                 switch (countPackages, cardsWithTransitions.count) {
                 case (2, 1), (3, 1), (4, 1):
@@ -1612,18 +1620,60 @@ class CardManager {
                     cardsWithTransitions[0].belongsToPackageMin = minPackage
                 case (3, 2), (4, 2):
                     if cardsWithTransitions[0].minValue <= cardsWithTransitions[1].maxValue {
-                        cardsWithTransitions[0].belongsToPackageMin = minPackage
-                        cardsWithTransitions[0].belongsToPackageMax = minPackage << UInt8(cardsWithTransitions[0].countTransitions)
-                        cardsWithTransitions[1].belongsToPackageMax = maxPackage
-                        cardsWithTransitions[1].belongsToPackageMin = maxPackage >> UInt8(cardsWithTransitions[1].countTransitions)
+                        setBelonging(upperIndex: 1, lowerIndex: 0)
                     } else if cardsWithTransitions[1].minValue <= cardsWithTransitions[0].maxValue {
-                        cardsWithTransitions[1].belongsToPackageMin = minPackage
-                        cardsWithTransitions[1].belongsToPackageMax = minPackage << UInt8(cardsWithTransitions[1].countTransitions)
-                        cardsWithTransitions[0].belongsToPackageMax = maxPackage
-                        cardsWithTransitions[0].belongsToPackageMin = maxPackage >> UInt8(cardsWithTransitions[0].countTransitions)
+                        setBelonging(upperIndex: 0, lowerIndex: 1)
                     }
                 case (4, 3):
-                    break
+                    if cardsWithTransitions[0].minValue <= cardsWithTransitions[1].maxValue &&
+                        cardsWithTransitions[0].minValue <= cardsWithTransitions[2].maxValue
+                    {
+                        cardsWithTransitions[0].belongsToPackageMin = minPackage
+                        cardsWithTransitions[0].belongsToPackageMax = minPackage << UInt8(cardsWithTransitions[0].countTransitions)
+                        if cardsWithTransitions[1].minValue <= cardsWithTransitions[2].maxValue {
+                            cardsWithTransitions[1].belongsToPackageMin = minPackage << 1
+                            cardsWithTransitions[1].belongsToPackageMax = minPackage << 2
+                            cardsWithTransitions[2].belongsToPackageMax = maxPackage
+                            cardsWithTransitions[2].belongsToPackageMin = maxPackage >> 1
+                        } else if cardsWithTransitions[2].minValue <= cardsWithTransitions[1].maxValue {
+                            cardsWithTransitions[2].belongsToPackageMin = minPackage << 1
+                            cardsWithTransitions[2].belongsToPackageMax = minPackage << 2
+                            cardsWithTransitions[1].belongsToPackageMax = maxPackage
+                            cardsWithTransitions[1].belongsToPackageMin = maxPackage >> 1
+                        }
+                    } else if cardsWithTransitions[1].minValue <= cardsWithTransitions[0].maxValue &&
+                        cardsWithTransitions[1].minValue <= cardsWithTransitions[2].maxValue
+                    {
+                        cardsWithTransitions[1].belongsToPackageMin = minPackage
+                        cardsWithTransitions[1].belongsToPackageMax = minPackage << UInt8(cardsWithTransitions[0].countTransitions)
+                        if cardsWithTransitions[0].minValue <= cardsWithTransitions[2].maxValue {
+                            cardsWithTransitions[0].belongsToPackageMin = minPackage << 1
+                            cardsWithTransitions[0].belongsToPackageMax = minPackage << 2
+                            cardsWithTransitions[2].belongsToPackageMax = maxPackage
+                            cardsWithTransitions[2].belongsToPackageMin = maxPackage >> 1
+                        } else if cardsWithTransitions[2].minValue <= cardsWithTransitions[0].maxValue {
+                            cardsWithTransitions[2].belongsToPackageMin = minPackage << 1
+                            cardsWithTransitions[2].belongsToPackageMax = minPackage << 2
+                            cardsWithTransitions[0].belongsToPackageMax = maxPackage
+                            cardsWithTransitions[0].belongsToPackageMin = maxPackage >> 1
+                        }
+                    } else if cardsWithTransitions[2].minValue <= cardsWithTransitions[0].maxValue &&
+                        cardsWithTransitions[2].minValue <= cardsWithTransitions[1].maxValue
+                    {
+                        cardsWithTransitions[2].belongsToPackageMin = minPackage
+                        cardsWithTransitions[2].belongsToPackageMax = minPackage << UInt8(cardsWithTransitions[0].countTransitions)
+                        if cardsWithTransitions[0].minValue <= cardsWithTransitions[1].maxValue {
+                            cardsWithTransitions[0].belongsToPackageMin = minPackage << 1
+                            cardsWithTransitions[0].belongsToPackageMax = minPackage << 2
+                            cardsWithTransitions[1].belongsToPackageMax = maxPackage
+                            cardsWithTransitions[1].belongsToPackageMin = maxPackage >> 1
+                        } else if cardsWithTransitions[1].minValue <= cardsWithTransitions[0].maxValue {
+                            cardsWithTransitions[1].belongsToPackageMin = minPackage << 1
+                            cardsWithTransitions[1].belongsToPackageMax = minPackage << 2
+                            cardsWithTransitions[0].belongsToPackageMax = maxPackage
+                            cardsWithTransitions[0].belongsToPackageMin = maxPackage >> 1
+                        }
+                    }
                 default:
                     break
                 }
@@ -1658,29 +1708,6 @@ class CardManager {
                 actSearchValue = (container!.minValue + CountCardsInPackage - 1) % CountCardsInPackage
             }
             var running = true
-            if usedCards[FirstCardValue].midCount == countPackages - 1 { // check from lower side
-                var actMinSearchValue = FirstCardValue
-                var running = true
-                while running {
-                    if let foundedCard = findActSearchValue(searchValue: actMinSearchValue, findMinValue: true) {
-                        let usedCard = usedCards[foundedCard.minValue]
-                        if (usedCard.midCount == countPackages - 1 && usedCard.freeMinCount == 1) ||
-                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMinCount == 1 && usedCard.freeMaxCount == 1) ||
-                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMinMaxCount == 1 && usedCard.freeMaxCount == 1) ||
-                            (usedCard.midCount == countPackages - 1 && usedCard.freeMinMaxCount == 1)
-                        {
-                            foundedCard.belongsToPackageMin = actMinPackage
-                            foundedCard.belongsToPackageMax = foundedCard.belongsToPackageMin << UInt8(foundedCard.countTransitions)
-                            actMinPackage = foundedCard.belongsToPackageMax
-                            actMinSearchValue = (foundedCard.maxValue + 1) % CountCardsInPackage
-                        } else {
-                            running = false
-                        }
-                    } else {
-                        running = false
-                    }
-                }
-            }
             running = true
             while running {  // check from upper side
                 if let foundedCard = findActSearchValue(searchValue: actSearchValue, findMinValue: false) {
@@ -1702,6 +1729,29 @@ class CardManager {
                     }
                 } else {
                     running = false
+                }
+            }
+            if usedCards[FirstCardValue].midCount == countPackages - 1 { // check from lower side
+                var actMinSearchValue = FirstCardValue
+                var running = true
+                while running {
+                    if let foundedCard = findActSearchValue(searchValue: actMinSearchValue, findMinValue: true) {
+                        let usedCard = usedCards[foundedCard.minValue]
+                        if (usedCard.midCount == countPackages - 1 && usedCard.freeMinCount == 1) ||
+                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMinCount == 1 && usedCard.freeMaxCount == 1) ||
+                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMinMaxCount == 1 && usedCard.freeMaxCount == 1) ||
+                            (usedCard.midCount == countPackages - 1 && usedCard.freeMinMaxCount == 1)
+                        {
+                            foundedCard.belongsToPackageMin = actMinPackage
+                            foundedCard.belongsToPackageMax = foundedCard.belongsToPackageMin << UInt8(foundedCard.countTransitions)
+                            actMinPackage = foundedCard.belongsToPackageMax
+                            actMinSearchValue = (foundedCard.maxValue + 1) % CountCardsInPackage
+                        } else {
+                            running = false
+                        }
+                    } else {
+                        running = false
+                    }
                 }
             }
         }
@@ -1936,17 +1986,17 @@ class CardManager {
                     for (ind, pair) in connectablePairs.enumerated() {
                         if pair != actPair {
                             if pair.card1.type == .cardType && pair.card2.type == .cardType &&
-                                (actPair.card1 == pair.card1 || actPair.card1 == pair.card2 || actPair.card2 == pair.card1 || actPair.card2 == pair.card2) /*&&
+                                (actPair.card1 == pair.card1 || actPair.card1 == pair.card2 || actPair.card2 == pair.card1 || actPair.card2 == pair.card2) &&
                                 (pair.card1.minValue == FirstCardValue && pair.card2.maxValue == LastCardValue ||
-                                    pair.card2.minValue == FirstCardValue && pair.card1.maxValue == LastCardValue)*/ {
+                                    pair.card2.minValue == FirstCardValue && pair.card1.maxValue == LastCardValue) {
                                 let actPairLen = actPair.card1.countCards + actPair.card2.countCards
                                 let pairLen = pair.card1.countCards + pair.card2.countCards
-                                if actPairLen >= CountCardsInPackage && actPairLen > pairLen && pairLen < CountCardsInPackage {
+                                if actPairLen >= CountCardsInPackage && actPairLen > pairLen /* && (pairLen < CountCardsInPackage */ {
                                     if !pairsToRemove.contains(ind) {
                                         pairsToRemove.append(ind)
                                     }
                                 }
-                                if pairLen >= CountCardsInPackage && actPairLen < pairLen && actPairLen < CountCardsInPackage {
+                                if pairLen >= CountCardsInPackage && actPairLen < pairLen /* && actPairLen < CountCardsInPackage */ {
                                     if !pairsToRemove.contains(index) {
                                         pairsToRemove.append(index)
                                     }

@@ -426,11 +426,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512665093.754641"
+            timestampString = "513009934.246951"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1543"
-            endingLineNumber = "1543"
+            startingLineNumber = "1544"
+            endingLineNumber = "1544"
             landmarkName = "analyzeColor()"
             landmarkType = "7">
          </BreakpointContent>
@@ -442,11 +442,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512665093.754641"
+            timestampString = "513009934.246951"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1574"
-            endingLineNumber = "1574"
+            startingLineNumber = "1576"
+            endingLineNumber = "1576"
             landmarkName = "analyzeColor()"
             landmarkType = "7">
          </BreakpointContent>
@@ -458,11 +458,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2068"
-            endingLineNumber = "2068"
+            startingLineNumber = "2119"
+            endingLineNumber = "2119"
             landmarkName = "findContainer()"
             landmarkType = "7">
          </BreakpointContent>
@@ -474,11 +474,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2119"
-            endingLineNumber = "2119">
+            startingLineNumber = "2170"
+            endingLineNumber = "2170">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -489,11 +489,11 @@
             condition = "colorIndex == 0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512665093.754641"
+            timestampString = "513009934.246951"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1581"
-            endingLineNumber = "1581"
+            startingLineNumber = "1583"
+            endingLineNumber = "1583"
             landmarkName = "analyzeColor()"
             landmarkType = "7">
             <Actions>
@@ -513,11 +513,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2176"
-            endingLineNumber = "2176">
+            startingLineNumber = "2227"
+            endingLineNumber = "2227">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -527,11 +527,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/AutoPlayer.swift"
-            timestampString = "512403815.7867"
+            timestampString = "513085772.439392"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "125"
-            endingLineNumber = "125"
+            startingLineNumber = "132"
+            endingLineNumber = "132"
             landmarkName = "startPlay(testType:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -543,11 +543,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/AutoPlayer.swift"
-            timestampString = "512403815.7867"
+            timestampString = "513085772.439392"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "181"
-            endingLineNumber = "181"
+            startingLineNumber = "188"
+            endingLineNumber = "188"
             landmarkName = "startPlay(testType:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -759,11 +759,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/AutoPlayer.swift"
-            timestampString = "512403815.7867"
+            timestampString = "513085772.439392"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "197"
-            endingLineNumber = "197"
+            startingLineNumber = "204"
+            endingLineNumber = "204"
             landmarkName = "startNextGame()"
             landmarkType = "7">
          </BreakpointContent>
@@ -803,15 +803,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
+            condition = "colorIndex == 3"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512665093.754641"
+            timestampString = "513009934.246951"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1552"
-            endingLineNumber = "1552"
+            startingLineNumber = "1553"
+            endingLineNumber = "1553"
             landmarkName = "analyzeColor()"
             landmarkType = "7">
             <Actions>
@@ -831,11 +832,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2047"
-            endingLineNumber = "2047"
+            startingLineNumber = "2098"
+            endingLineNumber = "2098"
             landmarkName = "checkIfNewCardCompatibleWithCWT(pairToCheck:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -847,11 +848,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2055"
-            endingLineNumber = "2055"
+            startingLineNumber = "2106"
+            endingLineNumber = "2106"
             landmarkName = "checkIfNewCardCompatibleWithCWT(pairToCheck:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -879,11 +880,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1943"
-            endingLineNumber = "1943"
+            startingLineNumber = "1994"
+            endingLineNumber = "1994"
             landmarkName = "checkPair(index:actPair:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -943,23 +944,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/AutoPlayer.swift"
-            timestampString = "512403815.7867"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "169"
-            endingLineNumber = "169"
-            landmarkName = "startPlay(testType:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FlowerCards/AutoPlayer.swift"
-            timestampString = "512403815.7867"
+            timestampString = "513085772.439392"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "176"
@@ -975,11 +960,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/AutoPlayer.swift"
-            timestampString = "512403815.7867"
+            timestampString = "513085772.439392"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "167"
-            endingLineNumber = "167"
+            startingLineNumber = "183"
+            endingLineNumber = "183"
             landmarkName = "startPlay(testType:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -991,11 +976,27 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/AutoPlayer.swift"
-            timestampString = "512403815.7867"
+            timestampString = "513085772.439392"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "230"
-            endingLineNumber = "230"
+            startingLineNumber = "174"
+            endingLineNumber = "174"
+            landmarkName = "startPlay(testType:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/AutoPlayer.swift"
+            timestampString = "513085772.439392"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "237"
+            endingLineNumber = "237"
             landmarkName = "nextStep(timerX:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1007,11 +1008,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/AutoPlayer.swift"
-            timestampString = "512403815.7867"
+            timestampString = "513085772.439392"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "194"
-            endingLineNumber = "194"
+            startingLineNumber = "201"
+            endingLineNumber = "201"
             landmarkName = "startNextGame()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1039,11 +1040,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2220"
-            endingLineNumber = "2220">
+            startingLineNumber = "2271"
+            endingLineNumber = "2271">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1051,13 +1052,14 @@
          <BreakpointContent
             shouldBeEnabled = "No"
             ignoreCount = "0"
+            condition = "colorIndex == 0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512665093.754641"
+            timestampString = "513009934.246951"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1553"
-            endingLineNumber = "1553"
+            startingLineNumber = "1554"
+            endingLineNumber = "1554"
             landmarkName = "analyzeColor()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1067,14 +1069,14 @@
          <BreakpointContent
             shouldBeEnabled = "No"
             ignoreCount = "0"
-            condition = "colorIndex == 1"
+            condition = "colorIndex == 0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512665093.754641"
+            timestampString = "513009934.246951"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1554"
-            endingLineNumber = "1554"
+            startingLineNumber = "1556"
+            endingLineNumber = "1556"
             landmarkName = "analyzeColor()"
             landmarkType = "7">
             <Actions>
@@ -1110,11 +1112,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512665093.754641"
+            timestampString = "513009934.246951"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1563"
-            endingLineNumber = "1563"
+            startingLineNumber = "1565"
+            endingLineNumber = "1565"
             landmarkName = "analyzeColor()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1126,11 +1128,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2250"
-            endingLineNumber = "2250">
+            startingLineNumber = "2301"
+            endingLineNumber = "2301">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1140,11 +1142,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2251"
-            endingLineNumber = "2251">
+            startingLineNumber = "2302"
+            endingLineNumber = "2302">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1154,11 +1156,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2254"
-            endingLineNumber = "2254">
+            startingLineNumber = "2305"
+            endingLineNumber = "2305">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1168,11 +1170,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512665093.754641"
+            timestampString = "513009934.246951"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1550"
-            endingLineNumber = "1550"
+            startingLineNumber = "1552"
+            endingLineNumber = "1552"
             landmarkName = "analyzeColor()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1184,11 +1186,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1653"
-            endingLineNumber = "1653"
+            startingLineNumber = "1704"
+            endingLineNumber = "1704"
             landmarkName = "checkAllCards()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1201,11 +1203,11 @@
             condition = "colorIndex == 2"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1686"
-            endingLineNumber = "1686"
+            startingLineNumber = "1714"
+            endingLineNumber = "1714"
             landmarkName = "checkAllCards()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1217,11 +1219,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1688"
-            endingLineNumber = "1688"
+            startingLineNumber = "1716"
+            endingLineNumber = "1716"
             landmarkName = "checkAllCards()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1233,11 +1235,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512665093.754641"
+            timestampString = "513009934.246951"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1584"
-            endingLineNumber = "1584"
+            startingLineNumber = "1586"
+            endingLineNumber = "1586"
             landmarkName = "analyzeColor()"
             landmarkType = "7">
             <Actions>
@@ -1289,11 +1291,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1634"
-            endingLineNumber = "1634"
+            startingLineNumber = "1685"
+            endingLineNumber = "1685"
             landmarkName = "checkAllCards()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1353,11 +1355,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2124"
-            endingLineNumber = "2124">
+            startingLineNumber = "2175"
+            endingLineNumber = "2175">
             <Actions>
                <BreakpointActionProxy
                   ActionExtensionID = "Xcode.BreakpointAction.DebuggerCommand">
@@ -1375,36 +1377,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2172"
-            endingLineNumber = "2172">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            condition = "colorIndex == 1"
-            continueAfterRunningActions = "No"
-            filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512665093.754641"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1551"
-            endingLineNumber = "1551"
-            landmarkName = "analyzeColor()"
-            landmarkType = "7">
-            <Actions>
-               <BreakpointActionProxy
-                  ActionExtensionID = "Xcode.BreakpointAction.DebuggerCommand">
-                  <ActionContent
-                     consoleCommand = "">
-                  </ActionContent>
-               </BreakpointActionProxy>
-            </Actions>
+            startingLineNumber = "2223"
+            endingLineNumber = "2223">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1414,11 +1391,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512665093.754641"
+            timestampString = "513009934.246951"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1588"
-            endingLineNumber = "1588"
+            startingLineNumber = "1590"
+            endingLineNumber = "1590"
             landmarkName = "analyzeColor()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1430,11 +1407,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512665093.754641"
+            timestampString = "513009934.246951"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1560"
-            endingLineNumber = "1560"
+            startingLineNumber = "1562"
+            endingLineNumber = "1562"
             landmarkName = "analyzeColor()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1446,11 +1423,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2060"
-            endingLineNumber = "2060"
+            startingLineNumber = "2111"
+            endingLineNumber = "2111"
             landmarkName = "DataForColor"
             landmarkType = "3">
          </BreakpointContent>
@@ -1462,11 +1439,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1707"
-            endingLineNumber = "1707"
+            startingLineNumber = "1735"
+            endingLineNumber = "1735"
             landmarkName = "checkAllCards()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1478,11 +1455,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512665093.754641"
+            timestampString = "513009934.246951"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1568"
-            endingLineNumber = "1568"
+            startingLineNumber = "1570"
+            endingLineNumber = "1570"
             landmarkName = "analyzeColor()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1494,11 +1471,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/AutoPlayer.swift"
-            timestampString = "512403815.7867"
+            timestampString = "513085772.439392"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "145"
-            endingLineNumber = "145"
+            startingLineNumber = "152"
+            endingLineNumber = "152"
             landmarkName = "startPlay(testType:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1510,11 +1487,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/AutoPlayer.swift"
-            timestampString = "512403815.7867"
+            timestampString = "513085772.439392"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "133"
-            endingLineNumber = "133"
+            startingLineNumber = "140"
+            endingLineNumber = "140"
             landmarkName = "startPlay(testType:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1526,11 +1503,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/AutoPlayer.swift"
-            timestampString = "512403815.7867"
+            timestampString = "513085772.439392"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "137"
-            endingLineNumber = "137"
+            startingLineNumber = "144"
+            endingLineNumber = "144"
             landmarkName = "startPlay(testType:)"
             landmarkType = "7">
             <Actions>
@@ -1582,11 +1559,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/AutoPlayer.swift"
-            timestampString = "512403815.7867"
+            timestampString = "513085772.439392"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "149"
-            endingLineNumber = "149"
+            startingLineNumber = "156"
+            endingLineNumber = "156"
             landmarkName = "startPlay(testType:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1598,11 +1575,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/AutoPlayer.swift"
-            timestampString = "512403815.7867"
+            timestampString = "513085772.439392"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "153"
-            endingLineNumber = "153"
+            startingLineNumber = "160"
+            endingLineNumber = "160"
             landmarkName = "startPlay(testType:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1646,11 +1623,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/AutoPlayer.swift"
-            timestampString = "512403815.7867"
+            timestampString = "513085772.439392"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "102"
-            endingLineNumber = "102"
+            startingLineNumber = "109"
+            endingLineNumber = "109"
             landmarkName = "printOldGames()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1662,11 +1639,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1649"
-            endingLineNumber = "1649"
+            startingLineNumber = "1700"
+            endingLineNumber = "1700"
             landmarkName = "findActSearchValue(searchValue:findMinValue:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -1678,11 +1655,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1647"
-            endingLineNumber = "1647"
+            startingLineNumber = "1698"
+            endingLineNumber = "1698"
             landmarkName = "findActSearchValue(searchValue:findMinValue:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -1694,11 +1671,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/AutoPlayer.swift"
-            timestampString = "512403815.7867"
+            timestampString = "513085772.439392"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "151"
-            endingLineNumber = "151"
+            startingLineNumber = "158"
+            endingLineNumber = "158"
             landmarkName = "startPlay(testType:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1789,22 +1766,6 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1661"
-            endingLineNumber = "1661"
-            landmarkName = "checkAllCards()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "FlowerCards/MySKCard.swift"
             timestampString = "512494030.735017"
             startingColumnNumber = "9223372036854775807"
@@ -1855,11 +1816,11 @@
             condition = "colorIndex == 1"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512665093.754641"
+            timestampString = "513009934.246951"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1555"
-            endingLineNumber = "1555"
+            startingLineNumber = "1557"
+            endingLineNumber = "1557"
             landmarkName = "analyzeColor()"
             landmarkType = "7">
             <Actions>
@@ -1911,11 +1872,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2125"
-            endingLineNumber = "2125">
+            startingLineNumber = "2176"
+            endingLineNumber = "2176">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1926,11 +1887,11 @@
             condition = "(actPair.card1.countTransitions + actPair.card2.countTransitions) &gt; 0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1924"
-            endingLineNumber = "1924"
+            startingLineNumber = "1975"
+            endingLineNumber = "1975"
             landmarkName = "checkPair(index:actPair:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1942,43 +1903,27 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1926"
-            endingLineNumber = "1926"
-            landmarkName = "checkPair(index:actPair:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1976"
-            endingLineNumber = "1976"
-            landmarkName = "checkCardPairWithOneTransition(actPair:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1977"
             endingLineNumber = "1977"
+            landmarkName = "checkPair(index:actPair:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/CardManager.swift"
+            timestampString = "513012904.037386"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "2027"
+            endingLineNumber = "2027"
             landmarkName = "checkCardPairWithOneTransition(actPair:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1990,11 +1935,27 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1968"
-            endingLineNumber = "1968"
+            startingLineNumber = "2028"
+            endingLineNumber = "2028"
+            landmarkName = "checkCardPairWithOneTransition(actPair:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/CardManager.swift"
+            timestampString = "513012904.037386"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "2019"
+            endingLineNumber = "2019"
             landmarkName = "findOtherPairWithSearchCard(searchCard:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -2006,11 +1967,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1980"
-            endingLineNumber = "1980"
+            startingLineNumber = "2031"
+            endingLineNumber = "2031"
             landmarkName = "checkCardPairWithOneTransition(actPair:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2022,11 +1983,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1982"
-            endingLineNumber = "1982"
+            startingLineNumber = "2033"
+            endingLineNumber = "2033"
             landmarkName = "checkCardPairWithOneTransition(actPair:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2038,11 +1999,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930089.63681"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1965"
-            endingLineNumber = "1965"
+            startingLineNumber = "2016"
+            endingLineNumber = "2016"
             landmarkName = "findOtherPairWithSearchCard(searchCard:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -2055,11 +2016,11 @@
             condition = "colorIndex == 1"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930352.75146"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1609"
-            endingLineNumber = "1609"
+            startingLineNumber = "1618"
+            endingLineNumber = "1618"
             landmarkName = "checkCardsWithTransitions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -2071,12 +2032,140 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardManager.swift"
-            timestampString = "512930389.4046"
+            timestampString = "513012904.037386"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1608"
-            endingLineNumber = "1608"
+            startingLineNumber = "1616"
+            endingLineNumber = "1616"
             landmarkName = "checkCardsWithTransitions()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/CardManager.swift"
+            timestampString = "513012904.037386"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1632"
+            endingLineNumber = "1632"
+            landmarkName = "checkCardsWithTransitions()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/CardManager.swift"
+            timestampString = "513012904.037386"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1648"
+            endingLineNumber = "1648"
+            landmarkName = "checkCardsWithTransitions()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/CardManager.swift"
+            timestampString = "513012904.037386"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1664"
+            endingLineNumber = "1664"
+            landmarkName = "checkCardsWithTransitions()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/CardManager.swift"
+            timestampString = "513012904.037386"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1629"
+            endingLineNumber = "1629"
+            landmarkName = "checkCardsWithTransitions()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/CardManager.swift"
+            timestampString = "513012904.037386"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1988"
+            endingLineNumber = "1988"
+            landmarkName = "checkPair(index:actPair:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/CardGameScene.swift"
+            timestampString = "513009531.890079"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "2016"
+            endingLineNumber = "2016"
+            landmarkName = "pull(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/CardManager.swift"
+            timestampString = "513009934.246951"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1551"
+            endingLineNumber = "1551"
+            landmarkName = "analyzeColor()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/CardManager.swift"
+            timestampString = "513012904.037386"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1993"
+            endingLineNumber = "1993"
+            landmarkName = "checkPair(index:actPair:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
