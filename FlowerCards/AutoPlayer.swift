@@ -12,27 +12,12 @@ import SpriteKit
 class AutoPlayer {
     // game to Play saves Games, Levels and CountPackages as they are displayed
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 17, countPackages: 3, gameNumber: 2610, stopAt: 100),
-//        GameToPlay(level: 19, countPackages: 3, gameNumber: 7604),
-//        GameToPlay(level: 21, countPackages: 3, gameNumber: 2650), // at Step: 151
-//        GameToPlay(level: 21, countPackages: 3, gameNumber: 4756), // at Step: 151
-//        GameToPlay(level: 21, countPackages: 3, gameNumber: 8574), // at Step: 151
-//        GameToPlay(level: 22, countPackages: 3, gameNumber: 288), // at Step: 150
-//        GameToPlay(level: 23, countPackages: 3, gameNumber: 6179), // at Step: 151
-        /*
-        GameToPlay(level: 22, countPackages: 4, gameNumber: 6819, stopAt: 145),
-        GameToPlay(level: 11, countPackages: 4, gameNumber: 3788, stopAt: 180),
-        GameToPlay(level: 4, countPackages: 3, gameNumber: 6271), // at Step: 150
-        GameToPlay(level: 4, countPackages: 3, gameNumber: 6597), // at Step: 150
-        GameToPlay(level: 5, countPackages: 3, gameNumber: 5949), // at Step: 150
-        GameToPlay(level: 6, countPackages: 3, gameNumber: 1416), // at Step: 151
-        GameToPlay(level: 7, countPackages: 3, gameNumber: 9769), // at Step: 151
-        GameToPlay(level: 8, countPackages: 3, gameNumber: 4649), // at Step: 150
-        GameToPlay(level: 10, countPackages: 3, gameNumber: 5416), // at Step: 151
-        GameToPlay(level: 10, countPackages: 3, gameNumber: 9423), // at Step: 151
-        GameToPlay(level: 11, countPackages: 3, gameNumber: 2810), // at Step: 150
-        GameToPlay(level: 17, countPackages: 4, gameNumber: 4279), // at Step: 202 
-*/
+        GameToPlay(level: 19, countPackages: 3, gameNumber: 958, stopAt:137),  // °°°°°°°°°°°°°°°°°°° ERROR °°°°°°°°°°°°°°°
+//        GameToPlay(level: 21, countPackages: 3, gameNumber: 2650), // °°°°°°°°°°°°°°°°°°° ERROR °°°°°°°°°°°°°°°
+//        GameToPlay(level: 21, countPackages: 3, gameNumber: 4756), // °°°°°°°°°°°°°°°°°°° ERROR °°°°°°°°°°°°°°°
+//        GameToPlay(level: 21, countPackages: 3, gameNumber: 8574), // °°°°°°°°°°°°°°°°°°° ERROR °°°°°°°°°°°°°°°
+//        GameToPlay(level: 22, countPackages: 3, gameNumber: 288), // °°°°°°°°°°°°°°°°°°° ERROR °°°°°°°°°°°°°°°
+//        GameToPlay(level: 23, countPackages: 3, gameNumber: 6179), // °°°°°°°°°°°°°°°°°°° ERROR °°°°°°°°°°°°°°°
     ]
     enum runStatus: Int {
         case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep
@@ -143,25 +128,39 @@ class AutoPlayer {
                     gameCounts[countPkgs][levelId] = count
                     if maxCount < count {
                         maxCount = count
-                        countMaxValues = 0
+                        countMaxValues = 1
                     } else if maxCount == count {
                         countMaxValues += 1
                     }
                 }
             }
-            var calculateCount = true
-            if countMaxValues == 4 * 26 {
-                calculateCount = false
-            }
-            for countPkgs in 0...3 {
-                for levelId in 0...25 {
-                    let count = calculateCount ? maxCount - gameCounts[3 - countPkgs][levelId] : 1
-                    for _ in 0..<count {
-                        let gameToPlay = GameToPlay(level: levelId + 1, countPackages: 4 - countPkgs, gameNumber: 1 + Int(arc4random()) % MaxGameNumber)
-                        gamesToPlay.append(gameToPlay)
+            
+            if countMaxValues != 4 * 26 {
+                for countPkgs in 0...3 {
+                    for levelId in 0...25 {
+                        let count = maxCount - gameCounts[3 - countPkgs][levelId]
+                        for _ in 0..<count {
+                            let gameToPlay = GameToPlay(level: levelId + 1, countPackages: 4 - countPkgs, gameNumber: 1 + Int(arc4random()) % MaxGameNumber)
+                            gamesToPlay.append(gameToPlay)
+                        }
                     }
                 }
             }
+            var go = true
+            while go {
+                for countPkgs in 0...3 {
+                    for levelId in 0...25 {
+                        for _ in 0..<1 {
+                            let gameToPlay = GameToPlay(level: levelId + 1, countPackages: 4 - countPkgs, gameNumber: 1 + Int(arc4random()) % MaxGameNumber)
+                            gamesToPlay.append(gameToPlay)
+                            if gamesToPlay.count > 1000 {
+                                go = false
+                            }
+                        }
+                    }
+                }
+            }
+            
 
         case .runOnce:
             gamesToPlay.removeAll()

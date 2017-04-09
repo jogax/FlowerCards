@@ -12,12 +12,16 @@ import SpriteKit
 struct ConnectablePair {
     var card1: MySKCard
     var card2: MySKCard
-    var connectedValues: (Int, Int) {
+    var connectedValues: (upper:Int, lower:Int) {
         get {
             if (card1.minValue - 1 == card2.maxValue) || (card1.minValue == FirstCardValue && card2.maxValue == LastCardValue) {
-                return (card1.minValue, card2.maxValue)
+                return (upper: card1.minValue, lower: card2.maxValue)
+            } else if (card1.maxValue + 1 == card2.minValue) || (card1.maxValue == LastCardValue && card2.minValue == FirstCardValue){
+                return (upper: card2.minValue, lower: card1.maxValue)
+            } else if card2.type == .containerType {
+                return (upper: NoValue, lower: card1.maxValue)
             } else {
-                return (card1.maxValue, card2.minValue)
+                return (upper: NoValue, lower: NoValue)
             }
         }
     }
@@ -1386,25 +1390,39 @@ class CardManager {
             }
         }
         struct UsedCard {
-//            var freeCount: Int
-//            var allCount: Int
-            var freeMinMaxCount: Int
-            var freeMinCount: Int
+            var freeMinValues: [MySKCard] = []
+            var freeMaxValues: [MySKCard] = []
             var midCount: Int
-            var freeMaxCount: Int
-//            var minNeeded: Int
-//            var maxNeeded: Int
             
             var countInStack: Int {
                 get {
-                    return countPackages - freeMaxCount - freeMinCount - midCount - freeMinMaxCount
+                    var returnValue = countPackages - freeMaxCount - freeMinCount - midCount
+                    for card in freeMinValues {
+                        // cards with countCards == 1 were counted twice, correct it
+                        if card.countCards == 1 {
+                            returnValue += 1
+                        }
+                    }
+                    return returnValue
                 }
             }
+            var freeMaxCount: Int {
+                get {
+                    return freeMaxValues.count
+                }
+            }
+            var freeMinCount: Int {
+                get {
+                    return freeMinValues.count
+                }
+            }
+//            var freeMinMaxCount: Int {
+//                get {
+//                    return freeMinMaxValues.count
+//                }
+//            }
             init() {
-                freeMinMaxCount = 0
-                freeMinCount = 0
                 midCount = 0
-                freeMaxCount = 0
             }
         }
         
@@ -1418,21 +1436,17 @@ class CardManager {
         }
         
         func addCardToUsedCards(card: MySKCard) {
-            if card.minValue == card.maxValue && card.countCards == 1 {
-                usedCards[card.minValue].freeMinMaxCount += 1
+            usedCards[card.minValue].freeMinValues.append(card)
+            if card.maxValue == LastCardValue && card.type == .containerType {
+                usedCards[card.maxValue].midCount += 1
             } else {
-                usedCards[card.minValue].freeMinCount += 1
-                if card.maxValue == LastCardValue && card.type == .containerType {
-                    usedCards[card.maxValue].midCount += 1
-                } else {
-                    usedCards[card.maxValue].freeMaxCount += 1
-                }
-                var index = 1
-                while index < card.countCards - 1 {
-                    let value = (card.minValue + index) % CountCardsInPackage
-                    usedCards[value].midCount += 1
-                    index += 1
-                }
+                usedCards[card.maxValue].freeMaxValues.append(card)
+            }
+            var index = 1
+            while index < card.countCards - 1 {
+                let value = (card.minValue + index) % CountCardsInPackage
+                usedCards[value].midCount += 1
+                index += 1
             }
         }
         
@@ -1505,7 +1519,7 @@ class CardManager {
         func printUsedCards() {
             for index in 0..<usedCards.count {
                 if let cardName = MySKCard.cardLib[index] {
-                    var printString = "card \(cardName.length == 1 ? " " : "" + cardName). alone: \(usedCards[index].freeMinMaxCount), "
+                    var printString = "card \((cardName.length == 1 ? " " : "") + cardName). "
                     printString += "freeMin: \(usedCards[index].freeMinCount), "
                     printString += "freeMax: \(usedCards[index].freeMaxCount), "
                     printString += "midCount: \(usedCards[index].midCount), "
@@ -1545,10 +1559,11 @@ class CardManager {
             cardsWithTransitions.removeAll()
             freeConnectableCards.removeAll()
             usedCards = Array(repeating: UsedCard(), count: CountCardsInPackage)
-                countTransitions = 0
+            countTransitions = 0
             
             findContainer()
             fillAllCards()
+            allCards = allCards.sorted(by: {$0.maxValue > $1.maxValue || $0.maxValue == $1.maxValue && $0.minValue > $1.minValue})
             checkCardsWithTransitions()
             checkAllCards()
             
@@ -1614,17 +1629,21 @@ class CardManager {
             }
 
             if countTransitions == countPackages - 1 {
-                switch (countPackages, cardsWithTransitions.count) {
-                case (2, 1), (3, 1), (4, 1):
+                var countTransitionsInContainer = 0
+                if container != nil {
+                    countTransitionsInContainer = container!.countTransitions
+                }
+                switch (countPackages, cardsWithTransitions.count, countTransitionsInContainer) {
+                case (2, 1, 0), (3, 1, 0), (4, 1, 0):
                     cardsWithTransitions[0].belongsToPackageMax = maxPackage
                     cardsWithTransitions[0].belongsToPackageMin = minPackage
-                case (3, 2), (4, 2):
+                case (3, 2, 0), (4, 2, 0):
                     if cardsWithTransitions[0].minValue <= cardsWithTransitions[1].maxValue {
                         setBelonging(upperIndex: 1, lowerIndex: 0)
                     } else if cardsWithTransitions[1].minValue <= cardsWithTransitions[0].maxValue {
                         setBelonging(upperIndex: 0, lowerIndex: 1)
                     }
-                case (4, 3):
+                case (4, 3, 0):
                     if cardsWithTransitions[0].minValue <= cardsWithTransitions[1].maxValue &&
                         cardsWithTransitions[0].minValue <= cardsWithTransitions[2].maxValue
                     {
@@ -1714,8 +1733,7 @@ class CardManager {
                     if foundedCard.belongsToPackageMax.countOnes() > 1 {
                         let usedCard = usedCards[foundedCard.maxValue]
                         if (usedCard.midCount == countPackages - 1 && usedCard.freeMaxCount == 1) ||
-                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMinCount == 1 && usedCard.freeMaxCount == 1) ||
-                            (usedCard.midCount == countPackages - 1 && usedCard.freeMinMaxCount == 1)
+                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMinCount == 1 && usedCard.freeMaxCount == 1)
                         {
                             foundedCard.belongsToPackageMax = actMaxPackage
                             foundedCard.belongsToPackageMin = foundedCard.belongsToPackageMax >> UInt8(foundedCard.countTransitions)
@@ -1739,8 +1757,7 @@ class CardManager {
                         let usedCard = usedCards[foundedCard.minValue]
                         if (usedCard.midCount == countPackages - 1 && usedCard.freeMinCount == 1) ||
                             (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMinCount == 1 && usedCard.freeMaxCount == 1) ||
-                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMinMaxCount == 1 && usedCard.freeMaxCount == 1) ||
-                            (usedCard.midCount == countPackages - 1 && usedCard.freeMinMaxCount == 1)
+                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMaxCount == 1)
                         {
                             foundedCard.belongsToPackageMin = actMinPackage
                             foundedCard.belongsToPackageMax = foundedCard.belongsToPackageMin << UInt8(foundedCard.countTransitions)
@@ -1935,7 +1952,28 @@ class CardManager {
                             break
                         }
                     }
-                    if !founded {
+                    let connectValues = connectablePair.connectedValues
+                    let upperUsedCard = usedCards[connectValues.upper]
+                    let lowerUsedCard = usedCards[connectValues.lower]
+                    var allowedPair = true
+                    if upperUsedCard.freeMinCount == 2 && lowerUsedCard.freeMaxCount == 2 && upperUsedCard.countInStack == 0 {
+                        var checkCard: MySKCard?
+                        
+                        if upperUsedCard.freeMinValues[0] == lowerUsedCard.freeMaxValues[0] ||
+                            upperUsedCard.freeMinValues[0] == lowerUsedCard.freeMaxValues[1] {
+                            checkCard = upperUsedCard.freeMinValues[0]
+                        }
+                        if upperUsedCard.freeMinValues[1] == lowerUsedCard.freeMaxValues[0] ||
+                            upperUsedCard.freeMinValues[1] == lowerUsedCard.freeMaxValues[1] {
+                            checkCard = upperUsedCard.freeMinValues[1]
+                        }
+                        if let card = checkCard {
+                            if !(card == connectablePair.card1 || card == connectablePair.card2) {
+                                allowedPair = false
+                            }
+                        }
+                    }
+                    if !founded && allowedPair {
                         connectablePairs.append(connectablePair)
                         foundedPairs.append(connectablePair)
                     }
@@ -1963,6 +2001,18 @@ class CardManager {
         }
 
         private func checkPair(index: Int, actPair: ConnectablePair) {
+            let values = actPair.connectedValues
+            if values.upper == NoValue {
+                return
+            }
+            let upperUsedCard = usedCards[values.upper]
+            let lowerUsedCard = usedCards[values.lower]
+
+            if values.upper == FirstCardValue {
+                if upperUsedCard.freeMinCount == 1 && upperUsedCard.midCount == countPackages - 2 {
+                    
+                }
+            }
             if actPair.card1.type == .cardType && actPair.card2.type == .cardType {
                 if actPair.card1.countTransitions > 0 && actPair.card2.countTransitions > 0 {
                     if !checkCardPairWithTransition(card1:actPair.card1, card2: actPair.card2) {
@@ -1986,7 +2036,7 @@ class CardManager {
                     for (ind, pair) in connectablePairs.enumerated() {
                         if pair != actPair {
                             if pair.card1.type == .cardType && pair.card2.type == .cardType &&
-                                (actPair.card1 == pair.card1 || actPair.card1 == pair.card2 || actPair.card2 == pair.card1 || actPair.card2 == pair.card2) &&
+                                (actPair.card1 === pair.card1 || actPair.card1 === pair.card2 || actPair.card2 === pair.card1 || actPair.card2 === pair.card2) &&
                                 (pair.card1.minValue == FirstCardValue && pair.card2.maxValue == LastCardValue ||
                                     pair.card2.minValue == FirstCardValue && pair.card1.maxValue == LastCardValue) {
                                 let actPairLen = actPair.card1.countCards + actPair.card2.countCards
@@ -2025,7 +2075,7 @@ class CardManager {
             if countTransitions == countPackages - 1 {
                 let otherCard: MySKCard = actPair.card1.countTransitions == 0 ? actPair.card1 : actPair.card2
                 let cardWithTransition: MySKCard = actPair.card1.countTransitions == 0 ? actPair.card2 : actPair.card1
-                let (otherPair, index) = findOtherPairWithSearchCard(searchCard: cardWithTransition)
+                let (otherPair, _) = findOtherPairWithSearchCard(searchCard: cardWithTransition)
                 if otherPair != nil {
                     let otherCard1 = otherPair?.card1 == cardWithTransition ? otherPair?.card2 : actPair.card1
                     if cardWithTransition.colorIndex == 1 {
@@ -2071,7 +2121,7 @@ class CardManager {
             
             
             if countPackages == 4 && countTransitions == countPackages - 1 {
-                if card1.countTransitions == 1 && card2.countTransitions == 1 {
+                if card1.countTransitions == 1 && card2.countTransitions == 1 && cardsWithTransitions.count == 3 {
                     return checkCardsBothWithTransitions(card1: card1, card2: card2)
                 }
             }
