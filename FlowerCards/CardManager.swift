@@ -1427,6 +1427,7 @@ class CardManager {
         }
         
         var freeConnectableCards: [FreeConnectableCards] = []
+        
         init(colorIndex: Int) {
             self.colorIndex = colorIndex
         }
@@ -1973,6 +1974,19 @@ class CardManager {
                             }
                         }
                     }
+                    if lowerUsedCard.freeMinCount == 1 && lowerUsedCard.countInStack == 0 { // can be only in pkg 1
+                        if first === lowerUsedCard.freeMinValues[0] && first.belongsToPackageMax.countOnes() > 1 {
+                            first.belongsToPackageMax = minPackage
+                            if second.belongsToPackageMax != minPackage {
+                                allowedPair = false
+                            }
+                        } else if second === lowerUsedCard.freeMinValues[0] && second.belongsToPackageMax.countOnes() > 1 {
+                            second.belongsToPackageMax = minPackage
+                            if first.belongsToPackageMax != minPackage {
+                                allowedPair = false
+                            }
+                        }
+                   }
                     if !founded && allowedPair {
                         connectablePairs.append(connectablePair)
                         foundedPairs.append(connectablePair)

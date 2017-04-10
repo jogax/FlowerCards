@@ -12,12 +12,8 @@ import SpriteKit
 class AutoPlayer {
     // game to Play saves Games, Levels and CountPackages as they are displayed
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 19, countPackages: 3, gameNumber: 958, stopAt:137),  // °°°°°°°°°°°°°°°°°°° ERROR °°°°°°°°°°°°°°°
-//        GameToPlay(level: 21, countPackages: 3, gameNumber: 2650), // °°°°°°°°°°°°°°°°°°° ERROR °°°°°°°°°°°°°°°
-//        GameToPlay(level: 21, countPackages: 3, gameNumber: 4756), // °°°°°°°°°°°°°°°°°°° ERROR °°°°°°°°°°°°°°°
-//        GameToPlay(level: 21, countPackages: 3, gameNumber: 8574), // °°°°°°°°°°°°°°°°°°° ERROR °°°°°°°°°°°°°°°
-//        GameToPlay(level: 22, countPackages: 3, gameNumber: 288), // °°°°°°°°°°°°°°°°°°° ERROR °°°°°°°°°°°°°°°
-//        GameToPlay(level: 23, countPackages: 3, gameNumber: 6179), // °°°°°°°°°°°°°°°°°°° ERROR °°°°°°°°°°°°°°°
+        GameToPlay(level: 2, countPackages: 3, gameNumber: 9316),
+        GameToPlay(level: 23, countPackages: 4, gameNumber: 9431),
     ]
     enum runStatus: Int {
         case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep
