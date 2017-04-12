@@ -1370,10 +1370,20 @@ class CardManager {
     }
     
     class DataForColor {
+//        struct CardMap {
+//            struct CardPackArray {
+//                struct CardArray {
+//                    var cardIndexInAllCards: [Int] = Array(repeating: NoValue, count: CountCardsInPackage)
+//                }
+//                var cardPack: [CardArray] = Array(repeating: CardArray(), count: countPackages)
+//            }
+//            var map: [CardPackArray] = Array(repeating: CardPackArray(), count: countPackages == 4 ? 6 : countPackages == 3 ? 2 : 1)
+//        }
         var colorIndex: Int
         var container: MySKCard?
         var allCards: [MySKCard] = []
         var cardsWithTransitions: [MySKCard] = []
+        var cardMap: [[[Int]]] =  [[[]]]
         var connectablePairs: [ConnectablePair] = []
         var pairsToRemove: [Int] = []
         var countTransitions = 0
@@ -1552,6 +1562,30 @@ class CardManager {
             }
         }
         
+        func printCardMap() {
+            print("=======================    CardMap    ====================")
+            print("----|--------|--------|--------|--------|--------|--------|")
+            for value in 0...LastCardValue {
+                let reversedValue = LastCardValue - value
+                if let cardName = MySKCard.cardLib[reversedValue] {
+                    let cardNameModified = (cardName.length == 1 ? " " : "") + cardName
+                    var printString = "\(cardNameModified): "
+                    for cardMapIndex in 0..<6 {
+                        printString += "|"
+                        for pkgIndex in 0..<countPackages {
+                            let value = cardMap[cardMapIndex][pkgIndex][reversedValue]
+                            printString += value == NoValue ? " x" : cardNameModified
+                        }
+                    }
+                    printString += "|"
+                    print(printString)
+                }
+                if reversedValue == 9 || reversedValue == 5 || reversedValue == 0 {
+                    print("----|--------|--------|--------|--------|--------|--------|")
+                }
+            }
+        }
+        
 
         func analyzeColor() {
             container = nil
@@ -1559,12 +1593,15 @@ class CardManager {
             pairsToRemove.removeAll()
             cardsWithTransitions.removeAll()
             freeConnectableCards.removeAll()
+            cardMap = Array(repeating: Array(repeating: Array(repeating: NoValue, count: CountCardsInPackage), count: countPackages), count: 6)
             usedCards = Array(repeating: UsedCard(), count: CountCardsInPackage)
             countTransitions = 0
             
             findContainer()
             fillAllCards()
             allCards = allCards.sorted(by: {$0.maxValue > $1.maxValue || $0.maxValue == $1.maxValue && $0.minValue > $1.minValue})
+            cardsWithTransitions = cardsWithTransitions.sorted(by: {$0.maxValue > $1.maxValue || $0.maxValue == $1.maxValue && $0.minValue > $1.minValue})
+            fillCardMaps()
             checkCardsWithTransitions()
             checkAllCards()
             
@@ -1620,6 +1657,62 @@ class CardManager {
             }
 
         }
+        
+        private func fillCardMaps() {
+            var allCardIndexes: [Int] = []
+            func fillMap(mapIndex: Int, indexes: [Int]) {
+                var nextPkgIndexAdder = 0
+                for (pkgIndex, index) in indexes.enumerated() {
+                    let card = allCards[allCardIndexes[index]]
+                    let startIndex = card.maxValue
+                    var packageIndex = pkgIndex + nextPkgIndexAdder
+                    if card.countTransitions == 2 {
+                        nextPkgIndexAdder = 1
+                    }
+                    for adder in 0...card.countCards - 1 {
+                        let cardIndex = (startIndex - adder + (countPackages * CountCardsInPackage)) % CountCardsInPackage
+                        packageIndex += cardIndex == LastCardValue && adder > 0 ? 1 : 0
+                        if cardIndex == NoValue || packageIndex > 3 {
+                            print("mapIndex: \(mapIndex), packageIndex: \(packageIndex), cardIndex: \(cardIndex)")
+                        }
+                        if cardMap[mapIndex][packageIndex][cardIndex] == NoValue {
+                            cardMap[mapIndex][packageIndex][cardIndex] = allCardIndexes[index]
+                        } else {
+                            cardMap[mapIndex] = Array(repeating: Array(repeating: NoValue, count: CountCardsInPackage), count: countPackages)
+                        }
+                    }
+                }
+            }
+            for card in cardsWithTransitions {
+                for (allCardIndex, allCard) in allCards.enumerated() {
+                    if allCard === card {
+                        allCardIndexes.append(allCardIndex)
+                        break
+                    }
+                }
+            }
+            if countTransitions == countPackages - 1 {
+                switch cardsWithTransitions.count {
+                case 1:
+                    fillMap(mapIndex: 0, indexes: [0])
+                case 2:
+                    fillMap(mapIndex: 0, indexes: [0, 1])
+                    fillMap(mapIndex: 1, indexes: [1, 0])
+                case 3:
+                    fillMap(mapIndex: 0, indexes: [0, 1, 2])
+                    fillMap(mapIndex: 1, indexes: [0, 2, 1])
+                    fillMap(mapIndex: 2, indexes: [1, 0, 2])
+                    fillMap(mapIndex: 3, indexes: [1, 2, 0])
+                    fillMap(mapIndex: 4, indexes: [2, 0, 1])
+                    fillMap(mapIndex: 5, indexes: [2, 1, 0])
+                default:
+                    break
+                }
+            }
+            for card in allCards {
+            }
+        }
+
         
         private func checkCardsWithTransitions() {
             func setBelonging(upperIndex: Int, lowerIndex: Int) {
@@ -1734,7 +1827,7 @@ class CardManager {
                     if foundedCard.belongsToPackageMax.countOnes() > 1 {
                         let usedCard = usedCards[foundedCard.maxValue]
                         if (usedCard.midCount == countPackages - 1 && usedCard.freeMaxCount == 1) ||
-                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMinCount == 1 && usedCard.freeMaxCount == 1)
+                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMaxCount == 1)
                         {
                             foundedCard.belongsToPackageMax = actMaxPackage
                             foundedCard.belongsToPackageMin = foundedCard.belongsToPackageMax >> UInt8(foundedCard.countTransitions)
