@@ -16,9 +16,9 @@ class AutoPlayer {
 //        GameToPlay(level: 24, countPackages: 2, gameNumber: 1987), // at Step: 99  ************ OK **************
 //        GameToPlay(level: 24, countPackages: 2, gameNumber: 5188), // at Step: 99  ************ OK **************
 //        GameToPlay(level: 24, countPackages: 2, gameNumber: 6557), // at Step: 99  ************ OK **************
-        GameToPlay(level: 25, countPackages: 2, gameNumber: 166), // at Step: 99  ************ OK **************
-        GameToPlay(level: 26, countPackages: 2, gameNumber: 2819), // at Step: 99
-        GameToPlay(level: 2, countPackages: 3, gameNumber: 9316),
+//        GameToPlay(level: 25, countPackages: 2, gameNumber: 166), // at Step: 99  ************ OK **************
+//        GameToPlay(level: 26, countPackages: 2, gameNumber: 2819), // at Step: 99
+//        GameToPlay(level: 2, countPackages: 3, gameNumber: 9316),
         GameToPlay(level: 23, countPackages: 4, gameNumber: 9431),
     ]
     enum runStatus: Int {
