@@ -511,7 +511,7 @@ class MySKCard: SKSpriteNode {
         #endif
         self.countTransitions += otherCard.countTransitions
         
-        if self.minValue == otherCard.maxValue + 1  && self.belongsToPackageMin & otherCard.belongsToPackageMax != 0 && !upperOnly {
+        if self.minValue == otherCard.maxValue + 1  && self.belongsToPackageMin & otherCard.belongsToPackageMax != 0 /*&& !upperOnly*/ {
             self.minValue = otherCard.minValue
         } else if self.maxValue == otherCard.minValue - 1 && self.belongsToPackageMax & otherCard.belongsToPackageMin != 0 {
             self.maxValue = otherCard.maxValue

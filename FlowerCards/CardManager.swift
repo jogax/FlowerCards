@@ -9,9 +9,10 @@
 import Foundation
 import SpriteKit
 
-struct ConnectablePair {
+class ConnectablePair {
     var card1: MySKCard
     var card2: MySKCard
+    var supressed: Bool
     var connectedValues: (upper:Int, lower:Int) {
         get {
             if (card1.minValue - 1 == card2.maxValue) || (card1.minValue == FirstCardValue && card2.maxValue == LastCardValue) {
@@ -24,6 +25,11 @@ struct ConnectablePair {
                 return (upper: NoValue, lower: NoValue)
             }
         }
+    }
+    init(card1: MySKCard, card2: MySKCard) {
+        self.card1 = card1
+        self.card2 = card2
+        supressed = false
     }
     func convertCard(card: MySKCard)->Int64 {
         var hash = card.countTransitions << 0
@@ -61,7 +67,7 @@ struct ConnectablePair {
     }
 }
 
-struct Tipp {
+class Tipp: ConnectablePair {
     struct InnerTipp {
         var points: [CGPoint]
         var value: Int
@@ -78,15 +84,16 @@ struct Tipp {
         }
     }
     var removed: Bool
-    var card1: MySKCard
-    var card2: MySKCard
+//    var card1: MySKCard
+//    var card2: MySKCard
     var innerTipps: [InnerTipp]
     
     init() {
         removed = false
         innerTipps = [InnerTipp]()
-        card1 = MySKCard()
-        card2 = MySKCard()
+        super.init(card1: MySKCard(), card2: MySKCard())
+//        card1 = MySKCard()
+//        card2 = MySKCard()
     }
     func hasThisInnerTipp(count:Int, firstPoint: CGPoint)->Bool {
         for innerTipp in innerTipps {
@@ -1590,6 +1597,7 @@ class CardManager {
 
         func analyzeColor() {
             container = nil
+            allCards.removeAll()
             connectablePairs.removeAll()
             pairsToRemove.removeAll()
             cardsWithTransitions.removeAll()
@@ -1709,6 +1717,42 @@ class CardManager {
                 if cardMapIndexes.count == 1 && allCards.count > 1 { // only one possible arrangement, set the belongingflags
                     var index = 0
                     var actMaxPackage = maxPackage
+                    if container != nil {
+                        if container!.minValue == 0 {
+                            actMaxPackage = container!.belongsToPackageMin >> 1
+                        } else {
+                            actMaxPackage = container!.belongsToPackageMin
+                        }
+                    }
+                    while allCards[index].countTransitions > 0 {
+                        allCards[index].belongsToPackageMax = actMaxPackage
+                        actMaxPackage = actMaxPackage >> UInt8(allCards[index].countTransitions)
+                        allCards[index].belongsToPackageMin = actMaxPackage
+                        index += 1
+                    }
+                }
+            }
+            if countTransitions == countPackages - 2 {
+                cardMapIndexes = []
+                switch cardsWithTransitions.count {
+                case 1:
+                    fillMap(mapIndex: 0, indexes: [0])
+                case 2:
+                    fillMap(mapIndex: 0, indexes: [0, 1])
+                    fillMap(mapIndex: 1, indexes: [1, 0])
+                default:
+                    break
+                }
+                if cardMapIndexes.count == 1 && allCards.count > 1 { // only one possible arrangement, set the belongingflags
+                    var index = 0
+                    var actMaxPackage = maxPackage
+                    if container != nil {
+                        if container!.minValue == 0 {
+                            actMaxPackage = container!.belongsToPackageMin >> 1
+                        } else {
+                            actMaxPackage = container!.belongsToPackageMin
+                        }
+                    }
                     while allCards[index].countTransitions > 0 {
                         allCards[index].belongsToPackageMax = actMaxPackage
                         actMaxPackage = actMaxPackage >> UInt8(allCards[index].countTransitions)
@@ -1920,7 +1964,7 @@ class CardManager {
             func createMask(withMinPackage: Bool = true)->UInt8 {
                 var bit = masterCard.belongsToPackageMax
                 var mask = masterCard.belongsToPackageMax | (withMinPackage ? masterCard.belongsToPackageMin : 0)
-                while bit != masterCard.belongsToPackageMin {
+                while bit != masterCard.belongsToPackageMin && bit > 0 {
                     mask |= bit
                     bit = bit >> 1
                 }
@@ -2307,7 +2351,6 @@ class CardManager {
         }
 
         private func fillAllCards() {
-            allCards.removeAll()
             for cardColumn in gameArray {
                 for card in cardColumn {
                     if card.used && card.card.colorIndex == colorIndex {
@@ -2329,8 +2372,12 @@ class CardManager {
                                 card.card.belongsToPackageMax = maxPackage
                                 card.card.belongsToPackageMin = minPackage
                             case (3, 1), (4, 1):
-                                card.card.belongsToPackageMax = allPackages & ~minPackage
-                                card.card.belongsToPackageMin = allPackages & ~maxPackage
+                                var actAllPackages = allPackages
+                                if container != nil {
+                                    actAllPackages = allPackages >> UInt8(container!.countTransitions)
+                                }
+                                card.card.belongsToPackageMax = actAllPackages & ~minPackage
+                                card.card.belongsToPackageMin = card.card.belongsToPackageMax >> 1
                             case (4, 2):
                                 card.card.belongsToPackageMax = maxPackage + maxPackage >> 1
                                 card.card.belongsToPackageMin = minPackage + minPackage << 1
