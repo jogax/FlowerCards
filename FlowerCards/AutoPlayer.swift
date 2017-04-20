@@ -12,13 +12,16 @@ import SpriteKit
 class AutoPlayer {
     // game to Play saves Games, Levels and CountPackages as they are displayed
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 26, countPackages: 3, gameNumber: 4875), // at Step: 150
-        //        GameToPlay(level: 2, countPackages: 4, gameNumber: 6381), // goes to 0 Tipps
-        //        GameToPlay(level: 24, countPackages: 3, gameNumber: 5451, stopAt: 130), **** OK ****
-        //        GameToPlay(level: 25, countPackages: 3, gameNumber: 9710), // at Step: 154 **** OK ****
-        //        GameToPlay(level: 24, countPackages: 3, gameNumber: 2093), // at Step: 151 **** OK ****
-        //        GameToPlay(level: 26, countPackages: 3, gameNumber: 4007), // at Step: 150 **** OK ****
-        //        GameToPlay(level: 26, countPackages: 3, gameNumber: 4595), // at Step: 151 **** OK ****
+        GameToPlay(level: 26, countPackages: 3, gameNumber: 4875, stopAt: 90), // at Step: 150 *** Error *** Purple, 2(2)/A(1) , 9(3)/10(2)
+        GameToPlay(level: 1, countPackages: 4, gameNumber: 341), // at Step: 202 *** Error *** Purple
+        GameToPlay(level: 4, countPackages: 4, gameNumber: 9126), // at Step: 203 // ** Error *** Red 5(4) / 6(1)
+        GameToPlay(level: 6, countPackages: 4, gameNumber: 1913), // at Step: 106 ** OK **
+        GameToPlay(level: 7, countPackages: 4, gameNumber: 3342), // at Step: 132 ** OK **
+        GameToPlay(level: 9, countPackages: 4, gameNumber: 5372), // at Step: 189 ** OK **
+        GameToPlay(level: 14, countPackages: 4, gameNumber: 1487), // at Step: 202 ** Error ** Red?
+        GameToPlay(level: 24, countPackages: 4, gameNumber: 205), // at Step: 192
+        GameToPlay(level: 26, countPackages: 4, gameNumber: 2810), // at Step: 191
+        GameToPlay(level: 2, countPackages: 4, gameNumber: 6381), // at Step: 81 ** Tippcounter = 0 **
     ]
     enum runStatus: Int {
         case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep
