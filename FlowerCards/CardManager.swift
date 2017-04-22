@@ -84,8 +84,6 @@ class Tipp: ConnectablePair {
         }
     }
     var removed: Bool
-//    var card1: MySKCard
-//    var card2: MySKCard
     var innerTipps: [InnerTipp]
     
     init() {
@@ -537,8 +535,6 @@ class CardManager {
             }
         }
         _ = createTipps()
-//        let generatingCardArrayEnded = Date()
-//        let cardArrayGeneratingTime = CFDateGetTimeIntervalSinceDate(generatingCardArrayStarted as CFDate!, generatingCardArrayEnded as CFDate!)
         return cardArray
     }
     
@@ -1377,15 +1373,6 @@ class CardManager {
     }
     
     class DataForColor {
-//        struct CardMap {
-//            struct CardPackArray {
-//                struct CardArray {
-//                    var cardIndexInAllCards: [Int] = Array(repeating: NoValue, count: CountCardsInPackage)
-//                }
-//                var cardPack: [CardArray] = Array(repeating: CardArray(), count: countPackages)
-//            }
-//            var map: [CardPackArray] = Array(repeating: CardPackArray(), count: countPackages == 4 ? 6 : countPackages == 3 ? 2 : 1)
-//        }
         var colorIndex: Int
         var container: MySKCard?
         var allCards: [MySKCard] = []
@@ -1582,7 +1569,7 @@ class CardManager {
                         printString += " |"
                         for pkgIndex in 0..<countPackages {
                             let value = cardMap[cardMapIndex][pkgIndex][reversedValue]
-                            printString += value == NoValue ? "x" : "\(value)"
+                            printString += value == NoValue ? "x" : value == NoColor ? "C" : "\(value)"
                             printString += "|"
                         }
                     }
@@ -1608,32 +1595,9 @@ class CardManager {
             
             findContainer()
             fillAllCards()
-//            allCards = allCards.sorted(by: {$0.maxValue > $1.maxValue || $0.maxValue == $1.maxValue && $0.minValue > $1.minValue})
-            allCards = allCards.sorted(by: {$0.countTransitions > $1.countTransitions || $0.countTransitions == $1.countTransitions && ($0.countCards > $1.countCards || $0.countCards == $1.countCards && $0.maxValue > $1.maxValue)})
-            cardsWithTransitions = cardsWithTransitions.sorted(by: {$0.maxValue > $1.maxValue || $0.maxValue == $1.maxValue && $0.minValue > $1.minValue})
             fillCardMaps()
-//            checkCardsWithTransitions()
             checkAllCards()
             
-//            var countChanges = 0
-//            if let container = container {
-//                // set the belongingsFlags by all other Cards
-//                countChanges += setOtherCardBelonging(cardWithTransition: container)
-//            }
-//            for card in cardsWithTransitions {
-//                countChanges += setOtherCardBelonging(cardWithTransition: card)
-//            }
-//            countChanges = 1
-//            var counter = allCards.count
-//            while countChanges > 0 && counter > 0 {
-//                countChanges = 0
-//                for card in allCards {
-//                    if card.belongsToPackageMax.countOnes() == 1 {  // if more then one possible connections
-//                        countChanges += setOtherCardBelonging(cardWithTransition: card)
-//                    }
-//                }
-//                counter -= 1
-//            }
             
             if container != nil {
                 _ = findPair(card: container!)
@@ -1669,13 +1633,44 @@ class CardManager {
         }
         
         private func fillCardMaps() {
-            func fillMap(mapIndex: Int, indexes: [Int], startPackageIndex: Int = 0) {
-
+            func fillMap(mapIndex: Int, indexes: [Int], startPackageIndexes: [Int] = []) {
+                func fillMapWithContainer() {
+                    let startIndex = container!.maxValue
+                    let index = NoColor
+                    var packageIndex = 0
+                    for adder in 0...container!.countCards - 1 {
+                        let cardIndex = (startIndex - adder + (countPackages * CountCardsInPackage)) % CountCardsInPackage
+                        packageIndex += cardIndex == LastCardValue && adder > 0 ? 1 : 0
+                        if cardIndex == NoValue || packageIndex > countPackages - 1 {
+                            cardMap[mapIndex] = Array(repeating: Array(repeating: NoValue, count: CountCardsInPackage), count: countPackages)
+                            cardMapIndexes.removeLast()
+                            return
+                        }
+                        if cardMap[mapIndex][packageIndex][cardIndex] == NoValue {
+                            cardMap[mapIndex][packageIndex][cardIndex] = index
+                            if !cardMapIndexes.contains(mapIndex) {
+                                cardMapIndexes.append(mapIndex)
+                            }
+                        } else {
+                            cardMap[mapIndex] = Array(repeating: Array(repeating: NoValue, count: CountCardsInPackage), count: countPackages)
+                            cardMapIndexes.removeLast()
+                            return
+                        }
+                    }
+                }
+                
                 var nextPkgIndexAdder = 0
+                if container != nil {
+                    fillMapWithContainer()
+                }
                 for (pkgIndex, index) in indexes.enumerated() {
                     let card = allCards[index]
                     let startIndex = card.maxValue
-                    var packageIndex = pkgIndex + nextPkgIndexAdder + startPackageIndex
+                    var startPackageIndex = pkgIndex
+                    if startPackageIndexes.count > pkgIndex {
+                        startPackageIndex = startPackageIndexes[pkgIndex]
+                    }
+                    var packageIndex = startPackageIndex + nextPkgIndexAdder
                     if packageIndex > countPackages - 1 {
                         break
                     }
@@ -1703,6 +1698,7 @@ class CardManager {
                     }
                 }
             }
+            // hier check all filled maps, not only the First!!!!!! Only if in all maps OK, fill the Card !!!!!
             func addCardToMap(mapIndex: Int, index: Int) {
                 let card = allCards[index]
                 var OKPackageIndexes: [Int] = []
@@ -1725,104 +1721,75 @@ class CardManager {
                     for value in card.minValue...card.maxValue {
                         cardMap[mapIndex][OKPKGIndex][value] = index
                     }
-                    card.belongsToPackageMax = maxPackage >> UInt8(OKPKGIndex)
+                    card.belongsToPackageMax = card.belongsToPackageMax | maxPackage >> UInt8(OKPKGIndex)
                     card.belongsToPackageMin = card.belongsToPackageMax
                 default:
                     return
                 }
             }
-//            if countTransitions == countPackages - 1 {
-                cardMapIndexes = []
-                switch (countPackages, cardsWithTransitions.count) {
-                case (2, 1):
-                    fillMap(mapIndex: 0, indexes: [0])
-                case (3, 1):
-                    fillMap(mapIndex: 0, indexes: [0])
-                    fillMap(mapIndex: 1, indexes: [0], startPackageIndex: 1)
-                case (3, 2):
-                    fillMap(mapIndex: 0, indexes: [0, 1])
-                    fillMap(mapIndex: 1, indexes: [1, 0])
-                case (4, 1):
-                    fillMap(mapIndex: 0, indexes: [0])
-                    fillMap(mapIndex: 1, indexes: [0], startPackageIndex: 1)
-                    fillMap(mapIndex: 2, indexes: [0], startPackageIndex: 2)
-                case (4, 2):
-                    fillMap(mapIndex: 0, indexes: [0, 1])
-                    fillMap(mapIndex: 1, indexes: [0, 1], startPackageIndex: 1)
-                    fillMap(mapIndex: 2, indexes: [1, 0])
-                    fillMap(mapIndex: 3, indexes: [1, 0], startPackageIndex: 1)
-                case (4, 3):
-                    fillMap(mapIndex: 0, indexes: [0, 1, 2])
-                    fillMap(mapIndex: 1, indexes: [0, 2, 1])
-                    fillMap(mapIndex: 2, indexes: [1, 0, 2])
-                    fillMap(mapIndex: 3, indexes: [1, 2, 0])
-                    fillMap(mapIndex: 4, indexes: [2, 0, 1])
-                    fillMap(mapIndex: 5, indexes: [2, 1, 0])
-                default:
-                    break
-                }
-                if cardMapIndexes.count == 1 && allCards.count > 1 { // only one possible arrangement, set the belongingflags
-                    var index = 0
-                    var actMaxPackage = maxPackage
-                    let cardMapIndex = cardMapIndexes[0]
-                    if container != nil {
-                        if container!.minValue == 0 {
-                            actMaxPackage = container!.belongsToPackageMin >> 1
-                        } else {
-                            actMaxPackage = container!.belongsToPackageMin
-                        }
-                    }
-                    while index < allCards.count && allCards[index].countTransitions > 0 {
-                        for pkg in 0..<countPackages {
-                            let value = allCards[index].maxValue
-                            if cardMap[cardMapIndex][pkg][value] == index {
-                               allCards[index].belongsToPackageMax = maxPackage >> UInt8(pkg)
-                               allCards[index].belongsToPackageMin = allCards[index].belongsToPackageMax >> UInt8(allCards[index].countTransitions)
-                            break
-                            }
-                        }
-                        index += 1
+            cardMapIndexes = []
+            switch (countPackages, cardsWithTransitions.count) {
+            case (2, 1):
+                fillMap(mapIndex: 0, indexes: [0])
+            case (3, 1):
+                fillMap(mapIndex: 0, indexes: [0])
+                fillMap(mapIndex: 1, indexes: [0], startPackageIndexes: [1])
+            case (3, 2):
+                fillMap(mapIndex: 0, indexes: [0, 1])
+                fillMap(mapIndex: 1, indexes: [1, 0])
+            case (4, 1):
+                fillMap(mapIndex: 0, indexes: [0])
+                fillMap(mapIndex: 1, indexes: [0], startPackageIndexes: [1])
+                fillMap(mapIndex: 2, indexes: [0], startPackageIndexes: [2])
+            case (4, 2):
+                fillMap(mapIndex: 0, indexes: [0, 1], startPackageIndexes: [0, 1])
+                fillMap(mapIndex: 1, indexes: [0, 1], startPackageIndexes: [0, 2])
+                fillMap(mapIndex: 2, indexes: [0, 1], startPackageIndexes: [1, 2])
+                fillMap(mapIndex: 3, indexes: [1, 0], startPackageIndexes: [0, 1])
+                fillMap(mapIndex: 4, indexes: [1, 0], startPackageIndexes: [0, 2])
+                fillMap(mapIndex: 5, indexes: [1, 0], startPackageIndexes: [1, 2])
+            case (4, 3):
+                fillMap(mapIndex: 0, indexes: [0, 1, 2])
+                fillMap(mapIndex: 1, indexes: [0, 2, 1])
+                fillMap(mapIndex: 2, indexes: [1, 0, 2])
+                fillMap(mapIndex: 3, indexes: [1, 2, 0])
+                fillMap(mapIndex: 4, indexes: [2, 0, 1])
+                fillMap(mapIndex: 5, indexes: [2, 1, 0])
+            default:
+                break
+            }
+            if cardMapIndexes.count == 1 && allCards.count > 1 { // only one possible arrangement, set the belongingflags
+                var index = 0
+                var actMaxPackage = maxPackage
+                let cardMapIndex = cardMapIndexes[0]
+                if container != nil {
+                    if container!.minValue == 0 {
+                        actMaxPackage = container!.belongsToPackageMin >> 1
+                    } else {
+                        actMaxPackage = container!.belongsToPackageMin
                     }
                 }
-//            } else  {
-//                cardMapIndexes = []
-//                switch (countPackages, cardsWithTransitions.count) {
-//                case (3, 1):
-//                    fillMap(mapIndex: 0, indexes: [0])
-//                    fillMap(mapIndex: 1, indexes: [0], startPackageIndex: 1)
-//                case (4, 1):
-//                    fillMap(mapIndex: 0, indexes: [0])
-//                    fillMap(mapIndex: 1, indexes: [0], startPackageIndex: 1)
-//                    fillMap(mapIndex: 2, indexes: [0], startPackageIndex: 2)
-//                case (4, 2):
-//                    fillMap(mapIndex: 0, indexes: [0, 1])
-//                    fillMap(mapIndex: 1, indexes: [0, 1], startPackageIndex: 1)
-//                    fillMap(mapIndex: 2, indexes: [1, 0])
-//                    fillMap(mapIndex: 3, indexes: [1, 0], startPackageIndex: 1)
-//                default:
-//                    break
-//                }
-//                if cardMapIndexes.count == 1 && allCards.count > 1 { // only one possible arrangement, set the belongingflags
-//                    var index = 0
-//                    var actMaxPackage = maxPackage
-//                    if container != nil {
-//                        if container!.minValue == 0 {
-//                            actMaxPackage = container!.belongsToPackageMin >> 1
-//                        } else {
-//                            actMaxPackage = container!.belongsToPackageMin
-//                        }
-//                    }
-//                    while allCards[index].countTransitions > 0 {
-//                        allCards[index].belongsToPackageMax = actMaxPackage
-//                        actMaxPackage = actMaxPackage >> UInt8(allCards[index].countTransitions)
-//                        allCards[index].belongsToPackageMin = actMaxPackage
-//                        index += 1
-//                    }
-//                }
-//            }
-            for mapIndex in 0..<cardMapIndexes.count {
-                for index in cardsWithTransitions.count..<allCards.count {
+                while index < allCards.count && allCards[index].countTransitions > 0 {
+                    for pkg in 0..<countPackages {
+                        let value = allCards[index].maxValue
+                        if cardMap[cardMapIndex][pkg][value] == index {
+                           allCards[index].belongsToPackageMax = maxPackage >> UInt8(pkg)
+                           allCards[index].belongsToPackageMin = allCards[index].belongsToPackageMax >> UInt8(allCards[index].countTransitions)
+                        break
+                        }
+                    }
+                    index += 1
+                }
+            }
+            for index in cardsWithTransitions.count..<allCards.count {
+                var belongsMaxOrig = allCards[index].belongsToPackageMax
+                allCards[index].belongsToPackageMax = 0
+                for mapIndex in cardMapIndexes {
                     addCardToMap(mapIndex: mapIndex, index: index)
+                }
+                if allCards[index].belongsToPackageMax == 0 {
+                    allCards[index].belongsToPackageMax = belongsMaxOrig
+                    allCards[index].belongsToPackageMin = belongsMaxOrig
                 }
             }
         }
@@ -2456,7 +2423,8 @@ class CardManager {
                     }
                 }
             }
-//            allCards = allCards.sorted(by: {$0.maxValue > $1.maxValue})
+            allCards = allCards.sorted(by: {$0.countTransitions > $1.countTransitions || $0.countTransitions == $1.countTransitions && ($0.countCards > $1.countCards || $0.countCards == $1.countCards && $0.maxValue > $1.maxValue)})
+            cardsWithTransitions = cardsWithTransitions.sorted(by: {$0.maxValue > $1.maxValue || $0.maxValue == $1.maxValue && $0.minValue > $1.minValue})
         }
 
 

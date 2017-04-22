@@ -193,7 +193,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     enum CardGeneratingType: Int {
-        case first = 0, normal, special
+        case first = 0, normal
     }
     
     struct GenerateCard {
@@ -521,7 +521,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             buttonXPosNormalized = self.size.width / 10
             self.name = "CardGameScene"
             prepareNextGame(newGame: true)
-            generateCards(.first)
+            generateCards(generatingType: .first)
             autoPlayer = AutoPlayer(scene: self)
         } else {
             playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
@@ -1007,7 +1007,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         //printFunc(function: "fillEmptyCards", start: false)
     }
 
-    func generateCards(_ generatingType: CardGeneratingType) {
+    func generateCards(generatingType: CardGeneratingType) {
         var waitForStart: TimeInterval = 0.0
         let cardArray = cardManager!.findNewCardsForGameArray()
         showCardCount()
@@ -1053,35 +1053,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 cardPackage!.changeButtonPicture(SKTexture(imageNamed: "emptycard"))
                 cardPackage!.alpha = 0.3
             }
-//            card.setCardValues(color: card.colorIndex, row: card.row, column: card.column, minValue: card.minValue, maxValue: card.maxValue, status: .OnScreen)
-
         }
         
         self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.checkCountMovingCards), userInfo: nil, repeats: false) // start timer for check
 
-//        if generatingType != .special {
-//            cardManager!.startCreateTipps()
-////            gameArrayChanged = true
-//
-//        }
         if generatingType == .first {
             countUp = Timer.scheduledTimer(timeInterval: doCountUpSleepTime, target: self, selector: Selector(doCountUpSelector), userInfo: nil, repeats: true)
             doTimeCount = true
         }
         stopped = false
-        //printFunc(function: "generateCards", start: false)
     }
-    
-//    func startCreateTippsInBackground() {
-//        tippsButton!.activateButton(false)
-//        cardManager!.startCreateTipps()
-//        showTippCount()
-//        if tippArray.count == 0 && self.cardCount > 0 {
-//            print ("You have lost!")
-//        }
-//
-//        tippsButton!.activateButton(true)
-//    }
     
     func startAutoplay(testType: AutoPlayer.TestType) {
         autoPlayerActive = true
@@ -1487,14 +1468,14 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 let alert = getNextPlayArt(congratulations: .Won)
                 GV.mainViewController!.showAlert(alert)
             }
-        } else if usedCellCount <= minUsedCells && usedCellCount > 1 { //  && cardCount > maxUsedCells {
-            generateCards(.normal)  // Nachgenerierung
-        } else {
+        } else if cardCount > 0 { // usedCellCount <= minUsedCells && usedCellCount > 1 {
+            generateCards(generatingType: .normal)  // Nachgenerierung
+        } /*else {
             if cardCount > 0 /*&& cardStack.count(.MySKCardType) > 0*/ {
-                generateCards(.normal)
+                generateCards(generatingType: .normal)
 //                gameArrayChanged = true
             }
-        }
+        } */
     }
     
     func saveStatisticAndGame () {
@@ -1675,7 +1656,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         stopTimer(&countUp)
         prepareNextGame(newGame: next)
-        generateCards(.first)
+        generateCards(generatingType: .first)
     }
 
     func getNextPlayArt(congratulations: CongratulationsType, firstStart: Bool = false)->UIAlertController {
@@ -2071,7 +2052,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     run = false
                 }
             } while run
-            generateCards(.normal)  // Nachgenerierung
+            generateCards(generatingType: .normal)  // Nachgenerierung
             showScore()
         }
         
@@ -2717,7 +2698,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             } else {
                 prepareNextGame(newGame: true)  // start a random game
             }
-            generateCards(.first)
+            generateCards(generatingType: .first)
         } else {
             playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
             let name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
