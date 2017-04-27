@@ -1596,7 +1596,7 @@ class CardManager {
             findContainer()
             fillAllCards()
             fillCardMaps()
-            checkAllCards()
+//            checkAllCards()
             
             
             if container != nil {
@@ -1633,6 +1633,8 @@ class CardManager {
         }
         
         private func fillCardMaps() {
+            var checkAgain = true
+            var needToCheck = true
             func fillMap(mapIndex: Int, indexes: [Int], startPackageIndexes: [Int] = []) {
                 func fillMapWithContainer() {
                     let startIndex = container!.maxValue
@@ -1715,6 +1717,12 @@ class CardManager {
                 }
                 switch OKPackageIndexes.count {
                 case 0:
+                    for ind in 0..<cardMapIndexes.count {
+                        if cardMapIndexes[ind] == mapIndex {
+                            cardMapIndexes.remove(at: ind)
+                            break
+                        }
+                    }
                     cardMap[mapIndex] = Array(repeating: Array(repeating: NoValue, count: CountCardsInPackage), count: countPackages)
                 case 1:
                     let OKPKGIndex = OKPackageIndexes[0]
@@ -1723,8 +1731,9 @@ class CardManager {
                     }
                     card.belongsToPackageMax = card.belongsToPackageMax | maxPackage >> UInt8(OKPKGIndex)
                     card.belongsToPackageMin = card.belongsToPackageMax
+                    checkAgain = true
                 default:
-                    return
+                    needToCheck = true
                 }
             }
             cardMapIndexes = []
@@ -1758,6 +1767,25 @@ class CardManager {
             default:
                 break
             }
+            checkAgain = true
+            while checkAgain && needToCheck {
+                checkAgain = false
+                needToCheck = false
+                for index in cardsWithTransitions.count..<allCards.count {
+                    if allCards[index].belongsToPackageMax.countOnes() > 1 {
+                        let belongsMinMaxOrig = allCards[index].belongsToPackageMax
+                        allCards[index].belongsToPackageMax = 0
+                        allCards[index].belongsToPackageMin = 0
+                        for mapIndex in cardMapIndexes {
+                            addCardToMap(mapIndex: mapIndex, index: index)
+                        }
+                        if allCards[index].belongsToPackageMax == 0 {
+                            allCards[index].belongsToPackageMax = belongsMinMaxOrig
+                            allCards[index].belongsToPackageMin = belongsMinMaxOrig
+                        }
+                    }
+                }
+            }
             if cardMapIndexes.count == 1 && allCards.count > 1 { // only one possible arrangement, set the belongingflags
                 var index = 0
                 var actMaxPackage = maxPackage
@@ -1779,17 +1807,6 @@ class CardManager {
                         }
                     }
                     index += 1
-                }
-            }
-            for index in cardsWithTransitions.count..<allCards.count {
-                let belongsMinMaxOrig = allCards[index].belongsToPackageMax
-                allCards[index].belongsToPackageMax = 0
-                for mapIndex in cardMapIndexes {
-                    addCardToMap(mapIndex: mapIndex, index: index)
-                }
-                if allCards[index].belongsToPackageMax == 0 {
-                    allCards[index].belongsToPackageMax = belongsMinMaxOrig
-                    allCards[index].belongsToPackageMin = belongsMinMaxOrig
                 }
             }
         }
@@ -1874,102 +1891,102 @@ class CardManager {
             }
         }
         
-        private func checkAllCards() {
-            var actMaxPackage = maxPackage
-            var actMinPackage = minPackage
-            var actSearchValue = LastCardValue
-            
-            func findActSearchValue(searchValue: Int, findMinValue: Bool)->MySKCard? {
-                var cardArray: [MySKCard] = []
-                for card in allCards {
-                    let value = findMinValue ? card.minValue : card.maxValue
-                    if value == searchValue {
-                        if card.belongsToPackageMax.countOnes() > 1 {
-                            cardArray.append(card)
-                        } else {
-                            return nil
-                        }
-                    }
-                }
-                if cardArray.count == 1 {
-                    return cardArray[0]
-                } else {
-                    return nil
-                }
-            }
-            if container != nil {
-                if container!.minValue == FirstCardValue {
-                    actMaxPackage = container!.belongsToPackageMin >> 1
-                } else {
-                    actMaxPackage = container!.belongsToPackageMin
-                }
-                actSearchValue = (container!.minValue + CountCardsInPackage - 1) % CountCardsInPackage
-            }
-            var running = true
-            running = true
-            while running {  // check from upper side
-                if let foundedCard = findActSearchValue(searchValue: actSearchValue, findMinValue: false) {
-                    if foundedCard.belongsToPackageMax.countOnes() > 1 {
-                        let usedCard = usedCards[foundedCard.maxValue]
-                        if (usedCard.midCount == countPackages - 1 && usedCard.freeMaxCount == 1) ||
-                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMaxCount == 1)
-                        {
-                            foundedCard.belongsToPackageMax = actMaxPackage
-                            foundedCard.belongsToPackageMin = foundedCard.belongsToPackageMax >> UInt8(foundedCard.countTransitions)
-                            actMaxPackage = foundedCard.belongsToPackageMin
-                            actSearchValue = (foundedCard.minValue + CountCardsInPackage - 1) % CountCardsInPackage
-                        } else {
-                            running = false
-                        }
-                    } else {
-                        running = false
-                    }
-                } else {
-                    running = false
-                }
-            }
-            if usedCards[FirstCardValue].midCount == countPackages - 1 { // check from lower side
-                var actMinSearchValue = FirstCardValue
-                var running = true
-                while running {
-                    if let foundedCard = findActSearchValue(searchValue: actMinSearchValue, findMinValue: true) {
-                        let usedCard = usedCards[foundedCard.minValue]
-                        if (usedCard.midCount == countPackages - 1 && usedCard.freeMinCount == 1) ||
-                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMinCount == 1 && usedCard.freeMaxCount == 1) ||
-                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMaxCount == 1)
-                        {
-                            foundedCard.belongsToPackageMin = actMinPackage
-                            foundedCard.belongsToPackageMax = foundedCard.belongsToPackageMin << UInt8(foundedCard.countTransitions)
-                            actMinPackage = foundedCard.belongsToPackageMax
-                            actMinSearchValue = (foundedCard.maxValue + 1) % CountCardsInPackage
-                        } else {
-                            running = false
-                        }
-                    } else {
-                        running = false
-                    }
-                }
-            }
-            if cardMapIndexes.count == 1 {
-                for card in allCards {
-                    if card.belongsToPackageMin.countOnes() > 1 && card.countTransitions == 0 {
-                        let cardMapIndex = cardMapIndexes[0]
-                        var foundedPackageIndex = 0
-                        var countNoValues = 0
-                        for packageIndex in 0..<countPackages {
-                            if cardMap[cardMapIndex][packageIndex][card.minValue] == NoValue {
-                                countNoValues += 1
-                                foundedPackageIndex = packageIndex
-                            }
-                        }
-                        if countNoValues == 1 {
-                            card.belongsToPackageMax = maxPackage >> UInt8(foundedPackageIndex)
-                            card.belongsToPackageMin = card.belongsToPackageMax
-                        }
-                    }
-                }
-            }
-        }
+//        private func checkAllCards() {
+//            var actMaxPackage = maxPackage
+//            var actMinPackage = minPackage
+//            var actSearchValue = LastCardValue
+//            
+//            func findActSearchValue(searchValue: Int, findMinValue: Bool)->MySKCard? {
+//                var cardArray: [MySKCard] = []
+//                for card in allCards {
+//                    let value = findMinValue ? card.minValue : card.maxValue
+//                    if value == searchValue {
+//                        if card.belongsToPackageMax.countOnes() > 1 {
+//                            cardArray.append(card)
+//                        } else {
+//                            return nil
+//                        }
+//                    }
+//                }
+//                if cardArray.count == 1 {
+//                    return cardArray[0]
+//                } else {
+//                    return nil
+//                }
+//            }
+//            if container != nil {
+//                if container!.minValue == FirstCardValue {
+//                    actMaxPackage = container!.belongsToPackageMin >> 1
+//                } else {
+//                    actMaxPackage = container!.belongsToPackageMin
+//                }
+//                actSearchValue = (container!.minValue + CountCardsInPackage - 1) % CountCardsInPackage
+//            }
+//            var running = true
+//            running = true
+//            while running {  // check from upper side
+//                if let foundedCard = findActSearchValue(searchValue: actSearchValue, findMinValue: false) {
+//                    if foundedCard.belongsToPackageMax.countOnes() > 1 {
+//                        let usedCard = usedCards[foundedCard.maxValue]
+//                        if (usedCard.midCount == countPackages - 1 && usedCard.freeMaxCount == 1) ||
+//                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMaxCount == 1)
+//                        {
+//                            foundedCard.belongsToPackageMax = actMaxPackage
+//                            foundedCard.belongsToPackageMin = foundedCard.belongsToPackageMax >> UInt8(foundedCard.countTransitions)
+//                            actMaxPackage = foundedCard.belongsToPackageMin
+//                            actSearchValue = (foundedCard.minValue + CountCardsInPackage - 1) % CountCardsInPackage
+//                        } else {
+//                            running = false
+//                        }
+//                    } else {
+//                        running = false
+//                    }
+//                } else {
+//                    running = false
+//                }
+//            }
+//            if usedCards[FirstCardValue].midCount == countPackages - 1 { // check from lower side
+//                var actMinSearchValue = FirstCardValue
+//                var running = true
+//                while running {
+//                    if let foundedCard = findActSearchValue(searchValue: actMinSearchValue, findMinValue: true) {
+//                        let usedCard = usedCards[foundedCard.minValue]
+//                        if (usedCard.midCount == countPackages - 1 && usedCard.freeMinCount == 1) ||
+//                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMinCount == 1 && usedCard.freeMaxCount == 1) ||
+//                            (usedCard.midCount == countPackages - 2 && usedCard.countInStack == 0 && usedCard.freeMaxCount == 1)
+//                        {
+//                            foundedCard.belongsToPackageMin = actMinPackage
+//                            foundedCard.belongsToPackageMax = foundedCard.belongsToPackageMin << UInt8(foundedCard.countTransitions)
+//                            actMinPackage = foundedCard.belongsToPackageMax
+//                            actMinSearchValue = (foundedCard.maxValue + 1) % CountCardsInPackage
+//                        } else {
+//                            running = false
+//                        }
+//                    } else {
+//                        running = false
+//                    }
+//                }
+//            }
+//            if cardMapIndexes.count == 1 {
+//                for card in allCards {
+//                    if card.belongsToPackageMin.countOnes() > 1 && card.countTransitions == 0 {
+//                        let cardMapIndex = cardMapIndexes[0]
+//                        var foundedPackageIndex = 0
+//                        var countNoValues = 0
+//                        for packageIndex in 0..<countPackages {
+//                            if cardMap[cardMapIndex][packageIndex][card.minValue] == NoValue {
+//                                countNoValues += 1
+//                                foundedPackageIndex = packageIndex
+//                            }
+//                        }
+//                        if countNoValues == 1 {
+//                            card.belongsToPackageMax = maxPackage >> UInt8(foundedPackageIndex)
+//                            card.belongsToPackageMin = card.belongsToPackageMax
+//                        }
+//                    }
+//                }
+//            }
+//        }
         
         private func findUpperBelongs(belongs: UInt8)->UInt8 {
             var oper = belongs
