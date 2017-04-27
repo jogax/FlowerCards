@@ -448,7 +448,7 @@ class CardManager {
             updateColorArray()
             updateCountColors()
         }
-        while actFillingsProcent < 0.9 && cardStack.count(type: .MySKCardType) > 0 && positionsTab.count > 0 && checkCardTippCountInTippArray() < 20 /*tippArray.count < 10*/ {
+        while actFillingsProcent < 0.98 && cardStack.count(type: .MySKCardType) > 0 && positionsTab.count > 0 && checkCardTippCountInTippArray() < 20 /*tippArray.count < 10*/ {
             let index = random!.getRandomInt(0, max: positionsTab.count - 1)
             let gameArrayPos = positionsTab[index]
             positionsTab.remove(at: index)
@@ -634,7 +634,7 @@ class CardManager {
         //==========================================
         
         while angle <= stopAngle {
-            delay(time: 0.000001, closure: {})
+//            delay(time: 0.000001, closure: {})
             let toPoint = GV.pointOfCircle(10.0, center: startPoint, angle: angle)
             let (foundedPoint, myPoints) = createHelpLines(movedFrom: startCard, toPoint: toPoint, inFrame: GV.mainScene!.frame, lineSize: cardSize.width, showLines: false)
             if foundedPoint != nil {
