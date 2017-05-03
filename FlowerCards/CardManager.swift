@@ -26,6 +26,19 @@ class ConnectablePair {
             }
         }
     }
+    var connectedCards: (upperCard: MySKCard?, lowerCard: MySKCard?) {
+        get {
+            if (card1.minValue - 1 == card2.maxValue) || (card1.minValue == FirstCardValue && card2.maxValue == LastCardValue) {
+                return (upperCard: card1, lowerCard: card2)
+            } else if (card1.maxValue + 1 == card2.minValue) || (card1.maxValue == LastCardValue && card2.minValue == FirstCardValue){
+                return (upperCard: card2, lowerCard: card1)
+            } else if card2.type == .containerType {
+                return (upperCard: nil, lowerCard: card1)
+            } else {
+                return (upperCard: nil, lowerCard: nil)
+            }
+        }
+    }
     init(card1: MySKCard, card2: MySKCard) {
         self.card1 = card1
         self.card2 = card2
@@ -33,10 +46,10 @@ class ConnectablePair {
     }
     func convertCard(card: MySKCard)->Int64 {
         var hash = card.countTransitions << 0
-        hash |= card.minValue << 2
-        hash |= card.maxValue << 6
-        hash |= card.column << 10
-        hash |= card.row << 14
+        hash |= card.minValue & 0xf << 2
+        hash |= card.maxValue & 0xf << 6
+        hash |= card.column & 0xf << 10
+        hash |= card.row & 0xf << 14
         hash |= card.type.rawValue << 18
         return Int64(hash)
         //            return "\(card.countTransitions)-\(card.minValue)-\(card.maxValue)-\(card.column)-\(card.row)-\(card.type)"
@@ -232,15 +245,9 @@ func printGameArrayInhalt() {
     }
 }
 
-
-
-
 // for managing of connectibility of gameArray members
 class CardManager {
     
-    enum ConnectableType: Int {
-        case NotConnectable = 0, BothConnectable, UpperOnlyConnectable
-    }
     
     var setOfBinarys: [String] = []
     var tremblingCards: [MySKCard] = []
@@ -297,36 +304,19 @@ class CardManager {
         }
     }
     
-    func areConnectable(first: MySKCard, second: MySKCard)->ConnectableType {
-        if first.colorIndex != second.colorIndex || first.colorIndex == NoColor {
-            return .NotConnectable
+    func areConnectable(first: MySKCard, second: MySKCard)->Bool {
+        if first.colorIndex != second.colorIndex && second.colorIndex != NoColor {
+            return false
         }
+        var OK = false
         let searchPair = ConnectablePair(card1: first, card2: second)
-        var returnValue: ConnectableType = .NotConnectable
         for pair in colorArray[first.colorIndex].connectablePairs {
             if pair == searchPair {
-                returnValue = .BothConnectable
-                if pair.card1.minValue - 1 == pair.card2.maxValue && pair.card1.maxValue + 1 == pair.card2.minValue {
-                    var shortCard: MySKCard
-//                    var longCard: MySKCard
-                    if pair.card1.minValue == pair.card1.maxValue {
-                        shortCard = pair.card1
-//                        longCard = pair.card2
-                    } else {
-                        shortCard = pair.card2
-//                        longCard = pair.card1
-                    }
-                    let maxValue = shortCard.maxValue + 1
-                    let usedCard = colorArray[first.colorIndex].usedCards[maxValue]
-                    if usedCard.freeMinCount == 1 && usedCard.midCount == countPackages - 1 {
-                        returnValue = .UpperOnlyConnectable
-                    }
-                }
+                OK = true
                 break
             }
         }
-        _ = colorArray[first.colorIndex].countTransitions
-        return returnValue
+        return OK
     }
     
     func startCreateTipps() {
@@ -371,7 +361,13 @@ class CardManager {
         }
     }
     
+    //    @objc func nextStep(timerX: Timer) {
+    //    }
+    
+
+    
     func findNewCardsForGameArray()->[MySKCard] {
+    
         // saves how many cards of each color are in gameArray and Containers
         var colorCounts: [ColorsByCounts] = []
         
@@ -538,6 +534,8 @@ class CardManager {
         return cardArray
     }
     
+
+    
     private func checkTippArrayPlausibility() {
         for (index, tipp) in tippArray.enumerated().reversed() {
             let pos1 = ColumnRow(column: tipp.card1.column, row: tipp.card1.row)
@@ -634,7 +632,7 @@ class CardManager {
         //==========================================
         
         while angle <= stopAngle {
-//            delay(time: 0.000001, closure: {})
+            delay(time: 0.000001, closure: {})
             let toPoint = GV.pointOfCircle(10.0, center: startPoint, angle: angle)
             let (foundedPoint, myPoints) = createHelpLines(movedFrom: startCard, toPoint: toPoint, inFrame: GV.mainScene!.frame, lineSize: cardSize.width, showLines: false)
             if foundedPoint != nil {
@@ -835,7 +833,7 @@ class CardManager {
     private func checkPathToFoundedCards(pair:ConnectablePair) {
         let firstValue: CGFloat = 10000
         func checkPath(card1: MySKCard, card2: MySKCard)->Tipp {
-            var myTipp = Tipp()
+            let myTipp = Tipp()
             var distanceToLine = firstValue
             let startPoint = gameArray[card1.column][card1.row].position
             var targetPoint = CGPoint.zero
@@ -890,6 +888,7 @@ class CardManager {
         myTipp.innerTipps.append(contentsOf: myTipp2.innerTipps)
         if myTipp.innerTipps.count > 0 {
             myTipp.innerTipps = myTipp.innerTipps.sorted{$0.value < $1.value}
+            myTipp.supressed = pair.supressed
             tippArray.append(myTipp)
         }
     }
@@ -1175,7 +1174,7 @@ class CardManager {
         let first = gameArray[movedFrom.column][movedFrom.row].card
         let second = foundedPosition.card
         let connectable = areConnectable(first: first, second: second)
-        if connectable != .NotConnectable 
+        if connectable 
             ||
             (foundedPosition.card.minValue == NoColor && !actColorHasContainer) &&
             (gameArray[movedFrom.column][movedFrom.row].card.maxValue == LastCardValue) {
@@ -1442,17 +1441,19 @@ class CardManager {
         }
         
         func addCardToUsedCards(card: MySKCard) {
-            usedCards[card.minValue].freeMinValues.append(card)
-            if card.maxValue == LastCardValue && card.type == .containerType {
-                usedCards[card.maxValue].midCount += 1
-            } else {
-                usedCards[card.maxValue].freeMaxValues.append(card)
-            }
-            var index = 1
-            while index < card.countCards - 1 {
-                let value = (card.minValue + index) % CountCardsInPackage
-                usedCards[value].midCount += 1
-                index += 1
+            if card.minValue != NoColor {
+                usedCards[card.minValue].freeMinValues.append(card)
+                if card.maxValue == LastCardValue && card.type == .containerType {
+                    usedCards[card.maxValue].midCount += 1
+                } else {
+                    usedCards[card.maxValue].freeMaxValues.append(card)
+                }
+                var index = 1
+                while index < card.countCards - 1 {
+                    let value = (card.minValue + index) % CountCardsInPackage
+                    usedCards[value].midCount += 1
+                    index += 1
+                }
             }
         }
         
@@ -1558,8 +1559,17 @@ class CardManager {
         }
         
         func printCardMaps() {
+            func printLine() {
+                switch countPackages {
+                case 4: print("----+-------+-+-------+-+-------+-+-------+-+-------+-+-------+")
+                case 3: print("----+-----+-+-----+-+-----+-+-----+-+-----+-+-----+")
+                case 2: print("----+---+-+---+-+---+-+---+-+---+-+---+")
+                case 1: print("----+-+-+-+-+-+-+-+-+-+-+-+")
+                default: break
+                }
+            }
             print("=======================    CardMap    ====================")
-            print("----+-------+-+-------+-+-------+-+-------+-+-------+-+-------+")
+            printLine()
             for value in 0...LastCardValue {
                 let reversedValue = LastCardValue - value
                 if let cardName = MySKCard.cardLib[reversedValue] {
@@ -1575,8 +1585,8 @@ class CardManager {
                     }
                     print(printString)
                 }
-                if /*reversedValue == 9 || reversedValue == 5 || */reversedValue == 0 {
-                    print("----+-------+-+-------+-+-------+-+-------+-+-------+-+-------+")
+                if  reversedValue == 0 {
+                    printLine()
                 }
             }
         }
@@ -1788,14 +1798,14 @@ class CardManager {
             }
             if cardMapIndexes.count == 1 && allCards.count > 1 { // only one possible arrangement, set the belongingflags
                 var index = 0
-                var actMaxPackage = maxPackage
+//                var actMaxPackage = maxPackage
                 let cardMapIndex = cardMapIndexes[0]
                 if container != nil {
-                    if container!.minValue == 0 {
-                        actMaxPackage = container!.belongsToPackageMin >> 1
-                    } else {
-                        actMaxPackage = container!.belongsToPackageMin
-                    }
+//                    if container!.minValue == 0 {
+//                        actMaxPackage = container!.belongsToPackageMin >> 1
+//                    } else {
+//                        actMaxPackage = container!.belongsToPackageMin
+//                    }
                 }
                 while index < allCards.count && allCards[index].countTransitions > 0 {
                     for pkg in 0..<countPackages {
@@ -1812,85 +1822,85 @@ class CardManager {
         }
 
         
-        private func checkCardsWithTransitions() {
-            func setBelonging(upperIndex: Int, lowerIndex: Int) {
-                cardsWithTransitions[lowerIndex].belongsToPackageMin = minPackage
-                cardsWithTransitions[lowerIndex].belongsToPackageMax = minPackage << UInt8(cardsWithTransitions[lowerIndex].countTransitions)
-                cardsWithTransitions[upperIndex].belongsToPackageMax = maxPackage
-                cardsWithTransitions[upperIndex].belongsToPackageMin = maxPackage >> UInt8(cardsWithTransitions[upperIndex].countTransitions)
-            }
-
-            if countTransitions == countPackages - 1 {
-                var countTransitionsInContainer = 0
-                if container != nil {
-                    countTransitionsInContainer = container!.countTransitions
-                }
-                switch (countPackages, cardsWithTransitions.count, countTransitionsInContainer) {
-                case (2, 1, 0), (3, 1, 0), (4, 1, 0):
-                    cardsWithTransitions[0].belongsToPackageMax = maxPackage
-                    cardsWithTransitions[0].belongsToPackageMin = minPackage
-                case (3, 2, 0), (4, 2, 0):
-                    if cardsWithTransitions[0].minValue <= cardsWithTransitions[1].maxValue {
-                        setBelonging(upperIndex: 1, lowerIndex: 0)
-                    } else if cardsWithTransitions[1].minValue <= cardsWithTransitions[0].maxValue {
-                        setBelonging(upperIndex: 0, lowerIndex: 1)
-                    }
-                case (4, 3, 0):
-                    if cardsWithTransitions[0].minValue <= cardsWithTransitions[1].maxValue &&
-                        cardsWithTransitions[0].minValue <= cardsWithTransitions[2].maxValue
-                    {
-                        cardsWithTransitions[0].belongsToPackageMin = minPackage
-                        cardsWithTransitions[0].belongsToPackageMax = minPackage << UInt8(cardsWithTransitions[0].countTransitions)
-                        if cardsWithTransitions[1].minValue <= cardsWithTransitions[2].maxValue {
-                            cardsWithTransitions[1].belongsToPackageMin = minPackage << 1
-                            cardsWithTransitions[1].belongsToPackageMax = minPackage << 2
-                            cardsWithTransitions[2].belongsToPackageMax = maxPackage
-                            cardsWithTransitions[2].belongsToPackageMin = maxPackage >> 1
-                        } else if cardsWithTransitions[2].minValue <= cardsWithTransitions[1].maxValue {
-                            cardsWithTransitions[2].belongsToPackageMin = minPackage << 1
-                            cardsWithTransitions[2].belongsToPackageMax = minPackage << 2
-                            cardsWithTransitions[1].belongsToPackageMax = maxPackage
-                            cardsWithTransitions[1].belongsToPackageMin = maxPackage >> 1
-                        }
-                    } else if cardsWithTransitions[1].minValue <= cardsWithTransitions[0].maxValue &&
-                        cardsWithTransitions[1].minValue <= cardsWithTransitions[2].maxValue
-                    {
-                        cardsWithTransitions[1].belongsToPackageMin = minPackage
-                        cardsWithTransitions[1].belongsToPackageMax = minPackage << UInt8(cardsWithTransitions[0].countTransitions)
-                        if cardsWithTransitions[0].minValue <= cardsWithTransitions[2].maxValue {
-                            cardsWithTransitions[0].belongsToPackageMin = minPackage << 1
-                            cardsWithTransitions[0].belongsToPackageMax = minPackage << 2
-                            cardsWithTransitions[2].belongsToPackageMax = maxPackage
-                            cardsWithTransitions[2].belongsToPackageMin = maxPackage >> 1
-                        } else if cardsWithTransitions[2].minValue <= cardsWithTransitions[0].maxValue {
-                            cardsWithTransitions[2].belongsToPackageMin = minPackage << 1
-                            cardsWithTransitions[2].belongsToPackageMax = minPackage << 2
-                            cardsWithTransitions[0].belongsToPackageMax = maxPackage
-                            cardsWithTransitions[0].belongsToPackageMin = maxPackage >> 1
-                        }
-                    } else if cardsWithTransitions[2].minValue <= cardsWithTransitions[0].maxValue &&
-                        cardsWithTransitions[2].minValue <= cardsWithTransitions[1].maxValue
-                    {
-                        cardsWithTransitions[2].belongsToPackageMin = minPackage
-                        cardsWithTransitions[2].belongsToPackageMax = minPackage << UInt8(cardsWithTransitions[0].countTransitions)
-                        if cardsWithTransitions[0].minValue <= cardsWithTransitions[1].maxValue {
-                            cardsWithTransitions[0].belongsToPackageMin = minPackage << 1
-                            cardsWithTransitions[0].belongsToPackageMax = minPackage << 2
-                            cardsWithTransitions[1].belongsToPackageMax = maxPackage
-                            cardsWithTransitions[1].belongsToPackageMin = maxPackage >> 1
-                        } else if cardsWithTransitions[1].minValue <= cardsWithTransitions[0].maxValue {
-                            cardsWithTransitions[1].belongsToPackageMin = minPackage << 1
-                            cardsWithTransitions[1].belongsToPackageMax = minPackage << 2
-                            cardsWithTransitions[0].belongsToPackageMax = maxPackage
-                            cardsWithTransitions[0].belongsToPackageMin = maxPackage >> 1
-                        }
-                    }
-                default:
-                    break
-                }
-            }
-        }
-        
+//        private func checkCardsWithTransitions() {
+//            func setBelonging(upperIndex: Int, lowerIndex: Int) {
+//                cardsWithTransitions[lowerIndex].belongsToPackageMin = minPackage
+//                cardsWithTransitions[lowerIndex].belongsToPackageMax = minPackage << UInt8(cardsWithTransitions[lowerIndex].countTransitions)
+//                cardsWithTransitions[upperIndex].belongsToPackageMax = maxPackage
+//                cardsWithTransitions[upperIndex].belongsToPackageMin = maxPackage >> UInt8(cardsWithTransitions[upperIndex].countTransitions)
+//            }
+//
+//            if countTransitions == countPackages - 1 {
+//                var countTransitionsInContainer = 0
+//                if container != nil {
+//                    countTransitionsInContainer = container!.countTransitions
+//                }
+//                switch (countPackages, cardsWithTransitions.count, countTransitionsInContainer) {
+//                case (2, 1, 0), (3, 1, 0), (4, 1, 0):
+//                    cardsWithTransitions[0].belongsToPackageMax = maxPackage
+//                    cardsWithTransitions[0].belongsToPackageMin = minPackage
+//                case (3, 2, 0), (4, 2, 0):
+//                    if cardsWithTransitions[0].minValue <= cardsWithTransitions[1].maxValue {
+//                        setBelonging(upperIndex: 1, lowerIndex: 0)
+//                    } else if cardsWithTransitions[1].minValue <= cardsWithTransitions[0].maxValue {
+//                        setBelonging(upperIndex: 0, lowerIndex: 1)
+//                    }
+//                case (4, 3, 0):
+//                    if cardsWithTransitions[0].minValue <= cardsWithTransitions[1].maxValue &&
+//                        cardsWithTransitions[0].minValue <= cardsWithTransitions[2].maxValue
+//                    {
+//                        cardsWithTransitions[0].belongsToPackageMin = minPackage
+//                        cardsWithTransitions[0].belongsToPackageMax = minPackage << UInt8(cardsWithTransitions[0].countTransitions)
+//                        if cardsWithTransitions[1].minValue <= cardsWithTransitions[2].maxValue {
+//                            cardsWithTransitions[1].belongsToPackageMin = minPackage << 1
+//                            cardsWithTransitions[1].belongsToPackageMax = minPackage << 2
+//                            cardsWithTransitions[2].belongsToPackageMax = maxPackage
+//                            cardsWithTransitions[2].belongsToPackageMin = maxPackage >> 1
+//                        } else if cardsWithTransitions[2].minValue <= cardsWithTransitions[1].maxValue {
+//                            cardsWithTransitions[2].belongsToPackageMin = minPackage << 1
+//                            cardsWithTransitions[2].belongsToPackageMax = minPackage << 2
+//                            cardsWithTransitions[1].belongsToPackageMax = maxPackage
+//                            cardsWithTransitions[1].belongsToPackageMin = maxPackage >> 1
+//                        }
+//                    } else if cardsWithTransitions[1].minValue <= cardsWithTransitions[0].maxValue &&
+//                        cardsWithTransitions[1].minValue <= cardsWithTransitions[2].maxValue
+//                    {
+//                        cardsWithTransitions[1].belongsToPackageMin = minPackage
+//                        cardsWithTransitions[1].belongsToPackageMax = minPackage << UInt8(cardsWithTransitions[0].countTransitions)
+//                        if cardsWithTransitions[0].minValue <= cardsWithTransitions[2].maxValue {
+//                            cardsWithTransitions[0].belongsToPackageMin = minPackage << 1
+//                            cardsWithTransitions[0].belongsToPackageMax = minPackage << 2
+//                            cardsWithTransitions[2].belongsToPackageMax = maxPackage
+//                            cardsWithTransitions[2].belongsToPackageMin = maxPackage >> 1
+//                        } else if cardsWithTransitions[2].minValue <= cardsWithTransitions[0].maxValue {
+//                            cardsWithTransitions[2].belongsToPackageMin = minPackage << 1
+//                            cardsWithTransitions[2].belongsToPackageMax = minPackage << 2
+//                            cardsWithTransitions[0].belongsToPackageMax = maxPackage
+//                            cardsWithTransitions[0].belongsToPackageMin = maxPackage >> 1
+//                        }
+//                    } else if cardsWithTransitions[2].minValue <= cardsWithTransitions[0].maxValue &&
+//                        cardsWithTransitions[2].minValue <= cardsWithTransitions[1].maxValue
+//                    {
+//                        cardsWithTransitions[2].belongsToPackageMin = minPackage
+//                        cardsWithTransitions[2].belongsToPackageMax = minPackage << UInt8(cardsWithTransitions[0].countTransitions)
+//                        if cardsWithTransitions[0].minValue <= cardsWithTransitions[1].maxValue {
+//                            cardsWithTransitions[0].belongsToPackageMin = minPackage << 1
+//                            cardsWithTransitions[0].belongsToPackageMax = minPackage << 2
+//                            cardsWithTransitions[1].belongsToPackageMax = maxPackage
+//                            cardsWithTransitions[1].belongsToPackageMin = maxPackage >> 1
+//                        } else if cardsWithTransitions[1].minValue <= cardsWithTransitions[0].maxValue {
+//                            cardsWithTransitions[1].belongsToPackageMin = minPackage << 1
+//                            cardsWithTransitions[1].belongsToPackageMax = minPackage << 2
+//                            cardsWithTransitions[0].belongsToPackageMax = maxPackage
+//                            cardsWithTransitions[0].belongsToPackageMin = maxPackage >> 1
+//                        }
+//                    }
+//                default:
+//                    break
+//                }
+//            }
+//        }
+//        
 //        private func checkAllCards() {
 //            var actMaxPackage = maxPackage
 //            var actMinPackage = minPackage
@@ -2137,7 +2147,7 @@ class CardManager {
         
         
 
-        private func findPair(card: MySKCard)->[ConnectablePair] {
+        private func findPair(card: MySKCard, index: Int = NoValue)->[ConnectablePair] {
             var foundedPairs: [ConnectablePair] = []
             func saveIfPair(first: MySKCard, second: MySKCard) {
                 if (first.minValue == second.maxValue + 1 && first.belongsToPackageMin & second.belongsToPackageMax != 0)
@@ -2168,9 +2178,11 @@ class CardManager {
                         }
                     }
                     let connectValues = connectablePair.connectedValues
+                    let connectCards = connectablePair.connectedCards
                     let upperUsedCard = usedCards[connectValues.upper]
                     let lowerUsedCard = usedCards[connectValues.lower]
                     var allowedPair = true
+                    
                     if upperUsedCard.freeMinCount == 2 && lowerUsedCard.freeMaxCount == 2 && upperUsedCard.countInStack == 0 {
                         var checkCard: MySKCard?
                         
@@ -2187,21 +2199,30 @@ class CardManager {
                                 allowedPair = false
                             }
                         }
+                        connectablePair.supressed = !allowedPair
                     }
-//                    if lowerUsedCard.freeMinCount == 1 && lowerUsedCard.countInStack == 0 { // can be only in pkg 1
-//                        if first === lowerUsedCard.freeMinValues[0] && first.belongsToPackageMax.countOnes() > 1 {
-//                            first.belongsToPackageMax = minPackage
-//                            if second.belongsToPackageMax != minPackage {
-//                                allowedPair = false
-//                            }
-//                        } else if second === lowerUsedCard.freeMinValues[0] && second.belongsToPackageMax.countOnes() > 1 {
-//                            second.belongsToPackageMax = minPackage
-//                            if first.belongsToPackageMax != minPackage {
-//                                allowedPair = false
-//                            }
-//                        }
-//                   }
-                    if !founded && allowedPair {
+                    if connectCards.upperCard != nil && connectCards.lowerCard != nil {
+                        var OKFlag = false
+                        var mask = maxPackage
+                        if connectCards.upperCard!.minValue != FirstCardValue {
+                            while mask > 0 {
+                                if connectCards.upperCard!.belongsToPackageMin & connectCards.lowerCard!.belongsToPackageMax & mask > 0 {
+                                    OKFlag = true
+                                }
+                                mask = mask >> 1
+                            }
+                        } else {
+                            let lowerBelongs = connectCards.lowerCard!.belongsToPackageMax << 1
+                            while mask > 0 {
+                                if connectCards.upperCard!.belongsToPackageMin & lowerBelongs & mask > 0 {
+                                    OKFlag = true
+                                }
+                                mask = mask >> 1
+                            }
+                        }
+                        connectablePair.supressed = !OKFlag
+                    }
+                    if !founded {
                         connectablePairs.append(connectablePair)
                         foundedPairs.append(connectablePair)
                     }
@@ -2221,7 +2242,7 @@ class CardManager {
             }
             
             for card1 in allCards {
-                if card != card1 {
+                if card !== card1 {
                     saveIfPair(first: card, second: card1)
                 }
             }
@@ -2234,7 +2255,7 @@ class CardManager {
                 return
             }
             let upperUsedCard = usedCards[values.upper]
-            let lowerUsedCard = usedCards[values.lower]
+//            let lowerUsedCard = usedCards[values.lower]
 
             if values.upper == FirstCardValue {
                 if upperUsedCard.freeMinCount == 1 && upperUsedCard.midCount == countPackages - 2 {

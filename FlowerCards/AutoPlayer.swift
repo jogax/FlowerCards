@@ -12,8 +12,7 @@ import SpriteKit
 class AutoPlayer {
     // game to Play saves Games, Levels and CountPackages as they are displayed
     let gamesToPlayTable: [GameToPlay] = [
-//        GameToPlay(level: 2, countPackages: 4, gameNumber: 6381, stopAt: 60), // at Step: 33
-        GameToPlay(level: 2, countPackages: 4, gameNumber: 7002, stopAt: 40), // at Step: 43
+        GameToPlay(level: 6, countPackages: 2, gameNumber: 1509, stopAt: 96), // at Step: 101
     ]
     enum runStatus: Int {
         case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep
@@ -239,7 +238,7 @@ class AutoPlayer {
                         switch testerType {
                         case .beginner:
                             for tipp in tippArray {
-                                if bestTipp.innerTipps.count == 0 || bestTipp.innerTipps.first!.value < tipp.innerTipps.first!.value {
+                                if !tipp.supressed && (bestTipp.innerTipps.count == 0 || bestTipp.innerTipps.first!.value < tipp.innerTipps.first!.value) {
                                     bestTipp = tipp
                                     choosedTipp = tipp.innerTipps.first!
                                 }
@@ -256,7 +255,7 @@ class AutoPlayer {
                             }
                             if bestTipp.innerTipps.count == 0 {
                                 for tipp in tippArray {
-                                    if tipp.card2.type == .containerType  { // first check only Cards
+                                    if !tipp.supressed && tipp.card2.type == .containerType  { // first check only Cards
                                         if bestTipp.innerTipps.count == 0 || bestTipp.innerTipps.last!.value < tipp.innerTipps.last!.value {
                                             bestTipp = tipp
                                             choosedTipp = tipp.innerTipps.last!
@@ -272,7 +271,7 @@ class AutoPlayer {
 //                            let color2 = playerColors[actPlayer][(colorIndex + 1)%2]
                             
                             for tipp in tippArray {
-                                if tipp.card2.type != .containerType  { // first check only Cards
+                                if !tipp.supressed && tipp.card2.type != .containerType  { // first check only Cards an not supressed tipps
                                     if bestTipp.innerTipps.count == 0 || bestTipp.innerTipps.last!.value < tipp.innerTipps.last!.value {
                                         bestTipp = tipp
                                         choosedTipp = tipp.innerTipps.last!
