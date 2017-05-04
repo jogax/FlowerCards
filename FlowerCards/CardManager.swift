@@ -46,10 +46,10 @@ class ConnectablePair {
     }
     func convertCard(card: MySKCard)->Int64 {
         var hash = card.countTransitions << 0
-        hash |= card.minValue & 0xf << 2
-        hash |= card.maxValue & 0xf << 6
-        hash |= card.column & 0xf << 10
-        hash |= card.row & 0xf << 14
+        hash |= card.minValue << 2
+        hash |= card.maxValue << 6
+        hash |= card.column << 10
+        hash |= (card.row & 0xf) << 14
         hash |= card.type.rawValue << 18
         return Int64(hash)
         //            return "\(card.countTransitions)-\(card.minValue)-\(card.maxValue)-\(card.column)-\(card.row)-\(card.type)"

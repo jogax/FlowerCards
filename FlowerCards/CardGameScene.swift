@@ -1306,6 +1306,121 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
     }
     
+    
+    func cardDidCollideWithContainer(_ node1:MySKCard, node2:MySKCard, points: [CGPoint]) {
+        let movingCard = node1
+        let container = node2
+        
+        if container.minValue == container.maxValue && container.maxValue == NoColor && movingCard.maxValue == LastCardValue {
+            var containerNotFound = true
+            for index in 0..<countContainers {
+                if containers[index].colorIndex == movingCard.colorIndex {
+                    containerNotFound = false
+                }
+            }
+            if containerNotFound {
+                container.colorIndex = movingCard.colorIndex
+                container.colorIndex = movingCard.colorIndex
+                container.texture = getTexture(movingCard.colorIndex)
+                push(container, status: .firstCardAdded)
+            }
+        }
+        
+        let connectable = cardManager?.areConnectable(first: movingCard, second: container)
+        
+        let OK = movingCard.colorIndex == container.colorIndex &&
+            (
+                container.minValue == NoColor || connectable!
+        )
+        
+        
+        
+        if OK  {
+            push(container, status: .unification)
+            push(movingCard, status: .removed)
+            lastColor = movingCard.colorIndex
+            container.connectWith(otherCard: movingCard)
+            //            saveHistoryRecord(colorIndex: movingCard.colorIndex, points:  points,
+            //                              fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
+            //                              toColumn: container.column,   toRow: container.row,   toMinValue: container.minValue,   toMaxValue: container.maxValue)
+            //
+            self.addChild(showCountScore("+\(movingCard.countScore)", position: movingCard.position))
+            
+            levelScore += movingCard.countScore
+            levelScore += movingCard.getMirroredScore()
+            
+            container.reload()
+            cardManager!.resetGameArrayCell(movingCard)
+            movingCard.removeFromParent()
+            playSound("Container", volume: GV.player!.soundVolume)
+            countMovingCards = 0
+            
+            updateCardCount(-1)
+            
+//            collisionActive = false
+            //movingCard.removeFromParent()
+            //            checkGameFinished()
+        } else {
+            updateCardCount(-1)
+            movingCard.removeFromParent()
+            countMovingCards = 0
+            push(movingCard, status: .removed)
+            pull(false) // no createTipps
+//            startTippTimer()
+            
+        }
+        tippsButton!.activateButton(true)
+    }
+    
+    func cardDidCollideWithMovingCard(node1:MySKCard, node2:MySKCard, points: [CGPoint]) {
+        let movingCard = node1
+        let card = node2
+//        collisionActive = false
+        
+        let connectable = cardManager!.areConnectable(first: movingCard, second: card)
+        
+        //        let OK = connectable //MySKCard.areConnectable(first: movingCard, second: card)
+        if connectable {
+            push(card, status: .unification)
+            push(movingCard, status: .removed)
+            lastColor = movingCard.colorIndex
+            
+            card.connectWith(otherCard: movingCard)
+            //            cardManager!.check(color: card.colorIndex)
+            //            saveHistoryRecord(colorIndex: movingCard.colorIndex, points: points,
+            //                              fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
+            //                              toColumn: card.column,   toRow: card.row,   toMinValue: card.minValue,   toMaxValue: card.maxValue)
+            //
+            //
+            self.addChild(showCountScore("+\(movingCard.countScore)", position: movingCard.position))
+            levelScore += movingCard.countScore
+            levelScore += movingCard.getMirroredScore()
+            
+            card.reload()
+            
+            playSound("OK", volume: GV.player!.soundVolume)
+            
+            cardManager!.updateGameArrayCell(card: card)
+            cardManager!.resetGameArrayCell(movingCard)
+            
+            movingCard.removeFromParent()
+            countMovingCards = 0
+            updateCardCount(-1)
+            //            checkGameFinished()
+            saveStatisticAndGame()
+        } else {
+            
+            updateCardCount(-1)
+            movingCard.removeFromParent()
+            countMovingCards = 0
+            push(movingCard, status: .removed)
+            pull(false) // no createTipps
+//            startTippTimer()
+            
+        }
+        tippsButton!.activateButton(true)
+    }
+
     func cardDidCollideWithCardOrContainer(movingCard:MySKCard, cardOrContainer:MySKCard, connectable: Bool) {
         
 //        if cardOrContainer.minValue == cardOrContainer.maxValue && cardOrContainer.maxValue == NoColor && movingCard.maxValue == LastCardValue {
@@ -2240,6 +2355,231 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         myTouchesEnded(touchLocation: touchLocation)
     }
     
+//    func myTouchesEnded(touchLocation: CGPoint) {
+//        
+//        cardManager!.stopTrembling()
+//        cardManager!.removeNodesWithName(myLineName)
+//        let testNode = self.atPoint(touchLocation)
+//        
+//        let aktNodeType = analyzeNode(testNode)
+//        if movedFromNode != nil && !stopped {
+//            //let countTouches = touches.count
+//            var aktNode: MySKCard?
+//            
+//            movedFromNode.zPosition = 0
+//            let startNode = movedFromNode
+//            
+//            switch aktNodeType {
+//            case MyNodeTypes.LabelNode: aktNode = testNode.parent as? MySKCard
+//            case MyNodeTypes.CardNode: aktNode = testNode as? MySKCard
+//            case MyNodeTypes.ButtonNode:
+//                aktNode = (testNode as! MySKCard).parent as? MySKCard
+//            default: aktNode = nil
+//            }
+//            
+//            if showFingerNode {
+//                if let node = self.childNode(withName: fingerName) {
+//                  node.removeFromParent()
+//                }
+//            }
+//            if aktNode != nil && aktNode!.type == .buttonType && startNode?.type == .buttonType && aktNode!.name == movedFromNode.name {
+//                //            if aktNode != nil && MySKCard.type == .ButtonType && startNode.type == .ButtonType  {
+//                var MySKCard = aktNode!
+//                
+//                //                var name = (aktNode as! MySKCard).parent!.name
+//                if MySKCard.name == buttonName {
+//                    MySKCard = (MySKCard.parent) as! MySKCard
+//                }
+//                //switch (aktNode as! MySKCard).name! {
+//                switch MySKCard.name! {
+//                    case "settings": settingsButtonPressed()
+//                    case "undo": undoButtonPressed()
+//                    case "restart": restartButtonPressed()
+//                    case "help": helpButtonPressed()
+//                    default: specialButtonPressed(MySKCard.name!)
+//                }
+//                return
+//            }
+//            
+//            if startNode!.type == .cardType && (aktNode == nil || aktNode! != movedFromNode) {
+//                let card = movedFromNode// as! SKSpriteNode
+//                let movedFrom = ColumnRow(column: movedFromNode.column, row: movedFromNode.row)
+//                var (foundedPoint, myPoints) = cardManager!.createHelpLines(movedFrom: movedFrom, toPoint: touchLocation, inFrame: self.frame, lineSize: movedFromNode.size.width, showLines: false)
+//                var actFromToColumnRow = FromToColumnRow()
+//                actFromToColumnRow.fromColumnRow = movedFrom
+//                actFromToColumnRow.toColumnRow.column = foundedPoint!.column
+//                actFromToColumnRow.toColumnRow.row = foundedPoint!.row
+//                
+//                var color = cardManager!.calculateLineColor(foundedPoint: foundedPoint!, movedFrom: movedFrom)
+//                
+//                if lastPair.fixed {
+//                    actFromToColumnRow.toColumnRow.column = lastPair.pair.toColumnRow.column
+//                    actFromToColumnRow.toColumnRow.row = lastPair.pair.toColumnRow.row
+//                    myPoints = lastPair.points // set Back to last green line
+//                    color = .green
+//                }
+//                
+//                lastPair = PairStatus()
+//                push(card!, status: .movingStarted)
+//                
+//                
+//                let countAndPushAction = SKAction.run({
+//                    self.push(card!, status: .mirrored)
+////                    print("countAndPushAction")
+//                })
+//                
+//                let actionEmpty = SKAction.run({
+//                    self.makeEmptyCard((card?.column)!, row: (card?.row)!)
+////                    print("actionEmpty")
+//                })
+//
+//                let speed = CGFloat(1) //CGFloat(durationMultiplier)
+//                
+//                card?.zPosition += 5
+//
+////                var mirroredScore = 0
+//                
+////                let startTime = Date()
+//                var actionArray = [SKAction]()
+//                var moveActions = [SKAction]()
+//                var cardOrContainer: MySKCard
+//                actionArray.append(actionEmpty)
+//                moveActions.append(SKAction.run({
+//                    SKAction.move(to: myPoints[1], duration: Double((myPoints[1] - myPoints[0]).length() * speed))
+////                    print("moveAction at: \(Date().timeIntervalSince(startTime).threeDecimals)")
+//                }))
+//                if actFromToColumnRow.toColumnRow.row == NoValue {
+//                    cardOrContainer = containers[actFromToColumnRow.toColumnRow.column]
+//                } else {
+//                    cardOrContainer = gameArray[actFromToColumnRow.toColumnRow.column][actFromToColumnRow.toColumnRow.row].card
+//                }
+//                let connectable = cardManager!.areConnectable(first: self.movedFromNode, second: cardOrContainer)
+//                var connectAction = SKAction()
+//                if connectable {
+//                    connectAction = SKAction.run({
+//                        self.connectCardOrContainerWithMovingCard(movingCard: self.movedFromNode, cardOrContainer: cardOrContainer, connectable: connectable)
+////                        print("connectAction_cardOrContainer at: \(Date().timeIntervalSince(startTime).threeDecimals)")
+//                    })
+//                }
+//                
+//                let soundArray = ["Mirror1", "Mirror2", "Mirror3", "Mirror4", "Mirror5"]
+//                for pointsIndex in 2...6 {
+//                    if myPoints.count > pointsIndex {
+//                        if color == .green {
+//                            moveActions.append(SKAction.run({
+//                                self.movedFromNode.mirrored += 1
+////                                self.addChild(self.showCountScore("+\(self.movedFromNode.countScore)", position: (card?.position)!))
+//                                self.playSound(soundArray[pointsIndex - 2], volume: GV.player!.soundVolume, soundPlayerIndex: pointsIndex - 2)
+//                            }))
+//                        }
+//                        
+//                        moveActions.append(countAndPushAction)
+//                        let moveAction = SKAction.run ({
+//                            SKAction.move(to: myPoints[pointsIndex], duration: Double((myPoints[pointsIndex] - myPoints[pointsIndex - 1]).length() * speed))
+////                            print("moveAction at: \(Date().timeIntervalSince(startTime).threeDecimals)")
+//                        })
+//                        moveActions.append(moveAction)
+//                    }
+//                }
+//                let checkGameFinishedAction = SKAction.run({
+////                    print("checkGameFinishedAction_started at: \(Date().timeIntervalSince(startTime).threeDecimals))")
+//                    self.checkGameFinished()
+////                    print("checkGameFinishedAction_ended at: \(Date().timeIntervalSince(startTime).threeDecimals))")
+//                })
+//
+//                let groupActions = SKAction.group([SKAction.sequence(moveActions), SKAction.sequence([connectAction, checkGameFinishedAction])])
+//                actionArray.append(groupActions)
+//                let collisionAction = SKAction.run({
+//                        self.cardDidCollideWithCardOrContainer(movingCard: self.movedFromNode, cardOrContainer: cardOrContainer, connectable: connectable)
+////                        print("collisionAction_Container at: \(Date().timeIntervalSince(startTime).threeDecimals))")
+//                    })
+//                let userInteractionEnablingAction = SKAction.run({
+////                    self.checkGameFinished()
+//                    self.isUserInteractionEnabled = true
+////                    print("userInteractionEnablingAction")
+//                })
+//                actionArray.append(collisionAction)
+//                actionArray.append(userInteractionEnablingAction)
+//                
+//                tippsButton!.activateButton(false)
+//                
+//                
+//                
+//                
+//                //let actionMoveDone = SKAction.removeFromParent()
+////                collisionActive = true
+//                lastMirrored = ""
+//                
+//                self.isUserInteractionEnabled = false  // userInteraction forbidden!
+//                countMovingCards = 1
+//                self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(CardGameScene.checkCountMovingCards), userInfo: nil, repeats: false) // start timer for check
+//                
+//                movedFromNode.run(SKAction.sequence(actionArray))
+//                
+//            } else if startNode!.type == .cardType && aktNode == movedFromNode {
+////                startTippTimer()
+//            } else if startNode?.type == .showCardType {
+//                var foundedCard: MySKCard?
+//                let nodes = self.nodes(at: touchLocation)
+//                var founded = false
+//                for index in 0..<nodes.count {
+//                    foundedCard = nodes[index] as? MySKCard
+//                   if nodes[index] is MySKCard && foundedCard!.type == .emptyCardType {
+//                        startNode?.column = foundedCard!.column
+//                        startNode?.row = foundedCard!.row
+//                        push(startNode!, status: .stopCycle)
+//                        push(startNode!, status: .addedFromShowCard)
+//                        startNode?.size = foundedCard!.size
+//                        startNode?.position = foundedCard!.position
+//                        startNode?.type = .cardType
+//                        foundedCard!.removeFromParent()
+//                        founded = true
+//                        cardManager!.updateGameArrayCell(card: startNode!)
+//                        gameArrayChanged = true
+//
+//                        break
+//                    } else if nodes[index] is MySKCard && foundedCard!.type == .cardType && startNode?.colorIndex == foundedCard!.colorIndex &&
+//                        (foundedCard!.maxValue + 1 == startNode?.minValue ||
+//                         foundedCard!.minValue - 1 == startNode?.maxValue) {
+//                            push(startNode!, status: .stopCycle)
+//                            push(foundedCard!, status: .unification)
+//                            push(startNode!, status: .addedFromShowCard)
+//                            
+//                            if foundedCard!.maxValue < (startNode?.minValue)! {
+//                                foundedCard!.maxValue = (startNode?.maxValue)!
+//                            } else {
+//                                foundedCard!.minValue = (startNode?.minValue)!
+//                            }
+//                            foundedCard!.reload()
+//                            push(startNode!, status: .removed)
+//                            gameArray[(startNode?.column)!][(startNode?.row)!].card.minValue = foundedCard!.minValue
+//                            gameArray[(startNode?.column)!][(startNode?.row)!].card.maxValue = foundedCard!.maxValue
+//                            startNode?.removeFromParent()
+//                            founded = true
+//                            gameArrayChanged = true
+//
+//                            break
+//                   }
+//                }
+//                if !founded {
+//                    let actionMove = SKAction.move(to: cardPlaceButton!.position, duration: 0.5)
+//                    let actionDropShowCardFromStack = SKAction.run({
+//                        self.removeShowCardFromStack()
+//                        startNode?.zPosition = 0
+//                    })
+//                    startNode?.zPosition = 50
+//                    startNode?.run(SKAction.sequence([actionMove, actionDropShowCardFromStack]))
+//                }
+//            } else {
+////                startTippTimer()
+//            }
+//            
+//        } else {
+////            startTippTimer()
+//        }
+//        
+//    }
+    
     func myTouchesEnded(touchLocation: CGPoint) {
         
         cardManager!.stopTrembling()
@@ -2264,7 +2604,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             if showFingerNode {
                 if let node = self.childNode(withName: fingerName) {
-                  node.removeFromParent()
+                    node.removeFromParent()
                 }
             }
             if aktNode != nil && aktNode!.type == .buttonType && startNode?.type == .buttonType && aktNode!.name == movedFromNode.name {
@@ -2277,11 +2617,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 }
                 //switch (aktNode as! MySKCard).name! {
                 switch MySKCard.name! {
-                    case "settings": settingsButtonPressed()
-                    case "undo": undoButtonPressed()
-                    case "restart": restartButtonPressed()
-                    case "help": helpButtonPressed()
-                    default: specialButtonPressed(MySKCard.name!)
+                case "settings": settingsButtonPressed()
+                case "undo": undoButtonPressed()
+                case "restart": restartButtonPressed()
+                case "help": helpButtonPressed()
+                default: specialButtonPressed(MySKCard.name!)
                 }
                 return
             }
@@ -2310,81 +2650,55 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 
                 let countAndPushAction = SKAction.run({
                     self.push(card!, status: .mirrored)
-//                    print("countAndPushAction")
                 })
                 
                 let actionEmpty = SKAction.run({
                     self.makeEmptyCard((card?.column)!, row: (card?.row)!)
-//                    print("actionEmpty")
                 })
-
+                
                 let speed = CGFloat(durationMultiplier)
                 
                 card?.zPosition += 5
-
-//                var mirroredScore = 0
                 
-//                let startTime = Date()
+                //                var mirroredScore = 0
+                
                 var actionArray = [SKAction]()
-                var moveActions = [SKAction]()
-                var cardOrContainer: MySKCard
                 actionArray.append(actionEmpty)
-                moveActions.append(SKAction.run({
-                    SKAction.move(to: myPoints[1], duration: Double((myPoints[1] - myPoints[0]).length() * speed))
-//                    print("moveAction at: \(Date().timeIntervalSince(startTime).threeDecimals)")
-                }))
-                if actFromToColumnRow.toColumnRow.row == NoValue {
-                    cardOrContainer = containers[actFromToColumnRow.toColumnRow.column]
-                } else {
-                    cardOrContainer = gameArray[actFromToColumnRow.toColumnRow.column][actFromToColumnRow.toColumnRow.row].card
-                }
-                let connectable = cardManager!.areConnectable(first: self.movedFromNode, second: cardOrContainer)
-                var connectAction = SKAction()
-                if connectable {
-                    connectAction = SKAction.run({
-                        self.connectCardOrContainerWithMovingCard(movingCard: self.movedFromNode, cardOrContainer: cardOrContainer, connectable: connectable)
-//                        print("connectAction_cardOrContainer at: \(Date().timeIntervalSince(startTime).threeDecimals)")
-                    })
-                }
+                actionArray.append(SKAction.move(to: myPoints[1], duration: Double((myPoints[1] - myPoints[0]).length() * speed)))
                 
                 let soundArray = ["Mirror1", "Mirror2", "Mirror3", "Mirror4", "Mirror5"]
                 for pointsIndex in 2...6 {
                     if myPoints.count > pointsIndex {
                         if color == .green {
-                            moveActions.append(SKAction.run({
+                            actionArray.append(SKAction.run({
                                 self.movedFromNode.mirrored += 1
-//                                self.addChild(self.showCountScore("+\(self.movedFromNode.countScore)", position: (card?.position)!))
+                                self.addChild(self.showCountScore("+\(self.movedFromNode.countScore)", position: (card?.position)!))
                                 self.playSound(soundArray[pointsIndex - 2], volume: GV.player!.soundVolume, soundPlayerIndex: pointsIndex - 2)
                             }))
                         }
                         
-                        moveActions.append(countAndPushAction)
-                        let moveAction = SKAction.run ({
-                            SKAction.move(to: myPoints[pointsIndex], duration: Double((myPoints[pointsIndex] - myPoints[pointsIndex - 1]).length() * speed))
-//                            print("moveAction at: \(Date().timeIntervalSince(startTime).threeDecimals)")
-                        })
-                        moveActions.append(moveAction)
+                        actionArray.append(countAndPushAction)
+                        actionArray.append(SKAction.move(to: myPoints[pointsIndex], duration: Double((myPoints[pointsIndex] - myPoints[pointsIndex - 1]).length() * speed)))
                     }
                 }
-                let checkGameFinishedAction = SKAction.run({
-//                    print("checkGameFinishedAction_started at: \(Date().timeIntervalSince(startTime).threeDecimals))")
-                    self.checkGameFinished()
-//                    print("checkGameFinishedAction_ended at: \(Date().timeIntervalSince(startTime).threeDecimals))")
-                })
-
-//                var parallelActions = [SKAction]()
-//                parallelActions.append(SKAction.sequence([connectAction, checkGameFinishedAction]))
-//                parallelActions.append(SKAction.sequence(moveActions))
-                let groupActions = SKAction.group([SKAction.sequence(moveActions), SKAction.sequence([connectAction, checkGameFinishedAction])])
-                actionArray.append(groupActions)
-                let collisionAction = SKAction.run({
-                        self.cardDidCollideWithCardOrContainer(movingCard: self.movedFromNode, cardOrContainer: cardOrContainer, connectable: connectable)
-//                        print("collisionAction_Container at: \(Date().timeIntervalSince(startTime).threeDecimals))")
+                var collisionAction: SKAction
+                if actFromToColumnRow.toColumnRow.row == NoValue {
+                    let containerNode = containers[actFromToColumnRow.toColumnRow.column] //self.childNode(withName: containers[actFromToColumnRow.toColumnRow.column].name!) as! MySKCard
+                    collisionAction = SKAction.run({
+                        self.cardDidCollideWithContainer(self.movedFromNode, node2: containerNode, points: myPoints)
                     })
+                } else {
+                    let cardNode = gameArray[actFromToColumnRow.toColumnRow.column][actFromToColumnRow.toColumnRow.row].card
+                    
+                    //                    let cardNode = self.childNode(withName: gameArray[actFromToColumnRow.toColumnRow.column][actFromToColumnRow.toColumnRow.row].name) as! MySKCard
+                    //                    let startNode = gameArray[movedFromNode.column][movedFromNode.row].card
+                    collisionAction = SKAction.run({
+                        self.cardDidCollideWithMovingCard(node1: self.movedFromNode, node2: cardNode, points: myPoints)
+                    })
+                }
                 let userInteractionEnablingAction = SKAction.run({
-//                    self.checkGameFinished()
+                    self.checkGameFinished()
                     self.isUserInteractionEnabled = true
-//                    print("userInteractionEnablingAction")
                 })
                 actionArray.append(collisionAction)
                 actionArray.append(userInteractionEnablingAction)
@@ -2412,7 +2726,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 var founded = false
                 for index in 0..<nodes.count {
                     foundedCard = nodes[index] as? MySKCard
-                   if nodes[index] is MySKCard && foundedCard!.type == .emptyCardType {
+                    if nodes[index] is MySKCard && foundedCard!.type == .emptyCardType {
                         startNode?.column = foundedCard!.column
                         startNode?.row = foundedCard!.row
                         push(startNode!, status: .stopCycle)
@@ -2424,30 +2738,30 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         founded = true
                         cardManager!.updateGameArrayCell(card: startNode!)
                         gameArrayChanged = true
-
+                        
                         break
                     } else if nodes[index] is MySKCard && foundedCard!.type == .cardType && startNode?.colorIndex == foundedCard!.colorIndex &&
                         (foundedCard!.maxValue + 1 == startNode?.minValue ||
-                         foundedCard!.minValue - 1 == startNode?.maxValue) {
-                            push(startNode!, status: .stopCycle)
-                            push(foundedCard!, status: .unification)
-                            push(startNode!, status: .addedFromShowCard)
-                            
-                            if foundedCard!.maxValue < (startNode?.minValue)! {
-                                foundedCard!.maxValue = (startNode?.maxValue)!
-                            } else {
-                                foundedCard!.minValue = (startNode?.minValue)!
-                            }
-                            foundedCard!.reload()
-                            push(startNode!, status: .removed)
-                            gameArray[(startNode?.column)!][(startNode?.row)!].card.minValue = foundedCard!.minValue
-                            gameArray[(startNode?.column)!][(startNode?.row)!].card.maxValue = foundedCard!.maxValue
-                            startNode?.removeFromParent()
-                            founded = true
-                            gameArrayChanged = true
-
-                            break
-                   }
+                            foundedCard!.minValue - 1 == startNode?.maxValue) {
+                        push(startNode!, status: .stopCycle)
+                        push(foundedCard!, status: .unification)
+                        push(startNode!, status: .addedFromShowCard)
+                        
+                        if foundedCard!.maxValue < (startNode?.minValue)! {
+                            foundedCard!.maxValue = (startNode?.maxValue)!
+                        } else {
+                            foundedCard!.minValue = (startNode?.minValue)!
+                        }
+                        foundedCard!.reload()
+                        push(startNode!, status: .removed)
+                        gameArray[(startNode?.column)!][(startNode?.row)!].card.minValue = foundedCard!.minValue
+                        gameArray[(startNode?.column)!][(startNode?.row)!].card.maxValue = foundedCard!.maxValue
+                        startNode?.removeFromParent()
+                        founded = true
+                        gameArrayChanged = true
+                        
+                        break
+                    }
                 }
                 if !founded {
                     let actionMove = SKAction.move(to: cardPlaceButton!.position, duration: 0.5)
@@ -2467,6 +2781,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
         
     }
+
     
     func ActionsForMirroring(_ card: MySKCard, adder: Int, color: MyColors, fromPoint: CGPoint, toPoint: CGPoint)->[SKAction] {
         var actions = [SKAction]()
