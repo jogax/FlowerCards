@@ -295,13 +295,13 @@ class CardManager {
 //    }
     
     private func updateColorArray() {
-        if lastColor != NoColor {
-            colorArray[lastColor].analyzeColor()
-        } else {
-            for colorIndex in 0..<MaxColorValue {
-                colorArray[colorIndex].analyzeColor()
-            }
+//        if lastColor != NoColor {
+//            colorArray[lastColor].analyzeColor()
+//        } else {
+        for colorIndex in 0..<MaxColorValue {
+            colorArray[colorIndex].analyzeColor()
         }
+//        }
     }
     
     func areConnectable(first: MySKCard, second: MySKCard)->Bool {
