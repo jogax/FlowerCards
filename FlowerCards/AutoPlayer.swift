@@ -12,7 +12,7 @@ import SpriteKit
 class AutoPlayer {
     // game to Play saves Games, Levels and CountPackages as they are displayed
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 6, countPackages: 2, gameNumber: 1509, stopAt: 96), // at Step: 101
+        GameToPlay(level: 21, countPackages: 4, gameNumber: 7609, stopAt: 72), // at Step: 199
     ]
     enum runStatus: Int {
         case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep
@@ -21,7 +21,7 @@ class AutoPlayer {
         case newTest = 1, fromTable, fromDB, runOnce, stepByStep
     }
     enum TesterType: Int {
-        case beginner = 0, medium, expert
+        case beginner = 0, longPacks, medium, expert, tester
     }
     struct GameToPlay {
         var level: Int
@@ -104,58 +104,24 @@ class AutoPlayer {
         stopTimer = false
         gameIndex = 0
         self.testType = testType
+        let playerName = GV.player!.name
+        switch playerName {
+        case "NewPlayer": testerType = .tester
+        case "Beginner": testerType = .beginner
+        case "LongPacks": testerType = .longPacks
+        case "Medium": testerType = .medium
+        case "Expert": testerType = .expert
+        default: testerType = .expert
+        }
         switch testType {
         case .newTest:
             gamesToPlay.removeAll()
-//            let packageCountArray = [1,1,1,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
-//            for _ in 0..<1000 {
-//                let levelIndex = 1 + Int(arc4random()) % GV.levelsForPlay.count()
-//                let countPackages = packageCountArray[Int(arc4random()) % packageCountArray.count]
-//                let gameNumber = 1 + Int(arc4random()) % MaxGameNumber
-//                gamesToPlay.append(GameToPlay(level: levelIndex, countPackages: countPackages, gameNumber: gameNumber))
-//            }
-            var gameCounts: [[Int]] = Array(repeating: Array(repeating: 0, count: 26), count: 4)
-            var maxCount = 0
-            var countMaxValues = 0
-            for countPkgs in 0...3 {
-                for levelId in 0...25 {
-                    let count = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d and levelID = %d and countSteps > 3", GV.player!.ID, countPkgs + 1, levelId).count
-                    gameCounts[countPkgs][levelId] = count
-                    if maxCount < count {
-                        maxCount = count
-                        countMaxValues = 1
-                    } else if maxCount == count {
-                        countMaxValues += 1
-                    }
-                }
+            switch testerType {
+            case .tester:
+                generateTestForTester()
+            default:
+                generateTestForAllOthers()
             }
-            
-            if countMaxValues != 4 * 26 {
-                for countPkgs in 0...3 {
-                    for levelId in 0...25 {
-                        let count = maxCount - gameCounts[3 - countPkgs][levelId]
-                        for _ in 0..<count {
-                            let gameToPlay = GameToPlay(level: levelId + 1, countPackages: 4 - countPkgs, gameNumber: 1 + Int(arc4random()) % MaxGameNumber)
-                            gamesToPlay.append(gameToPlay)
-                        }
-                    }
-                }
-            }
-            var go = true
-            while go {
-                for countPkgs in 0...3 {
-                    for levelId in 0...25 {
-                        for _ in 0..<1 {
-                            let gameToPlay = GameToPlay(level: levelId + 1, countPackages: 4 - countPkgs, gameNumber: 1 + Int(arc4random()) % MaxGameNumber)
-                            gamesToPlay.append(gameToPlay)
-                            if gamesToPlay.count > 1000 {
-                                go = false
-                            }
-                        }
-                    }
-                }
-            }
-            
 
         case .runOnce:
             gamesToPlay.removeAll()
@@ -189,6 +155,67 @@ class AutoPlayer {
         autoPlayStatus = .getTipp
         stopTimer = false
         timer = Timer.scheduledTimer(timeInterval: 0.001, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+    }
+    
+    private func generateTestForTester() {
+        var gameCounts: [[Int]] = Array(repeating: Array(repeating: 0, count: 26), count: 4)
+        var maxCount = 0
+        var countMaxValues = 0
+        for countPkgs in 0...3 {
+            for levelId in 0...25 {
+                let count = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d and levelID = %d and countSteps > 3", GV.player!.ID, countPkgs + 1, levelId).count
+                gameCounts[countPkgs][levelId] = count
+                if maxCount < count {
+                    maxCount = count
+                    countMaxValues = 1
+                } else if maxCount == count {
+                    countMaxValues += 1
+                }
+            }
+        }
+        
+        if countMaxValues != 4 * 26 {
+            for countPkgs in 0...3 {
+                for levelId in 0...25 {
+                    let count = maxCount - gameCounts[3 - countPkgs][levelId]
+                    for _ in 0..<count {
+                        let gameToPlay = GameToPlay(level: levelId + 1, countPackages: 4 - countPkgs, gameNumber: 1 + Int(arc4random()) % MaxGameNumber)
+                        gamesToPlay.append(gameToPlay)
+                    }
+                }
+            }
+        }
+        var go = true
+        while go {
+            for countPkgs in 0...3 {
+                for levelId in 0...25 {
+                    for _ in 0..<1 {
+                        let gameToPlay = GameToPlay(level: levelId + 1, countPackages: 4 - countPkgs, gameNumber: 1 + Int(arc4random()) % MaxGameNumber)
+                        gamesToPlay.append(gameToPlay)
+                        if gamesToPlay.count > 1000 {
+                            go = false
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private func generateTestForAllOthers() {
+        let origID = realm.objects(PlayerModel.self).filter("name = %@", "NewPlayer").first!.ID
+        let games = realm.objects(GameModel.self).filter("playerID = %d", origID).sorted(byProperty: "gameNumber", ascending: true)
+        for game in games {
+            let levelID = game.levelID
+            let countPackages = game.countPackages
+            let gameNumber = game.gameNumber
+            if realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and countPackages = %d and gameNumber = %d", GV.player!.ID, levelID, countPackages, gameNumber).count == 0 {
+                let gameToPlay = GameToPlay(level: game.levelID + 1, countPackages: game.countPackages, gameNumber: game.gameNumber + 1)
+                gamesToPlay.append(gameToPlay)
+            }
+            if gamesToPlay.count == 1000 {
+                break
+            }
+        }
     }
     
     func startNextGame() {
@@ -243,6 +270,28 @@ class AutoPlayer {
                                     choosedTipp = tipp.innerTipps.first!
                                 }
                             }
+                        case .longPacks:
+                            for tipp in tippArray {
+                                let AWithK = (tipp.connectedValues.upper == FirstCardValue && tipp.connectedValues.lower == LastCardValue ) || tipp.card1.countTransitions + tipp.card2.countTransitions > 0
+                                if tipp.card2.type != .containerType && !AWithK { // first check only Cards without transitions
+                                    if bestTipp.innerTipps.count == 0 || bestTipp.innerTipps.last!.value < tipp.innerTipps.last!.value {
+                                        bestTipp = tipp
+                                        choosedTipp = tipp.innerTipps.last!
+                                    }
+                                }
+                            }
+                            if bestTipp.innerTipps.count == 0 {
+                                for tipp in tippArray {
+                                    if !tipp.supressed && tipp.card2.type == .containerType  { // first check only Cards
+                                        if bestTipp.innerTipps.count == 0 || bestTipp.innerTipps.last!.value < tipp.innerTipps.last!.value {
+                                            bestTipp = tipp
+                                            choosedTipp = tipp.innerTipps.last!
+                                            
+                                        }
+                                    }
+                                }
+                            }
+                            
                         case .medium:
                             for tipp in tippArray {
                                 
@@ -265,11 +314,7 @@ class AutoPlayer {
                                 }
                             }
                             
-                        case .expert:
-//                            let colorIndex = Int(arc4random()%2)
-//                            let color1 = playerColors[actPlayer][colorIndex]
-//                            let color2 = playerColors[actPlayer][(colorIndex + 1)%2]
-                            
+                        case .expert, .tester:
                             for tipp in tippArray {
                                 if !tipp.supressed && tipp.card2.type != .containerType  { // first check only Cards an not supressed tipps
                                     if bestTipp.innerTipps.count == 0 || bestTipp.innerTipps.last!.value < tipp.innerTipps.last!.value {

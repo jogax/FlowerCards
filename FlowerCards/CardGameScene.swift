@@ -1748,9 +1748,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         case .Won, .Lost:
             let actGames = realm.objects(GameModel.self).filter("levelID = %d and gameNumber = %d and countPackages = %d",
                 levelIndex, actGame!.gameNumber, actGame!.countPackages)
-            let bestGameScore: Int = actGames.max(ofProperty: "playerScore")!
-            let bestScorePlayerID = actGames.filter("playerScore = %d", bestGameScore).first!.playerID
-            let bestScorePlayerName = realm.objects(PlayerModel.self).filter("ID = %d",bestScorePlayerID).first!.name
+            var bestGameScore = 0
+            var bestScorePlayerName = ""
+            if actGames.count > 0 {
+                bestGameScore = actGames.max(ofProperty: "playerScore")!
+                let bestScorePlayerID = actGames.filter("playerScore = %d", bestGameScore).first!.playerID
+                bestScorePlayerName = realm.objects(PlayerModel.self).filter("ID = %d",bestScorePlayerID).first!.name
+            }
             
             tippCountLabel.text = String(0)
 //            let statistic = realm.objects(StatisticModel.self).filter("playerID = %d and levelID = %d and countPackages = %d",
