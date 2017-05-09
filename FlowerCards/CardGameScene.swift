@@ -895,16 +895,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let allGameCount = realm.objects(GameModel.self).filter("playerID = %d", GV.player!.ID).count
         allGamesLabel.text = GV.language.getText(.tcAllGamesCount, values: "\(allGameCount)")
         var pkgCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 1", GV.player!.ID).count
-        var pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 1 and gameFinished = false", GV.player!.ID).count
+        var pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 1 and gameFinished = false and ID != %d", GV.player!.ID, GV.actGame!.ID).count
         onePkgLabel.text = GV.language.getText(.tc1PkgTxt, values: "\(pkgErrorCount)", "\(pkgCount)")
         pkgCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 2", GV.player!.ID).count
-        pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 2 and gameFinished = false", GV.player!.ID).count
+        pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 2 and gameFinished = false and ID != %d", GV.player!.ID, GV.actGame!.ID).count
         twoPkgLabel.text = GV.language.getText(.tc2PkgTxt, values: "\(pkgErrorCount)", "\(pkgCount)")
         pkgCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 3", GV.player!.ID).count
-        pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 3 and gameFinished = false", GV.player!.ID).count
+        pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 3 and gameFinished = false and ID != %d", GV.player!.ID, GV.actGame!.ID).count
         threePkgLabel.text = GV.language.getText(.tc3PkgTxt, values: "\(pkgErrorCount)", "\(pkgCount)")
         pkgCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 4", GV.player!.ID).count
-        pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 4 and gameFinished = false", GV.player!.ID).count
+        pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 4 and gameFinished = false and ID != %d", GV.player!.ID, GV.actGame!.ID).count
         fourPkgLabel.text = GV.language.getText(.tc4PkgTxt, values: "\(pkgErrorCount)", "\(pkgCount)")
     }
     
