@@ -129,4 +129,9 @@ let ruDictionary: [TextConstants: String] = [
     .tcReplay:          "Воспроизведение игры",
     .tcActivateAutoPlay:"Активировать автотест",
     .tcLevelAndPackage: "Уровень:%, Колоды:%, Формат:%",
+    .tcAllGamesCount:   "All Games: %",
+    .tc1PkgTxt:         "One Pkg: % / %",
+    .tc2PkgTxt:         "Two Pkg: % / %",
+    .tc3PkgTxt:         "Three Pkg: % / %",
+    .tc4PkgTxt:         "Four Pkg: % / %",
 ]

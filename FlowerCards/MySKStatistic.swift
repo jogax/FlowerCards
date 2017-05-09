@@ -53,6 +53,7 @@ class MySKStatistic: MySKTable {
         for row in 0..<nameTable.count {
             if nameTable[row].name != GV.language.getText(.tcAnonym) || row == 0 {
                 let statisticTable = realm.objects(StatisticModel.self).filter("playerID = %d", nameTable[row].ID)
+
                 var allTime = 0
                 var countPlays = 0
                 var countMultiPlays = 0
@@ -60,11 +61,11 @@ class MySKStatistic: MySKTable {
                 var countDefeats = 0
                 for index in 0..<statisticTable.count {
                     allTime += statisticTable[index].allTime
-                    countPlays += statisticTable[index].countPlays
                     countMultiPlays += statisticTable[index].countMultiPlays
                     countVictorys += statisticTable[index].victorys
                     countDefeats += statisticTable[index].defeats
                 }
+                countPlays = realm.objects(GameModel.self).filter("playerID = %d and ID != %d", nameTable[row].ID, GV.actGame!.ID).count
                 let elements: [MultiVar] = [MultiVar(string: convertNameWhenRequired(nameTable[row].name)),
                                             MultiVar(string: "\(countPlays)"),
                                             MultiVar(string: "\(countMultiPlays)"),

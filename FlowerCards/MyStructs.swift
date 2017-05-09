@@ -56,6 +56,7 @@ struct GV {
     static var countPlayers: Int = 1
 
     static var player: PlayerModel?
+    static var actGame: GameModel?
     
     static func pointOfCircle(_ radius: CGFloat, center: CGPoint, angle: CGFloat) -> CGPoint {
         let pointOfCircle = CGPoint (x: center.x + radius * cos(angle), y: center.y + radius * sin(angle))

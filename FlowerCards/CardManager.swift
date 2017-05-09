@@ -195,7 +195,7 @@ let maxPackageCount = 4
 var stopCreateTippsInBackground = false
 var tippArray = [Tipp]()
 var tippArrayCreatedInSeconds = 0.0
-var showHelpLines: ShowHelpLine = .green
+//var showHelpLines: ShowHelpLine = .green
 var cardSize:CGSize = CGSize(width: 0, height: 0)
 
 let myLineName = "myLine"
@@ -304,19 +304,21 @@ class CardManager {
 //        }
     }
     
-    func areConnectable(first: MySKCard, second: MySKCard)->Bool {
+    func areConnectable(first: MySKCard, second: MySKCard)->(OK: Bool, supressed: Bool) {
         if first.colorIndex != second.colorIndex && second.colorIndex != NoColor {
-            return false
+            return (false, false)
         }
         var OK = false
+        var supressed = false
         let searchPair = ConnectablePair(card1: first, card2: second)
         for pair in colorArray[first.colorIndex].connectablePairs {
             if pair == searchPair {
                 OK = true
+                supressed = pair.supressed
                 break
             }
         }
-        return OK
+        return (OK, supressed)
     }
     
     func startCreateTipps() {
@@ -932,9 +934,9 @@ class CardManager {
     func drawHelpLinesSpec() {
         let points = lastDrawHelpLinesParameters.points
         var lineWidth = cardSize.width
-        if showHelpLines == .green {
+//        if showHelpLines == .green {
             lineWidth = lastDrawHelpLinesParameters.lineWidth
-        }
+//        }
         
         let twoArrows = lastDrawHelpLinesParameters.twoArrows
         let color = lastDrawHelpLinesParameters.color
@@ -1014,18 +1016,24 @@ class CardManager {
         
         myLine.path = pathToDraw
         
-        switch showHelpLines {
-        case .green:
-            if color == .red {
-                myLine.strokeColor = SKColor(red: 1.0, green: 0.0, blue: 0.0, alpha: 0.8) // GV.colorSets[GV.colorSetIndex][colorIndex + 1]
-            } else {
-                myLine.strokeColor = SKColor(red: 0.0, green: 1.0, blue: 0.0, alpha: 0.8) // GV.colorSets[GV.colorSetIndex][colorIndex + 1]
-            }
-        case .cyan:
-            myLine.strokeColor = SKColor.cyan
-        case .hidden:
-            myLine.strokeColor = SKColor(colorLiteralRed: 0, green: 0, blue: 0, alpha: 0)
+//        switch showHelpLines {
+//        case .green:
+        switch color {
+            case .red: myLine.strokeColor = SKColor.red //(red: 1.0, green: 0.0, blue: 0.0, alpha: 0.8)
+            case .green: myLine.strokeColor = SKColor.green//(red: 0.0, green: 1.0, blue: 0.0, alpha: 0.8)
+            case .yellow: myLine.strokeColor = SKColor.yellow//(red: 1.0, green: 0.0, blue: 0.0, alpha: 0.8)
+            default: break
         }
+//            if color == .red {
+//                myLine.strokeColor = SKColor(red: 1.0, green: 0.0, blue: 0.0, alpha: 0.8) // GV.colorSets[GV.colorSetIndex][colorIndex + 1]
+//            } else {
+//                myLine.strokeColor = SKColor(red: 0.0, green: 1.0, blue: 0.0, alpha: 0.8) // GV.colorSets[GV.colorSetIndex][colorIndex + 1]
+//            }
+//        case .cyan:
+//            myLine.strokeColor = SKColor.cyan
+//        case .hidden:
+//            myLine.strokeColor = SKColor(colorLiteralRed: 0, green: 0, blue: 0, alpha: 0)
+//        }
         myLine.zPosition = 100
         myLine.lineCap = .round
         
@@ -1037,9 +1045,9 @@ class CardManager {
         if lastPair.color == MyColors.green { // Timer for check Green Line
             if Date().timeIntervalSince(lastPair.startTime) > fixationTime && !lastPair.fixed {
                 lastPair.fixed = true
-                if showHelpLines == .green {
+//                if showHelpLines == .green {
                     lineWidthMultiplier = lineWidthMultiplierSpecial
-                }
+//                }
                 drawHelpLinesSpec() // draw thick Line
             }
         }
@@ -1174,11 +1182,13 @@ class CardManager {
         let first = gameArray[movedFrom.column][movedFrom.row].card
         let second = foundedPosition.card
         let connectable = areConnectable(first: first, second: second)
-        if connectable 
+        if (connectable.OK && !connectable.supressed)
             ||
             (foundedPosition.card.minValue == NoColor && !actColorHasContainer) &&
             (gameArray[movedFrom.column][movedFrom.row].card.maxValue == LastCardValue) {
             color = .green
+        } else if connectable.OK && connectable.supressed {
+            color = .yellow
         }
         return color
     }
@@ -1618,7 +1628,7 @@ class CardManager {
             
             if connectablePairs.count > 0 {
                 for (index, pair) in connectablePairs.enumerated() {
-                    if !pairsToRemove.contains(index) {
+                    if !pair.supressed {
                         checkPair(index: index, actPair: pair)
                     }
                 }
@@ -2028,51 +2038,52 @@ class CardManager {
                             break
                         }
                     }
-                    let connectValues = connectablePair.connectedValues
+//                    let connectValues = connectablePair.connectedValues
                     let connectCards = connectablePair.connectedCards
-                    let upperUsedCard = usedCards[connectValues.upper]
-                    let lowerUsedCard = usedCards[connectValues.lower]
-                    var allowedPair = true
-                    
-                    if upperUsedCard.freeMinCount == 2 && lowerUsedCard.freeMaxCount == 2 && upperUsedCard.countInStack == 0 {
-                        var checkCard: MySKCard?
-                        
-                        if upperUsedCard.freeMinValues[0] == lowerUsedCard.freeMaxValues[0] ||
-                            upperUsedCard.freeMinValues[0] == lowerUsedCard.freeMaxValues[1] {
-                            checkCard = upperUsedCard.freeMinValues[0]
-                        }
-                        if upperUsedCard.freeMinValues[1] == lowerUsedCard.freeMaxValues[0] ||
-                            upperUsedCard.freeMinValues[1] == lowerUsedCard.freeMaxValues[1] {
-                            checkCard = upperUsedCard.freeMinValues[1]
-                        }
-                        if let card = checkCard {
-                            if !(card == connectablePair.card1 || card == connectablePair.card2) {
-                                allowedPair = false
-                            }
-                        }
-                        connectablePair.supressed = !allowedPair
-                    }
-                    if connectCards.upperCard != nil && connectCards.lowerCard?.type != .containerType && connectCards.lowerCard != nil{
-                        var OKFlag = false
-                        var mask = maxPackage
-                        if connectCards.upperCard!.minValue != FirstCardValue {
-                            while mask > 0 {
-                                if connectCards.upperCard!.belongsToPackageMin & connectCards.lowerCard!.belongsToPackageMax & mask > 0 {
-                                    OKFlag = true
-                                }
-                                mask = mask >> 1
-                            }
-                        } else {
-                            let lowerBelongs = connectCards.lowerCard!.belongsToPackageMax << 1
-                            while mask > 0 {
-                                if connectCards.upperCard!.belongsToPackageMin & lowerBelongs & mask > 0 {
-                                    OKFlag = true
-                                }
-                                mask = mask >> 1
-                            }
-                        }
-                        connectablePair.supressed = !OKFlag
-                    }
+//                    let upperUsedCard = usedCards[connectValues.upper]
+//                    let lowerUsedCard = usedCards[connectValues.lower]
+//                    var allowedPair = true
+//                    
+//                    if upperUsedCard.freeMinCount == 2 && lowerUsedCard.freeMaxCount == 2 && upperUsedCard.countInStack == 0 {
+//                        var checkCard: MySKCard?
+//                        
+//                        if upperUsedCard.freeMinValues[0] == lowerUsedCard.freeMaxValues[0] ||
+//                            upperUsedCard.freeMinValues[0] == lowerUsedCard.freeMaxValues[1] {
+//                            checkCard = upperUsedCard.freeMinValues[0]
+//                        }
+//                        if upperUsedCard.freeMinValues[1] == lowerUsedCard.freeMaxValues[0] ||
+//                            upperUsedCard.freeMinValues[1] == lowerUsedCard.freeMaxValues[1] {
+//                            checkCard = upperUsedCard.freeMinValues[1]
+//                        }
+//                        if let card = checkCard {
+//                            if !(card == connectablePair.card1 || card == connectablePair.card2) {
+//                                allowedPair = false
+//                            }
+//                        }
+//                        connectablePair.supressed = !allowedPair
+//                    }
+//                    if connectCards.upperCard != nil && connectCards.lowerCard != nil && connectCards.lowerCard?.type != .containerType {
+//                        var OKFlag = false
+//                        var mask = maxPackage
+//                        
+//                        if connectCards.upperCard!.minValue != FirstCardValue {
+//                            while mask > 0 {
+//                                if connectCards.upperCard!.belongsToPackageMin & connectCards.lowerCard!.belongsToPackageMax & mask > 0 {
+//                                    OKFlag = true
+//                                }
+//                                mask = mask >> 1
+//                            }
+//                        } else {
+//                            let lowerBelongs = connectCards.lowerCard!.belongsToPackageMax << 1
+//                            while mask > 0 {
+//                                if connectCards.upperCard!.belongsToPackageMin & lowerBelongs & mask > 0 {
+//                                    OKFlag = true
+//                                }
+//                                mask = mask >> 1
+//                            }
+//                        }
+//                        connectablePair.supressed = !OKFlag
+//                    }
                     if !founded {
                         connectablePairs.append(connectablePair)
                         foundedPairs.append(connectablePair)
@@ -2114,26 +2125,23 @@ class CardManager {
                 }
             }
             if actPair.card1.type == .cardType && actPair.card2.type == .cardType {
-                if actPair.card1.countTransitions > 0 && actPair.card2.countTransitions > 0 {
-                    if !checkCardPairWithTransition(card1:actPair.card1, card2: actPair.card2) {
-                        if !pairsToRemove.contains(index) {
-                            pairsToRemove.append(index)
-                        }
-                    }
-                }
-//                if (actPair.card1.countTransitions > 0 && actPair.card2.countTransitions == 0) ||
-//                    (actPair.card2.countTransitions > 0 && actPair.card1.countTransitions == 0) {
-//                    checkCardPairWithOneTransition(actPair:actPair)
+//                if actPair.card1.countTransitions > 0 && actPair.card2.countTransitions > 0 {
+//                    if !checkCardPairWithTransition(card1:actPair.card1, card2: actPair.card2) {
+//                        if !pairsToRemove.contains(index) {
+//                            pairsToRemove.append(index)
+//                        }
+//                    }
 //                }
                 if (actPair.card1.minValue == FirstCardValue && actPair.card2.maxValue == LastCardValue ||
                         actPair.card2.minValue == FirstCardValue && actPair.card1.maxValue == LastCardValue) {
-                    if checkIfNewCardCompatibleWithCWT(pairToCheck: actPair) {
-                        if !pairsToRemove.contains(index) {
-                            pairsToRemove.append(index)
-                        }
-                        return
-                    }
-                    for (ind, pair) in connectablePairs.enumerated() {
+//                    if checkIfNewCardCompatibleWithCWT(pairToCheck: actPair) {
+//                        actPair.supressed = true
+////                        if !pairsToRemove.contains(index) {
+////                            pairsToRemove.append(index)
+////                        }
+//                        return
+//                    }
+                    for pair in connectablePairs {
                         if pair != actPair {
                             if pair.card1.type == .cardType && pair.card2.type == .cardType &&
                                 (actPair.card1 === pair.card1 || actPair.card1 === pair.card2 || actPair.card2 === pair.card1 || actPair.card2 === pair.card2) &&
@@ -2142,14 +2150,16 @@ class CardManager {
                                 let actPairLen = actPair.card1.countCards + actPair.card2.countCards
                                 let pairLen = pair.card1.countCards + pair.card2.countCards
                                 if actPairLen >= CountCardsInPackage && actPairLen > pairLen /* && (pairLen < CountCardsInPackage */ {
-                                    if !pairsToRemove.contains(ind) {
-                                        pairsToRemove.append(ind)
-                                    }
+                                    pair.supressed = true
+//                                    if !pairsToRemove.contains(ind) {
+//                                        pairsToRemove.append(ind)
+//                                    }
                                 }
                                 if pairLen >= CountCardsInPackage && actPairLen < pairLen /* && actPairLen < CountCardsInPackage */ {
-                                    if !pairsToRemove.contains(index) {
-                                        pairsToRemove.append(index)
-                                    }
+                                    actPair.supressed = true
+//                                    if !pairsToRemove.contains(index) {
+//                                        pairsToRemove.append(index)
+//                                    }
                                 }
                            }
                         }
@@ -2157,80 +2167,80 @@ class CardManager {
                 }
             }
         }
-        
-        private func checkCardPairWithOneTransition(actPair: ConnectablePair) {
-            func findOtherPairWithSearchCard(searchCard: MySKCard)->(ConnectablePair?, Int) {
-                for (index, pair) in connectablePairs.enumerated() {
-                    if pair != actPair && (pair.card1 == searchCard || pair.card2 == searchCard)  {
-                        let (value1, value2) = pair.connectedValues
-                        let (actValue1, actValue2) = actPair.connectedValues
-                        if value1 == actValue1 && value2 == actValue2 {
-                            return (pair, index)
-                        }
-                    }
-                }
-                return (nil, NoValue)
-            }
-            
-            if countTransitions == countPackages - 1 {
-                let otherCard: MySKCard = actPair.card1.countTransitions == 0 ? actPair.card1 : actPair.card2
-                let cardWithTransition: MySKCard = actPair.card1.countTransitions == 0 ? actPair.card2 : actPair.card1
-                let (otherPair, _) = findOtherPairWithSearchCard(searchCard: cardWithTransition)
-                if otherPair != nil {
-                    let otherCard1 = otherPair?.card1 == cardWithTransition ? otherPair?.card2 : actPair.card1
-                    if cardWithTransition.colorIndex == 1 {
-                        print(cardWithTransition.printValue)
-                        print(otherCard.printValue)
-                        print(otherCard1!.printValue)
-                    }
-                }
-            }
-        }
-        
-        private func checkCardPairWithTransition(card1: MySKCard, card2: MySKCard)->Bool {
-            var returnValue = true
-            func checkCardsBothWithTransitions(card1: MySKCard, card2: MySKCard)->Bool {
-                let ind1 = card1 == cardsWithTransitions[0] ? 0 : (card1 == cardsWithTransitions[1] ? 1 : 2)
-                let ind2 = card2 == cardsWithTransitions[0] ? 0 : (card2 == cardsWithTransitions[1] ? 1 : 2)
-                var ind3 = 0
-                switch (ind1, ind2) {
-                case (0,1), (1,0): ind3 = 2
-                case (0,2), (2,0): ind3 = 1
-                case (1,2), (2,1): ind3 = 0
-                default: break
-                }
-                let card1 = cardsWithTransitions[ind1]
-                let card2 = cardsWithTransitions[ind2]
-                let card3 = cardsWithTransitions[ind3]
-                if  card1.minValue - 1 == card2.maxValue ||
-                    card1.minValue == FirstCardValue && card2.maxValue == LastCardValue && countTransitions < countPackages - 1 {
-                    if card3.minValue <= card1.maxValue || card3.maxValue >= card2.minValue {
-                        return false
-                    }
-                    
-                }
-                if card1.maxValue + 1 == card2.minValue ||
-                    card1.maxValue == LastCardValue && card2.minValue == FirstCardValue && countTransitions < countPackages - 1 {
-                    if card3.minValue <= card2.maxValue || card3.maxValue >= card1.minValue {
-                        return false
-                    }
-                }
-                return true
-            }
-            
-            
-            
-            if countPackages == 4 && countTransitions == countPackages - 1 {
-                if card1.countTransitions == 1 && card2.countTransitions == 1 && cardsWithTransitions.count == 3 {
-                    return checkCardsBothWithTransitions(card1: card1, card2: card2)
-                }
-            }
-            return returnValue
-        }
+//
+//        private func checkCardPairWithOneTransition(actPair: ConnectablePair) {
+//            func findOtherPairWithSearchCard(searchCard: MySKCard)->(ConnectablePair?, Int) {
+//                for (index, pair) in connectablePairs.enumerated() {
+//                    if pair != actPair && (pair.card1 == searchCard || pair.card2 == searchCard)  {
+//                        let (value1, value2) = pair.connectedValues
+//                        let (actValue1, actValue2) = actPair.connectedValues
+//                        if value1 == actValue1 && value2 == actValue2 {
+//                            return (pair, index)
+//                        }
+//                    }
+//                }
+//                return (nil, NoValue)
+//            }
+//            
+//            if countTransitions == countPackages - 1 {
+//                let otherCard: MySKCard = actPair.card1.countTransitions == 0 ? actPair.card1 : actPair.card2
+//                let cardWithTransition: MySKCard = actPair.card1.countTransitions == 0 ? actPair.card2 : actPair.card1
+//                let (otherPair, _) = findOtherPairWithSearchCard(searchCard: cardWithTransition)
+//                if otherPair != nil {
+//                    let otherCard1 = otherPair?.card1 == cardWithTransition ? otherPair?.card2 : actPair.card1
+//                    if cardWithTransition.colorIndex == 1 {
+//                        print(cardWithTransition.printValue)
+//                        print(otherCard.printValue)
+//                        print(otherCard1!.printValue)
+//                    }
+//                }
+//            }
+//        }
+//        
+//        private func checkCardPairWithTransition(card1: MySKCard, card2: MySKCard)->Bool {
+//            var returnValue = true
+//            func checkCardsBothWithTransitions(card1: MySKCard, card2: MySKCard)->Bool {
+//                let ind1 = card1 == cardsWithTransitions[0] ? 0 : (card1 == cardsWithTransitions[1] ? 1 : 2)
+//                let ind2 = card2 == cardsWithTransitions[0] ? 0 : (card2 == cardsWithTransitions[1] ? 1 : 2)
+//                var ind3 = 0
+//                switch (ind1, ind2) {
+//                case (0,1), (1,0): ind3 = 2
+//                case (0,2), (2,0): ind3 = 1
+//                case (1,2), (2,1): ind3 = 0
+//                default: break
+//                }
+//                let card1 = cardsWithTransitions[ind1]
+//                let card2 = cardsWithTransitions[ind2]
+//                let card3 = cardsWithTransitions[ind3]
+//                if  card1.minValue - 1 == card2.maxValue ||
+//                    card1.minValue == FirstCardValue && card2.maxValue == LastCardValue && countTransitions < countPackages - 1 {
+//                    if card3.minValue <= card1.maxValue || card3.maxValue >= card2.minValue {
+//                        return false
+//                    }
+//                    
+//                }
+//                if card1.maxValue + 1 == card2.minValue ||
+//                    card1.maxValue == LastCardValue && card2.minValue == FirstCardValue && countTransitions < countPackages - 1 {
+//                    if card3.minValue <= card2.maxValue || card3.maxValue >= card1.minValue {
+//                        return false
+//                    }
+//                }
+//                return true
+//            }
+//            
+//        
+//            
+//            if countPackages == 4 && countTransitions == countPackages - 1 {
+//                if card1.countTransitions == 1 && card2.countTransitions == 1 && cardsWithTransitions.count == 3 {
+//                    return checkCardsBothWithTransitions(card1: card1, card2: card2)
+//                }
+//            }
+//            return returnValue
+//        }
         
 
         
-        func checkIfNewCardCompatibleWithCWT(pairToCheck: ConnectablePair)->Bool {
+        private func checkIfNewCardCompatibleWithCWT(pairToCheck: ConnectablePair)->Bool {
             if countTransitions < countPackages - 1 {  // check only if all possible transitions are used
                 return false
             }

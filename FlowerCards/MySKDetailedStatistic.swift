@@ -31,8 +31,8 @@ class MySKDetailedStatistic: MySKTable {
         self.callBack = callBack
         var errorTxt = ""
         #if TEST
-            let allGamesCount = realm.objects(GameModel.self).filter("playerID = %d", playerID).count
-            let errorGamesCount = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false", playerID).count - 1
+            let allGamesCount = realm.objects(GameModel.self).filter("playerID = %d and ID != %d", playerID, GV.actGame!.ID).count
+            let errorGamesCount = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and ID != %d", playerID, GV.actGame!.ID).count
             errorTxt = " errorGames: \(errorGamesCount) / \(allGamesCount)"
         #endif
         let headLines = GV.language.getText(.tcPlayerStatisticHeader, values: playerName, errorTxt)

@@ -119,7 +119,13 @@ enum TextConstants: Int {
     tcAutoPlayTable,
     tcReplay,
     tcActivateAutoPlay,
-    tcLevelAndPackage
+    tcLevelAndPackage,
+    tcAllGamesCount,
+    tc1PkgTxt,
+    tc2PkgTxt,
+    tc3PkgTxt,
+    tc4PkgTxt
+    
 
 }
 

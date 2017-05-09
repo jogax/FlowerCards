@@ -12,7 +12,7 @@ import SpriteKit
 class AutoPlayer {
     // game to Play saves Games, Levels and CountPackages as they are displayed
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 21, countPackages: 4, gameNumber: 7609, stopAt: 72), // at Step: 199
+        GameToPlay(level: 18, countPackages: 2, gameNumber: 1454), // at Step: 199
     ]
     enum runStatus: Int {
         case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep
@@ -66,7 +66,7 @@ class AutoPlayer {
 //        var lostGames: [String] = []
 //        var couldNotEndGames: [String] = []
         while levelID < maxLevelID {
-            let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and levelID = %d and ID != %d", GV.player!.ID, levelID, actGame!.ID).sorted(byProperty: "gameNumber")
+            let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and levelID = %d and ID != %d", GV.player!.ID, levelID, GV.actGame!.ID).sorted(byProperty: "gameNumber")
             for game in errorGames  {
                 if game.countSteps == 0 {
                     realm.beginWrite()
@@ -83,12 +83,12 @@ class AutoPlayer {
             levelID += 1
         }
         let allGamesCount = realm.objects(GameModel.self).filter("playerID = %d", GV.player!.ID).count
-        let errorGamesCount = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and ID != %d", GV.player!.ID, actGame!.ID).count
+        let errorGamesCount = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and ID != %d", GV.player!.ID, GV.actGame!.ID).count
         if allGamesCount > 0 {
             print ("AllGames: \(allGamesCount), Errorgames: \(errorGamesCount), Procent errorgames: \((Double(errorGamesCount) * 100.0 / Double(allGamesCount)).twoDecimals)%")
             for countPkgs in 1...4 {
                 let gameCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d", GV.player!.ID, countPkgs).count
-                let errorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d and gameFinished = false and (ID != %d or levelID != %d)", GV.player!.ID, countPkgs, actGame!.ID, actGame!.levelID).count
+                let errorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d and gameFinished = false and (ID != %d or levelID != %d)", GV.player!.ID, countPkgs, GV.actGame!.ID, GV.actGame!.levelID).count
                 if gameCount > 0 {
                     print ("Pack \(countPkgs): \(gameCount), Errorgames: \(errorCount), Procent errorgames: \((Double(errorCount) * 100.0 / Double(gameCount)).twoDecimals)%")
                 } else {
@@ -255,7 +255,7 @@ class AutoPlayer {
     
     
     @objc func nextStep(timerX: Timer) {
-        if scene.cardCount > 0 /*&& scene.tippArray.count > 0*/ {
+        if scene.cardCount > 0 {
             switch autoPlayStatus {
             case .getTipp:
                 choosedTipp = Tipp.InnerTipp()
@@ -316,6 +316,11 @@ class AutoPlayer {
                             
                         case .expert, .tester:
                             for tipp in tippArray {
+//                                if tipp.supressed {
+//                                    print("supressed: \(tipp.printValue())")
+//                                    stopAutoplay()
+//                                    break
+//                                } else 
                                 if !tipp.supressed && tipp.card2.type != .containerType  { // first check only Cards an not supressed tipps
                                     if bestTipp.innerTipps.count == 0 || bestTipp.innerTipps.last!.value < tipp.innerTipps.last!.value {
                                         bestTipp = tipp
@@ -357,7 +362,7 @@ class AutoPlayer {
                 scene.myTouchesMoved(touchLocation: choosedTipp.points[1])
                 autoPlayStatus = .touchesEnded
             case .touchesEnded:
-                scene.myTouchesEnded(touchLocation: choosedTipp.points[1])
+                scene.autoTouchesEnded(touchLocation: choosedTipp.points[1])
                 switch testType {
                 case .runOnce:
                     break
@@ -381,16 +386,17 @@ class AutoPlayer {
                 timer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }
         } else {
-                if gamesToPlay.count == 0 {
-                    stopAutoplay()
+            scene.updateGameCountLabels()
+            if gamesToPlay.count == 0 {
+                stopAutoplay()
+            } else {
+                gameIndex += 1
+                if gameIndex < gamesToPlay.count {
+                    startNextGame()
                 } else {
-                    gameIndex += 1
-                    if gameIndex < gamesToPlay.count {
-                        startNextGame()
-                    } else {
-                        stopAutoplay()
-                    }
+                    stopAutoplay()
                 }
+            }
             if !stopTimer {
                 timer = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }

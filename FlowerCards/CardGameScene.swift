@@ -89,7 +89,7 @@ enum Colors: Int {
 }
 
 enum MyColors: Int {
-    case none = 0, red, green
+    case none = 0, red, green, yellow
 }
 
 
@@ -125,7 +125,7 @@ var stack:Stack<SavedCard> = Stack()
 var lastColor = NoColor
 var countPackages = 1
 var random: MyRandom?
-var actGame: GameModel?
+//var actGame: GameModel?
 let MaxGameNumber = 10000
 
 var lastPair = PairStatus() {
@@ -365,6 +365,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var opponentTimeLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var opponentScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var opponentCardCountLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    
+    var allGamesLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var onePkgLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var twoPkgLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var threePkgLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var fourPkgLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     
     var cardCountLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
 //    var showScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
@@ -744,59 +750,54 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let scorePos = timePos + timeLength
         let cardCountPos = scorePos + scoreLength
         
-        createLabels(gameNumberLabel, text: gameNumberText, row: 1, xPosProzent: gameNumberPos)
-        createLabels(sizeLabel, text: sizeText, row: 1, xPosProzent: sizePos)
-        createLabels(packageLabel, text: packageText, row: 1, xPosProzent: packagePos)
-        createLabels(levelLabel, text: GV.language.getText(.tcLevel) + ": \(levelIndex + 1)", row: 1, xPosProzent: levelPos)
+        createLabels(label: gameNumberLabel, text: gameNumberText, row: 1, xPosProzent: gameNumberPos)
+        createLabels(label: sizeLabel, text: sizeText, row: 1, xPosProzent: sizePos)
+        createLabels(label: packageLabel, text: packageText, row: 1, xPosProzent: packagePos)
+        createLabels(label: levelLabel, text: GV.language.getText(.tcLevel) + ": \(levelIndex + 1)", row: 1, xPosProzent: levelPos)
         
-        createLabels(whoIsHeaderLabel, text: whoIsText, row: 2, xPosProzent: whoIsPos)
-        createLabels(playerHeaderLabel, text: playerHeaderText, row: 2, xPosProzent: playerNamePos)
-        createLabels(timeHeaderLabel, text: timeHeaderText, row: 2, xPosProzent: timePos)
-        createLabels(scoreHeaderLabel, text: scoreHeaderText, row: 2, xPosProzent: scorePos)
-        createLabels(cardCountHeaderLabel, text: GV.language.getText(.tcCardHead), row: 2, xPosProzent: cardCountPos)
+        createLabels(label: whoIsHeaderLabel, text: whoIsText, row: 2, xPosProzent: whoIsPos)
+        createLabels(label: playerHeaderLabel, text: playerHeaderText, row: 2, xPosProzent: playerNamePos)
+        createLabels(label: timeHeaderLabel, text: timeHeaderText, row: 2, xPosProzent: timePos)
+        createLabels(label: scoreHeaderLabel, text: scoreHeaderText, row: 2, xPosProzent: scorePos)
+        createLabels(label: cardCountHeaderLabel, text: GV.language.getText(.tcCardHead), row: 2, xPosProzent: cardCountPos)
 
-        createLabels(whoIsLabel, text: whoIsTypeText1, row: 3, xPosProzent: whoIsPos)
-        createLabels(playerNameLabel, text: playerNameText, row: 3, xPosProzent: playerNamePos)
-        createLabels(playerTimeLabel, text: "0", row: 3, xPosProzent: timePos)
-        createLabels(playerScoreLabel, text: String(levelScore), row: 3, xPosProzent: scorePos)
-        createLabels(playerCardCountLabel, text: String(cardCount), row: 3, xPosProzent: cardCountPos)
+        createLabels(label: whoIsLabel, text: whoIsTypeText1, row: 3, xPosProzent: whoIsPos)
+        createLabels(label: playerNameLabel, text: playerNameText, row: 3, xPosProzent: playerNamePos)
+        createLabels(label: playerTimeLabel, text: "0", row: 3, xPosProzent: timePos)
+        createLabels(label: playerScoreLabel, text: String(levelScore), row: 3, xPosProzent: scorePos)
+        createLabels(label: playerCardCountLabel, text: String(cardCount), row: 3, xPosProzent: cardCountPos)
 
         if playerType == .multiPlayer {
-            createLabels(opponentTypeLabel, text: whoIsTypeText2, row: 4, xPosProzent: whoIsPos)
-            createLabels(opponentNameLabel, text: opponentNameText, row: 4, xPosProzent: playerNamePos)
-            createLabels(opponentTimeLabel, text: "0", row: 4, xPosProzent: timePos)
-            createLabels(opponentScoreLabel, text: String(opponent.score), row: 4, xPosProzent: scorePos)
-            createLabels(opponentCardCountLabel, text: String(opponent.cardCount), row: 4, xPosProzent: cardCountPos)
+            createLabels(label: opponentTypeLabel, text: whoIsTypeText2, row: 4, xPosProzent: whoIsPos)
+            createLabels(label: opponentNameLabel, text: opponentNameText, row: 4, xPosProzent: playerNamePos)
+            createLabels(label: opponentTimeLabel, text: "0", row: 4, xPosProzent: timePos)
+            createLabels(label: opponentScoreLabel, text: String(opponent.score), row: 4, xPosProzent: scorePos)
+            createLabels(label: opponentCardCountLabel, text: String(opponent.cardCount), row: 4, xPosProzent: cardCountPos)
         } else {
-//            let gamesWithSameNumber = realm.objects(GameModel.self).filter("gameNumber = %d and levelID = %d and played = true", gameNumber, levelIndex )
-//            if gamesWithSameNumber.count == 0 { // this game is played 1st time
                 playerType = .singlePlayer
                 opponentTypeLabel.isHidden = true
                 opponentNameLabel.isHidden = true
                 opponentTimeLabel.isHidden = true
                 opponentScoreLabel.isHidden = true
                 opponentCardCountLabel.isHidden = true
-//            } else {
-//                playerType = .bestPlayer
-//                let maxScore = gamesWithSameNumber.max(ofProperty: "playerScore") as Int?
-//                let bestPlay = gamesWithSameNumber.filter("playerScore = %d", maxScore!).first!
-//                let bestPlayerName = realm.objects(PlayerModel.self).filter("ID = %d", bestPlay.playerID).first!.name
-//                let bestTime = bestPlay.time
-//                createLabels(opponentTypeLabel, text: GV.language.getText(.tcBestPlayerType), column: 1, row: 4)
-//                createLabels(opponentNameLabel, text: bestPlayerName, column: 2, row: 4)
-//                createLabels(opponentTimeLabel, text: bestTime.dayHourMinSec, column: 3, row: 4)
-//                createLabels(opponentScoreLabel, text: String(maxScore!), column: 4, row: 4)
-//                createLabels(opponentCardCountLabel, text: String(0), column: 5, row: 4)
-//                opponentTypeLabel.isHidden = false
-//                opponentNameLabel.isHidden = false
-//                opponentTimeLabel.isHidden = false
-//                opponentScoreLabel.isHidden = false
-//                opponentCardCountLabel.isHidden = false
-//            }
         }
-        createLabels(cardCountLabel, text: cardCountText, row: 5, buttonLabel: 1)
-        createLabels(tippCountLabel, text: tippCountText, row: 5, buttonLabel: 2)
-        
+        createLabels(label: cardCountLabel, text: cardCountText, row: 5, buttonLabel: 1)
+        createLabels(label: tippCountLabel, text: tippCountText, row: 5, buttonLabel: 2)
+
+        #if TEST
+            let pkgSize = 17
+            let allGamesLabelPos = 10
+            let onePkgLabelPos = allGamesLabelPos + pkgSize
+            let twoPkgLabelPos = onePkgLabelPos + pkgSize
+            let threePkgLabelPos = twoPkgLabelPos + pkgSize
+            let fourPkgLabelPos = threePkgLabelPos + pkgSize
+            createLabels(label: allGamesLabel, text: GV.language.getText(.tcAllGamesCount,values: "0"), row: 4, xPosProzent: allGamesLabelPos, fontSizeModifier: 0.7)
+            createLabels(label: onePkgLabel, text: GV.language.getText(.tc1PkgTxt,values: "0", "0"), row: 4, xPosProzent: onePkgLabelPos, fontSizeModifier: 0.7)
+            createLabels(label: twoPkgLabel, text: GV.language.getText(.tc2PkgTxt,values: "0", "0"), row: 4, xPosProzent: twoPkgLabelPos, fontSizeModifier: 0.7)
+            createLabels(label: threePkgLabel, text: GV.language.getText(.tc3PkgTxt,values: "0", "0"), row: 4, xPosProzent: threePkgLabelPos, fontSizeModifier: 0.7)
+            createLabels(label: fourPkgLabel, text: GV.language.getText(.tc4PkgTxt,values: "0", "0"), row: 4, xPosProzent: fourPkgLabelPos, fontSizeModifier: 0.7)
+            updateGameCountLabels()
+        #endif
         let mySortedPlays = realm.objects(GameModel.self).filter("playerID = %d and played = true", GV.player!.ID).sorted(byProperty: "levelID")
         if mySortedPlays.count > 0 {
             maxLevelIndex = mySortedPlays.last!.levelID
@@ -823,20 +824,20 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         try! realm.write() {
             realm.add(gameNew)
         }
-        actGame = gameNew
+        GV.actGame = gameNew
 //        //printFunc(function: "createGameRecord", start: false)
     }
     
     func getGameRecord(gameNumber: Int) {
-        actGame = realm.objects(GameModel.self).filter("gameNumber = %d and levelID = %d and playerID = %d and countPackages = %d", gameNumber, levelIndex, GV.player!.ID, GV.player!.countPackages).first
-        if actGame == nil {
+        GV.actGame = realm.objects(GameModel.self).filter("gameNumber = %d and levelID = %d and playerID = %d and countPackages = %d", gameNumber, levelIndex, GV.player!.ID, GV.player!.countPackages).first
+        if GV.actGame == nil {
             createGameRecord(gameNumber: gameNumber)
         }
     }
     
     
     
-    func createLabels(_ label: SKLabelNode, text: String, row: Int, xPosProzent: Int = 0, buttonLabel: Int = NoValue) {
+    func createLabels(label: SKLabelNode, text: String, row: Int, xPosProzent: Int = 0, fontSizeModifier: CGFloat = 1, buttonLabel: Int = NoValue) {
 //        //printFunc(function: "createLabels", start: true)
         
         // values for buttonLabel: NoValue - No Button, 1 - cardPackage, 2 tippsButton
@@ -850,12 +851,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             yPos += labelBackground.size.height / 2
             yPos -= labelFontSize / 2 + posAdder
             label.position = CGPoint(x: xPos, y: yPos)
-            label.fontSize = labelFontSize;
+            label.fontSize = labelFontSize * fontSizeModifier;
             label.horizontalAlignmentMode = .left
             label.verticalAlignmentMode = .baseline
         } else {
-           label.position = (buttonLabel == 1 ? self.cardPackage!.position : self.tippsButton!.position)
-            label.fontSize = labelFontSize * 1.5
+            label.position = (buttonLabel == 1 ? self.cardPackage!.position : self.tippsButton!.position)
+            label.fontSize = labelFontSize * 1.5 * fontSizeModifier
             label.zPosition = 5
             label.horizontalAlignmentMode = .center
             label.verticalAlignmentMode = .center
@@ -890,6 +891,23 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     
+    func updateGameCountLabels() {
+        let allGameCount = realm.objects(GameModel.self).filter("playerID = %d", GV.player!.ID).count
+        allGamesLabel.text = GV.language.getText(.tcAllGamesCount, values: "\(allGameCount)")
+        var pkgCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 1", GV.player!.ID).count
+        var pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 1 and gameFinished = false", GV.player!.ID).count
+        onePkgLabel.text = GV.language.getText(.tc1PkgTxt, values: "\(pkgErrorCount)", "\(pkgCount)")
+        pkgCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 2", GV.player!.ID).count
+        pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 2 and gameFinished = false", GV.player!.ID).count
+        twoPkgLabel.text = GV.language.getText(.tc2PkgTxt, values: "\(pkgErrorCount)", "\(pkgCount)")
+        pkgCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 3", GV.player!.ID).count
+        pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 3 and gameFinished = false", GV.player!.ID).count
+        threePkgLabel.text = GV.language.getText(.tc3PkgTxt, values: "\(pkgErrorCount)", "\(pkgCount)")
+        pkgCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 4", GV.player!.ID).count
+        pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 4 and gameFinished = false", GV.player!.ID).count
+        fourPkgLabel.text = GV.language.getText(.tc4PkgTxt, values: "\(pkgErrorCount)", "\(pkgCount)")
+    }
+    
     func specialPrepareFuncFirst() {
         //printFunc(function: "specialPrepareFuncFirst", start: true)
         stopCreateTippsInBackground = true
@@ -901,7 +919,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         countRows = GV.levelsForPlay.aktLevel.countRows
         minUsedCells = GV.levelsForPlay.aktLevel.minProzent * countColumns * countRows / 100
         maxUsedCells = GV.levelsForPlay.aktLevel.maxProzent * countColumns * countRows / 100
-        showHelpLines = .green
+//        showHelpLines = .green
         containerSize = CGSize(width: CGFloat(containerSizeOrig) * cardSizeMultiplier.width, height: CGFloat(containerSizeOrig) * cardSizeMultiplier.height)
         cardSize = CGSize(width: CGFloat(GV.levelsForPlay.aktLevel.cardSize) * cardSizeMultiplier.width, height: CGFloat(GV.levelsForPlay.aktLevel.cardSize) * cardSizeMultiplier.height )
         
@@ -1271,42 +1289,43 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         card.run(action)
     }
     
-    private func connectCardOrContainerWithMovingCard(movingCard:MySKCard, cardOrContainer:MySKCard, connectable: Bool) {
-        push(cardOrContainer, status: .unification)
-        push(movingCard, status: .removed)
-        lastColor = movingCard.colorIndex
-        cardOrContainer.connectWith(otherCard: movingCard)
-        self.addChild(showCountScore("+\(movingCard.countScore)", position: movingCard.position))
-        if cardOrContainer.type == .cardType {
-            cardManager!.updateGameArrayCell(card: cardOrContainer)
-        } else {
-            cardOrContainer.texture = getTexture(movingCard.colorIndex)
-        }
-        cardManager!.resetGameArrayCell(movingCard)
-        movingCard.removeFromParent()
-        playSound("Container", volume: GV.player!.soundVolume)
-        countMovingCards = 0
-        updateCardCount(-1)
-        saveStatisticAndGame()
-    }
-    private func connectCardWithMovingCard(movingCard:MySKCard, card:MySKCard, connectable: Bool) {
-        push(card, status: .unification)
-        push(movingCard, status: .removed)
-        lastColor = movingCard.colorIndex
-        card.connectWith(otherCard: movingCard)
-        self.addChild(showCountScore("+\(movingCard.countScore)", position: movingCard.position))
-        playSound("OK", volume: GV.player!.soundVolume)
-        
-        cardManager!.updateGameArrayCell(card: card)
-        cardManager!.resetGameArrayCell(movingCard)
-        
-        countMovingCards = 0
-        updateCardCount(-1)
-        saveStatisticAndGame()
-        
-    }
     
-    
+//    private func connectCardOrContainerWithMovingCard(movingCard:MySKCard, cardOrContainer:MySKCard, connectable: Bool) {
+//        push(cardOrContainer, status: .unification)
+//        push(movingCard, status: .removed)
+//        lastColor = movingCard.colorIndex
+//        cardOrContainer.connectWith(otherCard: movingCard)
+//        self.addChild(showCountScore("+\(movingCard.countScore)", position: movingCard.position))
+//        if cardOrContainer.type == .cardType {
+//            cardManager!.updateGameArrayCell(card: cardOrContainer)
+//        } else {
+//            cardOrContainer.texture = getTexture(movingCard.colorIndex)
+//        }
+//        cardManager!.resetGameArrayCell(movingCard)
+//        movingCard.removeFromParent()
+//        playSound("Container", volume: GV.player!.soundVolume)
+//        countMovingCards = 0
+//        updateCardCount(-1)
+//        saveStatisticAndGame()
+//    }
+//    private func connectCardWithMovingCard(movingCard:MySKCard, card:MySKCard, connectable: Bool) {
+//        push(card, status: .unification)
+//        push(movingCard, status: .removed)
+//        lastColor = movingCard.colorIndex
+//        card.connectWith(otherCard: movingCard)
+//        self.addChild(showCountScore("+\(movingCard.countScore)", position: movingCard.position))
+//        playSound("OK", volume: GV.player!.soundVolume)
+//        
+//        cardManager!.updateGameArrayCell(card: card)
+//        cardManager!.resetGameArrayCell(movingCard)
+//        
+//        countMovingCards = 0
+//        updateCardCount(-1)
+//        saveStatisticAndGame()
+//        
+//    }
+//    
+//    
     func cardDidCollideWithContainer(_ node1:MySKCard, node2:MySKCard, points: [CGPoint]) {
         let movingCard = node1
         let container = node2
@@ -1330,7 +1349,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         let OK = movingCard.colorIndex == container.colorIndex &&
             (
-                container.minValue == NoColor || connectable!
+                container.minValue == NoColor || connectable!.OK
         )
         
         
@@ -1380,7 +1399,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let connectable = cardManager!.areConnectable(first: movingCard, second: card)
         
         //        let OK = connectable //MySKCard.areConnectable(first: movingCard, second: card)
-        if connectable {
+        if connectable.OK {
             push(card, status: .unification)
             push(movingCard, status: .removed)
             lastColor = movingCard.colorIndex
@@ -1549,13 +1568,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 GV.mainViewController!.showAlert(alert)
             }
         } else if cardCount > 0 { // usedCellCount <= minUsedCells && usedCellCount > 1 {
-            generateCards(generatingType: .normal)  // Nachgenerierung
-        } /*else {
-            if cardCount > 0 /*&& cardStack.count(.MySKCardType) > 0*/ {
-                generateCards(generatingType: .normal)
-//                gameArrayChanged = true
+            if touchType == .manual {
+                DispatchQueue.global().async {
+                    self.generateCards(generatingType: .normal)  // Nachgenerierung
+                    DispatchQueue.main.async {
+                    }
+                }
+            } else {
+                self.generateCards(generatingType: .normal)  // Nachgenerierung
             }
-        } */
+        }
     }
     
     func saveStatisticAndGame () {
@@ -1593,22 +1615,22 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 statistic.bestScore = levelScore
             }
         }
-        actGame!.countSteps = maxCardCount - cardCount
-        actGame!.time = timeCount
-        actGame!.playerScore = levelScore
-        actGame!.played = true
-        actGame!.created = Date()
+        GV.actGame!.countSteps = maxCardCount - cardCount
+        GV.actGame!.time = timeCount
+        GV.actGame!.playerScore = levelScore
+        GV.actGame!.played = true
+        GV.actGame!.created = Date()
         #if REALM_V2
             if cardCount > 0 {
-                actGame!.gameFinished = false
+                GV.actGame!.gameFinished = false
             } else {
-                actGame!.gameFinished = true
+                GV.actGame!.gameFinished = true
             }
         #endif
         if playerType == .multiPlayer {
-            actGame!.multiPlay = true
-            actGame!.opponentName = opponent.name
-            actGame!.opponentScore = opponent.score
+            GV.actGame!.multiPlay = true
+            GV.actGame!.opponentName = opponent.name
+            GV.actGame!.opponentScore = opponent.score
             statistic.countMultiPlays += 1
             if opponent.score > levelScore {
                 statistic.defeats += 1
@@ -1747,7 +1769,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         switch congratulations {
         case .Won, .Lost:
             let actGames = realm.objects(GameModel.self).filter("levelID = %d and gameNumber = %d and countPackages = %d",
-                levelIndex, actGame!.gameNumber, actGame!.countPackages)
+                levelIndex, GV.actGame!.gameNumber, GV.actGame!.countPackages)
             var bestGameScore = 0
             var bestScorePlayerName = ""
             if actGames.count > 0 {
@@ -2351,11 +2373,19 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     
-
-    
+    enum TouchType: Int {
+        case manual = 0, auto
+    }
+    var touchType: TouchType = .manual
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        touchType = .manual
         let firstTouch = touches.first
         let touchLocation = firstTouch!.location(in: self)
+        myTouchesEnded(touchLocation: touchLocation)
+    }
+    
+    func autoTouchesEnded(touchLocation: CGPoint) {
+        touchType = .auto
         myTouchesEnded(touchLocation: touchLocation)
     }
     
