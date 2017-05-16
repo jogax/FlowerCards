@@ -544,6 +544,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         lastChange.toContainer = false
         durationMultiplier = durationMultiplierForPlayer
         waitForStartConst = waitForStartForPlayer
+        supressedTipps.removeAll()
         let playedGamesOnLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and countPackages = %d and played = true",
                                 GV.player!.ID, GV.player!.levelID, GV.player!.countPackages).count
         if playedGamesOnLevel >= countGamesToPlay && newGame {
@@ -1520,68 +1521,22 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         return score
     }
     
-//    func saveHistoryRecord(colorIndex: Int, points: [CGPoint],
-//                           fromColumn: Int, fromRow: Int, fromMinValue: Int, fromMaxValue: Int,
-//                           toColumn: Int,   toRow: Int,   toMinValue: Int,   toMaxValue: Int) {
-//            if !replaying {
-//                let historyRecord = HistoryModel()
-//                historyRecord.ID = GV.createNewRecordID(.historyModel)
-//                historyRecord.gameID = actGame!.ID
-//                historyRecord.recordNr = realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID).count + 1
-//                historyRecord.colorIndex = colorIndex
-//                historyRecord.fromColumn = fromColumn
-//                historyRecord.fromRow = fromRow
-//                historyRecord.fromMinValue = fromMinValue
-//                historyRecord.fromMaxValue = fromMaxValue
-//                
-//                historyRecord.toColumn = toColumn
-//                historyRecord.toRow = toRow
-//                historyRecord.toMinValue = toMinValue
-//                historyRecord.toMaxValue = toMaxValue
-//                try! realm.write() {
-//                    for point in points {
-//                        let realmPoint = PointModel()
-//                        realmPoint.x = Double(point.x)
-//                        realmPoint.y = Double(point.y)
-//                        historyRecord.points.append(realmPoint)
-//                        realm.add(realmPoint)
-//                    }
-//                    realm.add(historyRecord)
-//                }
-//            }
-//        #endif
-//    }
-    
-//    func deleteLastHistoryRecord() {
-//        #if REALM_V2
-//            try! realm.write() {
-//                if let last = realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID).last {
-//                    realm.delete(last)
-//                }
-//            }
-//        #endif
-//    }
-
     func checkGameFinished() {
         func checkNoMoreSteps() {
             if cardManager!.noMoreSteps && lastUsedTipp?.card1.colorIndex != NoColor {
                 print("NoMoreSteps")
-//                self.pull(createTipps: true)
-//                for (index, tipp) in tippArray.enumerated() {
-//                    if  tipp.card1.colorIndex == lastUsedTipp.color &&
-//                        tipp.card1.column == lastUsedTipp.column1 &&
-//                        tipp.card1.row == lastUsedTipp.row1 &&
-//                        tipp.card1.minValue == lastUsedTipp.minValue1 &&
-//                        tipp.card1.maxValue == lastUsedTipp.maxValue1 &&
-//                        tipp.card2.column == lastUsedTipp.column2 &&
-//                        tipp.card2.row == lastUsedTipp.row2 &&
-//                        tipp.card2.minValue == lastUsedTipp.minValue2 &&
-//                        tipp.card2.maxValue == lastUsedTipp.maxValue2
-//                    {
-//                        tippArray[index].supressed = true
-//                        break
-//                    }
-//                }
+                self.pull(createTipps: true)
+                for (index, tipp) in tippArray.enumerated() {
+                    if  tipp.card1 == lastUsedTipp!.card1 &&
+                        tipp.card2 == lastUsedTipp!.card2
+                    {
+                        tippArray[index].supressed = true
+                        if !supressedTipps.contains(where: {$0.card1 == lastUsedTipp!.card1 && $0.card2 == lastUsedTipp!.card2}) {
+                            supressedTipps.append(lastUsedTipp!)
+                        }
+                        break
+                    }
+                }
             }
         }
     

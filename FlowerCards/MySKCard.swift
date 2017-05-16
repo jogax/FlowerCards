@@ -314,7 +314,19 @@ class MySKCard: SKSpriteNode {
     }
     
     override func copy(with zone: NSZone? = nil) -> Any {
-        let copy = self
+        let copy = MySKCard()
+        copy.belongsToPackageMax = belongsToPackageMax
+        copy.belongsToPackageMin = belongsToPackageMin
+        copy.BGPicture = BGPicture
+        copy.BGPictureAdded = BGPictureAdded
+        copy.colorIndex = colorIndex
+        copy.column = column
+        copy.row = row
+        copy.countTransitions = countTransitions
+        copy.isCard = isCard
+        copy.minValue = minValue
+        copy.maxValue = maxValue
+        copy.type = type
         return copy
     }
 

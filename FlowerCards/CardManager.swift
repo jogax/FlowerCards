@@ -194,6 +194,7 @@ let maxPackageCount = 4
 
 var stopCreateTippsInBackground = false
 var tippArray = [Tipp]()
+var supressedTipps = [Tipp]()
 var tippArrayCreatedInSeconds = 0.0
 //var showHelpLines: ShowHelpLine = .green
 var cardSize:CGSize = CGSize(width: 0, height: 0)
@@ -745,6 +746,19 @@ class CardManager {
             if stopCreateTippsInBackground {
                 stopCreateTippsInBackground = false
                 return false
+            }
+        }
+        
+        for (index, tipp) in tippArray.enumerated() {
+            if supressedTipps.contains(where: {$0.card1 == tipp.card1 && $0.card2 == tipp.card2}) {
+                tippArray[index].supressed = true
+                let colorIndex = tipp.card1.colorIndex
+                
+                for index1 in 0..<colorArray[colorIndex].connectablePairs.count {
+                    if colorArray[colorIndex].connectablePairs[index1].card1 == tipp.card1 && colorArray[colorIndex].connectablePairs[index1].card2 == tipp.card2 {
+                        colorArray[colorIndex].connectablePairs[index1].supressed = true
+                    }
+                }
             }
         }
         
