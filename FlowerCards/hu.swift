@@ -129,9 +129,6 @@ let huDictionary: [TextConstants: String] = [
     .tcReplay:          "Visszajátszás",
     .tcActivateAutoPlay: "Automatikus lejátszás aktiválása",
     .tcLevelAndPackage: "Szint:%, Csomag:%, Formátum:%",
-    .tcAllGamesCount:   "All Games: %",
-    .tc1PkgTxt:         "One Pkg: % / %",
-    .tc2PkgTxt:         "Two Pkg: % / %",
-    .tc3PkgTxt:         "Three Pkg: % / %",
-    .tc4PkgTxt:         "Four Pkg: % / %",
+    .tcAllGamesCount:   "Games: % / %, %",
+    .tcPkgTxt:          "%. P: % / %",
 ]

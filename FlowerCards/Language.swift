@@ -121,12 +121,7 @@ enum TextConstants: Int {
     tcActivateAutoPlay,
     tcLevelAndPackage,
     tcAllGamesCount,
-    tc1PkgTxt,
-    tc2PkgTxt,
-    tc3PkgTxt,
-    tc4PkgTxt
-    
-
+    tcPkgTxt
 }
 
     let LanguageEN = "en" // index 0

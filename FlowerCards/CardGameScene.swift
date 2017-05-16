@@ -122,11 +122,13 @@ var gameArray = [[GameArrayPositions]]()
 var containers = [MySKCard]()
 var cardStack:Stack<MySKCard> = Stack()
 var stack:Stack<SavedCard> = Stack()
-var lastColor = NoColor
+var lastChange = (color: NoColor, toContainer: false)
 var countPackages = 1
 var random: MyRandom?
 //var actGame: GameModel?
 let MaxGameNumber = 10000
+var lastUsedTipp: Tipp?
+
 
 var lastPair = PairStatus() {
     didSet {
@@ -538,7 +540,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func prepareNextGame(newGame: Bool) {
         labelFontSize = GV.onIpad ? self.size.height / 50 : self.size.height / 70
-        lastColor = NoColor
+        lastChange.color = NoColor
+        lastChange.toContainer = false
         durationMultiplier = durationMultiplierForPlayer
         waitForStartConst = waitForStartForPlayer
         let playedGamesOnLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and countPackages = %d and played = true",
@@ -785,17 +788,18 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         createLabels(label: tippCountLabel, text: tippCountText, row: 5, buttonLabel: 2)
 
         #if TEST
-            let pkgSize = 17
+            let pkgSize = 15
+            let allGamesLabelSize = 25
             let allGamesLabelPos = 10
-            let onePkgLabelPos = allGamesLabelPos + pkgSize
+            let onePkgLabelPos = allGamesLabelPos + allGamesLabelSize
             let twoPkgLabelPos = onePkgLabelPos + pkgSize
             let threePkgLabelPos = twoPkgLabelPos + pkgSize
             let fourPkgLabelPos = threePkgLabelPos + pkgSize
             createLabels(label: allGamesLabel, text: GV.language.getText(.tcAllGamesCount,values: "0"), row: 4, xPosProzent: allGamesLabelPos, fontSizeModifier: 0.7)
-            createLabels(label: onePkgLabel, text: GV.language.getText(.tc1PkgTxt,values: "0", "0"), row: 4, xPosProzent: onePkgLabelPos, fontSizeModifier: 0.7)
-            createLabels(label: twoPkgLabel, text: GV.language.getText(.tc2PkgTxt,values: "0", "0"), row: 4, xPosProzent: twoPkgLabelPos, fontSizeModifier: 0.7)
-            createLabels(label: threePkgLabel, text: GV.language.getText(.tc3PkgTxt,values: "0", "0"), row: 4, xPosProzent: threePkgLabelPos, fontSizeModifier: 0.7)
-            createLabels(label: fourPkgLabel, text: GV.language.getText(.tc4PkgTxt,values: "0", "0"), row: 4, xPosProzent: fourPkgLabelPos, fontSizeModifier: 0.7)
+            createLabels(label: onePkgLabel, text: GV.language.getText(.tcPkgTxt,values: "1", "0", "0"), row: 4, xPosProzent: onePkgLabelPos, fontSizeModifier: 0.7)
+            createLabels(label: twoPkgLabel, text: GV.language.getText(.tcPkgTxt,values: "2", "0", "0"), row: 4, xPosProzent: twoPkgLabelPos, fontSizeModifier: 0.7)
+            createLabels(label: threePkgLabel, text: GV.language.getText(.tcPkgTxt,values: "3", "0"), row: 4, xPosProzent: threePkgLabelPos, fontSizeModifier: 0.7)
+            createLabels(label: fourPkgLabel, text: GV.language.getText(.tcPkgTxt,values: "4", "0"), row: 4, xPosProzent: fourPkgLabelPos, fontSizeModifier: 0.7)
             updateGameCountLabels()
         #endif
         let mySortedPlays = realm.objects(GameModel.self).filter("playerID = %d and played = true", GV.player!.ID).sorted(byProperty: "levelID")
@@ -893,19 +897,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func updateGameCountLabels() {
         let allGameCount = realm.objects(GameModel.self).filter("playerID = %d", GV.player!.ID).count
-        allGamesLabel.text = GV.language.getText(.tcAllGamesCount, values: "\(allGameCount)")
-        var pkgCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 1", GV.player!.ID).count
-        var pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 1 and gameFinished = false and ID != %d", GV.player!.ID, GV.actGame!.ID).count
-        onePkgLabel.text = GV.language.getText(.tc1PkgTxt, values: "\(pkgErrorCount)", "\(pkgCount)")
-        pkgCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 2", GV.player!.ID).count
-        pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 2 and gameFinished = false and ID != %d", GV.player!.ID, GV.actGame!.ID).count
-        twoPkgLabel.text = GV.language.getText(.tc2PkgTxt, values: "\(pkgErrorCount)", "\(pkgCount)")
-        pkgCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 3", GV.player!.ID).count
-        pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 3 and gameFinished = false and ID != %d", GV.player!.ID, GV.actGame!.ID).count
-        threePkgLabel.text = GV.language.getText(.tc3PkgTxt, values: "\(pkgErrorCount)", "\(pkgCount)")
-        pkgCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 4", GV.player!.ID).count
-        pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = 4 and gameFinished = false and ID != %d", GV.player!.ID, GV.actGame!.ID).count
-        fourPkgLabel.text = GV.language.getText(.tc4PkgTxt, values: "\(pkgErrorCount)", "\(pkgCount)")
+        let referencePlayerID = realm.objects(PlayerModel.self).filter("name = %@", "NewPlayer").first!.ID
+        let referenceGameCount = realm.objects(GameModel.self).filter("playerID = %d", referencePlayerID).count
+        let procent = String(Double(100.0 * Double(allGameCount) / Double(referenceGameCount)).twoDecimals) + "%"
+        let pkgLabels = [onePkgLabel, twoPkgLabel, threePkgLabel, fourPkgLabel]
+        allGamesLabel.text = GV.language.getText(.tcAllGamesCount, values: "\(allGameCount)", "\(referenceGameCount)", "\(procent)")
+        for pkgNr in 1...4 {
+            let pkgCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d", GV.player!.ID, pkgNr).count
+            let pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d and gameFinished = false and ID != %d", GV.player!.ID, pkgNr, GV.actGame!.ID).count
+            pkgLabels[pkgNr - 1].text = GV.language.getText(.tcPkgTxt, values: "\(pkgNr)", "\(pkgErrorCount)", "\(pkgCount)")
+        }
     }
     
     func specialPrepareFuncFirst() {
@@ -1326,10 +1327,21 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //    }
 //    
 //    
-    func cardDidCollideWithContainer(_ node1:MySKCard, node2:MySKCard, points: [CGPoint]) {
+//    struct LastUsedTipp {
+//        var color: Int = NoColor
+//        var column1: Int = 0
+//        var row1: Int = 0
+//        var minValue1: Int = 0
+//        var maxValue1: Int = 0
+//        var column2: Int = 0
+//        var row2: Int = 0
+//        var minValue2: Int = 0
+//        var maxValue2: Int = 0
+//
+//    }
+    func cardDidCollideWithContainer(node1:MySKCard, node2:MySKCard, points: [CGPoint]) {
         let movingCard = node1
         let container = node2
-        
         if container.minValue == container.maxValue && container.maxValue == NoColor && movingCard.maxValue == LastCardValue {
             var containerNotFound = true
             for index in 0..<countContainers {
@@ -1345,19 +1357,18 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             }
         }
         
-        let connectable = cardManager?.areConnectable(first: movingCard, second: container)
+        let connectable = cardManager!.areConnectable(first: movingCard, second: container)
         
-        let OK = movingCard.colorIndex == container.colorIndex &&
-            (
-                container.minValue == NoColor || connectable!.OK
-        )
-        
+        let OK = movingCard.colorIndex == container.colorIndex && (container.minValue == NoColor || connectable.OK)
+
         
         
         if OK  {
+            lastUsedTipp = Tipp()
             push(container, status: .unification)
             push(movingCard, status: .removed)
-            lastColor = movingCard.colorIndex
+            lastChange.color = movingCard.colorIndex
+            lastChange.toContainer = true
             container.connectWith(otherCard: movingCard)
             //            saveHistoryRecord(colorIndex: movingCard.colorIndex, points:  points,
             //                              fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
@@ -1376,15 +1387,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             updateCardCount(-1)
             
-//            collisionActive = false
-            //movingCard.removeFromParent()
-            //            checkGameFinished()
         } else {
             updateCardCount(-1)
             movingCard.removeFromParent()
             countMovingCards = 0
             push(movingCard, status: .removed)
-            pull(false) // no createTipps
+            pull(createTipps: false) // no createTipps
 //            startTippTimer()
             
         }
@@ -1400,9 +1408,22 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         //        let OK = connectable //MySKCard.areConnectable(first: movingCard, second: card)
         if connectable.OK {
+            lastUsedTipp = Tipp()
+            for tipp in tippArray {
+                if tipp.card1 == movingCard && tipp.card2 == card || tipp.card2 == movingCard && tipp.card1 == card {
+                    lastUsedTipp = Tipp()
+                    lastUsedTipp?.card1 = tipp.card1.copy() as! MySKCard
+                    lastUsedTipp?.card2 = tipp.card2.copy() as! MySKCard
+                    break
+                }
+            }
+            if lastUsedTipp?.card1.colorIndex == NoColor {
+                print("lastUsedTipp Not Filled!!! at \(movingCard.printValue)")
+            }
             push(card, status: .unification)
             push(movingCard, status: .removed)
-            lastColor = movingCard.colorIndex
+            lastChange.color = movingCard.colorIndex
+            lastChange.toContainer = false
             
             card.connectWith(otherCard: movingCard)
             //            cardManager!.check(color: card.colorIndex)
@@ -1433,7 +1454,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             movingCard.removeFromParent()
             countMovingCards = 0
             push(movingCard, status: .removed)
-            pull(false) // no createTipps
+            pull(createTipps: false) // no createTipps
 //            startTippTimer()
             
         }
@@ -1477,7 +1498,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             movingCard.removeFromParent()
             countMovingCards = 0
             push(movingCard, status: .removed)
-            pull(false) // no createTipps
+            pull(createTipps: false) // no createTipps
             //            startTippTimer()
             
         }
@@ -1542,8 +1563,28 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //    }
 
     func checkGameFinished() {
-        
-        
+        func checkNoMoreSteps() {
+            if cardManager!.noMoreSteps && lastUsedTipp?.card1.colorIndex != NoColor {
+                print("NoMoreSteps")
+//                self.pull(createTipps: true)
+//                for (index, tipp) in tippArray.enumerated() {
+//                    if  tipp.card1.colorIndex == lastUsedTipp.color &&
+//                        tipp.card1.column == lastUsedTipp.column1 &&
+//                        tipp.card1.row == lastUsedTipp.row1 &&
+//                        tipp.card1.minValue == lastUsedTipp.minValue1 &&
+//                        tipp.card1.maxValue == lastUsedTipp.maxValue1 &&
+//                        tipp.card2.column == lastUsedTipp.column2 &&
+//                        tipp.card2.row == lastUsedTipp.row2 &&
+//                        tipp.card2.minValue == lastUsedTipp.minValue2 &&
+//                        tipp.card2.maxValue == lastUsedTipp.maxValue2
+//                    {
+//                        tippArray[index].supressed = true
+//                        break
+//                    }
+//                }
+            }
+        }
+    
 //        let usedCellCount = cardManager!.countGameArrayItems
 //        let containersOK = checkContainers()
         
@@ -1572,10 +1613,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 DispatchQueue.global().async {
                     self.generateCards(generatingType: .normal)  // Nachgenerierung
                     DispatchQueue.main.async {
+                        checkNoMoreSteps()
                     }
                 }
             } else {
                 self.generateCards(generatingType: .normal)  // Nachgenerierung
+                checkNoMoreSteps()
             }
         }
     }
@@ -1834,14 +1877,14 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             })
             alert.addAction(chooseLevelAction)
             
-            let autoPlayActionNormal = UIAlertAction(title: GV.language.getText(.tcAutoPlayNormal), style: .default,
-                                                     handler: {(paramAction:UIAlertAction!) in
-                                                        self.startAutoplay(testType: .runOnce)
-            })
-            alert.addAction(autoPlayActionNormal)
-            
             #if TEST
                 
+                let autoPlayActionNormal = UIAlertAction(title: GV.language.getText(.tcAutoPlayNormal), style: .default,
+                                                         handler: {(paramAction:UIAlertAction!) in
+                                                            self.startAutoplay(testType: .runOnce)
+                })
+                alert.addAction(autoPlayActionNormal)
+            
                 let autoPlayActionNewTest = UIAlertAction(title: GV.language.getText(.tcAutoPlayNewTest), style: .default,
                                                    handler: {(paramAction:UIAlertAction!) in
                                                     self.startAutoplay(testType: .newTest)
@@ -1995,7 +2038,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
 
 
-    func pull(_ createTipps: Bool) {
+    func pull(createTipps: Bool) {
         //printFunc(function: "pull", start: true)
         let duration = 0.5
         var actionMoveArray = [SKAction]()
@@ -2719,7 +2762,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 if actFromToColumnRow.toColumnRow.row == NoValue {
                     let containerNode = containers[actFromToColumnRow.toColumnRow.column] //self.childNode(withName: containers[actFromToColumnRow.toColumnRow.column].name!) as! MySKCard
                     collisionAction = SKAction.run({
-                        self.cardDidCollideWithContainer(self.movedFromNode, node2: containerNode, points: myPoints)
+                        self.cardDidCollideWithContainer(node1: self.movedFromNode, node2: containerNode, points: myPoints)
                     })
                 } else {
                     let cardNode = gameArray[actFromToColumnRow.toColumnRow.column][actFromToColumnRow.toColumnRow.row].card
@@ -3049,7 +3092,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func undoButtonPressed() {
 
-        pull(true)
+        pull(createTipps: true)
     }
 
     

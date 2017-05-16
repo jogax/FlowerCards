@@ -129,9 +129,6 @@ let enDictionary: [TextConstants: String] = [
     .tcReplay:          "Replay",
     .tcActivateAutoPlay: "Activate Autoplay",
     .tcLevelAndPackage: "Level:%, Packages:%, Format:%",
-    .tcAllGamesCount:   "All Games: %",
-    .tc1PkgTxt:         "One Pkg: % / %",
-    .tc2PkgTxt:         "Two Pkg: % / %",
-    .tc3PkgTxt:         "Three Pkg: % / %",
-    .tc4PkgTxt:         "Four Pkg: % / %",
+    .tcAllGamesCount:   "Games: % / %, %",
+    .tcPkgTxt:         "%. P: % / %",
 ]

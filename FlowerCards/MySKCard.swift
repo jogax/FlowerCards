@@ -125,6 +125,7 @@ class MySKCard: SKSpriteNode {
     var minValue: Int
     var belongsToPackageMax: UInt8 = 0
     var belongsToPackageMin: UInt8 = 0
+    var compatibilityPack: Int = NoValue
     var countTransitions = 0 // how many A-K transitions in this card
     
     var startPosition = CGPoint.zero
@@ -312,6 +313,12 @@ class MySKCard: SKSpriteNode {
 
     }
     
+    override func copy(with zone: NSZone? = nil) -> Any {
+        let copy = self
+        return copy
+    }
+
+    
     func generateBelongsToPackageString(upper: Bool)->String {
         if MySKCard.countPackages == 1 {
             return ""
@@ -382,21 +389,29 @@ class MySKCard: SKSpriteNode {
         label.isUserInteractionEnabled = false
     }
     
-    func containsValue(value: Int)->(Bool, Bool, Bool) {
+    func containsValue(value: Int)->(Bool, Bool) {
         // return if value in upperPart (first Bool) and in lowerPart (second Bool)
         switch countTransitions {
         case 0:
             if value.between(min: minValue, max: maxValue) {
-                return (true, false, true)
+                return (true, true)
             } else {
-                return (false, false, false)
+                return (false, false)
             }
         case 1:
-            return (value.between(min: 0, max: maxValue), false, value.between(min: minValue, max: LastCardValue))
+            return (value.between(min: 0, max: maxValue), value.between(min: minValue, max: LastCardValue))
         case 2...3:
-            return (value.between(min: 0, max: maxValue), true, value.between(min: minValue, max: LastCardValue))
+            return (value.between(min: 0, max: maxValue), value.between(min: minValue, max: LastCardValue))
         default:
-            return (false, false, false)
+            return (false, false)
+        }
+    }
+    
+    func overlapping(with: MySKCard) -> Bool {
+        if self.minValue > with.maxValue || self.maxValue < with.minValue {
+            return false
+        } else {
+            return true
         }
     }
     
@@ -504,7 +519,9 @@ class MySKCard: SKSpriteNode {
         let cardCountTxt = (MySKCard.cardCount > 100 ? "" : MySKCard.cardCount > 9 ? " " : "  ") + String(MySKCard.cardCount)
         MySKCard.cardCount += 1
         var text = ""
-        let cardText = createCardText(card: self, from: false)
+        #if TEST
+            let cardText = createCardText(card: self, from: false)
+        #endif
         self.countTransitions += otherCard.countTransitions
         
         if self.minValue == otherCard.maxValue + 1  && self.belongsToPackageMin & otherCard.belongsToPackageMax != 0 /*&& !upperOnly*/ {

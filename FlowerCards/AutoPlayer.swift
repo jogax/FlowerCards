@@ -12,7 +12,24 @@ import SpriteKit
 class AutoPlayer {
     // game to Play saves Games, Levels and CountPackages as they are displayed
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 18, countPackages: 2, gameNumber: 1454), // at Step: 199
+        GameToPlay(level: 14, countPackages: 3, gameNumber: 2055, stopAt: 4),// , stopAt: 128), // at Step: 144
+        GameToPlay(level: 25, countPackages: 2, gameNumber: 1138), // at Step: 92
+//        GameToPlay(level: 24, countPackages: 3, gameNumber: 1291), // at Step: 145
+//        GameToPlay(level: 13, countPackages: 3, gameNumber: 868), // at Step: 42
+//        GameToPlay(level: 18, countPackages: 3, gameNumber: 1346), // at Step: 150
+//        GameToPlay(level: 19, countPackages: 4, gameNumber: 2000), // at Step: 195
+//        GameToPlay(level: 20, countPackages: 4, gameNumber: 1770), // at Step: 199
+//        GameToPlay(level: 21, countPackages: 4, gameNumber: 1950), // at Step: 200
+//        GameToPlay(level: 22, countPackages: 3, gameNumber: 1366), // at Step: 150
+//        GameToPlay(level: 24, countPackages: 4, gameNumber: 471), // at Step: 197
+//        GameToPlay(level: 24, countPackages: 3, gameNumber: 1529), // at Step: 150
+//        GameToPlay(level: 25, countPackages: 3, gameNumber: 1087), // at Step: 11
+//        GameToPlay(level: 25, countPackages: 4, gameNumber: 1672), // at Step: 196
+//        GameToPlay(level: 25, countPackages: 3, gameNumber: 2168), // at Step: 149
+//        GameToPlay(level: 26, countPackages: 4, gameNumber: 435), // at Step: 201
+//        GameToPlay(level: 26, countPackages: 3, gameNumber: 1241), // at Step: 140
+//        GameToPlay(level: 26, countPackages: 3, gameNumber: 2132), // at Step: 145    
+        //        GameToPlay(level: 12, countPackages: 2, gameNumber: 781), // at Step: 98 OK
     ]
     enum runStatus: Int {
         case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep
@@ -258,8 +275,16 @@ class AutoPlayer {
         if scene.cardCount > 0 {
             switch autoPlayStatus {
             case .getTipp:
+//                if scene.cardManager!.noMoreSteps {
+//                    scene.pull(createTipps: true)
+//                    for tipp in tippArray {
+//                        if tipp == bestTipp {
+//                            tipp.supressed = true
+//                        }
+//                    }
+//                }
                 choosedTipp = Tipp.InnerTipp()
-                if scene.tippsButton!.alpha == 1 && scene.countMovingCards == 0 {  // if tipps are ready
+                if scene.tippsButton!.alpha == 1 && scene.countMovingCards == 0 /*&& !scene.cardManager!.noMoreSteps */ {  // if tipps are ready
                     bestTipp = Tipp()
                     if tippArray.count > 0 {
                         switch testerType {
