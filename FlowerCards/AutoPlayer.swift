@@ -12,7 +12,14 @@ import SpriteKit
 class AutoPlayer {
     // game to Play saves Games, Levels and CountPackages as they are displayed
     let gamesToPlayTable: [GameToPlay] = [
-        GameToPlay(level: 20, countPackages: 2, gameNumber: 2222, stopAt: 94), // at Step: 98
+//        GameToPlay(level: 18, countPackages: 2, gameNumber: 2818, stopAt: 60), // at Step: 97 OK
+        GameToPlay(level: 19, countPackages: 2, gameNumber: 2404), // at Step: 95
+        GameToPlay(level: 20, countPackages: 2, gameNumber: 2222), // at Step: 95
+        GameToPlay(level: 24, countPackages: 2, gameNumber: 2917), // at Step: 100
+        GameToPlay(level: 26, countPackages: 2, gameNumber: 2351), // at Step: 100
+        GameToPlay(level: 19, countPackages: 3, gameNumber: 2618), // at Step: 151
+        GameToPlay(level: 18, countPackages: 4, gameNumber: 2624), // at Step: 204
+
 //        GameToPlay(level: 14, countPackages: 3, gameNumber: 2055, stopAt: 4),// , stopAt: 128), // at Step: 144
 //        GameToPlay(level: 25, countPackages: 2, gameNumber: 1138), // at Step: 92
 //        GameToPlay(level: 24, countPackages: 3, gameNumber: 1291), // at Step: 145
@@ -30,7 +37,7 @@ class AutoPlayer {
 //        GameToPlay(level: 26, countPackages: 4, gameNumber: 435), // at Step: 201
 //        GameToPlay(level: 26, countPackages: 3, gameNumber: 1241), // at Step: 140
 //        GameToPlay(level: 26, countPackages: 3, gameNumber: 2132), // at Step: 145    
-        //        GameToPlay(level: 12, countPackages: 2, gameNumber: 781), // at Step: 98 OK
+//        GameToPlay(level: 12, countPackages: 2, gameNumber: 781), // at Step: 98 OK
     ]
     enum runStatus: Int {
         case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep

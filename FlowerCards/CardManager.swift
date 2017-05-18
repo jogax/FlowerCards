@@ -1847,7 +1847,7 @@ class CardManager {
                 checkAgain = false
                 needToCheck = false
                 for index in cardsWithTransitions.count..<allCards.count {
-                    if allCards[index].belongsToPackageMax.countOnes() > 1 {
+//                    if allCards[index].belongsToPackageMax.countOnes() > 1 {
                         let belongsMinMaxOrig = allCards[index].belongsToPackageMax
                         allCards[index].belongsToPackageMax = 0
                         allCards[index].belongsToPackageMin = 0
@@ -1858,7 +1858,7 @@ class CardManager {
                             allCards[index].belongsToPackageMax = belongsMinMaxOrig
                             allCards[index].belongsToPackageMin = belongsMinMaxOrig
                         }
-                    }
+//                    }
                 }
             }
             for index in 0..<cardsWithTransitions.count {
