@@ -10,9 +10,8 @@ import SpriteKit
 
 struct LevelParam {
     
-//    #if REALM_V1
+
     var countPackages: Int
-//    #endif
     var countColumns: Int
     var countRows: Int
     var minProzent: Int
@@ -21,9 +20,8 @@ struct LevelParam {
     
     init()
     {
-//        #if REALM_V1
-            countPackages = 0
-//        #endif
+
+        countPackages = 0
         self.countColumns = 0
         self.countRows = 0
         self.minProzent = 0
@@ -52,7 +50,6 @@ class LevelsForPlayWithCards {
     let maxCountPackages = 4
 //    let maxCountPackages = 2
     
-//    #if REALM_V1
     fileprivate var levelContent = [
         
         "3,3,25,50,40",
@@ -89,18 +86,6 @@ class LevelsForPlayWithCards {
         
         "10,10,60,80,22", // old 6 new 23
     ]
-//    #else
-//        fileprivate var levelContent = [
-//        
-//        "4,4,40,60,40",   // old 0 new 4
-//        "5,5,40,60,35",   // old 1 new 8
-//        "6,6,40,60,33",   // old 2 new 12
-//        "7,7,40,60,30",   // old 3 new 15
-//        "8,8,50,60,28",   // old 4 new 18
-//        "9,9,80,100,25",  // old 5 new 21
-//        "10,10,80,100,25",// old 6 new 23
-//        ]
-//    #endif
     
     var levelParam = [LevelParam]()
     
@@ -108,7 +93,6 @@ class LevelsForPlayWithCards {
         level = 0
         
         //let sizeMultiplier: CGFloat = 1.0 //UIDevice.currentDevice().modelConstants[GV.deviceType] //GV.onIpad ? 1.0 : 0.6
-//        #if REALM_V1
             for index in 0..<levelContent.count {
 //                for countPackages in 1...maxCountPackages {
                     let paramString = levelContent[index]
@@ -123,19 +107,6 @@ class LevelsForPlayWithCards {
                     levelParam.append(aktLevelParam)
 //                }
             }
-//        #else
-//            for index in 0..<levelContent.count {
-//                let paramString = levelContent[index]
-//                let paramArr = paramString.components(separatedBy: ",")
-//                var aktLevelParam: LevelParam = LevelParam()
-//                aktLevelParam.countColumns = Int(paramArr[0])!
-//                aktLevelParam.countRows = Int(paramArr[1])!
-//                aktLevelParam.minProzent = Int(paramArr[2])!
-//                aktLevelParam.maxProzent = Int(paramArr[3])!
-//                aktLevelParam.cardSize = Int(paramArr[4])!
-//                levelParam.append(aktLevelParam)
-//            }
-//        #endif
         aktLevel = levelParam[0]
     }
     

@@ -344,6 +344,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     let countLabelRows = CGFloat(4.0)
     let MaxCountGamesToPlayInARound = 5
     var countGamesToPlay = 0
+    var inTouches = false
     
     var gameNumberLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var sizeLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
@@ -898,11 +899,17 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func updateGameCountLabels() {
         let allGameCount = realm.objects(GameModel.self).filter("playerID = %d", GV.player!.ID).count
-        let referencePlayerID = realm.objects(PlayerModel.self).filter("name = %@", "NewPlayer").first!.ID
-        let referenceGameCount = realm.objects(GameModel.self).filter("playerID = %d", referencePlayerID).count
-        let procent = String(Double(100.0 * Double(allGameCount) / Double(referenceGameCount)).twoDecimals) + "%"
+        var referencePlayerID = NoValue
+        var referenceGameCount = 0
+        if realm.objects(PlayerModel.self).filter("name = %@", "NewPlayer").count > 0 {
+            referencePlayerID = realm.objects(PlayerModel.self).filter("name = %@", "NewPlayer").first!.ID
+            referenceGameCount = realm.objects(GameModel.self).filter("playerID = %d", referencePlayerID).count
+            let procent = String(Double(100.0 * Double(allGameCount) / Double(referenceGameCount)).twoDecimals) + "%"
+            allGamesLabel.text = GV.language.getText(.tcAllGamesCount, values: "\(allGameCount)", "\(referenceGameCount)", "\(procent)")
+        } else {
+            allGamesLabel.text = GV.language.getText(.tcAllGamesCount, values: "\(allGameCount)", "0", "0")
+        }
         let pkgLabels = [onePkgLabel, twoPkgLabel, threePkgLabel, fourPkgLabel]
-        allGamesLabel.text = GV.language.getText(.tcAllGamesCount, values: "\(allGameCount)", "\(referenceGameCount)", "\(procent)")
         for pkgNr in 1...4 {
             let pkgCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d", GV.player!.ID, pkgNr).count
             let pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d and gameFinished = false and ID != %d", GV.player!.ID, pkgNr, GV.actGame!.ID).count
@@ -1618,13 +1625,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         GV.actGame!.playerScore = levelScore
         GV.actGame!.played = true
         GV.actGame!.created = Date()
-        #if REALM_V2
-            if cardCount > 0 {
-                GV.actGame!.gameFinished = false
-            } else {
-                GV.actGame!.gameFinished = true
-            }
-        #endif
+//        #if REALM_V2
+        if cardCount > 0 {
+            GV.actGame!.gameFinished = false
+        } else {
+            GV.actGame!.gameFinished = true
+        }
+//        #endif
         if playerType == .multiPlayer {
             GV.actGame!.multiPlay = true
             GV.actGame!.opponentName = opponent.name
@@ -2192,6 +2199,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         lastPair.color = .none
         lineWidthMultiplier = lineWidthMultiplierNormal
         touchesBeganAt = Date()
+        inTouches = true
         movedFromNode = nil
         let nodes = self.nodes(at: touchLocation)
         for nodesIndex in 0..<nodes.count {
@@ -2613,7 +2621,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //    }
     
     func myTouchesEnded(touchLocation: CGPoint) {
-        
         cardManager!.stopTrembling()
         cardManager!.removeNodesWithName(myLineName)
         let testNode = self.atPoint(touchLocation)
@@ -2811,7 +2818,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         } else {
 //            startTippTimer()
         }
-        
+        inTouches = false
     }
 
     

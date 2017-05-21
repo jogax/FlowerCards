@@ -80,7 +80,7 @@ struct GV {
         } else  {
             recordID = realm.objects(RecordIDModel.self).first!
         }
-        #if REALM_V2
+//        #if REALM_V2
             switch recordType {
             case .gameModel:
                 ID = recordID.gameModelID
@@ -95,19 +95,19 @@ struct GV {
                 ID = recordID.historyModelID
                 recordID.historyModelID += 1
            }
-        #else
-            switch recordType {
-            case .gameModel:
-                ID = recordID.gameModelID
-                recordID.gameModelID += 1
-            case .playerModel:
-                ID = recordID.playerModelID
-                recordID.playerModelID += 1
-            case .statisticModel:
-                ID = recordID.statisticModelID
-                recordID.statisticModelID += 1
-            }
-        #endif
+//        #else
+//            switch recordType {
+//            case .gameModel:
+//                ID = recordID.gameModelID
+//                recordID.gameModelID += 1
+//            case .playerModel:
+//                ID = recordID.playerModelID
+//                recordID.playerModelID += 1
+//            case .statisticModel:
+//                ID = recordID.statisticModelID
+//                recordID.statisticModelID += 1
+//            }
+//        #endif
         if !inWrite {
             try! realm.commitWrite()
         }

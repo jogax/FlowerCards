@@ -63,12 +63,12 @@ class MySKGameStatistic: MySKTable {
             var score = String(game.playerScore)
             var victory: SKTexture = SKTexture(image: DrawImages.getOKImage(CGSize(width: 20, height: 20)))
             var textureSize:CGFloat = 1.0
-            #if REALM_V2
-                if !game.gameFinished {
-                    victory = atlas.textureNamed("help")
-                    textureSize = 0.25
-                }
-            #endif
+//            #if REALM_V2
+            if !game.gameFinished {
+                victory = atlas.textureNamed("help")
+                textureSize = 0.25
+            }
+//            #endif
             let startImage = DrawImages.getStartImage(CGSize(width: 20, height: 20))
             if game.multiPlay {
                 gameArt = GV.language.getText(.tcCompetitionShort)
