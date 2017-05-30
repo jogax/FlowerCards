@@ -312,7 +312,7 @@ class CardManager {
         var OK = false
         var supressed = false
         let searchPair = ConnectablePair(card1: first, card2: second)
-        for (index, pair) in colorArray[first.colorIndex].connectablePairs.enumerated() {
+        for (_, pair) in colorArray[first.colorIndex].connectablePairs.enumerated() {
             if pair == searchPair {
                 OK = true
                 supressed = pair.supressed
@@ -334,13 +334,13 @@ class CardManager {
         }
     }
     
-    func delay(time: Double, closure:@escaping ()->()) {
-        let delayTime = DispatchTime.now() + Double(Int64(time * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
-        DispatchQueue.main.asyncAfter(deadline: delayTime)  {
-            closure()
-        }
-        
-    }
+//    func delay(time: Double, closure:@escaping ()->()) {
+//        let delayTime = DispatchTime.now() + Double(Int64(time * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+//        DispatchQueue.main.asyncAfter(deadline: delayTime)  {
+//            closure()
+//        }
+//        
+//    }
     
 
     
@@ -636,7 +636,7 @@ class CardManager {
         //==========================================
         
         while angle <= stopAngle {
-            delay(time: 0.000001, closure: {})
+//            delay(time: 0.000001, closure: {})
             let toPoint = GV.pointOfCircle(10.0, center: startPoint, angle: angle)
             let (foundedPoint, myPoints) = createHelpLines(movedFrom: startCard, toPoint: toPoint, inFrame: GV.mainScene!.frame, lineSize: cardSize.width, showLines: false)
             if foundedPoint != nil {
@@ -869,7 +869,7 @@ class CardManager {
                 let toPoint = GV.pointOfCircle(1.0, center: startPoint, angle: angle)
                 let movedFrom = ColumnRow(column: card1.column, row: card1.row)
                 let (foundedPoint, myPoints) = createHelpLines(movedFrom: movedFrom, toPoint: toPoint, inFrame: GV.mainScene!.frame, lineSize: cardSize.width, showLines: false)
-                delay(time: 0.000001, closure: {})
+//                delay(time: 0.000001, closure: {})
                 if foundedPoint != nil {
                     if foundedPoint!.foundContainer && card2.type == .containerType && foundedPoint!.column == card2.column ||
                         (foundedPoint!.column == card2.column && foundedPoint!.row == card2.row) {
@@ -1648,7 +1648,6 @@ class CardManager {
             cardMap = Array(repeating: Array(repeating: Array(repeating: NoValue, count: CountCardsInPackage), count: countPackages), count: 6)
             usedCards = Array(repeating: UsedCard(), count: CountCardsInPackage)
             countTransitions = 0
-            
             findContainer()
             fillAllCards()
 //            fillCompatibilityMap()
@@ -1663,22 +1662,22 @@ class CardManager {
                 _ = findPair(card: allCards[index])
             }
             
-            if connectablePairs.count > 0 {
-                for (index, pair) in connectablePairs.enumerated() {
-                    if !pair.supressed {
-                        checkPair(index: index, actPair: pair)
-                    }
-                }
-
-                if pairsToRemove.count > 0 {
-                    for index in pairsToRemove.reversed() {
-                        //                    print(connectablePairs[index].printValue)
-                        if index < connectablePairs.count {
-                            connectablePairs.remove(at: index)
-                        }
-                    }
-                }
-            }
+//            if connectablePairs.count > 0 {
+//                for (index, pair) in connectablePairs.enumerated() {
+//                    if !pair.supressed {
+//                        checkPair(index: index, actPair: pair)
+//                    }
+//                }
+//
+//                if pairsToRemove.count > 0 {
+//                    for index in pairsToRemove.reversed() {
+//                        //                    print(connectablePairs[index].printValue)
+//                        if index < connectablePairs.count {
+//                            connectablePairs.remove(at: index)
+//                        }
+//                    }
+//                }
+//            }
             
             if container != nil {
                 container!.setBelongsLabels()
@@ -2171,40 +2170,40 @@ class CardManager {
         }
 
         private func checkPair(index: Int, actPair: ConnectablePair) {
-            let values = actPair.connectedValues
-            if values.upper == NoValue {
-                return
-            }
-            let upperUsedCard = usedCards[values.upper]
+//            let values = actPair.connectedValues
+//            if values.upper == NoValue {
+//                return
+//            }
+//            let upperUsedCard = usedCards[values.upper]
 //            let lowerUsedCard = usedCards[values.lower]
 
-            if values.upper == FirstCardValue {
-                if upperUsedCard.freeMinCount == 1 && upperUsedCard.midCount == countPackages - 2 {
-                    
-                }
-            }
-            if actPair.card1.type == .cardType && actPair.card2.type == .cardType {
-                if (actPair.card1.minValue == FirstCardValue && actPair.card2.maxValue == LastCardValue ||
-                        actPair.card2.minValue == FirstCardValue && actPair.card1.maxValue == LastCardValue) {
-                    for pair in connectablePairs {
-                        if pair != actPair {
-                            if pair.card1.type == .cardType && pair.card2.type == .cardType &&
-                                (actPair.card1 === pair.card1 || actPair.card1 === pair.card2 || actPair.card2 === pair.card1 || actPair.card2 === pair.card2) &&
-                                (pair.card1.minValue == FirstCardValue && pair.card2.maxValue == LastCardValue ||
-                                    pair.card2.minValue == FirstCardValue && pair.card1.maxValue == LastCardValue) {
-                                let actPairLen = actPair.card1.countCards + actPair.card2.countCards
-                                let pairLen = pair.card1.countCards + pair.card2.countCards
-                                if actPairLen >= CountCardsInPackage && actPairLen > pairLen /* && (pairLen < CountCardsInPackage */ {
-                                    pair.supressed = true
-                                }
-                                if pairLen >= CountCardsInPackage && actPairLen < pairLen /* && actPairLen < CountCardsInPackage */ {
-                                    actPair.supressed = true
-                                }
-                           }
-                        }
-                    }
-                }
-            }
+//            if values.upper == FirstCardValue {
+//                if upperUsedCard.freeMinCount == 1 && upperUsedCard.midCount == countPackages - 2 {
+//                    
+//                }
+//            }
+//            if actPair.card1.type == .cardType && actPair.card2.type == .cardType {
+//                if (actPair.card1.minValue == FirstCardValue && actPair.card2.maxValue == LastCardValue ||
+//                        actPair.card2.minValue == FirstCardValue && actPair.card1.maxValue == LastCardValue) {
+//                    for pair in connectablePairs {
+//                        if pair != actPair {
+//                            if pair.card1.type == .cardType && pair.card2.type == .cardType &&
+//                                (actPair.card1 === pair.card1 || actPair.card1 === pair.card2 || actPair.card2 === pair.card1 || actPair.card2 === pair.card2) &&
+//                                (pair.card1.minValue == FirstCardValue && pair.card2.maxValue == LastCardValue ||
+//                                    pair.card2.minValue == FirstCardValue && pair.card1.maxValue == LastCardValue) {
+//                                let actPairLen = actPair.card1.countCards + actPair.card2.countCards
+//                                let pairLen = pair.card1.countCards + pair.card2.countCards
+//                                if actPairLen > CountCardsInPackage && actPairLen > pairLen /* && (pairLen < CountCardsInPackage */ {
+//                                    pair.supressed = true
+//                                }
+//                                if pairLen > CountCardsInPackage && actPairLen < pairLen /* && actPairLen < CountCardsInPackage */ {
+//                                    actPair.supressed = true
+//                                }
+//                           }
+//                        }
+//                    }
+//                }
+//            }
         }
         
         private func checkIfNewCardCompatibleWithCWT(pairToCheck: ConnectablePair)->Bool {

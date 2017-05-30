@@ -12,14 +12,18 @@ import SpriteKit
 class AutoPlayer {
     // game to Play saves Games, Levels and CountPackages as they are displayed
     let gamesToPlayTable: [GameToPlay] = [
+        GameToPlay(level: 2, countPackages: 1, gameNumber: 6025, stopAt: 35),
+//        GameToPlay(level: 20, countPackages: 3, gameNumber: 3250, stopAt: 289),
+//        GameToPlay(level: 15, countPackages: 4, gameNumber: 787), // at Step: 88
+//        GameToPlay(level: 18, countPackages: 4, gameNumber: 5332), // at Step: 5
 //        GameToPlay(level: 18, countPackages: 2, gameNumber: 2818, stopAt: 60), // at Step: 97 OK
-        GameToPlay(level: 19, countPackages: 2, gameNumber: 2404), // at Step: 95
-        GameToPlay(level: 20, countPackages: 2, gameNumber: 2222), // at Step: 95
-        GameToPlay(level: 24, countPackages: 2, gameNumber: 2917), // at Step: 100
-        GameToPlay(level: 26, countPackages: 2, gameNumber: 2351), // at Step: 100
-        GameToPlay(level: 19, countPackages: 3, gameNumber: 2618), // at Step: 151
-        GameToPlay(level: 18, countPackages: 4, gameNumber: 2624), // at Step: 204
-
+//        GameToPlay(level: 19, countPackages: 2, gameNumber: 2404), // at Step: 95
+//        GameToPlay(level: 20, countPackages: 2, gameNumber: 2222), // at Step: 95
+//        GameToPlay(level: 24, countPackages: 2, gameNumber: 2917), // at Step: 100
+//        GameToPlay(level: 26, countPackages: 2, gameNumber: 2351), // at Step: 100
+//        GameToPlay(level: 19, countPackages: 3, gameNumber: 2618), // at Step: 151
+//        GameToPlay(level: 18, countPackages: 4, gameNumber: 2624), // at Step: 204
+//
 //        GameToPlay(level: 14, countPackages: 3, gameNumber: 2055, stopAt: 4),// , stopAt: 128), // at Step: 144
 //        GameToPlay(level: 25, countPackages: 2, gameNumber: 1138), // at Step: 92
 //        GameToPlay(level: 24, countPackages: 3, gameNumber: 1291), // at Step: 145
@@ -167,7 +171,7 @@ class AutoPlayer {
         }
         if self.testType != .runOnce {
             startNextGame()
-            scene.durationMultiplier = scene.durationMultiplierForAutoplayer
+//            scene.durationMultiplier = scene.durationMultiplierForAutoplayer
             scene.waitForStartConst = scene.waitForStartForAutoplayer
         }
         scene.isUserInteractionEnabled = false
@@ -272,7 +276,7 @@ class AutoPlayer {
                 try! realm.commitWrite()
                 scene.gameNumber = gamesToPlay[gameIndex].gameNumber - 1
                 scene.startNewGame(next: false)
-                scene.durationMultiplier = scene.durationMultiplierForAutoplayer
+//                scene.durationMultiplier = scene.durationMultiplierForAutoplayer
                 scene.waitForStartConst = scene.waitForStartForAutoplayer
             }
         }
@@ -292,7 +296,7 @@ class AutoPlayer {
 //                    }
 //                }
                 choosedTipp = Tipp.InnerTipp()
-                if scene.tippsButton!.alpha == 1 && scene.countMovingCards == 0 /*&& !scene.cardManager!.noMoreSteps */ {  // if tipps are ready
+                if scene.tippsButton!.alpha == 1 && scene.movingCards.count == 0 && !scene.inGeneratingCards /*&& !scene.cardManager!.noMoreSteps */ {  // if tipps are ready
                     bestTipp = Tipp()
                     if tippArray.count > 0 {
                         switch testerType {

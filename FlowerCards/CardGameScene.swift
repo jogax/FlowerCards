@@ -255,6 +255,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     
     let emptyCardTxt = "emptycard"
+    var movingCards: [MySKCard] = []
     
 //    var cardStack:Stack<MySKCard> = Stack()
 //    var showCardStack:Stack<MySKCard> = Stack()
@@ -315,10 +316,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     let containerSizeOrig: CGFloat = 40
     
     var showFingerNode = false
-    var countMovingCards = 0
+//    var countMovingCards = 0
     var countCheckCounts = 0
     var freeUndoCounter = 0
     var freeTippCounter = 0
+    var buildNumber: String = ""
+    var versionsNumber: String = ""
     
     
     
@@ -342,8 +345,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var labelBackground = SKSpriteNode()
     let labelRowCorr = CGFloat(0.1)
     let countLabelRows = CGFloat(4.0)
-    let MaxCountGamesToPlayInARound = 5
-    var countGamesToPlay = 0
+//    var MaxCountGamesToPlayInARound = 1
+//    var countGamesToPlay = 0
     var inTouches = false
     
     var gameNumberLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
@@ -471,6 +474,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var startGetNextPlayArt = false
     var restartGame: Bool = false
     var inSettings: Bool = false
+    var inGeneratingCards: Bool = false
     var receivedMessage: [String] = []
 
     
@@ -510,16 +514,24 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
 //            cardTabRect.origin = CGPoint(x: self.frame.midX, y: self.frame.midY * 0.80)
 //            cardTabRect.size = CGSize(width: self.frame.size.width * 0.80, height: self.frame.size.height * 0.80)
-            
             let width:CGFloat = 64.0
             let height: CGFloat = 89.0
             let sizeMultiplierConstant = CGFloat(0.0020)
-            countGamesToPlay = MaxCountGamesToPlayInARound
+            levelIndex = GV.player!.levelID
+            
+//            switch (levelIndex + 1) {
+//            case (1...12):
+//                MaxCountGamesToPlayInARound = 1
+//            case (13...26):
+//                MaxCountGamesToPlayInARound = 2
+//            default:
+//                break
+//            }
+//            countGamesToPlay = MaxCountGamesToPlayInARound
 
             cardSizeMultiplier = CGSize(width: self.size.width * sizeMultiplierConstant,
                                     height: self.size.width * sizeMultiplierConstant * height / width)
 
-            levelIndex = GV.player!.levelID
             
 
             GV.levelsForPlay.setAktLevel(levelIndex)
@@ -546,21 +558,21 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         durationMultiplier = durationMultiplierForPlayer
         waitForStartConst = waitForStartForPlayer
         supressedTipps.removeAll()
-        let playedGamesOnLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and countPackages = %d and played = true",
-                                GV.player!.ID, GV.player!.levelID, GV.player!.countPackages).count
-        if playedGamesOnLevel >= countGamesToPlay && newGame {
-            realm.beginWrite()
-            GV.player!.levelID += 1
-            GV.player!.levelID %= GV.levelsForPlay.count()
-            if GV.player!.levelID == 0 {
-                GV.player!.countPackages += 1
-                if GV.player!.countPackages > maxPackageCount {
-                    GV.player!.countPackages = 1
-                    countGamesToPlay += MaxCountGamesToPlayInARound
-                }
-            }
-            try! realm.commitWrite()
-        }
+//        let playedGamesOnLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and countPackages = %d and played = true",
+//                                GV.player!.ID, GV.player!.levelID, GV.player!.countPackages).count
+//        if /*playedGamesOnLevel >= countGamesToPlay && */ newGame {
+//            realm.beginWrite()
+//            GV.player!.levelID += 1
+//            GV.player!.levelID %= GV.levelsForPlay.count()
+//            if GV.player!.levelID == 0 {
+//                GV.player!.countPackages += 1
+//                if GV.player!.countPackages > maxPackageCount {
+//                    GV.player!.countPackages = 1
+////                    countGamesToPlay += MaxCountGamesToPlayInARound
+//                }
+//            }
+//            try! realm.commitWrite()
+//        }
         levelIndex = GV.player!.levelID
         countPackages = GV.player!.countPackages
         GV.levelsForPlay.setAktLevel(levelIndex)
@@ -580,7 +592,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         freeTippCounter = freeAmount
         scoreModifyer = 0
         levelScore = 0
-        countMovingCards = 0
+//        countMovingCards = 0
         showTippCounter = showTippsFreeCount
 
 //        GV.statistic = GV.realm.objects(StatisticModel).filter("playerID = %d and levelID = %d", GV.player!.ID, GV.player!.levelID).first
@@ -1035,6 +1047,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
 
     func generateCards(generatingType: CardGeneratingType) {
+        if inGeneratingCards {
+            return
+        }
+        inGeneratingCards = true
+//        if countMovingCards > 0 {
+//            waitForMovingCards()
+//            print("countMovingCards: \(countMovingCards)")
+////            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1))  {}
+//        }
         var waitForStart: TimeInterval = 0.0
         let cardArray = cardManager!.findNewCardsForGameArray()
         showCardCount()
@@ -1071,24 +1092,31 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             let actionFadeAlpha = SKAction.fadeAlpha(to: 1, duration: 0.2)
             let actionMoveAndFadeIn = SKAction.group([actionMove, actionFadeAlpha])
-            let actionCountMovingCards = SKAction.run {
-                self.countMovingCards -= 1
+            let actionAddCardToMovingCards = SKAction.run {
+                self.movingCards.append(card)
             }
-            countMovingCards += 1
-            card.run(SKAction.sequence([waitingAction, zPositionPlus, actionMoveAndFadeIn, zPositionMinus, actionHideEmptyCard, actionCountMovingCards]))
+            let actionRemoveCardFromMovingCards = SKAction.run {
+                self.movingCards.remove(at: self.movingCards.index(where: { $0 === card })!)
+            }
+//            let actionCountMovingCards = SKAction.run {
+//                self.countMovingCards -= 1
+//            }
+//            countMovingCards += 1
+            card.run(SKAction.sequence([actionAddCardToMovingCards, waitingAction, zPositionPlus, actionMoveAndFadeIn, zPositionMinus, actionHideEmptyCard, /*actionCountMovingCards,*/ actionRemoveCardFromMovingCards]))
             if cardStack.count(type: .MySKCardType) == 0 {
                 cardPackage!.changeButtonPicture(SKTexture(imageNamed: "emptycard"))
                 cardPackage!.alpha = 0.3
             }
         }
         
-        self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.checkCountMovingCards), userInfo: nil, repeats: false) // start timer for check
+        self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.waitForMovingCards), userInfo: nil, repeats: false) // start timer for check
 
         if generatingType == .first {
             countUp = Timer.scheduledTimer(timeInterval: doCountUpSleepTime, target: self, selector: Selector(doCountUpSelector), userInfo: nil, repeats: true)
             doTimeCount = true
         }
         stopped = false
+        inGeneratingCards = false
     }
     
     func startAutoplay(testType: AutoPlayer.TestType) {
@@ -1293,8 +1321,14 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let countAction = SKAction.run { 
             self.showCardCount()
         }
+        let actionAddCardToMovingCards = SKAction.run {
+            self.movingCards.append(card)
+        }
+        let actionRemoveCardFromMovingCards = SKAction.run {
+            self.movingCards.remove(at: self.movingCards.index(where: { $0 === card })!)
+        }
         let allActions = SKAction.group([moveToContainerAction, rotateAction])
-        let action = SKAction.sequence([allActions, hideAction, countAction])
+        let action = SKAction.sequence([actionAddCardToMovingCards, allActions, hideAction, countAction, actionRemoveCardFromMovingCards])
         card.run(action)
     }
     
@@ -1391,14 +1425,14 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             cardManager!.resetGameArrayCell(movingCard)
             movingCard.removeFromParent()
             playSound("Container", volume: GV.player!.soundVolume)
-            countMovingCards = 0
+//            countMovingCards = 0
             
             updateCardCount(-1)
             
         } else {
             updateCardCount(-1)
             movingCard.removeFromParent()
-            countMovingCards = 0
+//            countMovingCards = 0
             push(movingCard, status: .removed)
             pull(createTipps: false) // no createTipps
 //            startTippTimer()
@@ -1452,7 +1486,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             cardManager!.resetGameArrayCell(movingCard)
             
             movingCard.removeFromParent()
-            countMovingCards = 0
+//            countMovingCards = 0
             updateCardCount(-1)
             //            checkGameFinished()
             saveStatisticAndGame()
@@ -1460,7 +1494,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             updateCardCount(-1)
             movingCard.removeFromParent()
-            countMovingCards = 0
+//            countMovingCards = 0
             push(movingCard, status: .removed)
             pull(createTipps: false) // no createTipps
 //            startTippTimer()
@@ -1504,7 +1538,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         } else {
             updateCardCount(-1)
             movingCard.removeFromParent()
-            countMovingCards = 0
+//            countMovingCards = 0
             push(movingCard, status: .removed)
             pull(createTipps: false) // no createTipps
             //            startTippTimer()
@@ -1521,7 +1555,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         score.fontName = "ArialMT"
         score.fontSize = 30
         score.zPosition = 1000
-        let showAction = SKAction.moveTo(y: position.y + 1000, duration: 10.0)
+        let showAction = SKAction.moveTo(y: position.y + 1000, duration: 3.0)
         let hideAction = SKAction.sequence([SKAction.fadeOut(withDuration: 3.0), SKAction.removeFromParent()])
         let scoreActions = SKAction.group([showAction, hideAction])
         score.run(scoreActions)
@@ -1531,7 +1565,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func checkGameFinished() {
         func checkNoMoreSteps() {
             if cardManager!.noMoreSteps && lastUsedTipp?.card1.colorIndex != NoColor {
-                print("NoMoreSteps")
+//                if countMovingCards > 0 {
+//                    waitForMovingCards()
+//                    self.pull(createTipps: false)
+//                }
                 self.pull(createTipps: true)
                 for (index, tipp) in tippArray.enumerated() {
                     if  tipp.card1 == lastUsedTipp!.card1 &&
@@ -1550,27 +1587,28 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        let usedCellCount = cardManager!.countGameArrayItems
 //        let containersOK = checkContainers()
         
-        let finishGame = cardCount == 0
+//        let finishGame = cardCount == 0
         
-        if finishGame { // Level completed, start a new game
+        if cardCount == 0 { // Level completed, start a new game
             
             stopTimer(&countUp)
             playMusic("Winner", volume: GV.player!.musicVolume, loops: 0)
             playerCardCountLabel.text = "0"
-            if playerType == .multiPlayer {
-                GV.peerToPeerService?.sendInfo(.gameIsFinished, message: [String(levelScore)], toPeerIndex: opponent.peerIndex)
-            }
+//            if playerType == .multiPlayer {
+//                GV.peerToPeerService?.sendInfo(.gameIsFinished, message: [String(levelScore)], toPeerIndex: opponent.peerIndex)
+//            }
             
             // get && modify the statistic record
             
             saveStatisticAndGame()
             if playerType == .multiPlayer {
+                GV.peerToPeerService?.sendInfo(.gameIsFinished, message: [String(levelScore)], toPeerIndex: opponent.peerIndex)
                 alertIHaveGameFinished()
             } else {
                 let alert = getNextPlayArt(congratulations: .Won)
                 GV.mainViewController!.showAlert(alert)
             }
-        } else if cardCount > 0 { // usedCellCount <= minUsedCells && usedCellCount > 1 {
+        } else { // usedCellCount <= minUsedCells && usedCellCount > 1 {
             if touchType == .manual {
                 DispatchQueue.global().async {
                     self.generateCards(generatingType: .normal)  // Nachgenerierung
@@ -1827,6 +1865,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             }
             let newGameAction = UIAlertAction(title: GV.language.getText(TextConstants.tcNewGame), style: .default,
                 handler: {(paramAction:UIAlertAction!) in
+                    realm.beginWrite()
+                    GV.player!.levelID += 1
+                    GV.player!.levelID %= GV.levelsForPlay.count()
+                    if GV.player!.levelID == 0 {
+                        GV.player!.countPackages += 1
+                        if GV.player!.countPackages > maxPackageCount {
+                            GV.player!.countPackages = 1
+                        }
+                    }
+                    try! realm.commitWrite()
                     self.startNewGame(next: true)
                     //self.gameArrayChanged = true
 
@@ -2001,6 +2049,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
 
     func pull(createTipps: Bool) {
+//        if countMovingCards > 0 {
+//            print ("countMovingCards in pull(): \(countMovingCards)")
+//            waitForMovingCards()
+//            print ("countMovingCards in pull(): \(countMovingCards)")
+//        }
         //printFunc(function: "pull", start: true)
         let duration = 0.5
         var actionMoveArray = [SKAction]()
@@ -2030,39 +2083,51 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         let removeOldCard = SKAction.run({
                             self.childNode(withName: searchName)!.removeFromParent()
                         })
-                        cardToPush.run(SKAction.sequence([actionMove, removeOldCard]))
+                        let actionAddCardToMovingCards = SKAction.run {
+                            self.movingCards.append(cardToPush)
+                        }
+                        let actionRemoveCardFromMovingCards = SKAction.run {
+                            self.movingCards.remove(at: self.movingCards.index(where: { $0 === cardToPush })!)
+                        }
+                        cardToPush.run(SKAction.sequence([actionAddCardToMovingCards,actionMove, removeOldCard, actionRemoveCardFromMovingCards]))
                     }
-                case .addedFromShowCard:
-                    if cardPlaceButtonAddedToParent {
-                        cardPlaceButton?.removeFromParent()
-                        cardPlaceButtonAddedToParent = false
-                    }
-                    let oldShowCardExists = showCard != nil
-                    var removeOldShowCard = SKAction()
-                    if oldShowCardExists {
-                        var oldShowCard = showCard
-//                        showCardStack.push(showCard!)
-                        removeOldShowCard = SKAction.run({
-                            oldShowCard!.removeFromParent()
-                            oldShowCard = nil
-                        })
-                    }
-                    let cardName = savedCardInCycle.name
-                    let searchName = "\(cardName)"
-                    showCard = self.childNode(withName: searchName)! as? MySKCard
-                    showCard!.position = savedCardInCycle.endPosition //(cardPlaceButton?.position)!
-                    showCard!.size = (cardPlaceButton?.size)!
-                    showCard!.type = .showCardType
-                    self.childNode(withName: searchName)!.removeFromParent()
-                    self.addChild(showCard!)
-                    gameArray[savedCardInCycle.column][savedCardInCycle.row].used = false
-                    makeEmptyCard(savedCardInCycle.column, row: savedCardInCycle.row)
-                    let actionMove = SKAction.move(to: cardPlaceButton!.position, duration: 0.5)
-                    if oldShowCardExists {
-                        showCard!.run(SKAction.sequence([actionMove, removeOldShowCard]))
-                    } else {
-                        showCard!.run(actionMove)
-                    }
+//                case .addedFromShowCard:
+//                    if cardPlaceButtonAddedToParent {
+//                        cardPlaceButton?.removeFromParent()
+//                        cardPlaceButtonAddedToParent = false
+//                    }
+//                    let oldShowCardExists = showCard != nil
+//                    var removeOldShowCard = SKAction()
+//                    if oldShowCardExists {
+//                        var oldShowCard = showCard
+////                        showCardStack.push(showCard!)
+//                        removeOldShowCard = SKAction.run({
+//                            oldShowCard!.removeFromParent()
+//                            oldShowCard = nil
+//                        })
+//                    }
+//                    let cardName = savedCardInCycle.name
+//                    let searchName = "\(cardName)"
+//                    showCard = self.childNode(withName: searchName)! as? MySKCard
+//                    showCard!.position = savedCardInCycle.endPosition //(cardPlaceButton?.position)!
+//                    showCard!.size = (cardPlaceButton?.size)!
+//                    showCard!.type = .showCardType
+//                    self.childNode(withName: searchName)!.removeFromParent()
+//                    self.addChild(showCard!)
+//                    gameArray[savedCardInCycle.column][savedCardInCycle.row].used = false
+//                    makeEmptyCard(savedCardInCycle.column, row: savedCardInCycle.row)
+//                    let actionMove = SKAction.move(to: cardPlaceButton!.position, duration: 0.5)
+//                    let actionAddCardToMovingCards = SKAction.run {
+//                        self.movingCards.append(self.showCard!)
+//                    }
+//                    let actionRemoveCardFromMovingCards = SKAction.run {
+//                        self.movingCards.remove(at: self.movingCards.index(where: { $0 === self.showCard! })!)
+//                    }
+//                    if oldShowCardExists {
+//                        showCard!.run(SKAction.sequence([actionAddCardToMovingCards, actionMove, removeOldShowCard, actionRemoveCardFromMovingCards]))
+//                    } else {
+//                        showCard!.run(SKAction.sequence([actionAddCardToMovingCards, actionMove, actionRemoveCardFromMovingCards]))
+//                    }
                 case .removed:
                     //let cardTexture = SKTexture(imageNamed: "card\(savedCardInCycle.colorIndex)")
 //                    let card = MySKCard(colorIndex: savedCardInCycle.colorIndex, type: savedCardInCycle.type, value: savedCardInCycle.minValue)
@@ -2131,6 +2196,14 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                             self.cardManager!.removeNodesWithName("\(self.emptyCardTxt)-\(card.column)-\(card.row)")
                         })
                     )
+                    let actionAddCardToMovingCards = SKAction.run {
+                        self.movingCards.append(card)
+                    }
+                    let actionRemoveCardFromMovingCards = SKAction.run {
+                        self.movingCards.remove(at: self.movingCards.index(where: { $0 === card })!)
+                    }
+                    actionMoveArray.insert(actionAddCardToMovingCards, at: 0)
+                    actionMoveArray.append(actionRemoveCardFromMovingCards)
                     card.run(SKAction.sequence(actionMoveArray))
                     card.reload()
                     
@@ -2149,10 +2222,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     actionMoveArray.append(SKAction.move(to: savedCardInCycle.endPosition, duration: duration))
                 case .stopCycle: break
                 case .nothing: break
+                default: break
                 }
                 if let savedCard:SavedCard = stack.pull() {
                     savedCardInCycle = savedCard
-                    if ((savedCardInCycle.status == .addedFromCardStack || savedCardInCycle.status == .addedFromShowCard) && stack.countChangesInStack() == 0) || stopSoon  || savedCardInCycle.status == .stopCycle {
+                    if ((savedCardInCycle.status == .addedFromCardStack /*|| savedCardInCycle.status == .addedFromShowCard*/) && stack.countChangesInStack() == 0) || stopSoon  || savedCardInCycle.status == .stopCycle {
                         stack.push(card: savedCardInCycle)
                         run = false
                     }
@@ -2202,20 +2276,14 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         inTouches = true
         movedFromNode = nil
         let nodes = self.nodes(at: touchLocation)
-        for nodesIndex in 0..<nodes.count {
-            switch nodes[nodesIndex]  {
+        for node in nodes {
+            switch node  {
                 case is MySKButton:
-                    movedFromNode = (nodes[nodesIndex] as! MySKButton) as MySKCard
-                    break
+                    movedFromNode = (node as! MySKButton) as MySKCard
                 case is MySKCard:
-                    if (nodes[nodesIndex] as! MySKCard).type == .cardType ||
-                       (nodes[nodesIndex] as! MySKCard).type == .showCardType ||
-                       (nodes[nodesIndex] as! MySKCard).type == .emptyCardType
-                    {
-                        movedFromNode = (nodes[nodesIndex] as! MySKCard)
-                        if movedFromNode.type == .cardType {
-                            self.addChild(showValue(movedFromNode))
-                        }
+                    if (node as! MySKCard).type == .cardType {
+                        movedFromNode = (node as! MySKCard)
+                        self.addChild(showValue(movedFromNode))
                         if showFingerNode {
                             let fingerNode = SKSpriteNode(imageNamed: "finger.png")
                             fingerNode.name = fingerName
@@ -2276,7 +2344,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func myTouchesMoved(touchLocation: CGPoint) {
-
+        if inGeneratingCards || movingCards.count > 0 {
+            return
+        }
         if movedFromNode != nil {
             cardManager!.removeNodesWithName(myLineName)
 
@@ -2293,21 +2363,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 case MyNodeTypes.ButtonNode: aktNode = self.atPoint(touchLocation) as! MySKCard
                 default: aktNode = nil
             }
-            if movedFromNode.type == .showCardType {
-                movedFromNode.position = touchLocation
-//                if showCardStack.count(.MySKCardType) > 0 {
-//                    if !showCardFromStackAddedToParent {
-//                        showCardFromStackAddedToParent = true
-//                        showCardFromStack = showCardStack.last()
-//                        showCardFromStack!.position = cardPlaceButton!.position
-//                        showCardFromStack!.size = cardPlaceButton!.size
-//                        addChild(showCardFromStack!)
-//                    }
-//                } else if !cardPlaceButtonAddedToParent {
-//                    cardPlaceButtonAddedToParent = true
-//                    addChild(cardPlaceButton!)
-//                }
-            }  else if movedFromNode == aktNode && cardManager!.tremblingCards.count > 0 { // stop trembling
+            if movedFromNode == aktNode && cardManager!.tremblingCards.count > 0 { // stop trembling
                 lastPair.color = .none
                 cardManager!.stopTrembling()
                 cardManager!.lastNextPoint = nil
@@ -2385,6 +2441,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var touchType: TouchType = .manual
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         touchType = .manual
+        durationMultiplier = durationMultiplierForPlayer
         let firstTouch = touches.first
         let touchLocation = firstTouch!.location(in: self)
         myTouchesEnded(touchLocation: touchLocation)
@@ -2392,235 +2449,14 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func autoTouchesEnded(touchLocation: CGPoint) {
         touchType = .auto
+        durationMultiplier = durationMultiplierForAutoplayer
         myTouchesEnded(touchLocation: touchLocation)
     }
     
-//    func myTouchesEnded(touchLocation: CGPoint) {
-//        
-//        cardManager!.stopTrembling()
-//        cardManager!.removeNodesWithName(myLineName)
-//        let testNode = self.atPoint(touchLocation)
-//        
-//        let aktNodeType = analyzeNode(testNode)
-//        if movedFromNode != nil && !stopped {
-//            //let countTouches = touches.count
-//            var aktNode: MySKCard?
-//            
-//            movedFromNode.zPosition = 0
-//            let startNode = movedFromNode
-//            
-//            switch aktNodeType {
-//            case MyNodeTypes.LabelNode: aktNode = testNode.parent as? MySKCard
-//            case MyNodeTypes.CardNode: aktNode = testNode as? MySKCard
-//            case MyNodeTypes.ButtonNode:
-//                aktNode = (testNode as! MySKCard).parent as? MySKCard
-//            default: aktNode = nil
-//            }
-//            
-//            if showFingerNode {
-//                if let node = self.childNode(withName: fingerName) {
-//                  node.removeFromParent()
-//                }
-//            }
-//            if aktNode != nil && aktNode!.type == .buttonType && startNode?.type == .buttonType && aktNode!.name == movedFromNode.name {
-//                //            if aktNode != nil && MySKCard.type == .ButtonType && startNode.type == .ButtonType  {
-//                var MySKCard = aktNode!
-//                
-//                //                var name = (aktNode as! MySKCard).parent!.name
-//                if MySKCard.name == buttonName {
-//                    MySKCard = (MySKCard.parent) as! MySKCard
-//                }
-//                //switch (aktNode as! MySKCard).name! {
-//                switch MySKCard.name! {
-//                    case "settings": settingsButtonPressed()
-//                    case "undo": undoButtonPressed()
-//                    case "restart": restartButtonPressed()
-//                    case "help": helpButtonPressed()
-//                    default: specialButtonPressed(MySKCard.name!)
-//                }
-//                return
-//            }
-//            
-//            if startNode!.type == .cardType && (aktNode == nil || aktNode! != movedFromNode) {
-//                let card = movedFromNode// as! SKSpriteNode
-//                let movedFrom = ColumnRow(column: movedFromNode.column, row: movedFromNode.row)
-//                var (foundedPoint, myPoints) = cardManager!.createHelpLines(movedFrom: movedFrom, toPoint: touchLocation, inFrame: self.frame, lineSize: movedFromNode.size.width, showLines: false)
-//                var actFromToColumnRow = FromToColumnRow()
-//                actFromToColumnRow.fromColumnRow = movedFrom
-//                actFromToColumnRow.toColumnRow.column = foundedPoint!.column
-//                actFromToColumnRow.toColumnRow.row = foundedPoint!.row
-//                
-//                var color = cardManager!.calculateLineColor(foundedPoint: foundedPoint!, movedFrom: movedFrom)
-//                
-//                if lastPair.fixed {
-//                    actFromToColumnRow.toColumnRow.column = lastPair.pair.toColumnRow.column
-//                    actFromToColumnRow.toColumnRow.row = lastPair.pair.toColumnRow.row
-//                    myPoints = lastPair.points // set Back to last green line
-//                    color = .green
-//                }
-//                
-//                lastPair = PairStatus()
-//                push(card!, status: .movingStarted)
-//                
-//                
-//                let countAndPushAction = SKAction.run({
-//                    self.push(card!, status: .mirrored)
-////                    print("countAndPushAction")
-//                })
-//                
-//                let actionEmpty = SKAction.run({
-//                    self.makeEmptyCard((card?.column)!, row: (card?.row)!)
-////                    print("actionEmpty")
-//                })
-//
-//                let speed = CGFloat(1) //CGFloat(durationMultiplier)
-//                
-//                card?.zPosition += 5
-//
-////                var mirroredScore = 0
-//                
-////                let startTime = Date()
-//                var actionArray = [SKAction]()
-//                var moveActions = [SKAction]()
-//                var cardOrContainer: MySKCard
-//                actionArray.append(actionEmpty)
-//                moveActions.append(SKAction.run({
-//                    SKAction.move(to: myPoints[1], duration: Double((myPoints[1] - myPoints[0]).length() * speed))
-////                    print("moveAction at: \(Date().timeIntervalSince(startTime).threeDecimals)")
-//                }))
-//                if actFromToColumnRow.toColumnRow.row == NoValue {
-//                    cardOrContainer = containers[actFromToColumnRow.toColumnRow.column]
-//                } else {
-//                    cardOrContainer = gameArray[actFromToColumnRow.toColumnRow.column][actFromToColumnRow.toColumnRow.row].card
-//                }
-//                let connectable = cardManager!.areConnectable(first: self.movedFromNode, second: cardOrContainer)
-//                var connectAction = SKAction()
-//                if connectable {
-//                    connectAction = SKAction.run({
-//                        self.connectCardOrContainerWithMovingCard(movingCard: self.movedFromNode, cardOrContainer: cardOrContainer, connectable: connectable)
-////                        print("connectAction_cardOrContainer at: \(Date().timeIntervalSince(startTime).threeDecimals)")
-//                    })
-//                }
-//                
-//                let soundArray = ["Mirror1", "Mirror2", "Mirror3", "Mirror4", "Mirror5"]
-//                for pointsIndex in 2...6 {
-//                    if myPoints.count > pointsIndex {
-//                        if color == .green {
-//                            moveActions.append(SKAction.run({
-//                                self.movedFromNode.mirrored += 1
-////                                self.addChild(self.showCountScore("+\(self.movedFromNode.countScore)", position: (card?.position)!))
-//                                self.playSound(soundArray[pointsIndex - 2], volume: GV.player!.soundVolume, soundPlayerIndex: pointsIndex - 2)
-//                            }))
-//                        }
-//                        
-//                        moveActions.append(countAndPushAction)
-//                        let moveAction = SKAction.run ({
-//                            SKAction.move(to: myPoints[pointsIndex], duration: Double((myPoints[pointsIndex] - myPoints[pointsIndex - 1]).length() * speed))
-////                            print("moveAction at: \(Date().timeIntervalSince(startTime).threeDecimals)")
-//                        })
-//                        moveActions.append(moveAction)
-//                    }
-//                }
-//                let checkGameFinishedAction = SKAction.run({
-////                    print("checkGameFinishedAction_started at: \(Date().timeIntervalSince(startTime).threeDecimals))")
-//                    self.checkGameFinished()
-////                    print("checkGameFinishedAction_ended at: \(Date().timeIntervalSince(startTime).threeDecimals))")
-//                })
-//
-//                let groupActions = SKAction.group([SKAction.sequence(moveActions), SKAction.sequence([connectAction, checkGameFinishedAction])])
-//                actionArray.append(groupActions)
-//                let collisionAction = SKAction.run({
-//                        self.cardDidCollideWithCardOrContainer(movingCard: self.movedFromNode, cardOrContainer: cardOrContainer, connectable: connectable)
-////                        print("collisionAction_Container at: \(Date().timeIntervalSince(startTime).threeDecimals))")
-//                    })
-//                let userInteractionEnablingAction = SKAction.run({
-////                    self.checkGameFinished()
-//                    self.isUserInteractionEnabled = true
-////                    print("userInteractionEnablingAction")
-//                })
-//                actionArray.append(collisionAction)
-//                actionArray.append(userInteractionEnablingAction)
-//                
-//                tippsButton!.activateButton(false)
-//                
-//                
-//                
-//                
-//                //let actionMoveDone = SKAction.removeFromParent()
-////                collisionActive = true
-//                lastMirrored = ""
-//                
-//                self.isUserInteractionEnabled = false  // userInteraction forbidden!
-//                countMovingCards = 1
-//                self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(CardGameScene.checkCountMovingCards), userInfo: nil, repeats: false) // start timer for check
-//                
-//                movedFromNode.run(SKAction.sequence(actionArray))
-//                
-//            } else if startNode!.type == .cardType && aktNode == movedFromNode {
-////                startTippTimer()
-//            } else if startNode?.type == .showCardType {
-//                var foundedCard: MySKCard?
-//                let nodes = self.nodes(at: touchLocation)
-//                var founded = false
-//                for index in 0..<nodes.count {
-//                    foundedCard = nodes[index] as? MySKCard
-//                   if nodes[index] is MySKCard && foundedCard!.type == .emptyCardType {
-//                        startNode?.column = foundedCard!.column
-//                        startNode?.row = foundedCard!.row
-//                        push(startNode!, status: .stopCycle)
-//                        push(startNode!, status: .addedFromShowCard)
-//                        startNode?.size = foundedCard!.size
-//                        startNode?.position = foundedCard!.position
-//                        startNode?.type = .cardType
-//                        foundedCard!.removeFromParent()
-//                        founded = true
-//                        cardManager!.updateGameArrayCell(card: startNode!)
-//                        gameArrayChanged = true
-//
-//                        break
-//                    } else if nodes[index] is MySKCard && foundedCard!.type == .cardType && startNode?.colorIndex == foundedCard!.colorIndex &&
-//                        (foundedCard!.maxValue + 1 == startNode?.minValue ||
-//                         foundedCard!.minValue - 1 == startNode?.maxValue) {
-//                            push(startNode!, status: .stopCycle)
-//                            push(foundedCard!, status: .unification)
-//                            push(startNode!, status: .addedFromShowCard)
-//                            
-//                            if foundedCard!.maxValue < (startNode?.minValue)! {
-//                                foundedCard!.maxValue = (startNode?.maxValue)!
-//                            } else {
-//                                foundedCard!.minValue = (startNode?.minValue)!
-//                            }
-//                            foundedCard!.reload()
-//                            push(startNode!, status: .removed)
-//                            gameArray[(startNode?.column)!][(startNode?.row)!].card.minValue = foundedCard!.minValue
-//                            gameArray[(startNode?.column)!][(startNode?.row)!].card.maxValue = foundedCard!.maxValue
-//                            startNode?.removeFromParent()
-//                            founded = true
-//                            gameArrayChanged = true
-//
-//                            break
-//                   }
-//                }
-//                if !founded {
-//                    let actionMove = SKAction.move(to: cardPlaceButton!.position, duration: 0.5)
-//                    let actionDropShowCardFromStack = SKAction.run({
-//                        self.removeShowCardFromStack()
-//                        startNode?.zPosition = 0
-//                    })
-//                    startNode?.zPosition = 50
-//                    startNode?.run(SKAction.sequence([actionMove, actionDropShowCardFromStack]))
-//                }
-//            } else {
-////                startTippTimer()
-//            }
-//            
-//        } else {
-////            startTippTimer()
-//        }
-//        
-//    }
-    
     func myTouchesEnded(touchLocation: CGPoint) {
+        if inGeneratingCards || movingCards.count > 0 {
+            return
+        }
         cardManager!.stopTrembling()
         cardManager!.removeNodesWithName(myLineName)
         let testNode = self.atPoint(touchLocation)
@@ -2665,152 +2501,69 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 return
             }
             
-            if startNode!.type == .cardType && (aktNode == nil || aktNode! != movedFromNode) {
-                let card = movedFromNode// as! SKSpriteNode
-                let movedFrom = ColumnRow(column: movedFromNode.column, row: movedFromNode.row)
-                var (foundedPoint, myPoints) = cardManager!.createHelpLines(movedFrom: movedFrom, toPoint: touchLocation, inFrame: self.frame, lineSize: movedFromNode.size.width, showLines: false)
-                var actFromToColumnRow = FromToColumnRow()
-                actFromToColumnRow.fromColumnRow = movedFrom
-                actFromToColumnRow.toColumnRow.column = foundedPoint!.column
-                actFromToColumnRow.toColumnRow.row = foundedPoint!.row
-                
-                var color = cardManager!.calculateLineColor(foundedPoint: foundedPoint!, movedFrom: movedFrom)
-                
-                if lastPair.fixed {
-                    actFromToColumnRow.toColumnRow.column = lastPair.pair.toColumnRow.column
-                    actFromToColumnRow.toColumnRow.row = lastPair.pair.toColumnRow.row
-                    myPoints = lastPair.points // set Back to last green line
-                    color = .green
-                }
-                
-                lastPair = PairStatus()
-                push(card!, status: .movingStarted)
-                
-                
-                let countAndPushAction = SKAction.run({
-                    self.push(card!, status: .mirrored)
-                })
-                
-                let actionEmpty = SKAction.run({
-                    self.makeEmptyCard((card?.column)!, row: (card?.row)!)
-                })
-                
-                let speed = CGFloat(durationMultiplier)
-                
-                card?.zPosition += 5
-                
-                //                var mirroredScore = 0
-                
-                var actionArray = [SKAction]()
-                actionArray.append(actionEmpty)
-                actionArray.append(SKAction.move(to: myPoints[1], duration: Double((myPoints[1] - myPoints[0]).length() * speed)))
-                
-                let soundArray = ["Mirror1", "Mirror2", "Mirror3", "Mirror4", "Mirror5"]
-                for pointsIndex in 2...6 {
-                    if myPoints.count > pointsIndex {
-                        if color == .green {
-                            actionArray.append(SKAction.run({
-                                self.movedFromNode.mirrored += 1
-                                self.addChild(self.showCountScore("+\(self.movedFromNode.countScore)", position: (card?.position)!))
-                                self.playSound(soundArray[pointsIndex - 2], volume: GV.player!.soundVolume, soundPlayerIndex: pointsIndex - 2)
-                            }))
-                        }
-                        
-                        actionArray.append(countAndPushAction)
-                        actionArray.append(SKAction.move(to: myPoints[pointsIndex], duration: Double((myPoints[pointsIndex] - myPoints[pointsIndex - 1]).length() * speed)))
-                    }
-                }
-                var collisionAction: SKAction
-                if actFromToColumnRow.toColumnRow.row == NoValue {
-                    let containerNode = containers[actFromToColumnRow.toColumnRow.column] //self.childNode(withName: containers[actFromToColumnRow.toColumnRow.column].name!) as! MySKCard
-                    collisionAction = SKAction.run({
-                        self.cardDidCollideWithContainer(node1: self.movedFromNode, node2: containerNode, points: myPoints)
-                    })
-                } else {
-                    let cardNode = gameArray[actFromToColumnRow.toColumnRow.column][actFromToColumnRow.toColumnRow.row].card
-                    
-                    //                    let cardNode = self.childNode(withName: gameArray[actFromToColumnRow.toColumnRow.column][actFromToColumnRow.toColumnRow.row].name) as! MySKCard
-                    //                    let startNode = gameArray[movedFromNode.column][movedFromNode.row].card
-                    collisionAction = SKAction.run({
-                        self.cardDidCollideWithMovingCard(node1: self.movedFromNode, node2: cardNode, points: myPoints)
-                    })
-                }
-                let userInteractionEnablingAction = SKAction.run({
-                    self.checkGameFinished()
-                    self.isUserInteractionEnabled = true
-                })
-                actionArray.append(collisionAction)
-                actionArray.append(userInteractionEnablingAction)
-                
-                tippsButton!.activateButton(false)
-                
-                
-                
-                
-                //let actionMoveDone = SKAction.removeFromParent()
-//                collisionActive = true
-                lastMirrored = ""
-                
-                self.isUserInteractionEnabled = false  // userInteraction forbidden!
-                countMovingCards = 1
-                self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(CardGameScene.checkCountMovingCards), userInfo: nil, repeats: false) // start timer for check
-                
-                movedFromNode.run(SKAction.sequence(actionArray))
-                
+            if startNode!.type == .cardType && movedFromNode != nil && (aktNode == nil || aktNode! != movedFromNode) {
+                startMovingCard(touchLocation: touchLocation)
             } else if startNode!.type == .cardType && aktNode == movedFromNode {
 //                startTippTimer()
-            } else if startNode?.type == .showCardType {
-                var foundedCard: MySKCard?
-                let nodes = self.nodes(at: touchLocation)
-                var founded = false
-                for index in 0..<nodes.count {
-                    foundedCard = nodes[index] as? MySKCard
-                    if nodes[index] is MySKCard && foundedCard!.type == .emptyCardType {
-                        startNode?.column = foundedCard!.column
-                        startNode?.row = foundedCard!.row
-                        push(startNode!, status: .stopCycle)
-                        push(startNode!, status: .addedFromShowCard)
-                        startNode?.size = foundedCard!.size
-                        startNode?.position = foundedCard!.position
-                        startNode?.type = .cardType
-                        foundedCard!.removeFromParent()
-                        founded = true
-                        cardManager!.updateGameArrayCell(card: startNode!)
-                        gameArrayChanged = true
-                        
-                        break
-                    } else if nodes[index] is MySKCard && foundedCard!.type == .cardType && startNode?.colorIndex == foundedCard!.colorIndex &&
-                        (foundedCard!.maxValue + 1 == startNode?.minValue ||
-                            foundedCard!.minValue - 1 == startNode?.maxValue) {
-                        push(startNode!, status: .stopCycle)
-                        push(foundedCard!, status: .unification)
-                        push(startNode!, status: .addedFromShowCard)
-                        
-                        if foundedCard!.maxValue < (startNode?.minValue)! {
-                            foundedCard!.maxValue = (startNode?.maxValue)!
-                        } else {
-                            foundedCard!.minValue = (startNode?.minValue)!
-                        }
-                        foundedCard!.reload()
-                        push(startNode!, status: .removed)
-                        gameArray[(startNode?.column)!][(startNode?.row)!].card.minValue = foundedCard!.minValue
-                        gameArray[(startNode?.column)!][(startNode?.row)!].card.maxValue = foundedCard!.maxValue
-                        startNode?.removeFromParent()
-                        founded = true
-                        gameArrayChanged = true
-                        
-                        break
-                    }
-                }
-                if !founded {
-                    let actionMove = SKAction.move(to: cardPlaceButton!.position, duration: 0.5)
-                    let actionDropShowCardFromStack = SKAction.run({
-                        self.removeShowCardFromStack()
-                        startNode?.zPosition = 0
-                    })
-                    startNode?.zPosition = 50
-                    startNode?.run(SKAction.sequence([actionMove, actionDropShowCardFromStack]))
-                }
+//            }
+//            else if startNode?.type == .showCardType {
+//                var foundedCard: MySKCard?
+//                let nodes = self.nodes(at: touchLocation)
+//                var founded = false
+//                for index in 0..<nodes.count {
+//                    foundedCard = nodes[index] as? MySKCard
+//                    if nodes[index] is MySKCard && foundedCard!.type == .emptyCardType {
+//                        startNode?.column = foundedCard!.column
+//                        startNode?.row = foundedCard!.row
+//                        push(startNode!, status: .stopCycle)
+//                        push(startNode!, status: .addedFromShowCard)
+//                        startNode?.size = foundedCard!.size
+//                        startNode?.position = foundedCard!.position
+//                        startNode?.type = .cardType
+//                        foundedCard!.removeFromParent()
+//                        founded = true
+//                        cardManager!.updateGameArrayCell(card: startNode!)
+//                        gameArrayChanged = true
+//                        
+//                        break
+//                    } else if nodes[index] is MySKCard && foundedCard!.type == .cardType && startNode?.colorIndex == foundedCard!.colorIndex &&
+//                        (foundedCard!.maxValue + 1 == startNode?.minValue ||
+//                            foundedCard!.minValue - 1 == startNode?.maxValue) {
+//                        push(startNode!, status: .stopCycle)
+//                        push(foundedCard!, status: .unification)
+//                        push(startNode!, status: .addedFromShowCard)
+//                        
+//                        if foundedCard!.maxValue < (startNode?.minValue)! {
+//                            foundedCard!.maxValue = (startNode?.maxValue)!
+//                        } else {
+//                            foundedCard!.minValue = (startNode?.minValue)!
+//                        }
+//                        foundedCard!.reload()
+//                        push(startNode!, status: .removed)
+//                        gameArray[(startNode?.column)!][(startNode?.row)!].card.minValue = foundedCard!.minValue
+//                        gameArray[(startNode?.column)!][(startNode?.row)!].card.maxValue = foundedCard!.maxValue
+//                        startNode?.removeFromParent()
+//                        founded = true
+//                        gameArrayChanged = true
+//                        
+//                        break
+//                    }
+//                }
+//                if !founded {
+//                    let actionMove = SKAction.move(to: cardPlaceButton!.position, duration: 0.5)
+//                    let actionDropShowCardFromStack = SKAction.run({
+//                        self.removeShowCardFromStack()
+//                        startNode?.zPosition = 0
+//                    })
+//                    startNode?.zPosition = 50
+//                    let actionAddCardToMovingCards = SKAction.run {
+//                        self.movingCards.append(self.movedFromNode)
+//                    }
+//                    let actionRemoveCardFromMovingCards = SKAction.run {
+//                        self.movingCards.remove(at: self.movingCards.index(where: { $0 === self.movedFromNode })!)
+//                    }
+//                    startNode?.run(SKAction.sequence([actionAddCardToMovingCards, actionMove, actionDropShowCardFromStack, actionRemoveCardFromMovingCards]))
+//                }
             } else {
 //                startTippTimer()
             }
@@ -2819,6 +2572,116 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //            startTippTimer()
         }
         inTouches = false
+    }
+    
+    func waitWhileInGeneratingCards() {
+        while inGeneratingCards {
+            self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(CardGameScene.waitWhileInGeneratingCards), userInfo: nil, repeats: false) // start timer for check
+        }
+        self.waitForSKActionEnded?.invalidate()
+    }
+    
+    func startMovingCard(touchLocation: CGPoint) {
+        waitWhileInGeneratingCards()
+        let card = movedFromNode// as! SKSpriteNode
+        let movedFrom = ColumnRow(column: movedFromNode.column, row: movedFromNode.row)
+        var (foundedPoint, myPoints) = cardManager!.createHelpLines(movedFrom: movedFrom, toPoint: touchLocation, inFrame: self.frame, lineSize: movedFromNode.size.width, showLines: false)
+        var actFromToColumnRow = FromToColumnRow()
+        actFromToColumnRow.fromColumnRow = movedFrom
+        actFromToColumnRow.toColumnRow.column = foundedPoint!.column
+        actFromToColumnRow.toColumnRow.row = foundedPoint!.row
+        
+        var color = cardManager!.calculateLineColor(foundedPoint: foundedPoint!, movedFrom: movedFrom)
+        
+        if lastPair.fixed {
+            actFromToColumnRow.toColumnRow.column = lastPair.pair.toColumnRow.column
+            actFromToColumnRow.toColumnRow.row = lastPair.pair.toColumnRow.row
+            myPoints = lastPair.points // set Back to last green line
+            color = .green
+        }
+        
+        lastPair = PairStatus()
+        push(card!, status: .movingStarted)
+        
+        
+        let countAndPushAction = SKAction.run({
+            self.push(card!, status: .mirrored)
+        })
+        
+        let actionEmpty = SKAction.run({
+            self.makeEmptyCard((card?.column)!, row: (card?.row)!)
+        })
+        
+        let speed = CGFloat(durationMultiplier)
+        
+        card?.zPosition += 5
+        
+        //                var mirroredScore = 0
+        
+        var actionArray = [SKAction]()
+        actionArray.append(actionEmpty)
+        actionArray.append(SKAction.move(to: myPoints[1], duration: Double((myPoints[1] - myPoints[0]).length() * speed)))
+        
+        let soundArray = ["Mirror1", "Mirror2", "Mirror3", "Mirror4", "Mirror5"]
+        for pointsIndex in 2...6 {
+            if myPoints.count > pointsIndex {
+                if color == .green {
+                    actionArray.append(SKAction.run({
+                        self.movedFromNode.mirrored += 1
+                        self.addChild(self.showCountScore("+\(self.movedFromNode.countScore)", position: (card?.position)!))
+                        self.playSound(soundArray[pointsIndex - 2], volume: GV.player!.soundVolume, soundPlayerIndex: pointsIndex - 2)
+                    }))
+                }
+                
+                actionArray.append(countAndPushAction)
+                actionArray.append(SKAction.move(to: myPoints[pointsIndex], duration: Double((myPoints[pointsIndex] - myPoints[pointsIndex - 1]).length() * speed)))
+            }
+        }
+        var collisionAction: SKAction
+        if actFromToColumnRow.toColumnRow.row == NoValue {
+            let containerNode = containers[actFromToColumnRow.toColumnRow.column] //self.childNode(withName: containers[actFromToColumnRow.toColumnRow.column].name!) as! MySKCard
+            collisionAction = SKAction.run({
+                self.cardDidCollideWithContainer(node1: self.movedFromNode, node2: containerNode, points: myPoints)
+            })
+        } else {
+            let cardNode = gameArray[actFromToColumnRow.toColumnRow.column][actFromToColumnRow.toColumnRow.row].card
+            
+            //                    let cardNode = self.childNode(withName: gameArray[actFromToColumnRow.toColumnRow.column][actFromToColumnRow.toColumnRow.row].name) as! MySKCard
+            //                    let startNode = gameArray[movedFromNode.column][movedFromNode.row].card
+            collisionAction = SKAction.run({
+                self.cardDidCollideWithMovingCard(node1: self.movedFromNode, node2: cardNode, points: myPoints)
+            })
+        }
+        let userInteractionEnablingAction = SKAction.run({
+            self.isUserInteractionEnabled = true
+            self.checkGameFinished()
+        })
+        actionArray.append(collisionAction)
+        actionArray.append(userInteractionEnablingAction)
+        
+        tippsButton!.activateButton(false)
+        
+        
+        
+        
+        //let actionMoveDone = SKAction.removeFromParent()
+        //                collisionActive = true
+        lastMirrored = ""
+        
+        self.isUserInteractionEnabled = false  // userInteraction forbidden!
+//        countMovingCards = 1
+        self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(CardGameScene.waitForMovingCards), userInfo: nil, repeats: false) // start timer for check
+        let actionAddCardToMovingCards = SKAction.run {
+            self.movingCards.append(self.movedFromNode)
+        }
+        let actionRemoveCardFromMovingCards = SKAction.run {
+            self.movingCards.remove(at: self.movingCards.index(where: { $0 === self.movedFromNode })!)
+        }
+        actionArray.insert(actionAddCardToMovingCards, at: 0)
+        actionArray.append(actionRemoveCardFromMovingCards)
+        
+        movedFromNode.run(SKAction.sequence(actionArray))
+
     }
 
     
@@ -2991,7 +2854,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             var MySKCard: MySKCard = (testNode as! MySKCard)
             switch MySKCard.type {
             case .containerType: return MyNodeTypes.ContainerNode
-            case .cardType, .emptyCardType, .showCardType: return MyNodeTypes.CardNode
+            case .cardType, .emptyCardType/*, .showCardType*/: return MyNodeTypes.CardNode
             case .buttonType:
                 if MySKCard.name == buttonName {
                     MySKCard = MySKCard.parent as! MySKCard
@@ -3086,10 +2949,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     
+    func waitForMovingCards() {
+        countCheckCounts = 0
+        checkCountMovingCards()
+    }
+    
     func checkCountMovingCards() {
-        if  countMovingCards > 0 && countCheckCounts < 100 {
+        if  movingCards.count > 0 && countCheckCounts < 1000 {
             countCheckCounts += 1
-            self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(CardGameScene.checkCountMovingCards), userInfo: nil, repeats: false)
+            self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(CardGameScene.checkCountMovingCards), userInfo: nil, repeats: false)
         } else {
             countCheckCounts = 0
             self.isUserInteractionEnabled = true

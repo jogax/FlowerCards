@@ -7,7 +7,7 @@
 //
 
 enum MySKCardType: Int {
-    case cardType = 0, containerType, buttonType, emptyCardType, showCardType
+    case cardType = 0, containerType, buttonType, emptyCardType//, showCardType
 }
 
 enum TremblingType: Int {

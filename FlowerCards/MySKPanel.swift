@@ -42,10 +42,14 @@ class MySKPanel: SKSpriteNode {
     let musicLabel = SKLabelNode()
     let languageLabel = SKLabelNode()
     let playerStatisticLabel = SKLabelNode()
+    let appName_Build_Version_Label = SKLabelNode()
     let returnLabel = SKLabelNode()
     let callbackName = "SettingsCallbackName"
     var oldPlayerID = 0
-
+    var versionsNumber = ""
+    var buildNumber = ""
+    var appName = ""
+    var appName_Build_Version = ""
     var type: PanelTypes
     var playerChanged = false
     var touchesBeganWithNode: SKNode?
@@ -54,6 +58,19 @@ class MySKPanel: SKSpriteNode {
         let size = parent.size * 0.75 // / 2 //CGSizeMake(parent.size.width / 2, parent.s)
 //        let texture: SKTexture = SKTexture(imageNamed: "panel")
         let texture: SKTexture = SKTexture()
+        if let strAppName = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") {
+            appName = strAppName as! String
+        }
+        if let strVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") {
+            versionsNumber = strVersion as! String
+        }
+        if let strBuildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") {
+            buildNumber = strBuildNumber as! String
+        }
+        let copyRight = "Copyright \u{00A9} 2017 "
+        appName_Build_Version = copyRight + appName + "(Ver:" + versionsNumber + " / Build:" + buildNumber + ")"
+        
+
         
         sizeMultiplier = size / 10
         
@@ -104,6 +121,10 @@ class MySKPanel: SKSpriteNode {
     
     func makeSettings() {
         let name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
+        createLabels(appName_Build_Version_Label, text: appName_Build_Version, lineNr: 0.3, horAlignment: SKLabelHorizontalAlignmentMode.left, name: noTouchFunc)
+        appName_Build_Version_Label.fontColor = UIColor.black
+        
+        appName_Build_Version_Label.fontSize = fontSize / 2
         createLabels(playerLabel, text: GV.language.getText(.tcPlayer, values: name), lineNr: 1, horAlignment: SKLabelHorizontalAlignmentMode.center, name: noTouchFunc)
         playerLabel.fontColor = UIColor.black
         createLabels(nameLabel, text: GV.language.getText(.tcChooseName), lineNr: 2, horAlignment: .left, name: setPlayerFunc)
@@ -113,7 +134,7 @@ class MySKPanel: SKSpriteNode {
         createLabels(playerStatisticLabel, text: GV.language.getText(.tcStatistic), lineNr: 6, horAlignment: .left, name: setPlayerStatisticFunc )
         createLabels(returnLabel, text: GV.language.getText(.tcReturn), lineNr: 7, horAlignment: .left, name: setReturnFunc )
     }
-    func createLabels(_ label: SKLabelNode, text: String, lineNr: Int, horAlignment: SKLabelHorizontalAlignmentMode, name:String) {
+    func createLabels(_ label: SKLabelNode, text: String, lineNr: Double, horAlignment: SKLabelHorizontalAlignmentMode, name:String) {
         label.text = text
         label.name = name
         

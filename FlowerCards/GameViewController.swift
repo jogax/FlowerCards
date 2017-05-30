@@ -68,6 +68,7 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
     }
     
     func startScene() {
+        self.view.isMultipleTouchEnabled = false
         skView = self.view as? SKView
         skView!.showsFPS = true
         skView!.showsNodeCount = true
