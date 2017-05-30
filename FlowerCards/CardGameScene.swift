@@ -1609,17 +1609,17 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 GV.mainViewController!.showAlert(alert)
             }
         } else { // usedCellCount <= minUsedCells && usedCellCount > 1 {
-            if touchType == .manual {
-                DispatchQueue.global().async {
-                    self.generateCards(generatingType: .normal)  // Nachgenerierung
-                    DispatchQueue.main.async {
-                        checkNoMoreSteps()
-                    }
-                }
-            } else {
+//            if touchType == .manual {
+//                DispatchQueue.global().async {
+//                    self.generateCards(generatingType: .normal)  // Nachgenerierung
+//                    DispatchQueue.main.async {
+//                        checkNoMoreSteps()
+//                    }
+//                }
+//            } else {
                 self.generateCards(generatingType: .normal)  // Nachgenerierung
                 checkNoMoreSteps()
-            }
+//            }
         }
     }
     

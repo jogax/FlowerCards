@@ -322,10 +322,10 @@ class CardManager {
         return (OK, supressed)
     }
     
-    func startCreateTipps() {
-        _ = createTipps()
-    }
-    
+//    func startCreateTipps() {
+//        _ = createTipps()
+//    }
+//    
     func printTippArray() {
         print("======== \(tippArray.count) tipps created in: \(tippArrayCreatedInSeconds) seconds  ========")
         for tipp in tippArray {
@@ -399,8 +399,6 @@ class CardManager {
             return returnColors
         }
         
-//        checkTippArrayPlausibility()
-//        let generatingCardArrayStarted = Date()
         _ = createTipps()
         updateCountColors()
         
@@ -540,24 +538,24 @@ class CardManager {
     
 
     
-    private func checkTippArrayPlausibility() {
-        for (index, tipp) in tippArray.enumerated().reversed() {
-            let pos1 = ColumnRow(column: tipp.card1.column, row: tipp.card1.row)
-            let pos2 = ColumnRow(column: tipp.card2.column, row: tipp.card2.row)
-            switch tipp.card2.type {
-            case .cardType:
-                if !(gameArray[pos1.column][pos1.row].used && gameArray[pos2.column][pos2.row].used) {
-                    tippArray.remove(at: index)
-                }
-            case .containerType:
-                if !gameArray[pos1.column][pos1.row].used {
-                    tippArray.remove(at:index)
-                }
-            default: break
-            }
-        }
-    }
-    
+//    private func checkTippArrayPlausibility() {
+//        for (index, tipp) in tippArray.enumerated().reversed() {
+//            let pos1 = ColumnRow(column: tipp.card1.column, row: tipp.card1.row)
+//            let pos2 = ColumnRow(column: tipp.card2.column, row: tipp.card2.row)
+//            switch tipp.card2.type {
+//            case .cardType:
+//                if !(gameArray[pos1.column][pos1.row].used && gameArray[pos2.column][pos2.row].used) {
+//                    tippArray.remove(at: index)
+//                }
+//            case .containerType:
+//                if !gameArray[pos1.column][pos1.row].used {
+//                    tippArray.remove(at:index)
+//                }
+//            default: break
+//            }
+//        }
+//    }
+//    
     private func checkCardTippCountInTippArray()->Int {
         var count = 0
         for tipp in tippArray {
@@ -734,9 +732,7 @@ class CardManager {
         return pairsToCheck
     }
     
-
-
-    private func createTipps()->Bool {
+    private func createTipps() {
         let createTippsStartedAt = Date()
         updateColorArray()
         tippArray.removeAll()
@@ -745,7 +741,6 @@ class CardManager {
             checkPathToFoundedCards(pair: pair)
             if stopCreateTippsInBackground {
                 stopCreateTippsInBackground = false
-                return false
             }
         }
         
@@ -764,12 +759,10 @@ class CardManager {
         
         if stopCreateTippsInBackground {
             stopCreateTippsInBackground = false
-            return false
         }
         tippArray.sort(by: {checkForSort(t0: $0, t1: $1) })
         let createTippsEndedAt = Date()
         tippArrayCreatedInSeconds = CFDateGetTimeIntervalSinceDate(createTippsEndedAt as CFDate!, createTippsStartedAt as CFDate!)
-        return true
     }
     
     func createHelpLines(movedFrom: ColumnRow, toPoint: CGPoint, inFrame: CGRect, lineSize: CGFloat, showLines: Bool)->(foundedPoint: Founded?, [CGPoint]) {
@@ -1643,16 +1636,12 @@ class CardManager {
             pairsToRemove.removeAll()
             cardsWithTransitions.removeAll()
             freeConnectableCards.removeAll()
-//            forbiddenPairs.removeAll()
-//            allowedPairs.removeAll()
             cardMap = Array(repeating: Array(repeating: Array(repeating: NoValue, count: CountCardsInPackage), count: countPackages), count: 6)
             usedCards = Array(repeating: UsedCard(), count: CountCardsInPackage)
             countTransitions = 0
             findContainer()
             fillAllCards()
-//            fillCompatibilityMap()
             fillCardMaps()
-//            checkAllCards()
             
             
             if container != nil {
@@ -1661,23 +1650,6 @@ class CardManager {
             for index in 0..<allCards.count {
                 _ = findPair(card: allCards[index])
             }
-            
-//            if connectablePairs.count > 0 {
-//                for (index, pair) in connectablePairs.enumerated() {
-//                    if !pair.supressed {
-//                        checkPair(index: index, actPair: pair)
-//                    }
-//                }
-//
-//                if pairsToRemove.count > 0 {
-//                    for index in pairsToRemove.reversed() {
-//                        //                    print(connectablePairs[index].printValue)
-//                        if index < connectablePairs.count {
-//                            connectablePairs.remove(at: index)
-//                        }
-//                    }
-//                }
-//            }
             
             if container != nil {
                 container!.setBelongsLabels()
@@ -2019,30 +1991,6 @@ class CardManager {
             }
             return countChanges
         }
-        
-        
-
-        
-//        private func setOtherCardBelonging(cardWithTransition: MySKCard)->Int {
-//            
-//            var countChanges = 0
-//            for otherCard in allCards {
-//                if cardWithTransition != otherCard {
-//                     if cardWithTransition.belongsToPackageMax.countOnes() == 1 &&
-//                        otherCard.belongsToPackageMax.countOnes() > 1
-//                    {
-//                        countChanges += doAction(masterCard: cardWithTransition, otherCard: otherCard)
-//                    } else {
-//                        if cardWithTransition.belongsToPackageMax.countOnes() == 2  && otherCard.belongsToPackageMax.countOnes() > 2 {
-////                            countChanges += doAction(masterCard: cardWithTransition, otherCard: otherCard)
-//                        }
-//                    }
-//                }
-//            }
-//            return countChanges
-//        }
-        
-        
 
         private func findPair(card: MySKCard, index: Int = NoValue)->[ConnectablePair] {
             var foundedPairs: [ConnectablePair] = []
@@ -2055,38 +2003,6 @@ class CardManager {
                     }
                     return NoColor
                 }
-//                func indexesInCardMapsAreNeighbour(upperValue: Int, upperIndex: Int, lowerValue: Int, lowerIndex: Int)->Bool {
-//                    var upperIndexInMap = false
-//                    var lowerIndexInMap = false
-//                    for mapIndex in cardMapIndexes {
-//                        for packageIndex in 0..<countPackages {
-//                            if cardMap[mapIndex][packageIndex].contains(upperIndex) {
-//                                upperIndexInMap = true
-//                            }
-//                            if cardMap[mapIndex][packageIndex].contains(lowerIndex) {
-//                                lowerIndexInMap = true
-//                            }
-//                        }
-//                    }
-//                    if lowerIndexInMap && upperIndexInMap {
-//                        for mapIndex in cardMapIndexes {
-//                            for packageIndex in 0..<countPackages {
-//                                if packageIndex < countPackages && upperValue == FirstCardValue && lowerValue == LastCardValue {
-//                                    if cardMap[mapIndex][packageIndex][upperValue] == upperIndex && cardMap[mapIndex][packageIndex + 1][lowerValue] == lowerIndex {
-//                                        return true
-//                                    }
-//                                } else {
-//                                    if cardMap[mapIndex][packageIndex][upperValue] == upperIndex && cardMap[mapIndex][packageIndex][lowerValue] == lowerIndex {
-//                                        return true
-//                                    }
-//                                }
-//                            }
-//                        }
-//                        return false
-//                    } else {
-//                        return true
-//                    }
-//                }
                 if (first.minValue == second.maxValue + 1 && first.belongsToPackageMin & second.belongsToPackageMax != 0)
                     ||
                     (first.maxValue == second.minValue - 1 && first.belongsToPackageMax & second.belongsToPackageMin != 0)
@@ -2115,33 +2031,6 @@ class CardManager {
                         }
                     }
                     
-//                    let connectCards = connectablePair.connectedCards
-//                    var cardArray: [MySKCard] = []
-//                    if let lowerCard = connectCards.lowerCard {
-//                        if let upperCard = connectCards.upperCard {
-//                            if cardMapIndexes.count > 0 {
-                            // can i place all cards in a map?
-//                            if upperCard.minValue == FirstCardValue && lowerCard.maxValue == LastCardValue {
-//                                let lowerIndex = findCardIndexInAllCards(card: lowerCard)
-//                                let upperIndex = findCardIndexInAllCards(card: upperCard)
-//                                cardArray.append(allCards[upperIndex])
-//                                cardArray.append(allCards[lowerIndex])
-//                                for index in 0..<allCards.count {
-//                                    if index != upperIndex && index != lowerIndex {
-//                                        if allCards[index].minValue > cardArray[0].maxValue {
-//                                            cardArray.insert(allCards[index], at: 0)
-//                                        } else if allCards[index].maxValue < cardArray.last?.minValue {
-//                                            cardArray.append(allCards[index])
-//                                        } else {
-//                                            for (cardIndex, card) in allCards.enumerated() {
-//                                                if card.maxValue < allCards[index]
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
                     if !founded {
                         connectablePairs.append(connectablePair)
                         foundedPairs.append(connectablePair)
@@ -2169,71 +2058,7 @@ class CardManager {
             return foundedPairs
         }
 
-        private func checkPair(index: Int, actPair: ConnectablePair) {
-//            let values = actPair.connectedValues
-//            if values.upper == NoValue {
-//                return
-//            }
-//            let upperUsedCard = usedCards[values.upper]
-//            let lowerUsedCard = usedCards[values.lower]
-
-//            if values.upper == FirstCardValue {
-//                if upperUsedCard.freeMinCount == 1 && upperUsedCard.midCount == countPackages - 2 {
-//                    
-//                }
-//            }
-//            if actPair.card1.type == .cardType && actPair.card2.type == .cardType {
-//                if (actPair.card1.minValue == FirstCardValue && actPair.card2.maxValue == LastCardValue ||
-//                        actPair.card2.minValue == FirstCardValue && actPair.card1.maxValue == LastCardValue) {
-//                    for pair in connectablePairs {
-//                        if pair != actPair {
-//                            if pair.card1.type == .cardType && pair.card2.type == .cardType &&
-//                                (actPair.card1 === pair.card1 || actPair.card1 === pair.card2 || actPair.card2 === pair.card1 || actPair.card2 === pair.card2) &&
-//                                (pair.card1.minValue == FirstCardValue && pair.card2.maxValue == LastCardValue ||
-//                                    pair.card2.minValue == FirstCardValue && pair.card1.maxValue == LastCardValue) {
-//                                let actPairLen = actPair.card1.countCards + actPair.card2.countCards
-//                                let pairLen = pair.card1.countCards + pair.card2.countCards
-//                                if actPairLen > CountCardsInPackage && actPairLen > pairLen /* && (pairLen < CountCardsInPackage */ {
-//                                    pair.supressed = true
-//                                }
-//                                if pairLen > CountCardsInPackage && actPairLen < pairLen /* && actPairLen < CountCardsInPackage */ {
-//                                    actPair.supressed = true
-//                                }
-//                           }
-//                        }
-//                    }
-//                }
-//            }
-        }
         
-        private func checkIfNewCardCompatibleWithCWT(pairToCheck: ConnectablePair)->Bool {
-            if countTransitions < countPackages - 1 {  // check only if all possible transitions are used
-                return false
-            }
-            for cwt in cardsWithTransitions {
-                if cwt != pairToCheck.card1 && cwt != pairToCheck.card2 {
-                    var upperCardMaxIncwtUpper = false
-                    var upperCardMinIncwtLower = false
-                    var cwtMaxInUpperCardUpper = false
-                    var cwtMinInLowerCardLower = false
-                    var upperCard = pairToCheck.card1
-                    var lowerCard = pairToCheck.card2
-                    if pairToCheck.card1.maxValue == LastCardValue && pairToCheck.card2.minValue == FirstCardValue {
-                        upperCard = pairToCheck.card2
-                        lowerCard = pairToCheck.card1
-                    }
-                    (upperCardMaxIncwtUpper, _) = cwt.containsValue(value: upperCard.maxValue)
-                    (_, upperCardMinIncwtLower) = cwt.containsValue(value: lowerCard.minValue)
-                    (cwtMaxInUpperCardUpper, _) = upperCard.containsValue(value: cwt.maxValue)
-                    (_, cwtMinInLowerCardLower) = lowerCard.containsValue(value: cwt.minValue)
-                    if (upperCardMaxIncwtUpper && upperCardMinIncwtLower) || (cwtMaxInUpperCardUpper && cwtMinInLowerCardLower) {
-                        return true
-                    }
-                }
-            }
-            return false
-        }
-
         private func findContainer() {
             for container in containers {
                 if container.colorIndex == colorIndex {
@@ -2248,23 +2073,6 @@ class CardManager {
             }
         }
         
-//        private func fillCompatibilityMap() {
-//            if allCards.count > 1 {
-//                for index1 in 0..<allCards.count {
-//                    for index2 in index1 + 1..<allCards.count {
-//                        if allCards[index1].overlapping(with: allCards[index2]) {
-//                            forbiddenPairs.append((first:index1, second: index2))
-//                            forbiddenPairs.append((first:index2, second: index1))
-//                        } else {
-//                            allowedPairs.append(first:index1, second: index2)
-//                            allowedPairs.append(first: index2, second: index1)
-//                        }
-//                    }
-//                }
-//                allowedPairs = allowedPairs.sorted(by: {$0 < $1})
-//                forbiddenPairs = forbiddenPairs.sorted(by: {$0 < $1})            }
-//        }
-//
         private func fillAllCards() {
             for cardColumn in gameArray {
                 for card in cardColumn {
