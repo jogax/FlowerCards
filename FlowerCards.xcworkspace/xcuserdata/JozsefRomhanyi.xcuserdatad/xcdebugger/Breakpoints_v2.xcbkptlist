@@ -87,8 +87,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "709"
             endingLineNumber = "709"
-            landmarkName = "CardManager"
-            landmarkType = "3">
+            landmarkName = "getTipps()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -432,8 +432,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1679"
             endingLineNumber = "1679"
-            landmarkName = "analyzeColor()"
-            landmarkType = "7">
+            landmarkName = "fillAllMapsWithContainer()"
+            landmarkType = "9">
             <Actions>
                <BreakpointActionProxy
                   ActionExtensionID = "Xcode.BreakpointAction.DebuggerCommand">
@@ -491,8 +491,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1686"
             endingLineNumber = "1686"
-            landmarkName = "analyzeColor()"
-            landmarkType = "7">
+            landmarkName = "fillAllMapsWithContainer()"
+            landmarkType = "9">
             <Actions>
                <BreakpointActionProxy
                   ActionExtensionID = "Xcode.BreakpointAction.DebuggerCommand">
@@ -577,8 +577,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1552"
             endingLineNumber = "1552"
-            landmarkName = "addCardToColor(card:)"
-            landmarkType = "7">
+            landmarkName = "DataForColor"
+            landmarkType = "3">
             <Actions>
                <BreakpointActionProxy
                   ActionExtensionID = "Xcode.BreakpointAction.DebuggerCommand">
@@ -776,9 +776,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2152"
-            endingLineNumber = "2152"
-            landmarkName = "DataForColor"
-            landmarkType = "3">
+            endingLineNumber = "2152">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1009,8 +1007,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1909"
             endingLineNumber = "1909"
-            landmarkName = "findLowerBelongs(belongs:)"
-            landmarkType = "7">
+            landmarkName = "createMaskUp()"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1026,8 +1024,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1919"
             endingLineNumber = "1919"
-            landmarkName = "createMask(withMinPackage:)"
-            landmarkType = "9">
+            landmarkName = "doAction(masterCard:otherCard:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1042,8 +1040,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1689"
             endingLineNumber = "1689"
-            landmarkName = "fillCardMaps()"
-            landmarkType = "7">
+            landmarkName = "fillAllMapsWithContainer()"
+            landmarkType = "9">
             <Actions>
                <BreakpointActionProxy
                   ActionExtensionID = "Xcode.BreakpointAction.DebuggerCommand">
@@ -1196,8 +1194,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1905"
             endingLineNumber = "1905"
-            landmarkName = "findUpperBelongs(belongs:)"
-            landmarkType = "7">
+            landmarkName = "createMaskUp()"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1322,7 +1320,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1449"
             endingLineNumber = "1449"
-            landmarkName = "freeMaxCount"
+            landmarkName = "freeMinCount"
             landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1338,7 +1336,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2082"
             endingLineNumber = "2082"
-            landmarkName = "findPair(card:index:)"
+            landmarkName = "fillAllCards()"
             landmarkType = "7">
             <Actions>
                <BreakpointActionProxy
@@ -1368,8 +1366,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1610"
             endingLineNumber = "1610"
-            landmarkName = "printLine()"
-            landmarkType = "9">
+            landmarkName = "printCardMaps()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1384,7 +1382,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1634"
             endingLineNumber = "1634"
-            landmarkName = "printCardMaps()"
+            landmarkName = "analyzeColor()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1416,7 +1414,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1632"
             endingLineNumber = "1632"
-            landmarkName = "printCardMaps()"
+            landmarkName = "analyzeColor()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1528,9 +1526,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2137"
-            endingLineNumber = "2137"
-            landmarkName = "fillAllCards()"
-            landmarkType = "7">
+            endingLineNumber = "2137">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1673,8 +1669,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1792"
             endingLineNumber = "1792"
-            landmarkName = "addCardToMap(mapIndex:index:)"
-            landmarkType = "9">
+            landmarkName = "fillCardMaps()"
+            landmarkType = "7">
             <Actions>
                <BreakpointActionProxy
                   ActionExtensionID = "Xcode.BreakpointAction.DebuggerCommand">
@@ -1698,8 +1694,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1691"
             endingLineNumber = "1691"
-            landmarkName = "fillCardMaps()"
-            landmarkType = "7">
+            landmarkName = "fillAllMapsWithContainer()"
+            landmarkType = "9">
             <Locations>
                <Location
                   shouldBeEnabled = "No"
@@ -1746,8 +1742,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1794"
             endingLineNumber = "1794"
-            landmarkName = "addCardToMap(mapIndex:index:)"
-            landmarkType = "9">
+            landmarkName = "fillCardMaps()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1842,7 +1838,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1878"
             endingLineNumber = "1878"
-            landmarkName = "fillCardMaps()"
+            landmarkName = "findUpperBelongs(belongs:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1987,7 +1983,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2076"
             endingLineNumber = "2076"
-            landmarkName = "findPair(card:index:)"
+            landmarkName = "fillAllCards()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2003,7 +1999,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2069"
             endingLineNumber = "2069"
-            landmarkName = "findPair(card:index:)"
+            landmarkName = "findContainer()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2035,7 +2031,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "928"
             endingLineNumber = "928"
-            landmarkName = "calculateAngle(_:point2:)"
+            landmarkName = "checkForSort(t0:t1:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2067,7 +2063,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "770"
             endingLineNumber = "770"
-            landmarkName = "createTipps()"
+            landmarkName = "createHelpLines(movedFrom:toPoint:inFrame:lineSize:showLines:)"
             landmarkType = "7">
             <Locations>
                <Location
@@ -2403,8 +2399,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1868"
             endingLineNumber = "1868"
-            landmarkName = "fillCardMaps()"
-            landmarkType = "7">
+            landmarkName = "DataForColor"
+            landmarkType = "3">
             <Actions>
                <BreakpointActionProxy
                   ActionExtensionID = "Xcode.BreakpointAction.DebuggerCommand">
@@ -2526,8 +2522,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1868"
             endingLineNumber = "1868"
-            landmarkName = "fillCardMaps()"
-            landmarkType = "7">
+            landmarkName = "DataForColor"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -2702,7 +2698,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1703"
             endingLineNumber = "1703"
-            landmarkName = "fillAllMapsWithContainer()"
+            landmarkName = "fillMap(mapIndex:indexes:startPackageIndexes:)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2719,7 +2715,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1704"
             endingLineNumber = "1704"
-            landmarkName = "fillAllMapsWithContainer()"
+            landmarkName = "fillMap(mapIndex:indexes:startPackageIndexes:)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2735,8 +2731,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1785"
             endingLineNumber = "1785"
-            landmarkName = "addCardToMap(mapIndex:index:)"
-            landmarkType = "9">
+            landmarkName = "fillCardMaps()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -2752,8 +2748,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1804"
             endingLineNumber = "1804"
-            landmarkName = "addCardToMap(mapIndex:index:)"
-            landmarkType = "9">
+            landmarkName = "fillCardMaps()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -2785,7 +2781,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1766"
             endingLineNumber = "1766"
-            landmarkName = "fillMap(mapIndex:indexes:startPackageIndexes:)"
+            landmarkName = "addCardToMap(mapIndex:index:)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2802,7 +2798,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1765"
             endingLineNumber = "1765"
-            landmarkName = "fillMap(mapIndex:indexes:startPackageIndexes:)"
+            landmarkName = "addCardToMap(mapIndex:index:)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2882,7 +2878,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1214"
             endingLineNumber = "1214"
-            landmarkName = "calculateLineColor(foundedPoint:movedFrom:)"
+            landmarkName = "makeTrembling(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -3107,8 +3103,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1894"
             endingLineNumber = "1894"
-            landmarkName = "DataForColor"
-            landmarkType = "3">
+            landmarkName = "createMask(withMinPackage:)"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -3443,7 +3439,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2080"
             endingLineNumber = "2080"
-            landmarkName = "findPair(card:index:)"
+            landmarkName = "fillAllCards()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -3661,11 +3657,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "517755195.872176"
+            timestampString = "518109422.268635"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2848"
-            endingLineNumber = "2848"
+            startingLineNumber = "2787"
+            endingLineNumber = "2787"
             landmarkName = "analyzeNode(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4115,6 +4111,102 @@
             startingLineNumber = "1803"
             endingLineNumber = "1803"
             landmarkName = "startNewGame(next:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/CardGameScene.swift"
+            timestampString = "518109100.216896"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1723"
+            endingLineNumber = "1723"
+            landmarkName = "callPartner(_:identity:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/CardGameScene.swift"
+            timestampString = "518109954.8966"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "3043"
+            endingLineNumber = "3043"
+            landmarkName = "alertStartMultiPlay(_:message:messageNr:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/MySKCard.swift"
+            timestampString = "518620651.211237"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "233"
+            endingLineNumber = "233"
+            landmarkName = "cardLib"
+            landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/CardGameScene.swift"
+            timestampString = "518958127.087119"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "2452"
+            endingLineNumber = "2452"
+            landmarkName = "autoTouchesEnded(touchLocation:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/CardGameScene.swift"
+            timestampString = "518958196.050591"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "2453"
+            endingLineNumber = "2453"
+            landmarkName = "autoTouchesEnded(touchLocation:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/CardGameScene.swift"
+            timestampString = "518958199.773688"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "2459"
+            endingLineNumber = "2459"
+            landmarkName = "myTouchesEnded(touchLocation:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

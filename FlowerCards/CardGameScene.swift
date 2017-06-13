@@ -1720,7 +1720,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let gameNumber = randomGameNumber()
         opponent.peerIndex = index
         let myName = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
-        var answer = GV.peerToPeerService!.sendMessage(.iWantToPlayWithYou, message: [myName, String(levelIndex), String(gameNumber)], toPeerIndex: index)
+        var answer = GV.peerToPeerService!.sendMessage(.iWantToPlayWithYou, message: [myName, String(levelIndex), String(countPackages), String(gameNumber)], toPeerIndex: index)
         switch answer[0] {
         case answerYes:
             self.playerType = .multiPlayer
@@ -2222,7 +2222,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     actionMoveArray.append(SKAction.move(to: savedCardInCycle.endPosition, duration: duration))
                 case .stopCycle: break
                 case .nothing: break
-                default: break
                 }
                 if let savedCard:SavedCard = stack.pull() {
                     savedCardInCycle = savedCard
@@ -2503,67 +2502,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             if startNode!.type == .cardType && movedFromNode != nil && (aktNode == nil || aktNode! != movedFromNode) {
                 startMovingCard(touchLocation: touchLocation)
-            } else if startNode!.type == .cardType && aktNode == movedFromNode {
-//                startTippTimer()
-//            }
-//            else if startNode?.type == .showCardType {
-//                var foundedCard: MySKCard?
-//                let nodes = self.nodes(at: touchLocation)
-//                var founded = false
-//                for index in 0..<nodes.count {
-//                    foundedCard = nodes[index] as? MySKCard
-//                    if nodes[index] is MySKCard && foundedCard!.type == .emptyCardType {
-//                        startNode?.column = foundedCard!.column
-//                        startNode?.row = foundedCard!.row
-//                        push(startNode!, status: .stopCycle)
-//                        push(startNode!, status: .addedFromShowCard)
-//                        startNode?.size = foundedCard!.size
-//                        startNode?.position = foundedCard!.position
-//                        startNode?.type = .cardType
-//                        foundedCard!.removeFromParent()
-//                        founded = true
-//                        cardManager!.updateGameArrayCell(card: startNode!)
-//                        gameArrayChanged = true
-//                        
-//                        break
-//                    } else if nodes[index] is MySKCard && foundedCard!.type == .cardType && startNode?.colorIndex == foundedCard!.colorIndex &&
-//                        (foundedCard!.maxValue + 1 == startNode?.minValue ||
-//                            foundedCard!.minValue - 1 == startNode?.maxValue) {
-//                        push(startNode!, status: .stopCycle)
-//                        push(foundedCard!, status: .unification)
-//                        push(startNode!, status: .addedFromShowCard)
-//                        
-//                        if foundedCard!.maxValue < (startNode?.minValue)! {
-//                            foundedCard!.maxValue = (startNode?.maxValue)!
-//                        } else {
-//                            foundedCard!.minValue = (startNode?.minValue)!
-//                        }
-//                        foundedCard!.reload()
-//                        push(startNode!, status: .removed)
-//                        gameArray[(startNode?.column)!][(startNode?.row)!].card.minValue = foundedCard!.minValue
-//                        gameArray[(startNode?.column)!][(startNode?.row)!].card.maxValue = foundedCard!.maxValue
-//                        startNode?.removeFromParent()
-//                        founded = true
-//                        gameArrayChanged = true
-//                        
-//                        break
-//                    }
-//                }
-//                if !founded {
-//                    let actionMove = SKAction.move(to: cardPlaceButton!.position, duration: 0.5)
-//                    let actionDropShowCardFromStack = SKAction.run({
-//                        self.removeShowCardFromStack()
-//                        startNode?.zPosition = 0
-//                    })
-//                    startNode?.zPosition = 50
-//                    let actionAddCardToMovingCards = SKAction.run {
-//                        self.movingCards.append(self.movedFromNode)
-//                    }
-//                    let actionRemoveCardFromMovingCards = SKAction.run {
-//                        self.movingCards.remove(at: self.movingCards.index(where: { $0 === self.movedFromNode })!)
-//                    }
-//                    startNode?.run(SKAction.sequence([actionAddCardToMovingCards, actionMove, actionDropShowCardFromStack, actionRemoveCardFromMovingCards]))
-//                }
             } else {
 //                startTippTimer()
             }
@@ -3100,9 +3038,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                                             self.opponent.score = 0
                                             try! realm.write({ 
                                                 GV.player!.levelID = Int(message[1])!
+                                                GV.player!.countPackages = Int(message[2])!
                                             })
                                             self.levelIndex = Int(message[1])!
-                                            self.gameNumber = Int(message[2])!
+                                            countPackages = Int(message[2])!
+                                            self.gameNumber = Int(message[3])!
                                             self.restartGame = true
                                             GV.peerToPeerService!.sendAnswer(messageNr, answer: [self.answerYes])
                                         }
