@@ -1459,9 +1459,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                     break
                 }
             }
-            if lastUsedTipp?.card1.colorIndex == NoColor {
-                print("lastUsedTipp Not Filled!!! at \(movingCard.printValue)")
-            }
+//            if lastUsedTipp?.card1.colorIndex == NoColor {
+//                print("lastUsedTipp Not Filled!!! at \(movingCard.printValue)")
+//            }
             push(card, status: .unification)
             push(movingCard, status: .removed)
             lastChange.color = movingCard.colorIndex
