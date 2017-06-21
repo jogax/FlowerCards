@@ -46,9 +46,6 @@ class MySKPanel: SKSpriteNode {
     let returnLabel = SKLabelNode()
     let callbackName = "SettingsCallbackName"
     var oldPlayerID = 0
-    var versionsNumber = ""
-    var buildNumber = ""
-    var appName = ""
     var appName_Build_Version = ""
     var type: PanelTypes
     var playerChanged = false
@@ -58,17 +55,17 @@ class MySKPanel: SKSpriteNode {
         let size = parent.size * 0.75 // / 2 //CGSizeMake(parent.size.width / 2, parent.s)
 //        let texture: SKTexture = SKTexture(imageNamed: "panel")
         let texture: SKTexture = SKTexture()
-        if let strAppName = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") {
-            appName = strAppName as! String
-        }
-        if let strVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") {
-            versionsNumber = strVersion as! String
-        }
-        if let strBuildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") {
-            buildNumber = strBuildNumber as! String
-        }
+//        if let strAppName = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") {
+//            appName = strAppName as! String
+//        }
+//        if let strVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") {
+//            versionsNumber = strVersion as! String
+//        }
+//        if let strBuildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") {
+//            buildNumber = strBuildNumber as! String
+//        }
         let copyRight = "Copyright \u{00A9} 2017 "
-        appName_Build_Version = copyRight + appName + "(Ver:" + versionsNumber + " / Build:" + buildNumber + ")"
+        appName_Build_Version = copyRight + GV.appName + "(Ver:" + GV.versionsNumber + " / Build:" + GV.buildNumber + ")"
         
 
         

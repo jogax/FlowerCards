@@ -100,7 +100,8 @@ let huDictionary: [TextConstants: String] = [
                         "Pontjaid: %\r\n" +
                         "% pontjai: %\r\n ",
     .tcOpponentNotPlay: "% nem akar veled játszani!",
-    .tcOpponentLevelIsLower: "% még nem érte el a szintedet",
+    .tcPeerToPeerVersionIsHigher: "% Kommunikációs Verziója magasabb, töltsd le a játék legújabb verzióját, hogy vele versenyezhess!",
+    .tcPeerToPeerVersionIsLower: "% Kommunikációs Verziója kisebb, le kell töltenie a játék legújabb verzióját, hogy veled versenyezhessen!",
     .tcGameArt:         "Tipus",
     .tcVictory:         "Győzelem",
     .tcStart:           "Start",
@@ -131,4 +132,5 @@ let huDictionary: [TextConstants: String] = [
     .tcLevelAndPackage: "Szint:%, Csomag:%, Formátum:%",
     .tcAllGamesCount:   "Games: % / %, %",
     .tcPkgTxt:          "%. P: % / %",
+    .tcNoMoreSteps:     "Hoppá! Ez a lépés lehetetlenné tenné a játék befejezését --> ezért vissza",
 ]

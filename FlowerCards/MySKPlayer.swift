@@ -267,7 +267,7 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
             let playerToDelete = realm.objects(PlayerModel.self).filter("ID = %d", nameTable[nameTableIndex].ID).first!
             try! realm.write({
                 nameTable.remove(at: nameTableIndex)
-                realm.delete(realm.objects(StatisticModel.self).filter("playerID = %d", playerToDelete.ID))
+//                realm.delete(realm.objects(StatisticModel.self).filter("playerID = %d", playerToDelete.ID))
                 realm.delete(realm.objects(GameModel.self).filter("playerID = %d", playerToDelete.ID))
                 realm.delete(playerToDelete)
                 let playerToSetActPlayer = nameTable[0]

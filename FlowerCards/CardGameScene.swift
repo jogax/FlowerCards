@@ -128,6 +128,9 @@ var random: MyRandom?
 //var actGame: GameModel?
 let MaxGameNumber = 10000
 var lastUsedTipp: Tipp?
+let myBuildVersion = GV.buildNumber + "/" + GV.versionsNumber
+
+
 
 
 var lastPair = PairStatus() {
@@ -237,7 +240,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     let answerYes = "YES"
     let answerNo = "NO"
-    let answerLevelNotOK = "LevelNotOK"
+    let peerToPeerVersionOfOpponentIsLower = "LOWER"
+    let peerToPeerVersionOfOpponentIsHigher = "HIGHER"
     
     let showTippSleepTime = 30.0
     let doCountUpSleepTime = 1.0
@@ -320,8 +324,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var countCheckCounts = 0
     var freeUndoCounter = 0
     var freeTippCounter = 0
-    var buildNumber: String = ""
-    var versionsNumber: String = ""
+//    var buildNumber: String = ""
+//    var versionsNumber: String = ""
     
     
     
@@ -574,6 +578,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //            try! realm.commitWrite()
 //        }
         levelIndex = GV.player!.levelID
+        if GV.player!.countPackages > maxPackageCount {
+            realm.beginWrite()
+            GV.player!.countPackages = maxPackageCount
+            try! realm.commitWrite()
+        }
         countPackages = GV.player!.countPackages
         GV.levelsForPlay.setAktLevel(levelIndex)
         specialPrepareFuncFirst()
@@ -933,7 +942,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         //printFunc(function: "specialPrepareFuncFirst", start: true)
         stopCreateTippsInBackground = true
 //        countPackages = GV.levelsForPlay.aktLevel.countPackages
-        countPackages = GV.player!.countPackages
+//        countPackages = GV.player!.countPackages
         maxCardCount = countPackages * countContainers * CountCardsInPackage
         countCardsProContainer = CountCardsInPackage //levelsForPlay.aktLevel.countCardsProContainer
         countColumns = GV.levelsForPlay.aktLevel.countColumns
@@ -1333,54 +1342,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     
-//    private func connectCardOrContainerWithMovingCard(movingCard:MySKCard, cardOrContainer:MySKCard, connectable: Bool) {
-//        push(cardOrContainer, status: .unification)
-//        push(movingCard, status: .removed)
-//        lastColor = movingCard.colorIndex
-//        cardOrContainer.connectWith(otherCard: movingCard)
-//        self.addChild(showCountScore("+\(movingCard.countScore)", position: movingCard.position))
-//        if cardOrContainer.type == .cardType {
-//            cardManager!.updateGameArrayCell(card: cardOrContainer)
-//        } else {
-//            cardOrContainer.texture = getTexture(movingCard.colorIndex)
-//        }
-//        cardManager!.resetGameArrayCell(movingCard)
-//        movingCard.removeFromParent()
-//        playSound("Container", volume: GV.player!.soundVolume)
-//        countMovingCards = 0
-//        updateCardCount(-1)
-//        saveStatisticAndGame()
-//    }
-//    private func connectCardWithMovingCard(movingCard:MySKCard, card:MySKCard, connectable: Bool) {
-//        push(card, status: .unification)
-//        push(movingCard, status: .removed)
-//        lastColor = movingCard.colorIndex
-//        card.connectWith(otherCard: movingCard)
-//        self.addChild(showCountScore("+\(movingCard.countScore)", position: movingCard.position))
-//        playSound("OK", volume: GV.player!.soundVolume)
-//        
-//        cardManager!.updateGameArrayCell(card: card)
-//        cardManager!.resetGameArrayCell(movingCard)
-//        
-//        countMovingCards = 0
-//        updateCardCount(-1)
-//        saveStatisticAndGame()
-//        
-//    }
-//    
-//    
-//    struct LastUsedTipp {
-//        var color: Int = NoColor
-//        var column1: Int = 0
-//        var row1: Int = 0
-//        var minValue1: Int = 0
-//        var maxValue1: Int = 0
-//        var column2: Int = 0
-//        var row2: Int = 0
-//        var minValue2: Int = 0
-//        var maxValue2: Int = 0
-//
-//    }
     func cardDidCollideWithContainer(node1:MySKCard, node2:MySKCard, points: [CGPoint]) {
         let movingCard = node1
         let container = node2
@@ -1564,7 +1525,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func checkGameFinished() {
         func checkNoMoreSteps() {
-            if cardManager!.noMoreSteps && lastUsedTipp?.card1.colorIndex != NoColor {
+            if cardManager!.noMoreSteps && lastUsedTipp?.card1.colorIndex != NoColor
+//               || (lastUsedTipp?.card1.minValue == FirstCardValue && lastUsedTipp?.card2.maxValue == LastCardValue)
+            {
 //                if countMovingCards > 0 {
 //                    waitForMovingCards()
 //                    self.pull(createTipps: false)
@@ -1581,6 +1544,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         break
                     }
                 }
+                let alert = UIAlertController(title: GV.language.getText(.tcNoMoreSteps),
+                                              message: "",
+                                              preferredStyle: .alert)
+                
+                let OKAction = UIAlertAction(title: GV.language.getText(.tcok), style: .default,
+                                             handler: {(paramAction:UIAlertAction!) in
+                                                
+                })
+                alert.addAction(OKAction)
+                GV.mainViewController!.showAlert(alert)
             }
         }
     
@@ -1624,40 +1597,40 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func saveStatisticAndGame () {
-        if realm.objects(StatisticModel.self).filter("playerID = %d and levelID = %d and countPackages = %d",
-            GV.player!.ID, GV.player!.levelID, GV.player!.countPackages).count == 0 {
-            // create a new Statistic record if required
-            let statistic = StatisticModel()
-            statistic.ID = GV.createNewRecordID(.statisticModel)
-            statistic.playerID = GV.player!.ID
-            statistic.levelID = GV.player!.levelID
-            statistic.countPackages = GV.player!.countPackages
-            try! realm.write({
-                realm.add(statistic)
-            })
-        }
-
-        let statistic = realm.objects(StatisticModel.self).filter("playerID = %d and levelID = %d and countPackages = %d",
-            GV.player!.ID, GV.player!.levelID, GV.player!.countPackages).first!        
         realm.beginWrite()
-        statistic.actTime = timeCount
-        statistic.allTime += timeCount
-        
-        if statistic.bestTime == 0 || timeCount < statistic.bestTime {
-            statistic.bestTime = timeCount
-        }
-        
-        
-        statistic.actScore = levelScore
-        if cardCount == 0 {
-            statistic.levelScore += levelScore
-            if statistic.bestScore < levelScore {
-                statistic.bestScore = levelScore
-            }
-            if statistic.bestScore < levelScore {
-                statistic.bestScore = levelScore
-            }
-        }
+//        if realm.objects(StatisticModel.self).filter("playerID = %d and levelID = %d and countPackages = %d",
+//            GV.player!.ID, GV.player!.levelID, GV.player!.countPackages).count == 0 {
+//            // create a new Statistic record if required
+//            let statistic = StatisticModel()
+//            statistic.ID = GV.createNewRecordID(.statisticModel)
+//            statistic.playerID = GV.player!.ID
+//            statistic.levelID = GV.player!.levelID
+//            statistic.countPackages = GV.player!.countPackages
+//            try! realm.write({
+//                realm.add(statistic)
+//            })
+//        }
+//
+//        let statistic = realm.objects(StatisticModel.self).filter("playerID = %d and levelID = %d and countPackages = %d",
+//            GV.player!.ID, GV.player!.levelID, GV.player!.countPackages).first!        
+//        statistic.actTime = timeCount
+//        statistic.allTime += timeCount
+//        
+//        if statistic.bestTime == 0 || timeCount < statistic.bestTime {
+//            statistic.bestTime = timeCount
+//        }
+//        
+//        
+//        statistic.actScore = levelScore
+//        if cardCount == 0 {
+//            statistic.levelScore += levelScore
+//            if statistic.bestScore < levelScore {
+//                statistic.bestScore = levelScore
+//            }
+//            if statistic.bestScore < levelScore {
+//                statistic.bestScore = levelScore
+//            }
+//        }
         GV.actGame!.countSteps = maxCardCount - cardCount
         GV.actGame!.time = timeCount
         GV.actGame!.playerScore = levelScore
@@ -1674,14 +1647,14 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             GV.actGame!.multiPlay = true
             GV.actGame!.opponentName = opponent.name
             GV.actGame!.opponentScore = opponent.score
-            statistic.countMultiPlays += 1
-            if opponent.score > levelScore {
-                statistic.defeats += 1
-            } else {
-                statistic.victorys += 1
-            }
+//            statistic.countMultiPlays += 1
+//            if opponent.score > levelScore {
+//                statistic.defeats += 1
+//            } else {
+//                statistic.victorys += 1
+//            }
         } else if cardCount == 0 {  // countPlays only when game is finished
-            statistic.countPlays += 1
+//            statistic.countPlays += 1
         }
         try! realm.commitWrite()
 
@@ -1720,7 +1693,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let gameNumber = randomGameNumber()
         opponent.peerIndex = index
         let myName = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
-        var answer = GV.peerToPeerService!.sendMessage(.iWantToPlayWithYou, message: [myName, String(levelIndex), String(countPackages), String(gameNumber)], toPeerIndex: index)
+        var answer = GV.peerToPeerService!.sendMessage(.iWantToPlayWithYou, message: [myName, GV.peerToPeerVersion, String(levelIndex), String(countPackages), String(gameNumber)], toPeerIndex: index)
         switch answer[0] {
         case answerYes:
             self.playerType = .multiPlayer
@@ -1732,17 +1705,21 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             alertOpponentDoesNotWantPlay(alert: .tcOpponentNotPlay)
             self.opponent = Opponent()
             self.playerType = .singlePlayer
-        case answerLevelNotOK:
-            alertOpponentDoesNotWantPlay(alert: .tcOpponentLevelIsLower, opponentName: identity)
+        case peerToPeerVersionOfOpponentIsHigher:
+            alertOpponentDoesNotWantPlay(alert: .tcPeerToPeerVersionIsHigher, opponentName: identity)
             self.opponent = Opponent()
             self.playerType = .singlePlayer
-        default:
+        case peerToPeerVersionOfOpponentIsLower:
+            alertOpponentDoesNotWantPlay(alert: .tcPeerToPeerVersionIsLower, opponentName: identity)
+            self.opponent = Opponent()
+            self.playerType = .singlePlayer
+       default:
             break
         }
     }
     
     func alertOpponentDoesNotWantPlay(alert: TextConstants, opponentName: String = "") {
-        let alert = UIAlertController(title: GV.language.getText(alert, values: String(opponentName)),
+        let alert = UIAlertController(title: GV.language.getText(alert, values: opponentName),
             message: "",
             preferredStyle: .alert)
         
@@ -1840,7 +1817,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             } else {
                 congratulationsTxt += "\r\n" + GV.language.getText(.tcLevelScore, values: " \(bestGameScore)")
             }
-            congratulationsTxt += "\r\n" + GV.language.getText(.tcActTime) + String(timeCount.dayHourMinSec)
+            congratulationsTxt += "\r\n" + GV.language.getText(.tcActTime) + String(timeCount.HourMin)
         case .No:
             break
         }
@@ -2241,6 +2218,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
         
         if createTipps {
+            lastChange.color = NoColor
             gameArrayChanged = true
         }
         //printFunc(function: "pull", start: false)
@@ -2880,9 +2858,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         if doTimeCount {
             timeCount += 1 // countUpAdder
-            playerTimeLabel.text = timeCount.dayHourMinSec
+            playerTimeLabel.text = timeCount.HourMinSec
             if playerType == .multiPlayer {
-                opponentTimeLabel.text = timeCount.dayHourMinSec
+                opponentTimeLabel.text = timeCount.HourMinSec
             }
         }
     }
@@ -2911,8 +2889,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         case .iWantToPlayWithYou:
             if inSettings {
                 GV.peerToPeerService!.sendAnswer(messageNr, answer: [GV.IAmBusy])
-            } else if Int(message[1])! > maxLevelIndex { // want the opponent play a higher level ?
-                GV.peerToPeerService!.sendAnswer(messageNr, answer: [answerLevelNotOK])
+            } else if message[1] > GV.peerToPeerVersion { // want the opponent play an other peerToPeerVerion ?
+                GV.peerToPeerService!.sendAnswer(messageNr, answer: [peerToPeerVersionOfOpponentIsLower])
+            } else if message[1] < GV.peerToPeerVersion { // want the opponent play an other peerToPeerVerion ?
+                GV.peerToPeerService!.sendAnswer(messageNr, answer: [peerToPeerVersionOfOpponentIsHigher])
             } else {
                 alertStartMultiPlay(fromPeerIndex, message: message, messageNr: messageNr)
             }
@@ -3037,12 +3017,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                                             self.opponent.peerIndex = fromPeerIndex
                                             self.opponent.score = 0
                                             try! realm.write({ 
-                                                GV.player!.levelID = Int(message[1])!
-                                                GV.player!.countPackages = Int(message[2])!
+                                                GV.player!.levelID = Int(message[2])!
+                                                GV.player!.countPackages = Int(message[3])!
                                             })
-                                            self.levelIndex = Int(message[1])!
-                                            countPackages = Int(message[2])!
-                                            self.gameNumber = Int(message[3])!
+                                            self.levelIndex = Int(message[2])!
+                                            countPackages = Int(message[3])!
+                                            self.gameNumber = Int(message[4])!
                                             self.restartGame = true
                                             GV.peerToPeerService!.sendAnswer(messageNr, answer: [self.answerYes])
                                         }

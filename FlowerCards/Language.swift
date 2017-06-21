@@ -92,7 +92,8 @@ enum TextConstants: Int {
     tcHeWon,
     tcYouWon,
     tcOpponentNotPlay,
-    tcOpponentLevelIsLower,
+    tcPeerToPeerVersionIsHigher,
+    tcPeerToPeerVersionIsLower,
     tcGameArt,
     tcVictory,
     tcStart,
@@ -121,7 +122,8 @@ enum TextConstants: Int {
     tcActivateAutoPlay,
     tcLevelAndPackage,
     tcAllGamesCount,
-    tcPkgTxt
+    tcPkgTxt,
+    tcNoMoreSteps
 }
 
     let LanguageEN = "en" // index 0

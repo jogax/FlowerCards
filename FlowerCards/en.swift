@@ -100,7 +100,8 @@ let enDictionary: [TextConstants: String] = [
                         "your score : %\r\n" +
                         "% score: %\r\n ",
     .tcOpponentNotPlay: "% does not want to play with you!",
-    .tcOpponentLevelIsLower: "% has not yet reached your level",
+    .tcPeerToPeerVersionIsHigher: "% has a higher Communication Version, you must update Flowercards for a competition with him",
+    .tcPeerToPeerVersionIsLower: "% has a lower Communication Version, he must update Flowercards  for a competition with you",
     .tcGameArt:         "Type",
     .tcVictory:         "Victory",
     .tcStart:           "Start",
@@ -131,4 +132,5 @@ let enDictionary: [TextConstants: String] = [
     .tcLevelAndPackage: "Level:%, Packages:%, Format:%",
     .tcAllGamesCount:   "Games: % / %, %",
     .tcPkgTxt:         "%. P: % / %",
+    .tcNoMoreSteps:     "Oops! This step would make the game unfinishable -> undo!",
 ]

@@ -538,24 +538,6 @@ class CardManager {
     
 
     
-//    private func checkTippArrayPlausibility() {
-//        for (index, tipp) in tippArray.enumerated().reversed() {
-//            let pos1 = ColumnRow(column: tipp.card1.column, row: tipp.card1.row)
-//            let pos2 = ColumnRow(column: tipp.card2.column, row: tipp.card2.row)
-//            switch tipp.card2.type {
-//            case .cardType:
-//                if !(gameArray[pos1.column][pos1.row].used && gameArray[pos2.column][pos2.row].used) {
-//                    tippArray.remove(at: index)
-//                }
-//            case .containerType:
-//                if !gameArray[pos1.column][pos1.row].used {
-//                    tippArray.remove(at:index)
-//                }
-//            default: break
-//            }
-//        }
-//    }
-//    
     private func checkCardTippCountInTippArray()->Int {
         var count = 0
         for tipp in tippArray {
@@ -743,15 +725,16 @@ class CardManager {
                 stopCreateTippsInBackground = false
             }
         }
-        
-        for (index, tipp) in tippArray.enumerated() {
-            if supressedTipps.contains(where: {$0.card1 == tipp.card1 && $0.card2 == tipp.card2}) {
-                tippArray[index].supressed = true
-                let colorIndex = tipp.card1.colorIndex
-                
-                for index1 in 0..<colorArray[colorIndex].connectablePairs.count {
-                    if colorArray[colorIndex].connectablePairs[index1].card1 == tipp.card1 && colorArray[colorIndex].connectablePairs[index1].card2 == tipp.card2 {
-                        colorArray[colorIndex].connectablePairs[index1].supressed = true
+        if supressedTipps.count > 0 {
+            for (index, tipp) in tippArray.enumerated() {
+                if supressedTipps.contains(where: {$0.card1 == tipp.card1 && $0.card2 == tipp.card2}) {
+                    tippArray[index].supressed = true
+                    let colorIndex = tipp.card1.colorIndex
+                    
+                    for index1 in 0..<colorArray[colorIndex].connectablePairs.count {
+                        if colorArray[colorIndex].connectablePairs[index1].card1 == tipp.card1 && colorArray[colorIndex].connectablePairs[index1].card2 == tipp.card2 {
+                            colorArray[colorIndex].connectablePairs[index1].supressed = true
+                        }
                     }
                 }
             }
@@ -1563,15 +1546,6 @@ class CardManager {
                 }
             }
         }
-//        func printCompatibilityMap() {
-//            for packageIndex in 0..<countPackages {
-//                print("============ Package \(packageIndex) ===============")
-//                for card in compatibilityMap[packageIndex] {
-//                    print(card.printValue)
-//                }
-//            }
-//            print("========== All Packages Printed ==========")
-//        }
         #endif
         
 

@@ -100,7 +100,8 @@ let deDictionary: [TextConstants: String] = [
                          "Deine Punkte : %\r\n" +
                          "% Punkte: %\r\n ",
     .tcOpponentNotPlay: "% will nicht spielen mit Dir!",
-    .tcOpponentLevelIsLower: "% hat noch nicht erreicht Deine Ebene!",
+    .tcPeerToPeerVersionIsHigher: "% hat höhere Kommunikation Version, Du muss Flowercards updaten für ein Wettbewerb mit ihm",
+    .tcPeerToPeerVersionIsLower: "% hat niedrigere Kommunikation Version, er muss Flowercards updaten  für ein Wettbewerb mit Dir",
     .tcGameArt:         "Art",
     .tcVictory:         "Sieg",
     .tcStart:           "Start",
@@ -131,6 +132,8 @@ let deDictionary: [TextConstants: String] = [
     .tcLevelAndPackage: "Ebene:%, Pakete:%, Format:%",
     .tcAllGamesCount:   "Games: % / %, %",
     .tcPkgTxt:          "%. P: % / %",
+    .tcNoMoreSteps:     "Hoppala! Dieser Schritt würde es unmöglich machen, das Spiel zu beenden -> so Schritt zurück"
+
 ]
 
 

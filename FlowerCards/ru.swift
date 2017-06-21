@@ -100,7 +100,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcYouWon:          "ты победил нa % - %! \r\n" +
                         "Поздравляю!!!",
     .tcOpponentNotPlay: "% не хочет с тобой играть!",
-    .tcOpponentLevelIsLower: "% ещё не достиг твой уровень",
+    .tcPeerToPeerVersionIsHigher: "Версия связи у % выше, загрузи последнюю версию игры для cоревнования с ним!",
+    .tcPeerToPeerVersionIsLower: "% Версия связи у % ниже, он должен загрузить последнюю версию игры для cоревнования с тобой!",
     .tcGameArt:         "Tип",
     .tcVictory:         "Победa",
     .tcStart:           "Старт",
@@ -131,4 +132,5 @@ let ruDictionary: [TextConstants: String] = [
     .tcLevelAndPackage: "Уровень:%, Колоды:%, Формат:%",
     .tcAllGamesCount:   "Games: % / %, %",
     .tcPkgTxt:          "%. P: % / %",
+    .tcNoMoreSteps:     "Упс! Этот шаг сделал бы невозможным закончить игру -> так шаг назад"
 ]

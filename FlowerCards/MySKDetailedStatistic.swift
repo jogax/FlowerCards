@@ -63,20 +63,23 @@ class MySKDetailedStatistic: MySKTable {
         tableOfRows.append(RowOfTable(elements: elements, selected: true))
         // collect all lines in tableOfRows in parent
         for levelID in 0..<countLines {
-            var statistic: StatisticModel?
-            statistic = realm.objects(StatisticModel.self).filter("playerID = %d and levelID = %d", playerID, levelID).first
-            if statistic == nil {
-                statistic = StatisticModel()
-            }
-            let formatter = NumberFormatter()
-            formatter.numberStyle = NumberFormatter.Style.none // .DecimalStyle
-            let levelString = (levelID < 9 ? "0" : "") + String(levelID + 1) + " (" + GV.levelsForPlay.getLevelFormat(level: levelID) + "): \(statistic!.countPlays)"
+//            var statistic: StatisticModel?
+            let gamesForLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true", playerID, levelID)
+            let countGames = String(gamesForLevel.count)
+            let allTime:Int = gamesForLevel.sum(ofProperty: "time")
+//            statistic = realm.objects(StatisticModel.self).filter("playerID = %d and levelID = %d", playerID, levelID).first
+//            if statistic == nil {
+//                statistic = StatisticModel()
+//            }
+//            let formatter = NumberFormatter()
+//            formatter.numberStyle = NumberFormatter.Style.none // .DecimalStyle
+            let levelString = (levelID < 9 ? "0" : "") + String(levelID + 1) + " (" + GV.levelsForPlay.getLevelFormat(level: levelID) + "): \(countGames)"
             let countStr1Pkg = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = 1", playerID, levelID).count)
             let countStr2Pkg = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = 2", playerID, levelID).count)
             let countStr3Pkg = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = 3", playerID, levelID).count)
             let countStr4Pkg = String(realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = 4", playerID, levelID).count)
             let elements: [MultiVar] = [MultiVar(string: levelString),
-                                        MultiVar(string: "\(statistic!.allTime.dayHourMinSec)"),
+                                        MultiVar(string: "\(allTime.HourMin)"),
                                         MultiVar(string: "(" + String(countStr1Pkg + ") >")),
                                         MultiVar(string: "(" + String(countStr2Pkg + ") >")),
                                         MultiVar(string: "(" + String(countStr3Pkg + ") >")),

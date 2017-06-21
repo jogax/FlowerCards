@@ -14,7 +14,7 @@ class MySKStatistic: MySKTable {
     
     var callBack: (Bool, Int, Int, Int)->()
     var nameTable = [PlayerModel]()
-    let myColumnWidths: [CGFloat] = [15, 13, 20, 30, 12, 10]  // in %
+    let myColumnWidths: [CGFloat] = [15, 13, 20, 25, 17, 10]  // in %
 //    let myName = "MySKPlayerStatistic"
 
     
@@ -52,25 +52,25 @@ class MySKStatistic: MySKTable {
         showRowOfTable(rowOfTable: RowOfTable(elements: elements, selected: true), row: 0)
         for row in 0..<nameTable.count {
             if nameTable[row].name != GV.language.getText(.tcAnonym) || row == 0 {
-                let statisticTable = realm.objects(StatisticModel.self).filter("playerID = %d", nameTable[row].ID)
-
-                var allTime = 0
-                var countPlays = 0
-                var countMultiPlays = 0
-                var countVictorys = 0
-                var countDefeats = 0
-                for index in 0..<statisticTable.count {
-                    allTime += statisticTable[index].allTime
-                    countMultiPlays += statisticTable[index].countMultiPlays
-                    countVictorys += statisticTable[index].victorys
-                    countDefeats += statisticTable[index].defeats
-                }
-                countPlays = realm.objects(GameModel.self).filter("playerID = %d and ID != %d", nameTable[row].ID, GV.actGame!.ID).count
+//                let statisticTable = realm.objects(StatisticModel.self).filter("playerID = %d", nameTable[row].ID)
+                let gamesForPlayer = realm.objects(GameModel.self).filter("playerID = %d and played = true", nameTable[row].ID)
+                let allTime:Int = gamesForPlayer.sum(ofProperty: "time")
+                let countPlays = gamesForPlayer.filter("ID != %d",GV.actGame!.ID).count
+                let countMultiPlays = gamesForPlayer.filter("multiPlay = true").count
+                let countVictorys = gamesForPlayer.filter("playerScore >= opponentScore and gameFinished = true").count
+                let countDefeats = gamesForPlayer.filter("playerScore < opponentScore").count
+//                for index in 0..<statisticTable.count {
+//                    allTime += statisticTable[index].allTime
+//                    countMultiPlays += statisticTable[index].countMultiPlays
+//                    countVictorys += statisticTable[index].victorys
+//                    countDefeats += statisticTable[index].defeats
+//                }
+//                countPlays = realm.objects(GameModel.self).filter("playerID = %d and ID != %d", nameTable[row].ID, GV.actGame!.ID).count
                 let elements: [MultiVar] = [MultiVar(string: convertNameWhenRequired(nameTable[row].name)),
                                             MultiVar(string: "\(countPlays)"),
                                             MultiVar(string: "\(countMultiPlays)"),
                                             MultiVar(string: "\(countVictorys) / \(countDefeats)"),
-                                            MultiVar(string: allTime.dayHourMinSec),
+                                            MultiVar(string: allTime.HourMin),
                                             MultiVar(texture: SKTexture(image: DrawImages.getGoForwardImage(CGSize(width: 20, height: 20))))
                 ]
                 showRowOfTable(rowOfTable: RowOfTable(elements: elements, selected: true), row: row + 1)

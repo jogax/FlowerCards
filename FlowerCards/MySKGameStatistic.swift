@@ -82,7 +82,7 @@ class MySKGameStatistic: MySKTable {
                                         MultiVar(string: gameArt),
                                         MultiVar(string: opponent),
                                         MultiVar(string: score),
-                                        MultiVar(string: game.time.dayHourMinSec),
+                                        MultiVar(string: game.time.HourMin),
                                         MultiVar(texture: victory, textureSize: textureSize),
                                         MultiVar(texture: SKTexture(image: startImage)),
                                         ]

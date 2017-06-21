@@ -28,6 +28,16 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
     override func viewDidLoad() {
         super.viewDidLoad()
         GV.mainViewController = self
+        if let strAppName = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") {
+            GV.appName = strAppName as! String
+        }
+        if let strVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") {
+            GV.versionsNumber = strVersion as! String
+        }
+        if let strBuildNumber = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") {
+            GV.buildNumber = strBuildNumber as! String
+        }
+
 //        self.importGamePredefinitions()
         startScene()
 
@@ -87,17 +97,17 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
         
         GV.player = realm.objects(PlayerModel.self).filter("isActPlayer = TRUE").first!
  
-        if realm.objects(StatisticModel.self).filter("playerID = %d", GV.player!.ID).count == 0 {
-            let statistic = StatisticModel()
-            statistic.ID = GV.createNewRecordID(.statisticModel)
-            statistic.playerID = GV.player!.ID
-            statistic.levelID = GV.player!.levelID
-            try! realm.write({
-                realm.add(statistic)
-            })
-        } else {
-//            GV.statistic = GV.realm.objects(StatisticModel).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).first!
-        }
+//        if realm.objects(StatisticModel.self).filter("playerID = %d", GV.player!.ID).count == 0 {
+//            let statistic = StatisticModel()
+//            statistic.ID = GV.createNewRecordID(.statisticModel)
+//            statistic.playerID = GV.player!.ID
+//            statistic.levelID = GV.player!.levelID
+//            try! realm.write({
+//                realm.add(statistic)
+//            })
+//        } else {
+////            GV.statistic = GV.realm.objects(StatisticModel).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).first!
+//        }
         
         GV.language.setLanguage(GV.player!.aktLanguageKey)
         

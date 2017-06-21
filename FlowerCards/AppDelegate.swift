@@ -64,12 +64,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             // over every Game object stored in the Realm file
                         }
                         // migrate StatisticModel
-                        migration.enumerateObjects(ofType: StatisticModel.className()) { oldObject, newObject in
-                            newObject!["levelID"] = (oldObject!["levelID"] as! Int) / MaxColorValue
-                            newObject!["countPackages"] = ((oldObject!["levelID"] as! Int) % 4) + 1
-                            // The enumerateObjects(ofType:_:) method iterates
-                            // over every Game object stored in the Realm file
-                        }
+//                        migration.enumerateObjects(ofType: StatisticModel.className()) { oldObject, newObject in
+//                            newObject!["levelID"] = (oldObject!["levelID"] as! Int) / MaxColorValue
+//                            newObject!["countPackages"] = ((oldObject!["levelID"] as! Int) % 4) + 1
+//                            // The enumerateObjects(ofType:_:) method iterates
+//                            // over every Game object stored in the Realm file
+//                        }
                     }
             })
 

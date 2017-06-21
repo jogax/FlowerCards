@@ -25,6 +25,7 @@ struct GV {
     static var mainScene: CardGameScene?
     static let freeGameCount = 1000
     static var peerToPeerService: PeerToPeerServiceManager?
+    static let peerToPeerVersion = "1.0" // 2017-06-21
 
     static var dX: CGFloat = 0
     static var speed: CGSize = CGSize.zero
@@ -43,6 +44,12 @@ struct GV {
     static let oneGrad:CGFloat = CGFloat(Double.pi) / 180
     static let timeOut = "TimeOut"
     static let IAmBusy = "Busy"
+    static var appName: String = ""
+    static var versionsNumber: String = ""
+    static var buildNumber: String = ""
+    
+    
+
 
 //    static let dataStore = DataStore()
 //    static let cloudStore = CloudData()
