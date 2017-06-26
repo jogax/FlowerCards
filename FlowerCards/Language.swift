@@ -160,7 +160,11 @@ class Language {
     var aktLanguage = [TextConstants: String]()
     
     init() {
-        aktLanguage = languages[getPreferredLanguage()]!
+        var preferredLanguage = getPreferredLanguage()
+        if !languageNames.contains(preferredLanguage) {
+            preferredLanguage = LanguageEN
+        }
+        aktLanguage = languages[preferredLanguage]!
     }
     
     func setLanguage(_ languageKey: String) {        

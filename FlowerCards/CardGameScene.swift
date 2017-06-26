@@ -498,7 +498,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var replaying = false
     var durationMultiplier = 0.001
     let durationMultiplierForPlayer = 0.001
-    let durationMultiplierForAutoplayer = 0.000001
+    let durationMultiplierForAutoplayer = 0.001 //0.000001
     var waitForStartConst = 0.1
     let waitForStartForPlayer = 0.1
     let waitForStartForAutoplayer = 0.001
@@ -548,6 +548,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             prepareNextGame(newGame: true)
             generateCards(generatingType: .first)
             autoPlayer = AutoPlayer(scene: self)
+            #if TEST
+                self.startAutoplay(testType: .runOnce)
+            #endif
+
         } else {
             playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
             
@@ -810,7 +814,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         createLabels(label: cardCountLabel, text: cardCountText, row: 5, buttonLabel: 1)
         createLabels(label: tippCountLabel, text: tippCountText, row: 5, buttonLabel: 2)
 
-        #if TEST
+        #if TESTX
             let pkgSize = 15
             let allGamesLabelSize = 25
             let allGamesLabelPos = 10
@@ -833,7 +837,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
         prepareCards()
 //        //printFunc(function: "prepareNextGame", start: false)
-
 
     }
     
@@ -1864,7 +1867,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             })
             alert.addAction(chooseLevelAction)
             
-            #if TEST
+            #if TESTX
                 
                 let autoPlayActionNormal = UIAlertAction(title: GV.language.getText(.tcAutoPlayNormal), style: .default,
                                                          handler: {(paramAction:UIAlertAction!) in
@@ -2265,7 +2268,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                             let fingerNode = SKSpriteNode(imageNamed: "finger.png")
                             fingerNode.name = fingerName
                             fingerNode.position = touchLocation
-                            fingerNode.size = CGSize(width: 25,height: 25)
+                            fingerNode.size = CGSize(width: 50,height: 50)
                             fingerNode.zPosition = 100
                             addChild(fingerNode)
                         }
@@ -2436,6 +2439,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
         cardManager!.stopTrembling()
         cardManager!.removeNodesWithName(myLineName)
+        if showFingerNode {
+            while true {
+                if let node = self.childNode(withName: fingerName) {
+                    node.removeFromParent()
+                } else {
+                    break
+                }
+            }
+        }
         let testNode = self.atPoint(touchLocation)
         
         let aktNodeType = analyzeNode(testNode)
@@ -2454,11 +2466,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             default: aktNode = nil
             }
             
-            if showFingerNode {
-                if let node = self.childNode(withName: fingerName) {
-                    node.removeFromParent()
-                }
-            }
             if aktNode != nil && aktNode!.type == .buttonType && startNode?.type == .buttonType && aktNode!.name == movedFromNode.name {
                 //            if aktNode != nil && MySKCard.type == .ButtonType && startNode.type == .ButtonType  {
                 var MySKCard = aktNode!
