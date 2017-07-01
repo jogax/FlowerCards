@@ -61,14 +61,14 @@ class ConnectablePair {
             return (value1, value2)
         }
     }
-    var hashValue : Int {
+    var hashValue : Int64 {
         get {
-            return  Int(convertCard(card: card1) << 32 | convertCard(card: card2))
+            return  Int64(convertCard(card: card1) << 32 | convertCard(card: card2))
         }
     }
-    var hashValue1 : Int {
+    var hashValue1 : Int64 {
         get {
-            return Int(convertCard(card: card2) << 32 | convertCard(card: card1))
+            return Int64(convertCard(card: card2) << 32 | convertCard(card: card1))
         }
     }
     static func ==(left: ConnectablePair, right: ConnectablePair) -> Bool {

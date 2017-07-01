@@ -283,7 +283,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //    var valueTab = [Int]()
     let nextLevel = true
     let previousLevel = false
-    let maxLevelForiPhone = GV.levelsForPlay.getLastLevelWithColumnCount(maxColumnCount: 7)
+//    let maxLevelForiPhone = GV.levelsForPlay.getLastLevelWithColumnCount(maxColumnCount: 7)
 
     var lastUpdateSec = 0
 //    var lastNextPoint: Founded?
@@ -548,10 +548,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             prepareNextGame(newGame: true)
             generateCards(generatingType: .first)
             autoPlayer = AutoPlayer(scene: self)
-            #if TEST
-                self.startAutoplay(testType: .runOnce)
-            #endif
-
         } else {
             playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
             
@@ -693,11 +689,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         prepareContainers()
         
         prepareCardArray()
+        
 
         for column in 0..<countColumns {
             for row in 0..<countRows {
                 gameArray[column][row].position = calculateCardPosition(column, row: row)
             }
+        }
+        
+        if !GV.onIpad {
+            calculateCardSizeForIPhone()
         }
         
 
@@ -814,7 +815,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         createLabels(label: cardCountLabel, text: cardCountText, row: 5, buttonLabel: 1)
         createLabels(label: tippCountLabel, text: tippCountText, row: 5, buttonLabel: 2)
 
-        #if TESTX
+        #if TEST
             let pkgSize = 15
             let allGamesLabelSize = 25
             let allGamesLabelPos = 10
@@ -837,6 +838,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
         prepareCards()
 //        //printFunc(function: "prepareNextGame", start: false)
+
 
     }
     
@@ -1867,7 +1869,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             })
             alert.addAction(chooseLevelAction)
             
-            #if TESTX
+            #if TEST
                 
                 let autoPlayActionNormal = UIAlertAction(title: GV.language.getText(.tcAutoPlayNormal), style: .default,
                                                          handler: {(paramAction:UIAlertAction!) in
@@ -2024,6 +2026,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             y: y
         )
         return point
+    }
+    
+    func calculateCardSizeForIPhone() {
+        let height = gameArray[0][1].position.y - gameArray[0][0].position.y - 1 / (CGFloat(countRows) * 20)
+        let width = height * (cardSizeMultiplier.width / cardSizeMultiplier.height)
+        cardSize = CGSize(width: width, height: height) * 0.7
     }
 
 
