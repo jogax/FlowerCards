@@ -135,6 +135,7 @@ class AutoPlayer {
         self.testType = testType
         let playerName = GV.player!.name
         switch playerName {
+        case "Anonymus": testerType = .tester
         case "NewPlayer": testerType = .tester
         case "Beginner": testerType = .beginner
         case "LongPacks": testerType = .longPacks
@@ -204,22 +205,24 @@ class AutoPlayer {
         }
         
         if countMaxValues != 4 * 26 {
-            for countPkgs in 0...3 {
+            for countPkgs in 1...4 {
                 for levelId in 0...25 {
-                    let count = maxCount - gameCounts[3 - countPkgs][levelId]
+                    let count = maxCount - gameCounts[4 - countPkgs][levelId]
+                    var gameToPlay: GameToPlay?
                     for _ in 0..<count {
-                        let gameToPlay = GameToPlay(level: levelId + 1, countPackages: 4 - countPkgs, gameNumber: 1 + Int(arc4random()) % MaxGameNumber)
-                        gamesToPlay.append(gameToPlay)
+                        let gameNumber = 1 + Int(arc4random()) % MaxGameNumber
+                        gameToPlay = GameToPlay(level: levelId + 1, countPackages: countPkgs, gameNumber: gameNumber)
+                        gamesToPlay.append(gameToPlay!)
                     }
                 }
             }
         }
         var go = true
         while go {
-            for countPkgs in 0...3 {
+            for countPkgs in 1...4 {
                 for levelId in 0...25 {
                     for _ in 0..<1 {
-                        let gameToPlay = GameToPlay(level: levelId + 1, countPackages: 4 - countPkgs, gameNumber: 1 + Int(arc4random()) % MaxGameNumber)
+                        let gameToPlay = GameToPlay(level: levelId + 1, countPackages: countPkgs, gameNumber: 1 + Int(arc4random()) % MaxGameNumber)
                         gamesToPlay.append(gameToPlay)
                         if gamesToPlay.count > 1000 {
                             go = false

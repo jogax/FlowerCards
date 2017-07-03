@@ -2031,7 +2031,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func calculateCardSizeForIPhone() {
         let height = gameArray[0][1].position.y - gameArray[0][0].position.y - 1 / (CGFloat(countRows) * 20)
         let width = height * (cardSizeMultiplier.width / cardSizeMultiplier.height)
-        cardSize = CGSize(width: width, height: height) * 0.7
+        cardSize = CGSize(width: width, height: height) * 0.75
     }
 
 
