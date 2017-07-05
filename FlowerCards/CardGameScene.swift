@@ -2029,9 +2029,30 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func calculateCardSizeForIPhone() {
-        let height = gameArray[0][1].position.y - gameArray[0][0].position.y - 1 / (CGFloat(countRows) * 20)
+        // 3 * 3 = 9,  3 * 4 = 12, 3 * 5 = 15, 3 * 6 = 18
+        // 4 * 4 = 16, 4 * 5 = 20, 4 * 6 = 24, 4 * 7 = 28
+        // 5 * 5 = 25, 5 * 6 = 30, 5 * 7 = 35, 5 * 8 = 40
+        // 6 * 6 = 36, 6 * 7 = 42, 6 * 8 = 48, 6 * 9 = 54
+        // 7 * 7 = 49, 7 * 8 = 56, 7 * 9 = 63, 7 * 10 = 70
+        // 8 * 8 = 64, 8 * 9 = 72, 8 * 10 = 80
+        // 9 * 9 = 81, 9 * 10 = 90
+        // 10 * 10 = 100
+        let sizeValue = countRows * countColumns
+        let sizeMultiplierArray: [Int:CGFloat] = [   9: 0.5, 12: 0.55, 15: 0.6, 18: 0.7,
+                                                    16: 0.48, 20: 0.55,  24: 0.6, 28: 0.7,
+                                                    25: 0.55, 30: 0.55, 35: 0.65, 40: 0.7,
+                                                    36: 0.6, 42: 0.65, 48: 0.7, 54: 0.75,
+                                                    49: 0.6, 56: 0.65, 63: 0.7, 70: 0.75,
+                                                    64: 0.65, 72: 0.70, 80: 0.75,
+                                                    81: 0.70, 90: 0.70,
+                                                    100: 0.70]
+        let height = (gameArray[0][1].position.y - gameArray[0][0].position.y)
         let width = height * (cardSizeMultiplier.width / cardSizeMultiplier.height)
-        cardSize = CGSize(width: width, height: height) * 0.75
+        if let sizeMultiplier = sizeMultiplierArray[sizeValue] {
+            cardSize = CGSize(width: width, height: height) * sizeMultiplier
+        } else {
+            cardSize = CGSize(width: width, height: height) * 0.5
+        }
     }
 
 

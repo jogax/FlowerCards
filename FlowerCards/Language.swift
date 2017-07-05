@@ -167,8 +167,12 @@ class Language {
         aktLanguage = languages[preferredLanguage]!
     }
     
-    func setLanguage(_ languageKey: String) {        
-        aktLanguage = languages[languageKey]!
+    func setLanguage(_ languageKey: String) {
+        if languageNames.contains(languageKey) {
+           aktLanguage = languages[languageKey]!
+        } else {
+            aktLanguage = languages[LanguageEN]!
+        }
         for index in 0..<callbacks.count {
             _ = callbacks[index].function()
         }

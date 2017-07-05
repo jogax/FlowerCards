@@ -1203,11 +1203,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2155"
-            endingLineNumber = "2155"
+            startingLineNumber = "2176"
+            endingLineNumber = "2176"
             landmarkName = "pull(createTipps:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1825,11 +1825,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2049"
-            endingLineNumber = "2049"
+            startingLineNumber = "2070"
+            endingLineNumber = "2070"
             landmarkName = "pull(createTipps:)"
             landmarkType = "7">
             <Actions>
@@ -2122,11 +2122,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2367"
-            endingLineNumber = "2367"
+            startingLineNumber = "2388"
+            endingLineNumber = "2388"
             landmarkName = "myTouchesMoved(touchLocation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2138,11 +2138,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2366"
-            endingLineNumber = "2366"
+            startingLineNumber = "2387"
+            endingLineNumber = "2387"
             landmarkName = "myTouchesMoved(touchLocation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3066,11 +3066,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2076"
-            endingLineNumber = "2076"
+            startingLineNumber = "2097"
+            endingLineNumber = "2097"
             landmarkName = "pull(createTipps:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3385,11 +3385,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2403"
-            endingLineNumber = "2403"
+            startingLineNumber = "2424"
+            endingLineNumber = "2424"
             landmarkName = "myTouchesMoved(touchLocation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3513,11 +3513,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2783"
-            endingLineNumber = "2783"
+            startingLineNumber = "2804"
+            endingLineNumber = "2804"
             landmarkName = "analyzeNode(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3849,11 +3849,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2501"
-            endingLineNumber = "2501"
+            startingLineNumber = "2522"
+            endingLineNumber = "2522"
             landmarkName = "myTouchesEnded(touchLocation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3881,11 +3881,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2340"
-            endingLineNumber = "2340"
+            startingLineNumber = "2361"
+            endingLineNumber = "2361"
             landmarkName = "myTouchesMoved(touchLocation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3897,11 +3897,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2339"
-            endingLineNumber = "2339"
+            startingLineNumber = "2360"
+            endingLineNumber = "2360"
             landmarkName = "myTouchesMoved(touchLocation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3913,11 +3913,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2278"
-            endingLineNumber = "2278"
+            startingLineNumber = "2299"
+            endingLineNumber = "2299"
             landmarkName = "myTouchesBegan(touchLocation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -3993,11 +3993,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "3041"
-            endingLineNumber = "3041"
+            startingLineNumber = "3062"
+            endingLineNumber = "3062"
             landmarkName = "alertStartMultiPlay(_:message:messageNr:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4025,11 +4025,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2444"
-            endingLineNumber = "2444"
+            startingLineNumber = "2465"
+            endingLineNumber = "2465"
             landmarkName = "myTouchesEnded(touchLocation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4041,11 +4041,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2445"
-            endingLineNumber = "2445"
+            startingLineNumber = "2466"
+            endingLineNumber = "2466"
             landmarkName = "myTouchesEnded(touchLocation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4057,11 +4057,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2451"
-            endingLineNumber = "2451"
+            startingLineNumber = "2472"
+            endingLineNumber = "2472"
             landmarkName = "myTouchesEnded(touchLocation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4137,11 +4137,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2376"
-            endingLineNumber = "2376"
+            startingLineNumber = "2397"
+            endingLineNumber = "2397"
             landmarkName = "myTouchesMoved(touchLocation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4521,11 +4521,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2911"
-            endingLineNumber = "2911"
+            startingLineNumber = "2932"
+            endingLineNumber = "2932"
             landmarkName = "messageReceived(_:command:message:messageNr:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4537,11 +4537,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2913"
-            endingLineNumber = "2913"
+            startingLineNumber = "2934"
+            endingLineNumber = "2934"
             landmarkName = "messageReceived(_:command:message:messageNr:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4553,11 +4553,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2279"
-            endingLineNumber = "2279"
+            startingLineNumber = "2300"
+            endingLineNumber = "2300"
             landmarkName = "myTouchesBegan(touchLocation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4569,11 +4569,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2422"
-            endingLineNumber = "2422"
+            startingLineNumber = "2443"
+            endingLineNumber = "2443"
             landmarkName = "myTouchesMoved(touchLocation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4585,11 +4585,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2453"
-            endingLineNumber = "2453"
+            startingLineNumber = "2474"
+            endingLineNumber = "2474"
             landmarkName = "myTouchesEnded(touchLocation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4601,11 +4601,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2458"
-            endingLineNumber = "2458"
+            startingLineNumber = "2479"
+            endingLineNumber = "2479"
             landmarkName = "myTouchesEnded(touchLocation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -4697,11 +4697,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520615472.758559"
+            timestampString = "520960188.556632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2034"
-            endingLineNumber = "2034"
+            startingLineNumber = "2054"
+            endingLineNumber = "2054"
             landmarkName = "calculateCardSizeForIPhone()"
             landmarkType = "7">
          </BreakpointContent>
@@ -4719,22 +4719,6 @@
             startingLineNumber = "237"
             endingLineNumber = "237"
             landmarkName = "generateTestForAllOthers()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FlowerCards/CardGameScene.swift"
-            timestampString = "520776775.833432"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2033"
-            endingLineNumber = "2033"
-            landmarkName = "calculateCardSizeForIPhone()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -4863,6 +4847,54 @@
             startingLineNumber = "213"
             endingLineNumber = "213"
             landmarkName = "generateTestForTester()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/CardGameScene.swift"
+            timestampString = "520946279.575583"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1179"
+            endingLineNumber = "1179"
+            landmarkName = "specialButtonPressed(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/Language.swift"
+            timestampString = "520947143.90996"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "171"
+            endingLineNumber = "171"
+            landmarkName = "setLanguage(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FlowerCards/Language.swift"
+            timestampString = "520947082.149967"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "170"
+            endingLineNumber = "170"
+            landmarkName = "setLanguage(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
