@@ -1178,7 +1178,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func specialButtonPressed(_ buttonName: String) {
         if buttonName == "tipps" {
             if !generatingTipps {
-                cardManager!.getTipps()
+                if let manager = cardManager {
+                    manager.getTipps()
+                }
             }
         }
     }
@@ -2666,58 +2668,56 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
     
     func playMusic(_ fileName: String, volume: Float, loops: Int) {
-        //levelArray = GV.cloudData.readLevelDataArray()
-        let url = URL(
-            fileURLWithPath: Bundle.main.path(forResource: fileName, ofType: "m4a")!)
-        //backgroundColor = SKColor(patternImage: UIImage(named: "aquarium.png")!)
-        
-        do {
-            try musicPlayer = AVAudioPlayer(contentsOf: url)
-            musicPlayer?.delegate = self
-            musicPlayer?.prepareToPlay()
-            musicPlayer?.volume = 0.001 * volume
-            musicPlayer?.numberOfLoops = loops
-            musicPlayer?.play()
-        } catch {
-            print("audioPlayer error")
+        if volume > 0 {
+            let url = URL(
+                fileURLWithPath: Bundle.main.path(forResource: fileName, ofType: "m4a")!)
+            do {
+                try musicPlayer = AVAudioPlayer(contentsOf: url)
+                musicPlayer?.delegate = self
+                musicPlayer?.prepareToPlay()
+                musicPlayer?.volume = 0.001 * volume
+                musicPlayer?.numberOfLoops = loops
+                musicPlayer?.play()
+            } catch {
+                print("audioPlayer error")
+            }
         }
     }
     
     func playSound(_ fileName: String, volume: Float) {
-        let url = URL(
-            fileURLWithPath: Bundle.main.path(forResource: fileName, ofType: "m4a")!)
-        
-        do {
-            try soundPlayer = AVAudioPlayer(contentsOf: url)
-            soundPlayer?.delegate = self
-            soundPlayer?.prepareToPlay()
-            soundPlayer?.volume = 0.001 * volume
-            soundPlayer?.numberOfLoops = 0
-            soundPlayer?.play()
-        } catch {
-            print("soundPlayer error")
+        if volume > 0 {
+            let url = URL(
+                fileURLWithPath: Bundle.main.path(forResource: fileName, ofType: "m4a")!)
+            
+            do {
+                try soundPlayer = AVAudioPlayer(contentsOf: url)
+                soundPlayer?.delegate = self
+                soundPlayer?.prepareToPlay()
+                soundPlayer?.volume = 0.001 * volume
+                soundPlayer?.numberOfLoops = 0
+                soundPlayer?.play()
+            } catch {
+                print("soundPlayer error")
+            }
         }
-        
-        
     }
     
     func playSound(_ fileName: String, volume: Float, soundPlayerIndex: Int) {
-        
-        let url = URL(
-            fileURLWithPath: Bundle.main.path(forResource: fileName, ofType: "m4a")!)
-        
-        do {
-            try soundPlayerArray[soundPlayerIndex] = AVAudioPlayer(contentsOf: url)
-            soundPlayerArray[soundPlayerIndex]!.delegate = self
-            soundPlayerArray[soundPlayerIndex]!.prepareToPlay()
-            soundPlayerArray[soundPlayerIndex]!.volume = 0.001 * volume
-            soundPlayerArray[soundPlayerIndex]!.numberOfLoops = 0
-            soundPlayerArray[soundPlayerIndex]!.play()
-        } catch {
-            print("soundPlayer error")
-        }
-        
-        
+        if volume > 0 {
+            let url = URL(
+                fileURLWithPath: Bundle.main.path(forResource: fileName, ofType: "m4a")!)
+            
+            do {
+                try soundPlayerArray[soundPlayerIndex] = AVAudioPlayer(contentsOf: url)
+                soundPlayerArray[soundPlayerIndex]!.delegate = self
+                soundPlayerArray[soundPlayerIndex]!.prepareToPlay()
+                soundPlayerArray[soundPlayerIndex]!.volume = 0.001 * volume
+                soundPlayerArray[soundPlayerIndex]!.numberOfLoops = 0
+                soundPlayerArray[soundPlayerIndex]!.play()
+            } catch {
+                print("soundPlayer error")
+            }
+        }        
     }
     
     
