@@ -44,7 +44,7 @@ class AutoPlayer {
 //        GameToPlay(level: 12, countPackages: 2, gameNumber: 781), // at Step: 98 OK
     ]
     enum runStatus: Int {
-        case getTipp = 0, touchesBegan, touchesMoved, touchesEnded, waitingForNextStep
+        case GetTipp = 0, TouchesBegan, TouchesMoved, TouchesEnded, WaitingForNextStep//, TippButtonPressed, TippButtonReleased
     }
     enum TestType: Int {
         case newTest = 1, fromTable, fromDB, runOnce, stepByStep
@@ -69,7 +69,7 @@ class AutoPlayer {
     private var timer: Timer = Timer()
     private var bestTipp = Tipp()
     private var choosedTipp: Tipp.InnerTipp = Tipp.InnerTipp()
-    private var autoPlayStatus: runStatus = .getTipp
+    private var autoPlayStatus: runStatus = .GetTipp
     private var indexForReplay: Int = 0
     private var stopTimer = false
     private var testType: TestType = .runOnce //.test
@@ -182,7 +182,7 @@ class AutoPlayer {
     func makeStep() {
         
         testType = .stepByStep
-        autoPlayStatus = .getTipp
+        autoPlayStatus = .GetTipp
         stopTimer = false
         timer = Timer.scheduledTimer(timeInterval: 0.001, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
     }
@@ -289,7 +289,16 @@ class AutoPlayer {
     @objc func nextStep(timerX: Timer) {
         if scene.cardCount > 0 {
             switch autoPlayStatus {
-            case .getTipp:
+//            case .TippButtonPressed:
+//                if scene.tippsButton!.alpha == 1 && scene.movingCards.count == 0 && !scene.inGeneratingCards  {// if tipps are ready
+//                    scene.myTouchesBegan(touchLocation: CGPoint(x: 783.5, y: 105.5))
+//                    autoPlayStatus = .TippButtonReleased
+//                }
+//            case .TippButtonReleased:
+//                scene.autoTouchesEnded(touchLocation: CGPoint(x: 783.5, y: 105.5))
+//                autoPlayStatus = .GetTipp
+//
+            case .GetTipp:
 //                if scene.cardManager!.noMoreSteps {
 //                    scene.pull(createTipps: true)
 //                    for tipp in tippArray {
@@ -382,7 +391,7 @@ class AutoPlayer {
                         }
                     }
                     if choosedTipp.points.count > 0 && tippArray.count > 0 {
-                        autoPlayStatus = .touchesBegan
+                        autoPlayStatus = .TouchesBegan
                     } else {
                         if gamesToPlay.count == 0 {
                             stopAutoplay()
@@ -395,19 +404,19 @@ class AutoPlayer {
                     }
                     
                 }
-            case .touchesBegan:
+            case .TouchesBegan:
                 scene.myTouchesBegan(touchLocation: choosedTipp.points[0])
-                autoPlayStatus = .touchesMoved
-            case .touchesMoved:
+                autoPlayStatus = .TouchesMoved
+            case .TouchesMoved:
                 scene.myTouchesMoved(touchLocation: choosedTipp.points[1])
-                autoPlayStatus = .touchesEnded
-            case .touchesEnded:
+                autoPlayStatus = .TouchesEnded
+            case .TouchesEnded:
                 scene.autoTouchesEnded(touchLocation: choosedTipp.points[1])
                 switch testType {
                 case .runOnce:
                     break
                 case .stepByStep:
-                    autoPlayStatus = .waitingForNextStep
+                    autoPlayStatus = .WaitingForNextStep
                     stopTimer = true
                     timer.invalidate()
                 default:
@@ -415,14 +424,21 @@ class AutoPlayer {
                         self.stopAutoplay()
                     }
                 }
-                autoPlayStatus = .getTipp
-            case .waitingForNextStep:
+                autoPlayStatus = .GetTipp
+//                autoPlayStatus = .TippButtonPressed
+            case .WaitingForNextStep:
                 break
             }
             if stopTimer {
                 timer.invalidate()
             } else {
-                let interval = autoPlayStatus == .getTipp || autoPlayStatus == .touchesBegan ? 0.001 : 0.2
+                var interval = 0.2
+                if autoPlayStatus == .GetTipp || autoPlayStatus == .TouchesBegan {
+                    interval = 0.001
+                } /*else if autoPlayStatus == .TippButtonPressed {
+                    interval = 2.0
+                } */
+//                let interval = autoPlayStatus == .GetTipp || autoPlayStatus == .TouchesBegan ? 0.001 : 0.2
                 timer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
             }
         } else {

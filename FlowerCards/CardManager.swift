@@ -696,9 +696,7 @@ class CardManager {
 
             addCardToTremblingCards(tippArray[tippIndex].card1.position)
             addCardToTremblingCards(tippArray[tippIndex].card2.position)
-            //            }
-            tippIndex += 1
-            tippIndex %= tippArray.count
+            tippIndex = tippIndex < tippArray.count - 1 ? tippIndex + 1 : 0
         }
         
         //printFunc(function: "getTipps", start: false)
@@ -746,6 +744,7 @@ class CardManager {
         tippArray.sort(by: {checkForSort(t0: $0, t1: $1) })
         let createTippsEndedAt = Date()
         tippArrayCreatedInSeconds = CFDateGetTimeIntervalSinceDate(createTippsEndedAt as CFDate!, createTippsStartedAt as CFDate!)
+        tippIndex = 0
     }
     
     func createHelpLines(movedFrom: ColumnRow, toPoint: CGPoint, inFrame: CGRect, lineSize: CGFloat, showLines: Bool)->(foundedPoint: Founded?, [CGPoint]) {
