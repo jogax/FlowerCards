@@ -85,8 +85,9 @@ class MySKStatistic: MySKTable {
         return name
     }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let (_, row, column, _) = checkTouches(touches, withEvent: event)
+//    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        let (_, row, column, _) = checkTouches(touches, withEvent: event)
+    override func ownTouchesEnded(row: Int, column: Int, element: Int) {
         switch (row, column) {
         case (0, 0):
             let fadeInAction = SKAction.fadeIn(withDuration: 0.5)
@@ -94,6 +95,7 @@ class MySKStatistic: MySKTable {
             removeFromParent()
             callBack(false, 0, 0, 0)
         case (2..<10000, myColumnWidths.count - 1):
+            self.isUserInteractionEnabled = false
             addDetailedPlayerStatistic(row - 2)
         default:
             break
@@ -108,6 +110,7 @@ class MySKStatistic: MySKTable {
     }
     
     func backFromMySKDetailedStatistic(_ startGame: Bool, gameNumber: Int, levelIndex: Int, countPackages: Int) {
+        self.isUserInteractionEnabled = true
         callBack(startGame, gameNumber, levelIndex, countPackages)
     }
 //    override func setMyDeviceSpecialConstants() {

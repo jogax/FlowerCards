@@ -201,6 +201,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         case first = 0, normal
     }
     
+    enum ButtonPos: Int {
+        case NoValue = 0, SettingsButtonPos, StartButtonPos, CardCountPos, HelpButtonPos, TippButtonPos, UndoButtonPos
+    }
+    
     struct GenerateCard {
         var cardValue: Int
         var packageNr: Int
@@ -383,6 +387,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var fourPkgLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     
     var cardCountLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var settingsLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var startLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var helpLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var tippLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var undoLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    
 //    var showScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
 //    var opponentScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     
@@ -523,15 +533,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             let sizeMultiplierConstant = CGFloat(0.0020)
             levelIndex = GV.player!.levelID
             
-//            switch (levelIndex + 1) {
-//            case (1...12):
-//                MaxCountGamesToPlayInARound = 1
-//            case (13...26):
-//                MaxCountGamesToPlayInARound = 2
-//            default:
-//                break
-//            }
-//            countGamesToPlay = MaxCountGamesToPlayInARound
 
             cardSizeMultiplier = CGSize(width: self.size.width * sizeMultiplierConstant,
                                     height: self.size.width * sizeMultiplierConstant * height / width)
@@ -542,7 +543,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             let buttonSizeMultiplierConstant = CGFloat(GV.onIpad ? 10 : 8)
             buttonSize = self.size.width / buttonSizeMultiplierConstant
-            buttonYPos = self.size.height * 0.07
+            buttonYPos = self.size.height * 0.09
             buttonXPosNormalized = self.size.width / 10
             self.name = "CardGameScene"
             prepareNextGame(newGame: true)
@@ -779,7 +780,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let playerNamePos = whoIsPos + whoIsLenght
         let timePos = playerNamePos + playerNameLength
         let scorePos = timePos + timeLength
+        
+        
         let cardCountPos = scorePos + scoreLength
+        
+        let settingsLabelText = GV.language.getText(.tcSettings)
+        let startLabelText = GV.language.getText(.tcStart)
+        let helpLabelText = GV.language.getText(.tcHelp)
+        let tippLabelText = GV.language.getText(.tcTipps)
+        let undoLabelText = GV.language.getText(.tcUndo)
         
         createLabels(label: gameNumberLabel, text: gameNumberText, row: 1, xPosProzent: gameNumberPos)
         createLabels(label: sizeLabel, text: sizeText, row: 1, xPosProzent: sizePos)
@@ -797,6 +806,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         createLabels(label: playerTimeLabel, text: "0", row: 3, xPosProzent: timePos)
         createLabels(label: playerScoreLabel, text: String(levelScore), row: 3, xPosProzent: scorePos)
         createLabels(label: playerCardCountLabel, text: String(cardCount), row: 3, xPosProzent: cardCountPos)
+        
+        createLabels(label: settingsLabel, text: settingsLabelText, row: 6, buttonLabel: .SettingsButtonPos)
+        createLabels(label: startLabel, text: startLabelText, row: 6, buttonLabel: .StartButtonPos)
+        createLabels(label: helpLabel, text: helpLabelText, row: 6, buttonLabel: .HelpButtonPos)
+        createLabels(label: tippLabel, text: tippLabelText, row: 6, buttonLabel: .TippButtonPos)
+        createLabels(label: undoLabel, text: undoLabelText, row: 6, buttonLabel: .UndoButtonPos)
 
         if playerType == .multiPlayer {
             createLabels(label: opponentTypeLabel, text: whoIsTypeText2, row: 4, xPosProzent: whoIsPos)
@@ -812,8 +827,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 opponentScoreLabel.isHidden = true
                 opponentCardCountLabel.isHidden = true
         }
-        createLabels(label: cardCountLabel, text: cardCountText, row: 5, buttonLabel: 1)
-        createLabels(label: tippCountLabel, text: tippCountText, row: 5, buttonLabel: 2)
+        createLabels(label: cardCountLabel, text: cardCountText, row: 5, buttonLabel: .CardCountPos)
+        createLabels(label: tippCountLabel, text: tippCountText, row: 5, buttonLabel: .TippButtonPos)
 
         #if TEST
             let pkgSize = 15
@@ -869,7 +884,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     
     
-    func createLabels(label: SKLabelNode, text: String, row: Int, xPosProzent: Int = 0, fontSizeModifier: CGFloat = 1, buttonLabel: Int = NoValue) {
+    func createLabels(label: SKLabelNode, text: String, row: Int, xPosProzent: Int = 0, fontSizeModifier: CGFloat = 1, buttonLabel: ButtonPos = .NoValue) {
 //        //printFunc(function: "createLabels", start: true)
         
         // values for buttonLabel: NoValue - No Button, 1 - cardPackage, 2 tippsButton
@@ -877,7 +892,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         label.fontName = "ArialMT"
         let xPos = self.size.width * CGFloat(xPosProzent) * 0.01
         
-        if buttonLabel == NoValue {
+        if buttonLabel == .NoValue {
             let posAdder = CGFloat(row - 1) * labelFontSize * (1 + labelRowCorr)
             var yPos = CGFloat(labelBackground.position.y - 120 * labelRowCorr)
             yPos += labelBackground.size.height / 2
@@ -886,14 +901,39 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             label.fontSize = labelFontSize * fontSizeModifier;
             label.horizontalAlignmentMode = .left
             label.verticalAlignmentMode = .baseline
+            label.fontColor = SKColor.black
         } else {
-            label.position = (buttonLabel == 1 ? self.cardPackage!.position : self.tippsButton!.position)
-            label.fontSize = labelFontSize * 1.5 * fontSizeModifier
+            label.fontSize = labelFontSize * (row == 5 ? 1.5 : 1) * fontSizeModifier
+            label.fontColor = row == 5 ? UIColor.black : UIColor.white
+            switch buttonLabel {
+            case .SettingsButtonPos:
+                label.position.x = (self.settingsButton?.position.x)!
+                label.position.y = (self.settingsButton?.position.y)! - (self.settingsButton?.size.height)! * 0.8
+            case .StartButtonPos:
+                label.position.x = (self.restartButton?.position.x)!
+                label.position.y = (self.restartButton?.position.y)! - (self.restartButton?.size.height)! * 0.8
+            case .CardCountPos:
+                label.position = self.cardPackage!.position
+            case .HelpButtonPos:
+                label.position.x = (self.helpButton?.position.x)!
+                label.position.y = (self.helpButton?.position.y)! - (self.helpButton?.size.height)! * 0.8
+            case .TippButtonPos:
+                if row == 5 {
+                    label.position = self.tippsButton!.position
+                } else {
+                    label.position.x = (self.tippsButton?.position.x)!
+                    label.position.y = (self.tippsButton?.position.y)! - (self.tippsButton?.size.height)! * 0.8
+                }
+            case .UndoButtonPos:
+                label.position.x = (self.undoButton?.position.x)!
+                label.position.y = (self.undoButton?.position.y)! - (self.undoButton?.size.height)! * 0.8
+            default: break
+            }
+//            label.position = (buttonLabel == 1 ? self.cardPackage!.position : self.tippsButton!.position)
             label.zPosition = 5
             label.horizontalAlignmentMode = .center
             label.verticalAlignmentMode = .center
         }
-        label.fontColor = SKColor.black
         label.color = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
         self.addChild(label)
         //printFunc(function: "createLabels", start: false)
@@ -1007,6 +1047,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         gameNumberLabel.text = GV.language.getText(.tcGameNumber) + "\(gameNumber + 1)"
         sizeLabel.text = GV.language.getText(.tcSize) + "\(GV.levelsForPlay.aktLevel.countColumns) x \(GV.levelsForPlay.aktLevel.countRows)"
         packageLabel.text = GV.language.getText(.tcPackage, values: String(countPackages))
+        
+        settingsLabel.text = GV.language.getText(.tcSettings)
+        startLabel.text = GV.language.getText(.tcStart)
+        helpLabel.text = GV.language.getText(.tcHelp)
+        tippLabel.text = GV.language.getText(.tcTipps)
+        undoLabel.text = GV.language.getText(.tcUndo)
 
         showCardCount()
         showTippCount()

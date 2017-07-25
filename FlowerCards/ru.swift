@@ -105,6 +105,10 @@ let ruDictionary: [TextConstants: String] = [
     .tcGameArt:         "Tип",
     .tcVictory:         "Победa",
     .tcStart:           "Старт",
+    .tcSettings:        "Настройки",
+    .tcHelp:            "Помощь",
+    .tcTipps:           "Подсказка",
+    .tcUndo:            "Назад",
     .tcStopCompetition: "Стоп cоревнование",
     .tcOpponentStoppedTheGame: "% остановил игру",
     .tcAreYouSureToDelete: "Действитель удалить игрока %?\r\n" +

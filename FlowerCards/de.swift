@@ -105,6 +105,10 @@ let deDictionary: [TextConstants: String] = [
     .tcGameArt:         "Art",
     .tcVictory:         "Sieg",
     .tcStart:           "Start",
+    .tcSettings:        "Einstellungen",
+    .tcHelp:            "Hilfe",
+    .tcTipps:           "Tipps",
+    .tcUndo:            "Zurück",
     .tcStopCompetition: "Stop Wettbewerb",
     .tcOpponentStoppedTheGame: "% hat das Spiel stopped",
     .tcAreYouSureToDelete: "Willst Du wirklich den Spieler % löschen?\r\n" +

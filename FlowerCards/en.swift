@@ -105,6 +105,10 @@ let enDictionary: [TextConstants: String] = [
     .tcGameArt:         "Type",
     .tcVictory:         "Victory",
     .tcStart:           "Start",
+    .tcSettings:        "Settings",
+    .tcHelp:            "Help",
+    .tcTipps:           "Tipps",
+    .tcUndo:            "Undo",
     .tcStopCompetition: "Stop competiton",
     .tcOpponentStoppedTheGame: "% has stopped the competition!",
     .tcAreYouSureToDelete: "Are you sure to delete %?\r\n" +

@@ -105,6 +105,10 @@ let huDictionary: [TextConstants: String] = [
     .tcGameArt:         "Tipus",
     .tcVictory:         "Győzelem",
     .tcStart:           "Start",
+    .tcSettings:        "Beállítások",
+    .tcHelp:            "Segitség",
+    .tcTipps:           "Tippek",
+    .tcUndo:            "Vissza",
     .tcStopCompetition: "Verseny leállítása",
     .tcOpponentStoppedTheGame: "% leállította a játékot",
     .tcAreYouSureToDelete: "Biztosan törölni akarod %-t?\r\n" +

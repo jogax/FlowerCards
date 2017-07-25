@@ -130,6 +130,7 @@ class MySKDetailedStatistic: MySKTable {
             callBack(false, 0, 0, 0)
         case (2..<10000, 2...5):
             countPackages = column - 1
+            self.isUserInteractionEnabled = false
             showDetailedPlayerStatistic(levelID: row - 2, countPackages: column - 1)
         default:
             break
@@ -143,6 +144,7 @@ class MySKDetailedStatistic: MySKTable {
     }
  
     func callBackFromGameStatistic(_ startGame: Bool = false, gameNumber: Int = 0, levelIndex: Int = 0) {
+        self.isUserInteractionEnabled = true
         if startGame {
             callBack(startGame, gameNumber, levelIndex, countPackages)
         }
