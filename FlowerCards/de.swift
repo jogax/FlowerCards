@@ -136,8 +136,10 @@ let deDictionary: [TextConstants: String] = [
     .tcLevelAndPackage: "Ebene:%, Pakete:%, Format:%",
     .tcAllGamesCount:   "Games: % / %, %",
     .tcPkgTxt:          "%. P: % / %",
-    .tcNoMoreSteps:     "Hoppala! Dieser Schritt würde es unmöglich machen, das Spiel zu beenden -> so Schritt zurück"
-
+    .tcNoMoreSteps:     "Hoppala! Dieser Schritt würde es unmöglich machen, das Spiel zu beenden -> so Schritt zurück",
+    .tcThereIsNoPartner: "Keine Spieler in der nähe!",
+    .tcIsPlayingWith:   " spielt mit %",
+    .tcWriteReview:     "Schreiben Sie eine Bewertung im App Store",
 ]
 
 

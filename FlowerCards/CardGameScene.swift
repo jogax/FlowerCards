@@ -151,7 +151,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         enum FinishType: Int {
             case none = 0, finished, interrupted
         }
-        var peerIndex: Int = 0
+        var peerID: MCPeerID?
         var ID = 0
         var name: String = ""
         var score: Int = 0
@@ -402,7 +402,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         didSet {
             showLevelScore()
             if playerType == .multiPlayer {
-                GV.peerToPeerService!.sendInfo(.myScoreHasChanged, message: [String(levelScore), String(cardCount)], toPeerIndex: opponent.peerIndex)
+                GV.peerToPeerService!.sendInfo(.myScoreHasChanged, message: [String(levelScore), String(cardCount)], toPeer: opponent.peerID!)
             }
         }
     }
@@ -425,7 +425,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var cardCount = 0 {
         didSet {
             if playerType == .multiPlayer {
-                GV.peerToPeerService!.sendInfo(.myScoreHasChanged, message: [String(levelScore), String(cardCount)], toPeerIndex: opponent.peerIndex)
+                GV.peerToPeerService!.sendInfo(.myScoreHasChanged, message: [String(levelScore), String(cardCount)], new: false, toPeer: opponent.peerID!)
             }
         }
     }
@@ -1320,6 +1320,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             }
             opponent.finish = .none
             playerType = .singlePlayer
+            GV.peerToPeerService!.changeStatusToFree()
             doTimeCount = false
             opponentTypeLabel.isHidden = true
             opponentNameLabel.isHidden = true
@@ -1628,7 +1629,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             saveStatisticAndGame()
             if playerType == .multiPlayer {
-                GV.peerToPeerService?.sendInfo(.gameIsFinished, message: [String(levelScore)], toPeerIndex: opponent.peerIndex)
+                GV.peerToPeerService?.sendInfo(.gameIsFinished, message: [String(levelScore)], new: false, toPeer: opponent.peerID!)
                 alertIHaveGameFinished()
             } else {
                 let alert = getNextPlayArt(congratulations: .Won)
@@ -1719,34 +1720,47 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func choosePartner() {
-        let partnerNames = GV.peerToPeerService!.getPartnerName()
-        if GV.peerToPeerService!.countPartners() > 1 {
-            let alert = UIAlertController(title: GV.language.getText(.tcChoosePartner),
-                                          message: "",
-                                          preferredStyle: .alert)
-            for index in 0..<partnerNames.count {
-                let identity = partnerNames[index]
-                let nameAction = UIAlertAction(title: identity, style: .default,
-                                                handler: {(paramAction:UIAlertAction!) in
-                                                    self.opponent.name = identity
-                                                    self.opponent.peerIndex = index
-                                                    self.opponent.score = 0
-                                                    self.callPartner(index, identity: identity)
-                })
-                alert.addAction(nameAction)
+        var playingPartners: [String] = []
+        let partners = GV.peerToPeerService!.getPartners()
+        let alert = UIAlertController(title: GV.language.getText(partners.count == 0 ?.tcThereIsNoPartner : .tcChoosePartner),
+                                      message: "",
+                                      preferredStyle: .alert)
+        if partners.count > 0 {
+            for index in 0..<partners.count {
+                var identity: String = ""
+                if partners[index].name != nil && !playingPartners.contains(partners[index].name!) {
+                    identity = partners[index].name!
+                    var isEnabled = true
+                    if partners[index].playingWith != nil && partners[index].playingWith != "" {
+                        identity = identity + GV.language.getText(.tcIsPlayingWith, values: partners[index].playingWith!)
+                        playingPartners.append(partners[index].playingWith!)
+                        isEnabled = false
+                    }
+                    let peerID = partners[index]
+                    let nameAction = UIAlertAction(title: identity, style: .default,
+                                                    handler: {(paramAction:UIAlertAction!) in
+                                                        self.opponent.name = identity
+                                                        self.opponent.score = 0
+                                                        self.callPartner(peerID: peerID, identity: identity)
+                    })
+                    alert.addAction(nameAction)
+                    alert.actions.last?.isEnabled = isEnabled
+                }
             }
-            GV.mainViewController!.showAlert(alert)
-        } else if GV.peerToPeerService!.countPartners() > 0 {
-            let identity = partnerNames[0]
-            callPartner(0, identity: identity )
         }
-    }
+        let returnAction = UIAlertAction(title: GV.language.getText(.tcReturn), style: .cancel,
+                                         handler: {(paramAction:UIAlertAction!) in
+                                            
+        })
+        alert.addAction(returnAction)
+        GV.mainViewController!.showAlert(alert)
+}
     
-    func callPartner(_ index: Int, identity: String) {
+    func callPartner(peerID: MCPeerID, identity: String) {
         let gameNumber = randomGameNumber()
-        opponent.peerIndex = index
+        opponent.peerID = peerID
         let myName = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
-        var answer = GV.peerToPeerService!.sendMessage(.iWantToPlayWithYou, message: [myName, GV.peerToPeerVersion, String(levelIndex), String(countPackages), String(gameNumber)], toPeerIndex: index)
+        var answer = GV.peerToPeerService!.sendMessage(command: .iWantToPlayWithYou, message: [myName, GV.peerToPeerVersion, String(levelIndex), String(countPackages), String(gameNumber)], toPeer: peerID)
         switch answer[0] {
         case answerYes:
             self.playerType = .multiPlayer
@@ -1754,18 +1768,22 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             self.opponent.name = identity
             self.opponent.score = 0
             self.restartGame = true
+            GV.peerToPeerService!.changeStatusToIsPlaying(isPlayingWith: opponent.name)
         case answerNo, GV.IAmBusy, GV.timeOut:
             alertOpponentDoesNotWantPlay(alert: .tcOpponentNotPlay)
             self.opponent = Opponent()
             self.playerType = .singlePlayer
+            GV.peerToPeerService!.changeStatusToFree()
         case peerToPeerVersionOfOpponentIsHigher:
             alertOpponentDoesNotWantPlay(alert: .tcPeerToPeerVersionIsHigher, opponentName: identity)
             self.opponent = Opponent()
             self.playerType = .singlePlayer
+            GV.peerToPeerService!.changeStatusToFree()
         case peerToPeerVersionOfOpponentIsLower:
             alertOpponentDoesNotWantPlay(alert: .tcPeerToPeerVersionIsLower, opponentName: identity)
             self.opponent = Opponent()
             self.playerType = .singlePlayer
+            GV.peerToPeerService!.changeStatusToFree()
        default:
             break
         }
@@ -1953,19 +1971,14 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             #endif
 
 
-            if GV.peerToPeerService!.hasOtherPlayers() {
-                let competitionAction = UIAlertAction(title: GV.language.getText(.tcCompetition), style: .default,
-                                                      handler: {(paramAction:UIAlertAction!) in
-                                                        self.choosePartner()
-                                                        //self.gameArrayChanged = true
-                                                        
-                })
-                alert.addAction(competitionAction)
+            let competitionAction = UIAlertAction(title: GV.language.getText(.tcCompetition), style: .default,
+                                                  handler: {(paramAction:UIAlertAction!) in
+                                                    self.choosePartner()
+                                                    //self.gameArrayChanged = true
+                                                    
+            })
+            alert.addAction(competitionAction)
                 
-            }
-            
-            
-
         }
         let cancelAction = UIAlertAction(title: GV.language.getText(TextConstants.tcCancel), style: .default,
             handler: {(paramAction:UIAlertAction!) in
@@ -1975,8 +1988,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func stopCompetition() {
-        GV.peerToPeerService!.sendInfo(.stopCompetition, message: [])
+        GV.peerToPeerService!.sendInfo(.stopCompetition, message: [], toPeer: opponent.peerID!)
         opponent.finish = .interrupted
+        playerType = .singlePlayer
+        GV.peerToPeerService!.changeStatusToFree()
         checkMultiplayer()
     }
 
@@ -2965,18 +2980,21 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func connectedDevicesChanged(_ manager : PeerToPeerServiceManager, connectedDevices: [String]) {
         
     }
-    func messageReceived(_ fromPeerIndex : Int, command: PeerToPeerCommands, message: [String], messageNr:Int) {
+    
+    func messageReceived(_ fromPeer: MCPeerID, command: PeerToPeerCommands, message: [String], messageNr:Int) {
         switch command {
         case .myNameIs: break
         case .iWantToPlayWithYou:
             if inSettings {
-                GV.peerToPeerService!.sendAnswer(messageNr, answer: [GV.IAmBusy])
+                GV.peerToPeerService!.sendAnswer(messageNr: messageNr, answer: [GV.IAmBusy])
             } else if message[1] > GV.peerToPeerVersion { // want the opponent play an other peerToPeerVerion ?
-                GV.peerToPeerService!.sendAnswer(messageNr, answer: [peerToPeerVersionOfOpponentIsLower])
+                GV.peerToPeerService!.sendAnswer(messageNr: messageNr, answer: [peerToPeerVersionOfOpponentIsLower])
             } else if message[1] < GV.peerToPeerVersion { // want the opponent play an other peerToPeerVerion ?
-                GV.peerToPeerService!.sendAnswer(messageNr, answer: [peerToPeerVersionOfOpponentIsHigher])
+                GV.peerToPeerService!.sendAnswer(messageNr: messageNr, answer: [peerToPeerVersionOfOpponentIsHigher])
+            } else if playerType == .multiPlayer {
+                GV.peerToPeerService!.sendAnswer(messageNr: messageNr, answer: [GV.IAmPlaying])
             } else {
-                alertStartMultiPlay(fromPeerIndex, message: message, messageNr: messageNr)
+                alertStartMultiPlay(fromPeer: fromPeer, message: message, messageNr: messageNr)
             }
         case .myScoreHasChanged:
             if playerType == .multiPlayer {
@@ -3081,12 +3099,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         })
         alert.addAction(OKAction)
         playerType = .singlePlayer
+        GV.peerToPeerService!.changeStatusToFree()
         GV.mainViewController!.showAlert(alert, delay: 20)
         
     }
     
 
-    func alertStartMultiPlay(_ fromPeerIndex: Int, message: [String], messageNr: Int) {
+    func alertStartMultiPlay(fromPeer: MCPeerID, message: [String], messageNr: Int) {
         let alert = UIAlertController(title: GV.language.getText(.tcWantToPlayWithYou, values: message[0]),
                                       message: "",
                                       preferredStyle: .alert)
@@ -3096,7 +3115,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                                         DispatchQueue.main.async {
                                             self.playerType = .multiPlayer
                                             self.opponent.name = message[0]
-                                            self.opponent.peerIndex = fromPeerIndex
+                                            self.opponent.peerID = fromPeer
                                             self.opponent.score = 0
                                             try! realm.write({ 
                                                 GV.player!.levelID = Int(message[2])!
@@ -3106,14 +3125,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                                             countPackages = Int(message[3])!
                                             self.gameNumber = Int(message[4])!
                                             self.restartGame = true
-                                            GV.peerToPeerService!.sendAnswer(messageNr, answer: [self.answerYes])
+                                            GV.peerToPeerService!.changeStatusToIsPlaying(isPlayingWith: self.opponent.name)
+                                            GV.peerToPeerService!.sendAnswer(messageNr: messageNr, answer: [self.answerYes])
                                         }
         })
         alert.addAction(OKAction)
         
         let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default,
                                          handler: {(paramAction:UIAlertAction!) in
-                                            GV.peerToPeerService!.sendAnswer(messageNr, answer: [self.answerNo])
+                                            GV.peerToPeerService!.sendAnswer(messageNr: messageNr, answer: [self.answerNo])
         })
         alert.addAction(cancelAction)
         DispatchQueue.main.async(execute: {

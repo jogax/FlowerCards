@@ -28,6 +28,8 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
     override func viewDidLoad() {
         super.viewDidLoad()
         GV.mainViewController = self
+        let actDate = getTodayString()
+        GV.deviceSessionID = UIDevice.current.identifierForVendor!.uuidString + "-" + actDate
         if let strAppName = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") {
             GV.appName = strAppName as! String
         }
@@ -46,7 +48,7 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
         
 //        let _ = ImportGamePredefinitions(countGames: countGames)
 //        backgroundThread(background: {
-//            self.loadGamePredefinitionIfNecessary(countGames)
+//            self.loadGamePredefinitionIfvaressary(countGames)
 //        })
 //        sleep(Double(1)) // wait for a second
 
@@ -54,6 +56,26 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
 //        printFonts()
         // Do any additional setup after loading the view, typically from a nib.
      }
+    
+    func getTodayString() -> String{
+        
+        let date = Date()
+        let calender = Calendar.current
+        let components = calender.dateComponents([.year,.month,.day,.hour,.minute,.second], from: date)
+        
+        let year = String(components.year!)
+        let month = (components.month! > 9 ? "" : "0") + String(describing: components.month!)
+        let day = (components.day! > 9 ? "" : "0") + String(describing: components.day!)
+        let hour = (components.hour! > 9 ? "" : "0") + String(describing: components.hour!)
+        let minute = (components.minute! > 9 ? "" : "0") + String(describing: components.minute!)
+        let second = (components.second! > 9 ? "" : "0") + String(describing: components.second!)
+        
+        let today_string = year + month + day + "-" + hour  + minute + second
+        
+        return today_string
+        
+    }
+
     
     func applicationWillEnterForeground(_ application: UIApplication) {
         _ = 0

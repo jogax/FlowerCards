@@ -137,4 +137,7 @@ let huDictionary: [TextConstants: String] = [
     .tcAllGamesCount:   "Games: % / %, %",
     .tcPkgTxt:          "%. P: % / %",
     .tcNoMoreSteps:     "Hoppá! Ez a lépés lehetetlenné tenné a játék befejezését --> ezért vissza",
+    .tcThereIsNoPartner: "Nincsenek játékosok a közelben!",
+    .tcIsPlayingWith:   " ellenfele %",
+    .tcWriteReview:     "Írj véleményt az App Store-ban",
 ]

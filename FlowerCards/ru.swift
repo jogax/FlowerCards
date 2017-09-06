@@ -136,5 +136,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcLevelAndPackage: "Уровень:%, Колоды:%, Формат:%",
     .tcAllGamesCount:   "Games: % / %, %",
     .tcPkgTxt:          "%. P: % / %",
-    .tcNoMoreSteps:     "Упс! Этот шаг сделал бы невозможным закончить игру -> так шаг назад"
+    .tcNoMoreSteps:     "Упс! Этот шаг сделал бы невозможным закончить игру -> так шаг назад",
+    .tcThereIsNoPartner: "Нет игроков поблизости!",
+    .tcIsPlayingWith:   " играет с %",
+    .tcWriteReview:     "Написать отзыв в App Store",
 ]

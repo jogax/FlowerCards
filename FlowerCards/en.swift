@@ -137,4 +137,7 @@ let enDictionary: [TextConstants: String] = [
     .tcAllGamesCount:   "Games: % / %, %",
     .tcPkgTxt:         "%. P: % / %",
     .tcNoMoreSteps:     "Oops! This step would make the game unfinishable -> undo!",
+    .tcThereIsNoPartner: "No Players found!",
+    .tcIsPlayingWith:   " is playing with %",
+    .tcWriteReview:     "Write Review on App Store",
 ]

@@ -127,7 +127,10 @@ enum TextConstants: Int {
     tcLevelAndPackage,
     tcAllGamesCount,
     tcPkgTxt,
-    tcNoMoreSteps
+    tcNoMoreSteps,
+    tcThereIsNoPartner,
+    tcIsPlayingWith,
+    tcWriteReview
 }
 
     let LanguageEN = "en" // index 0

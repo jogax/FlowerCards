@@ -14,19 +14,21 @@ import MultipeerConnectivity
 class PeerToPeerServiceManager: NSObject {
 
     let separator = "°"
+    let Nobody = ""
     var identifier: String
+    var iAmPlayingWith: String
     struct MessageContent {
         var command: PeerToPeerCommands
         var messages: [String]
         var answers: [String]
-        var fromPeerIndex: Int
+        var fromPeer: MCPeerID
         var closed: Bool
         var timeStamp: Date
    }
     fileprivate let peerToPeerType: String
 //    static private let CardFootballName:String = "CardFootball on "
-    
-    fileprivate let myPeerId = MCPeerID(displayName: UIDevice.current.identifierForVendor!.uuidString)//.name)
+    fileprivate let myPeerID = MCPeerID(displayName: GV.deviceSessionID)
+//    fileprivate let myPeerID = MCPeerID(displayName: UIDevice.current.identifierForVendor!.uuidString)//.name)
     
     fileprivate let serviceBrowser : MCNearbyServiceBrowser
     fileprivate let serviceAdvertiser : MCNearbyServiceAdvertiser
@@ -38,16 +40,17 @@ class PeerToPeerServiceManager: NSObject {
 
     
     lazy var session : MCSession = {
-        let session = MCSession(peer: self.myPeerId, securityIdentity: nil, encryptionPreference: MCEncryptionPreference.required)
+        let session = MCSession(peer: self.myPeerID, securityIdentity: nil, encryptionPreference: MCEncryptionPreference.required)
         session.delegate = self
         return session
     }()
 
     init(peerType: String, identifier: String, deviceName: String) {
         peerToPeerType = peerType
-        self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: peerToPeerType)
-        self.serviceBrowser = MCNearbyServiceBrowser(peer: myPeerId, serviceType: peerToPeerType)
+        self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerID, discoveryInfo: nil, serviceType: peerToPeerType)
+        self.serviceBrowser = MCNearbyServiceBrowser(peer: myPeerID, serviceType: peerToPeerType)
         self.identifier = identifier
+        self.iAmPlayingWith = Nobody
         super.init()
         self.serviceAdvertiser.delegate = self
         self.serviceAdvertiser.startAdvertisingPeer()
@@ -63,54 +66,68 @@ class PeerToPeerServiceManager: NSObject {
         return session.connectedPeers.count
     }
     
-    func getPartnerName()->([String]) {  // partnerName, deviceName
-        var names = [String]()
-        for index in 0..<session.connectedPeers.count {
-            names.append((session.connectedPeers[index].name!))
-        }
-        return names
+    func getPartners()->[MCPeerID] {  // [peerID]
+        return session.connectedPeers
     }
     
     func changeIdentifier(_ newIdentifier: String) {
         self.identifier = newIdentifier
         for index in 0..<session.connectedPeers.count {
-            sendInfo(.myNameIs, message: [identifier], toPeer: session.connectedPeers[index])
+            sendInfo(.myNameIs, message: [identifier, iAmPlayingWith], toPeer: session.connectedPeers[index])
         }
     }
     
-    func sendData(_ command: PeerToPeerCommands, messageNr: Int, message : [String], new: Bool = true, toPeer: MCPeerID? = nil, toPeerIndex: Int = 0, answer: Bool = false) {
-        var peer = toPeer
-        if toPeer == nil {
-            peer = session.connectedPeers[toPeerIndex]
+    func changeStatusToFree() {
+        for index in 0..<session.connectedPeers.count {
+            iAmPlayingWith = Nobody
+            sendInfo(.myStatusIsFree, message: [], toPeer: session.connectedPeers[index])
         }
-        if session.connectedPeers.count > 0 {
-            do {
-                var stringToSend = (command.commandName + separator + String(messageNr) + separator + String(new))
-                for index in 0..<message.count {
-                    stringToSend += separator + message[index]
-                }
-                messageArray[messageNr] = MessageContent(command: command, messages: message, answers: [String](), fromPeerIndex: 0, closed: false, timeStamp: Date())
-                let myNSData = (stringToSend as NSString).data(using: String.Encoding.utf8.rawValue)!
-//                print("sendMessage: \(stringToSend) to \(peer!.displayName)")
-                
-                try self.session.send(myNSData, toPeers: [peer!], with: MCSessionSendDataMode.reliable)
-            } catch let error as NSError {
-                print(error.localizedDescription)
+    }
+    
+    func changeStatusToIsPlaying(isPlayingWith: String) {
+        iAmPlayingWith = isPlayingWith
+        for index in 0..<session.connectedPeers.count {
+            sendInfo(.myStatusIsPlaying, message: [isPlayingWith], toPeer: session.connectedPeers[index])
+        }
+    }
+    
+    func sendData(command: PeerToPeerCommands, messageNr: Int, message : [String], new: Bool = true, toPeer: MCPeerID, answer: Bool = false) {
+        var founded = false
+        var peer: MCPeerID? = nil
+        for actPeer in session.connectedPeers {
+            if actPeer.displayName == toPeer.displayName {
+                founded = true
+                peer = actPeer
             }
-            
         }
+        if !founded {
+            return
+        }
+        do {
+            var stringToSend = (command.commandName + separator + String(messageNr) + separator + String(new))
+            for index in 0..<message.count {
+                stringToSend += separator + message[index]
+            }
+            messageArray[messageNr] = MessageContent(command: command, messages: message, answers: [String](), fromPeer: myPeerID, closed: false, timeStamp: Date())
+            let myNSData = (stringToSend as NSString).data(using: String.Encoding.utf8.rawValue)!
+            
+            try self.session.send(myNSData, toPeers: [peer!], with: MCSessionSendDataMode.reliable)
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+            
     }
     
-    func sendInfo(_ command: PeerToPeerCommands, message : [String], new: Bool = true, toPeer: MCPeerID? = nil, toPeerIndex: Int = 0) {
-        sendData(command, messageNr: messageNr, message: message, new: true, toPeer: toPeer, toPeerIndex: toPeerIndex, answer: false)
+    func sendInfo(_ command: PeerToPeerCommands, message : [String], new: Bool = true, toPeer: MCPeerID) {
+        sendData(command: command, messageNr: messageNr, message: message, new: true, toPeer: toPeer, answer: false)
         messageArray.removeValue(forKey: messageNr)
         messageNr += 1
     }
 
-    func sendMessage(_ command: PeerToPeerCommands, message : [String], toPeer: MCPeerID? = nil, toPeerIndex: Int = 0)->[String] {
+    func sendMessage(command: PeerToPeerCommands, message : [String], toPeer: MCPeerID)->[String] {
         let myMessageNr = messageNr
         messageNr += 1
-        sendData(command, messageNr: myMessageNr, message: message, new: true, toPeer: toPeer, toPeerIndex: toPeerIndex, answer: false)
+        sendData(command: command, messageNr: myMessageNr, message: message, new: true, toPeer: toPeer, answer: false)
         var counter = 0
         let maxTime: Double = 20 // sec
         let startAt = Date()
@@ -129,11 +146,11 @@ class PeerToPeerServiceManager: NSObject {
         return answersToReturn
     }
 
-    func sendAnswer(_ messageNr: Int, answer : [String]) {
+    func sendAnswer(messageNr: Int, answer : [String]) {
         
         let command = answerArray[messageNr]!.command
-        let toPeerIndex = answerArray[messageNr]!.fromPeerIndex
-        sendData(command, messageNr: messageNr, message: answer, new: false, toPeerIndex: toPeerIndex, answer: true)
+        let toPeer = answerArray[messageNr]!.fromPeer
+        sendData(command: command, messageNr: messageNr, message: answer, new: false, toPeer: toPeer, answer: true)
     }
     
     deinit {
@@ -171,12 +188,12 @@ extension PeerToPeerServiceManager : MCNearbyServiceAdvertiserDelegate {
 
     
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, error: NSError) {
-//        print("didNotStartAdvertisingPeer: \(error)")
+        print("didNotStartAdvertisingPeer: \(error)")
     }
     
 //    func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?,  invitationHandler: (Bool, MCSession) -> Void) {
 //        invitationHandler(true, self.session)
-////        print("from \(myPeerId.displayName): in PeerToPeerServiceManager")
+////        print("from \(myPeerID.displayName): in PeerToPeerServiceManager")
 //    }
 
 }
@@ -184,7 +201,7 @@ extension PeerToPeerServiceManager : MCNearbyServiceAdvertiserDelegate {
 extension PeerToPeerServiceManager : MCNearbyServiceBrowserDelegate {
 
     private func browser(_ browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: NSError) {
-//        print("didNotStartBrowsingForPeers: \(error)")
+        print("didNotStartBrowsingForPeers: \(error)")
     }
 
     
@@ -192,13 +209,13 @@ extension PeerToPeerServiceManager : MCNearbyServiceBrowserDelegate {
     func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) {
 //        if peerID.displayName.containsString(PeerToPeerServiceManager.CardFootballName) {
             browser.invitePeer(peerID, to: self.session, withContext: nil, timeout: 10)
-//            print("new connection found: \(peerID.displayName), countConnections: \(self.session.connectedPeers.count)")
+            print("new connection found: \(String(describing: peerID.displayName)), countConnections: \(self.session.connectedPeers.count)")
 //        }
     }
 
     func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
 //        connectionLost(
-        print("connections lost: \(peerID.displayName), count connections: \(self.session.connectedPeers.count)")
+        print("connections lost: \(String(describing: peerID.displayName)), count connections: \(self.session.connectedPeers.count)")
     }
 }
 
@@ -207,9 +224,10 @@ extension PeerToPeerServiceManager : MCSessionDelegate {
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         //        self.delegate?.connectedDevicesChanged(self, connectedDevices: session.connectedPeers.map({$0.displayName}))
         if state == .connected {
-            sendInfo(.myNameIs, message:  [identifier], toPeer: peerID)
+            sendInfo(.myNameIs, message:  [identifier, iAmPlayingWith], toPeer: peerID)
+            print ("connected to \(peerID.displayName), countConnections: \(self.session.connectedPeers.count)")
         }
-//        print("peer \(peerID.displayName) didChangeState: \(state.stringValue())")
+//        print("peer \(String(describing: peerID.displayName)) didChangeState: \(state.stringValue())")
         
     }
 
@@ -224,37 +242,55 @@ extension PeerToPeerServiceManager : MCSessionDelegate {
             parameterString.append(stringTable[index])
         }
         
-        var fromPeerIndex = -1
         for index in 0..<session.connectedPeers.count {
             if session.connectedPeers[index] == peerID {
-                fromPeerIndex = index
+                if command == .myNameIs {
+                    peerID.name = parameterString[0]
+                    if parameterString.count > 1 { // older versions send only the 1-st param
+                        peerID.playingWith = parameterString[1]
+                    }
+                    //                self.delegate!.messageReceived(fromPeerIndex, command: command, message: parameterString, messageNr: messageNr!)
+                } else if command == .myStatusIsFree {
+                    peerID.playingWith = ""
+                } else if command == .myStatusIsPlaying {
+                    peerID.playingWith = parameterString[0]
+                } else {
+                    if new { // new message from Partner
+                        answerArray[messageNr!] = MessageContent(command: command, messages: parameterString, answers: [String](), fromPeer: peerID, closed: false, timeStamp: Date())
+                        self.delegate!.messageReceived(peerID, command: command, message: parameterString, messageNr: messageNr!)
+                    } else { // answer to my Message
+                        messageArray[messageNr!]!.answers = parameterString
+                        //                    print("used time: \(Date().timeIntervalSince(messageArray[messageNr!]!.timeStamp)), \(parameterString)")
+                        messageArray[messageNr!]!.closed = true
+                    }
+                }
                 break
             }
         }
-        if fromPeerIndex != -1 {
-            if command == .myNameIs {
-                peerID.name = parameterString[0]
-//                self.delegate!.messageReceived(fromPeerIndex, command: command, message: parameterString, messageNr: messageNr!)
-            } else {
-                if new { // new message from Partner
-                    answerArray[messageNr!] = MessageContent(command: command, messages: parameterString, answers: [String](), fromPeerIndex: fromPeerIndex, closed: false, timeStamp: Date())
-                    self.delegate!.messageReceived(fromPeerIndex, command: command, message: parameterString, messageNr: messageNr!)
-                } else { // answer to my Message
-                    messageArray[messageNr!]!.answers = parameterString
-//                    print("used time: \(Date().timeIntervalSince(messageArray[messageNr!]!.timeStamp)), \(parameterString)")
-                    messageArray[messageNr!]!.closed = true
-                }
-            }
-        }
+//        if fromPeerIndex != -1 {
+//            if command == .myNameIs {
+//                peerID.name = parameterString[0]
+////                self.delegate!.messageReceived(fromPeerIndex, command: command, message: parameterString, messageNr: messageNr!)
+//            } else {
+//                if new { // new message from Partner
+//                    answerArray[messageNr!] = MessageContent(command: command, messages: parameterString, answers: [String](), fromPeer: fromPeerIndex, closed: false, timeStamp: Date())
+//                    self.delegate!.messageReceived(fromPeerIndex, command: command, message: parameterString, messageNr: messageNr!)
+//                } else { // answer to my Message
+//                    messageArray[messageNr!]!.answers = parameterString
+////                    print("used time: \(Date().timeIntervalSince(messageArray[messageNr!]!.timeStamp)), \(parameterString)")
+//                    messageArray[messageNr!]!.closed = true
+//                }
+//            }
+//        }
     }
     
     func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
-//        print("from \(myPeerId.displayName):didStartReceivingResourceWithName")
+//        print("from \(myPeerID.displayName):didStartReceivingResourceWithName")
     }
     
     
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL , withError error: Error?) {
-//        print("from \(myPeerId.displayName):didFinishReceivingResourceWithName")
+//        print("from \(myPeerID.displayName):didFinishReceivingResourceWithName")
     }
     
    func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
@@ -268,6 +304,7 @@ extension MCPeerID {
 
     fileprivate struct AssociatedKeys {
         static var partnerName:String?
+        static var opponentName:String?
         static var index: Int?
     }
     
@@ -281,14 +318,22 @@ extension MCPeerID {
             }
         }
     }
-
-    
+    var playingWith: String? {
+        get {
+            return objc_getAssociatedObject(self, &AssociatedKeys.opponentName) as? String
+        }
+        set {
+            if let newValue = newValue {
+                objc_setAssociatedObject(self, &AssociatedKeys.opponentName, newValue as String?, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            }
+        }
+    }
 }
 
 protocol PeerToPeerServiceManagerDelegate {
     
     func connectedDevicesChanged(_ manager : PeerToPeerServiceManager, connectedDevices: [String])
-    func messageReceived(_ fromPeerIndex : Int, command: PeerToPeerCommands, message: [String], messageNr: Int)
+    func messageReceived(_ fromPeer : MCPeerID, command: PeerToPeerCommands, message: [String], messageNr: Int)
     
 }
 

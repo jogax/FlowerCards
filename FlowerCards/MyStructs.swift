@@ -25,8 +25,8 @@ struct GV {
     static var mainScene: CardGameScene?
     static let freeGameCount = 1000
     static var peerToPeerService: PeerToPeerServiceManager?
-    static let peerToPeerVersion = "1.0" // 2017-06-21
-
+//    static let peerToPeerVersion = "1.0" // 2017-06-21
+    static let peerToPeerVersion = "1.1" // 2017-09-01
     static var dX: CGFloat = 0
     static var speed: CGSize = CGSize.zero
     static var touchPoint = CGPoint.zero
@@ -44,9 +44,11 @@ struct GV {
     static let oneGrad:CGFloat = CGFloat(Double.pi) / 180
     static let timeOut = "TimeOut"
     static let IAmBusy = "Busy"
+    static let IAmPlaying = "Playing"
     static var appName: String = ""
     static var versionsNumber: String = ""
     static var buildNumber: String = ""
+    static var deviceSessionID: String = ""
     
     
 
@@ -452,6 +454,15 @@ enum PeerToPeerCommands: Int {
     stopCompetition, // sendInfo
             //
             //      parameter:
+    myStatusIsFree,
+    //
+    //      parameters: -
+    
+    myStatusIsPlaying,
+    //
+    //      parameters: 1 - opponentName
+    
+
     maxValue
     
     var commandName: String {

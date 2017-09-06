@@ -30,6 +30,7 @@ class MySKPanel: SKSpriteNode {
     let setMusicFunc = "setMusicVolume"
     let setLanguageFunc = "setLanguage"
     let setPlayerStatisticFunc = "setPlayerStatistics"
+    let writeReviewFunc = "writeReview"
     let setReturnFunc = "setReturn"
     var sizeMultiplier = CGSize(width: 0, height: 0)
     var fontSize:CGFloat = 0
@@ -42,6 +43,7 @@ class MySKPanel: SKSpriteNode {
     let musicLabel = SKLabelNode()
     let languageLabel = SKLabelNode()
     let playerStatisticLabel = SKLabelNode()
+    let writeReviewLabel = SKLabelNode()
     let appName_Build_Version_Label = SKLabelNode()
     let returnLabel = SKLabelNode()
     let callbackName = "SettingsCallbackName"
@@ -110,6 +112,7 @@ class MySKPanel: SKSpriteNode {
         musicLabel.text = GV.language.getText(.tcMusicVolume)
         languageLabel.text = GV.language.getText(.tcLanguage)
         playerStatisticLabel.text = GV.language.getText(.tcStatistic)
+        writeReviewLabel.text = GV.language.getText(.tcWriteReview)
         returnLabel.text = GV.language.getText(.tcReturn)
         return false
     }
@@ -129,7 +132,8 @@ class MySKPanel: SKSpriteNode {
         createLabels(musicLabel, text: GV.language.getText(.tcMusicVolume), lineNr: 4, horAlignment: .left, name: setMusicFunc )
         createLabels(languageLabel, text: GV.language.getText(.tcLanguage), lineNr: 5, horAlignment: .left, name: setLanguageFunc )
         createLabels(playerStatisticLabel, text: GV.language.getText(.tcStatistic), lineNr: 6, horAlignment: .left, name: setPlayerStatisticFunc )
-        createLabels(returnLabel, text: GV.language.getText(.tcReturn), lineNr: 7, horAlignment: .left, name: setReturnFunc )
+        createLabels(writeReviewLabel, text: GV.language.getText(.tcWriteReview), lineNr: 7, horAlignment: .left, name: writeReviewFunc )
+        createLabels(returnLabel, text: GV.language.getText(.tcReturn), lineNr: 8, horAlignment: .left, name: setReturnFunc )
     }
     func createLabels(_ label: SKLabelNode, text: String, lineNr: Double, horAlignment: SKLabelHorizontalAlignmentMode, name:String) {
         label.text = text
@@ -167,7 +171,7 @@ class MySKPanel: SKSpriteNode {
             }
             let node = atPoint(touchLocation)
             if node is SKLabelNode && touchesBeganWithNode == node {
-                if node.name!.isMemberOf (setPlayerFunc, setSoundFunc, setMusicFunc, setLanguageFunc, setPlayerStatisticFunc,  setReturnFunc) {
+                if node.name!.isMemberOf (setPlayerFunc, setSoundFunc, setMusicFunc, setLanguageFunc, setPlayerStatisticFunc,  writeReviewFunc, setReturnFunc) {
     //                (node   as! SKLabelNode).fontSize -= 2
                     switch node.name! {
                     case setPlayerFunc: setPlayer()
@@ -175,6 +179,7 @@ class MySKPanel: SKSpriteNode {
                     case setMusicFunc: setMusicVolume()
                     case setLanguageFunc: setLanguage()
                     case setPlayerStatisticFunc: setPlayerStatistic()
+                    case writeReviewFunc: writeReview()
                     case setReturnFunc: goBack(playerChanged)
                     default: goBack(playerChanged)
                     }
@@ -209,6 +214,13 @@ class MySKPanel: SKSpriteNode {
         let _ = MySKStatistic(parent: self, callBack: callIfMySKStatisticEnds)
     }
     
+    func writeReview() {
+        let url = "https://itunes.apple.com/app/id1143924460"
+        if let url = URL(string: url) {
+            UIApplication.shared.openURL(url)
+        }
+    }
+    
     func goBack(_ restartGame: Bool, gameNumberChoosed: Bool = false, gameNumber: Int = 0, levelIndex: Int = 0, countPackages: Int = 0) {
         GV.language.removeCallback(callbackName)
         shadow?.removeFromParent()
@@ -240,6 +252,7 @@ class MySKPanel: SKSpriteNode {
         musicLabel.text = GV.language.getText(.tcMusicVolume)
         languageLabel.text = GV.language.getText(.tcLanguage)
         playerStatisticLabel.text = GV.language.getText(.tcStatistic)
+        writeReviewLabel.text = GV.language.getText(.tcWriteReview)
         returnLabel.text = GV.language.getText(.tcReturn)
     }
     
@@ -255,6 +268,7 @@ class MySKPanel: SKSpriteNode {
         musicLabel.text = GV.language.getText(.tcMusicVolume)
         languageLabel.text = GV.language.getText(.tcLanguage)
         playerStatisticLabel.text = GV.language.getText(.tcStatistic)
+        writeReviewLabel.text = GV.language.getText(.tcWriteReview)
         returnLabel.text = GV.language.getText(.tcReturn)
     }
     
