@@ -220,7 +220,7 @@ class Language {
     func getPreferredLanguage()->String {
         let deviceLanguage = Locale.preferredLanguages[0]
         let languageKey = deviceLanguage[deviceLanguage.startIndex..<deviceLanguage.characters.index(deviceLanguage.startIndex, offsetBy: 2)]
-        return languageKey
+        return String(languageKey)
     }
     
     func count()->Int {

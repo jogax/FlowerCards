@@ -166,22 +166,22 @@ extension Int {
     }
     
     func toBinary(len: Int = 0)->String {
-        let spacing = 4
-        var string = ""
-        var shifted = self
-        for index in 0...63 {
-            let digit = shifted & 1 == 0 ? "0" : "1"
-            string = digit + string
-            if index % spacing == 3 {
-                string = " " + string
+            let spacing = 4
+            var string = ""
+            var shifted = self
+            for index in 0...63 {
+                let digit = shifted & 1 == 0 ? "0" : "1"
+                string = digit + string
+                if index % spacing == 3 {
+                    string = " " + string
+                }
+                shifted = shifted >> 1
             }
-            shifted = shifted >> 1
+            let offset = len == 0 ? 0 : string.count - len - len / spacing
+            let startPos = string.index(string.startIndex, offsetBy: offset)
+            let returnString = String(string[startPos...])
+            return returnString
         }
-        let offset = len == 0 ? 0 : string.length - len
-        let startPos = string.index(string.startIndex, offsetBy: offset)
-        let returnString = string.substring(from: startPos)
-        return returnString
-    }
 }
 
 extension UInt8 {

@@ -214,8 +214,9 @@ func printGameArrayInhalt() {
         if container.minValue != NoColor {
             let minStr = (container.minValue != 9 ? " " : "") + MySKCard.cardLib[container.minValue]!
             let maxStr = (container.maxValue != 9 ? " " : "") + MySKCard.cardLib[container.maxValue]!
-            if let colorName = String(CardManager.colorNames[container.colorIndex]) {
-                string += "(" + colorName + ")"
+            let colorName:String? = String(CardManager.colorNames[container.colorIndex])
+            if colorName != nil {
+                string += "(" + colorName! + ")"
             }
             string += maxStr + "-" + minStr
         } else {
@@ -234,8 +235,9 @@ func printGameArrayInhalt() {
                 let card = gameArray[column][rowIndex].card
                 let minStr = (card.minValue != 9 ? " " : "") + MySKCard.cardLib[card.minValue]!
                 let maxStr = (card.minValue != 9 ? " " : "") + MySKCard.cardLib[card.maxValue]!
-                if let colorName = String(CardManager.colorNames[card.colorIndex]) {
-                    string += "(" + colorName + ")"
+                let colorName:String? = String(CardManager.colorNames[card.colorIndex])
+                if colorName != nil  {
+                    string += "(" + colorName! + ")"
                 }
                 string += maxStr + "-" + minStr
             } else {
@@ -433,7 +435,7 @@ class CardManager {
             let newPairs = colorArray[card.colorIndex].addCardToColor(card: card)
             if newPairs.count > 0 {
                 for pair in newPairs {
-                    checkPathToFoundedCards(pair: pair)
+                    checkPathToFoundedCards(pair: pair as! Tipp)
                 }
             }
             positionsTab.remove(at: index)
@@ -481,7 +483,7 @@ class CardManager {
                                 updateGameArrayCell(card: card)
                                 cardArray.append(card)
                                 for pair in newPairs {
-                                    checkPathToFoundedCards(pair: pair)
+                                    checkPathToFoundedCards(pair: pair as! Tipp)
                                 }
                                 actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
                                 go = false
@@ -518,7 +520,7 @@ class CardManager {
                         updateGameArrayCell(card: card)
                         cardArray.append(card)
                         for pair in newPairs {
-                            checkPathToFoundedCards(pair: pair)
+                            checkPathToFoundedCards(pair: pair as! Tipp)
                         }
                         actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
                     } else {
@@ -718,7 +720,7 @@ class CardManager {
         tippArray.removeAll()
         let pairsToCheck = getPairsToCheck()
         for pair in pairsToCheck {
-            checkPathToFoundedCards(pair: pair)
+            checkPathToFoundedCards(pair: pair as! Tipp)
             if stopCreateTippsInBackground {
                 stopCreateTippsInBackground = false
             }
@@ -823,7 +825,7 @@ class CardManager {
     }
 
     
-    private func checkPathToFoundedCards(pair:ConnectablePair) {
+    private func checkPathToFoundedCards(pair:Tipp) {
         let firstValue: CGFloat = 10000
         func checkPath(card1: MySKCard, card2: MySKCard)->Tipp {
             let myTipp = Tipp()
@@ -1336,8 +1338,9 @@ class CardManager {
             if container.minValue != NoColor {
                 let minStr = (container.minValue != 9 ? " " : "") + MySKCard.cardLib[container.minValue]!
                 let maxStr = (container.maxValue != 9 ? " " : "") + MySKCard.cardLib[container.maxValue]!
-                if let colorName = String(CardManager.colorNames[container.colorIndex]) {
-                    string += " (" + colorName + ")"
+                let colorName: String? = String(CardManager.colorNames[container.colorIndex])
+                if colorName != nil {
+                    string += " (" + colorName! + ")"
                 }
                 string += maxStr + "-\(container.countTransitions)-" + minStr
             } else {
@@ -1356,8 +1359,9 @@ class CardManager {
                     let card = gameArray[column][rowIndex].card
                     let minStr = (card.minValue != 9 ? " " : "") + MySKCard.cardLib[card.minValue]!
                     let maxStr = (card.minValue != 9 ? " " : "") + MySKCard.cardLib[card.maxValue]!
-                    if let colorName = String(CardManager.colorNames[card.colorIndex]) {
-                        string += " (" + colorName + ")"
+                    let colorName: String? = String(CardManager.colorNames[card.colorIndex])
+                    if colorName != nil {
+                        string += " (" + colorName! + ")"
                     }
                     string += maxStr + "-\(card.countTransitions)-" + minStr
                 } else {

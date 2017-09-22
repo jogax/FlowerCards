@@ -11,13 +11,11 @@ import RealmSwift
 
 class RecordIDModel: Object {
     
-    dynamic var ID = 0
-    dynamic var gameModelID = 0
-    dynamic var playerModelID = 0
-    dynamic var statisticModelID = 0
-//    #if REALM_V2
-        dynamic var historyModelID = 0
-//    #endif
+    @objc dynamic var ID = 0
+    @objc dynamic var gameModelID = 0
+    @objc dynamic var playerModelID = 0
+    @objc dynamic var statisticModelID = 0
+    @objc dynamic var historyModelID = 0
     override  class func primaryKey() -> String {
         return "ID"
     }

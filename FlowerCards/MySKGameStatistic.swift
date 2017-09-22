@@ -33,7 +33,7 @@ class MySKGameStatistic: MySKTable {
         let headLines = GV.language.getText(.tcPlayerStatisticLevel,
                         values: playerName, String(levelID + 1), GV.levelsForPlay.getLevelFormat(level: levelID), String(countPackages))
         gamesOfThisLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = %d",
-                        playerID, levelID, countPackages).sorted(byProperty: "gameNumber")
+                                                                playerID, levelID, countPackages).sorted(byKeyPath: "gameNumber")
         super.init(columnWidths: myGameColumnWidths, countRows:gamesOfThisLevel.count + 1, headLines: [headLines], parent: parent, myName: "MySKDetailedStatistic", width: parent.parent!.frame.width * 0.9)
         self.showVerticalLines = true
         

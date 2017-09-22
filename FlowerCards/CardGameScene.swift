@@ -114,7 +114,7 @@ enum ShowHelpLine: Int {
 }
 
 
-
+// Global Variable and Constants
 let countContainers = 4
 var countColumns = 0
 var countRows = 0
@@ -129,6 +129,8 @@ var random: MyRandom?
 let MaxGameNumber = 10000
 var lastUsedTipp: Tipp?
 let myBuildVersion = GV.buildNumber + "/" + GV.versionsNumber
+var cardTabRect = CGRect.zero
+
 
 
 
@@ -445,7 +447,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var settingsDelegate: SettingsDelegate?
     //var settingsNode = SettingsNode()
     var gameDifficulty: Int = 0
-    var cardTabRect = CGRect.zero
     
     var buttonField: SKSpriteNode?
     //var levelArray = [Level]()
@@ -517,17 +518,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     override func didMove(to view: SKView) {
         
         if !settingsSceneStarted {
-//            let modelURL = NSBundle.mainBundle().URLForResource("FlowerCards", withExtension: "momd")!
-
             myView = view
             GV.mainScene = self
             
             GV.peerToPeerService!.delegate = self
-//            let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
-//            print(documentsPath)
-            
-//            cardTabRect.origin = CGPoint(x: self.frame.midX, y: self.frame.midY * 0.80)
-//            cardTabRect.size = CGSize(width: self.frame.size.width * 0.80, height: self.frame.size.height * 0.80)
             let width:CGFloat = 64.0
             let height: CGFloat = 89.0
             let sizeMultiplierConstant = CGFloat(0.0020)
@@ -845,7 +839,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             createLabels(label: fourPkgLabel, text: GV.language.getText(.tcPkgTxt,values: "4", "0"), row: 4, xPosProzent: fourPkgLabelPos, fontSizeModifier: 0.7)
             updateGameCountLabels()
         #endif
-        let mySortedPlays = realm.objects(GameModel.self).filter("playerID = %d and played = true", GV.player!.ID).sorted(byProperty: "levelID")
+        let mySortedPlays = realm.objects(GameModel.self).filter("playerID = %d and played = true", GV.player!.ID).sorted(byKeyPath: "levelID")
         if mySortedPlays.count > 0 {
             maxLevelIndex = mySortedPlays.last!.levelID
         } else {
@@ -2589,7 +2583,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         inTouches = false
     }
     
-    func waitWhileInGeneratingCards() {
+    @objc func waitWhileInGeneratingCards() {
         while inGeneratingCards {
             self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(CardGameScene.waitWhileInGeneratingCards), userInfo: nil, repeats: false) // start timer for check
         }
@@ -2829,7 +2823,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     
-    func push(_ card: MySKCard, status: CardStatus) {
+    func push(_ card: MySKCard, status: CardStatusInStack) {
         var savedCard = SavedCard()
         savedCard.card = card
         savedCard.type = card.type
@@ -2889,7 +2883,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             doTimeCount = false
             let url = GV.language.getText(.tcHelpURL)
             if let url = URL(string: url) {
-                UIApplication.shared.openURL(url)
+                if #available(iOS 10.0, *) {
+                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                } else {
+                    UIApplication.shared.openURL(url)
+                }
             }
             doTimeCount = true
         }
@@ -2962,12 +2960,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     
-    func waitForMovingCards() {
+    @objc func waitForMovingCards() {
         countCheckCounts = 0
         checkCountMovingCards()
     }
     
-    func checkCountMovingCards() {
+    @objc func checkCountMovingCards() {
         if  movingCards.count > 0 && countCheckCounts < 1000 {
             countCheckCounts += 1
             self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(CardGameScene.checkCountMovingCards), userInfo: nil, repeats: false)

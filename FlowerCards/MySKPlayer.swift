@@ -30,7 +30,7 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
 
 
     init(parent: SKSpriteNode, view: UIView, callBack: @escaping ()->()) {
-        nameTable = Array(realm.objects(PlayerModel.self).sorted(byProperty: "created", ascending: true))
+        nameTable = Array(realm.objects(PlayerModel.self).sorted(byKeyPath: "created", ascending: true))
         countLines = nameTable.count// + (nameTable[0].name == GV.language.getText(.TCGuest) ? 0 : 1)
         self.parentNode = parent
         self.callBack = callBack
@@ -248,7 +248,7 @@ class MySKPlayer: MySKTable, UITextFieldDelegate {
     }
     
     func addNewPlayerWhenRequired() -> Int {
-        let lastPlayer = realm.objects(PlayerModel.self).sorted(byProperty: "created", ascending: false).first!
+        let lastPlayer = realm.objects(PlayerModel.self).sorted(byKeyPath: "created", ascending: false).first!
         if lastPlayer.name == GV.language.getText(.tcAnonym) {
             return lastPlayer.ID
         } else {

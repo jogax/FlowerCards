@@ -10,15 +10,15 @@ import Foundation
 import RealmSwift
 
 class PlayerModel: Object {
-    dynamic var ID = 0
-    dynamic var name = ""
-    dynamic var levelID = 0
-    dynamic var countPackages = 1
-    dynamic var isActPlayer = false
-    dynamic var aktLanguageKey = GV.language.getAktLanguageKey()
-    dynamic var soundVolume: Float = 0
-    dynamic var musicVolume: Float = 0
-    dynamic var created = Date()
+    @objc dynamic var ID = 0
+    @objc dynamic var name = ""
+    @objc dynamic var levelID = 0
+    @objc dynamic var countPackages = 1
+    @objc dynamic var isActPlayer = false
+    @objc dynamic var aktLanguageKey = GV.language.getAktLanguageKey()
+    @objc dynamic var soundVolume: Float = 0
+    @objc dynamic var musicVolume: Float = 0
+    @objc dynamic var created = Date()
 
     override  class func primaryKey() -> String {
         return "ID"

@@ -10,20 +10,20 @@ import Foundation
 import RealmSwift
 
 class GameModel: Object {
-    dynamic var ID = 0
-    dynamic var playerID = 0
-    dynamic var levelID = 0
-    dynamic var countPackages = 0
-    dynamic var gameNumber = 0
-    dynamic var played = false
-    dynamic var countSteps = 0
-    dynamic var gameFinished = false
-    dynamic var time = 0
-    dynamic var playerScore = 0
-    dynamic var multiPlay = false
-    dynamic var opponentName = ""
-    dynamic var opponentScore = 0
-    dynamic var created = Date()
+    @objc dynamic var ID = 0
+    @objc dynamic var playerID = 0
+    @objc dynamic var levelID = 0
+    @objc dynamic var countPackages = 0
+    @objc dynamic var gameNumber = 0
+    @objc dynamic var played = false
+    @objc dynamic var countSteps = 0
+    @objc dynamic var gameFinished = false
+    @objc dynamic var time = 0
+    @objc dynamic var playerScore = 0
+    @objc dynamic var multiPlay = false
+    @objc dynamic var opponentName = ""
+    @objc dynamic var opponentScore = 0
+    @objc dynamic var created = Date()
 
     override  class func primaryKey() -> String {
         return "ID"

@@ -217,7 +217,11 @@ class MySKPanel: SKSpriteNode {
     func writeReview() {
         let url = "https://itunes.apple.com/app/id1143924460"
         if let url = URL(string: url) {
-            UIApplication.shared.openURL(url)
+            if #available(iOS 10.0, *) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            } else {
+                UIApplication.shared.openURL(url)
+            }
         }
     }
     

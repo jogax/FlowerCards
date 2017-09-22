@@ -13,35 +13,6 @@ class AutoPlayer {
     // game to Play saves Games, Levels and CountPackages as they are displayed
     let gamesToPlayTable: [GameToPlay] = [
         GameToPlay(level: 2, countPackages: 1, gameNumber: 6025, stopAt: 35),
-//        GameToPlay(level: 20, countPackages: 3, gameNumber: 3250, stopAt: 289),
-//        GameToPlay(level: 15, countPackages: 4, gameNumber: 787), // at Step: 88
-//        GameToPlay(level: 18, countPackages: 4, gameNumber: 5332), // at Step: 5
-//        GameToPlay(level: 18, countPackages: 2, gameNumber: 2818, stopAt: 60), // at Step: 97 OK
-//        GameToPlay(level: 19, countPackages: 2, gameNumber: 2404), // at Step: 95
-//        GameToPlay(level: 20, countPackages: 2, gameNumber: 2222), // at Step: 95
-//        GameToPlay(level: 24, countPackages: 2, gameNumber: 2917), // at Step: 100
-//        GameToPlay(level: 26, countPackages: 2, gameNumber: 2351), // at Step: 100
-//        GameToPlay(level: 19, countPackages: 3, gameNumber: 2618), // at Step: 151
-//        GameToPlay(level: 18, countPackages: 4, gameNumber: 2624), // at Step: 204
-//
-//        GameToPlay(level: 14, countPackages: 3, gameNumber: 2055, stopAt: 4),// , stopAt: 128), // at Step: 144
-//        GameToPlay(level: 25, countPackages: 2, gameNumber: 1138), // at Step: 92
-//        GameToPlay(level: 24, countPackages: 3, gameNumber: 1291), // at Step: 145
-//        GameToPlay(level: 13, countPackages: 3, gameNumber: 868), // at Step: 42
-//        GameToPlay(level: 18, countPackages: 3, gameNumber: 1346), // at Step: 150
-//        GameToPlay(level: 19, countPackages: 4, gameNumber: 2000), // at Step: 195
-//        GameToPlay(level: 20, countPackages: 4, gameNumber: 1770), // at Step: 199
-//        GameToPlay(level: 21, countPackages: 4, gameNumber: 1950), // at Step: 200
-//        GameToPlay(level: 22, countPackages: 3, gameNumber: 1366), // at Step: 150
-//        GameToPlay(level: 24, countPackages: 4, gameNumber: 471), // at Step: 197
-//        GameToPlay(level: 24, countPackages: 3, gameNumber: 1529), // at Step: 150
-//        GameToPlay(level: 25, countPackages: 3, gameNumber: 1087), // at Step: 11
-//        GameToPlay(level: 25, countPackages: 4, gameNumber: 1672), // at Step: 196
-//        GameToPlay(level: 25, countPackages: 3, gameNumber: 2168), // at Step: 149
-//        GameToPlay(level: 26, countPackages: 4, gameNumber: 435), // at Step: 201
-//        GameToPlay(level: 26, countPackages: 3, gameNumber: 1241), // at Step: 140
-//        GameToPlay(level: 26, countPackages: 3, gameNumber: 2132), // at Step: 145    
-//        GameToPlay(level: 12, countPackages: 2, gameNumber: 781), // at Step: 98 OK
     ]
     enum runStatus: Int {
         case GetTipp = 0, TouchesBegan, TouchesMoved, TouchesEnded, WaitingForNextStep//, TippButtonPressed, TippButtonReleased
@@ -162,7 +133,7 @@ class AutoPlayer {
         case .fromDB:
             gamesToPlay.removeAll()
             let searchString = "" //"and ((countSteps < 190 and countPackages = 4) or (countSteps < 146 and countPackages = 3))"
-            let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false \(searchString)", GV.player!.ID).sorted(byProperty: "created", ascending: true)
+            let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false \(searchString)", GV.player!.ID).sorted(byKeyPath: "created", ascending: true)
             for game in errorGames {
                 let countSteps = game.countSteps
                 if countSteps > 0 {
@@ -235,7 +206,7 @@ class AutoPlayer {
     
     private func generateTestForAllOthers() {
         let origID = realm.objects(PlayerModel.self).filter("name = %@", "NewPlayer").first!.ID
-        let games = realm.objects(GameModel.self).filter("playerID = %d", origID).sorted(byProperty: "gameNumber", ascending: true)
+        let games = realm.objects(GameModel.self).filter("playerID = %d", origID).sorted(byKeyPath: "gameNumber", ascending: true)
         for game in games {
             let levelID = game.levelID
             let countPackages = game.countPackages

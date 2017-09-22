@@ -73,7 +73,7 @@ class MySKSlider: MySKTable, AVAudioPlayerDelegate {
         soundEffects!.play()
     }
     
-    func reStart() {
+    @objc func reStart() {
         playSound(fileName, volume: Float(volumeValue), loops: -1)
         soundEffects!.play()
         print(Date())

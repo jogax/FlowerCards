@@ -11,21 +11,21 @@ import RealmSwift
 
 class StatisticModel: Object {
 
-    dynamic var ID = 0
-    dynamic var playerID = 0
-    dynamic var levelID = 0
-    dynamic var countPackages = 0
-    dynamic var actScore = 0
-    dynamic var actTime = 0
-    dynamic var allTime = 0
-    dynamic var bestScore = 0
-    dynamic var bestTime = 0
-    dynamic var countPlays = 0
-    dynamic var countMultiPlays = 0
-    dynamic var victorys = 0
-    dynamic var defeats = 0
-    dynamic var levelScore = 0
-    dynamic var created = Date()
+    @objc dynamic var ID = 0
+    @objc dynamic var playerID = 0
+    @objc dynamic var levelID = 0
+    @objc dynamic var countPackages = 0
+    @objc dynamic var actScore = 0
+    @objc dynamic var actTime = 0
+    @objc dynamic var allTime = 0
+    @objc dynamic var bestScore = 0
+    @objc dynamic var bestTime = 0
+    @objc dynamic var countPlays = 0
+    @objc dynamic var countMultiPlays = 0
+    @objc dynamic var victorys = 0
+    @objc dynamic var defeats = 0
+    @objc dynamic var levelScore = 0
+    @objc dynamic var created = Date()
 
     override  class func primaryKey() -> String {
         return "ID"

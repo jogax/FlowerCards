@@ -21,7 +21,7 @@ class MySKStatistic: MySKTable {
     
     
     init(parent: SKSpriteNode, callBack: @escaping (Bool, Int, Int, Int)->()) {
-        nameTable = Array(realm.objects(PlayerModel.self).sorted(byProperty: "created", ascending: true))
+        nameTable = Array(realm.objects(PlayerModel.self).sorted(byKeyPath: "created", ascending: true))
         var countLines = nameTable.count
         if countLines == 1 {
             countLines += 1

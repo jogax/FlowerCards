@@ -28,12 +28,8 @@ class MySKCard: SKSpriteNode {
     
     var cardHashValue: Int {
         get {
-            let hash = column |
-                row << 4 |
-                colorIndex << 8 |
-                minValue << 12 |
-                maxValue << 16 |
-                countTransitions << 20
+            var hash = column | row << 4 | colorIndex << 8
+            hash |= minValue << 12 | maxValue << 16 | countTransitions << 20
             return hash
         }
     }
@@ -576,6 +572,10 @@ class MySKCard: SKSpriteNode {
         } else {
             return atlas.textureNamed ("card\(color)")
         }
+    }
+    
+    func getColumnRow()->(column: Int, row: Int) {
+        return (self.column, self.row)
     }
 
     
