@@ -52,7 +52,6 @@
 		202A53FF1DBE4C8E001152F8 /* News Pro Version DE.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 202A53FE1DBE4C8E001152F8 /* News Pro Version DE.rtf */; };
 		202A54011DBE4C9F001152F8 /* News Pro Version HU.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 202A54001DBE4C9F001152F8 /* News Pro Version HU.rtf */; };
 		202A54031DBE4CB1001152F8 /* News Pro Version RU.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 202A54021DBE4CB1001152F8 /* News Pro Version RU.rtf */; };
-		202ED85A1DD9EF380003D923 /* FlowerCardsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 202ED8591DD9EF380003D923 /* FlowerCardsTests.swift */; };
 		202EEB5E1E268A990052E400 /* MyDebugCommands in Resources */ = {isa = PBXBuildFile; fileRef = 202EEB5D1E268A990052E400 /* MyDebugCommands */; };
 		2035F57E1E1685C200AEBE31 /* CardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035F57D1E1685C200AEBE31 /* CardManager.swift */; };
 		20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20389B541D5F7EB400ADD133 /* Mirror5.m4a */; };
@@ -143,8 +142,6 @@
 		202A54001DBE4C9F001152F8 /* News Pro Version HU.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "News Pro Version HU.rtf"; sourceTree = "<group>"; };
 		202A54021DBE4CB1001152F8 /* News Pro Version RU.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "News Pro Version RU.rtf"; sourceTree = "<group>"; };
 		202ED8571DD9EF380003D923 /* FlowerCardsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlowerCardsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		202ED8591DD9EF380003D923 /* FlowerCardsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowerCardsTests.swift; sourceTree = "<group>"; };
-		202ED85B1DD9EF380003D923 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		202EEB5D1E268A990052E400 /* MyDebugCommands */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MyDebugCommands; sourceTree = "<group>"; };
 		2035F57D1E1685C200AEBE31 /* CardManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardManager.swift; sourceTree = "<group>"; };
 		203632AE1F7574DE004DCB42 /* Podfile copy */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Podfile copy"; sourceTree = "<group>"; };
@@ -192,7 +189,6 @@
 				20AC12E71F757958004C7BAC /* RealmSwift.framework */,
 				203632AE1F7574DE004DCB42 /* Podfile copy */,
 				2025F0BC1D5B18F300561FBF /* FlowerCards */,
-				202ED8581DD9EF380003D923 /* FlowerCardsTests */,
 				2025F0BB1D5B18F300561FBF /* Products */,
 				E484E8938C060242178BA9DF /* Pods */,
 				EF35DEF6D3AC2D9A50915C70 /* Frameworks */,
@@ -274,15 +270,6 @@
 				2025F1251D5B256A00561FBF /* JGXLine.swift */,
 			);
 			name = GameEngine;
-			sourceTree = "<group>";
-		};
-		202ED8581DD9EF380003D923 /* FlowerCardsTests */ = {
-			isa = PBXGroup;
-			children = (
-				202ED8591DD9EF380003D923 /* FlowerCardsTests.swift */,
-				202ED85B1DD9EF380003D923 /* Info.plist */,
-			);
-			path = FlowerCardsTests;
 			sourceTree = "<group>";
 		};
 		20720A791D5B72BB00389C0C /* Music */ = {
@@ -557,7 +544,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				202ED85A1DD9EF380003D923 /* FlowerCardsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

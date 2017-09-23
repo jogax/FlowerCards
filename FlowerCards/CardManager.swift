@@ -435,7 +435,7 @@ class CardManager {
             let newPairs = colorArray[card.colorIndex].addCardToColor(card: card)
             if newPairs.count > 0 {
                 for pair in newPairs {
-                    checkPathToFoundedCards(pair: pair as! Tipp)
+                    checkPathToFoundedCards(pair: pair)
                 }
             }
             positionsTab.remove(at: index)
@@ -483,7 +483,7 @@ class CardManager {
                                 updateGameArrayCell(card: card)
                                 cardArray.append(card)
                                 for pair in newPairs {
-                                    checkPathToFoundedCards(pair: pair as! Tipp)
+                                    checkPathToFoundedCards(pair: pair)
                                 }
                                 actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
                                 go = false
@@ -720,7 +720,7 @@ class CardManager {
         tippArray.removeAll()
         let pairsToCheck = getPairsToCheck()
         for pair in pairsToCheck {
-            checkPathToFoundedCards(pair: pair as! Tipp)
+            checkPathToFoundedCards(pair: pair)
             if stopCreateTippsInBackground {
                 stopCreateTippsInBackground = false
             }
@@ -825,7 +825,7 @@ class CardManager {
     }
 
     
-    private func checkPathToFoundedCards(pair:Tipp) {
+    private func checkPathToFoundedCards(pair: ConnectablePair) {
         let firstValue: CGFloat = 10000
         func checkPath(card1: MySKCard, card2: MySKCard)->Tipp {
             let myTipp = Tipp()
