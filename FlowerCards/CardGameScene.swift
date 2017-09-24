@@ -262,7 +262,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     let doCountUpSelector = "showTime"
     let checkGreenLineSelector = "setGreenLineSize"
     let fingerName = "finger"
-    
+    let settingsButtonName = "settings"
+    let restartButtonName = "restart"
+    let undoButtonName = "undo"
+    let helpButtonName = "help"
+
     
     let emptyCardTxt = "emptycard"
     var movingCards: [MySKCard] = []
@@ -330,18 +334,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var countCheckCounts = 0
     var freeUndoCounter = 0
     var freeTippCounter = 0
-//    var buildNumber: String = ""
-//    var versionsNumber: String = ""
-    
-    
-    
-    //let timeLimitKorr = 5 // sec for pro card
-    //    var startTime: NSDate?
-    //    var startTimeOrig: NSDate?
-    var timer: Timer?
-    var countUp: Timer?
+
+    var countUpTimer: Timer?
     var greenLineTimer: Timer?
-    var waitForSKActionEnded: Timer?
+    var waitForSKActionEndedTimer: Timer?
+    var waitWhileInGeneratingCardsTimer: Timer?
     var lastMirrored = ""
     var musicPlayer: AVAudioPlayer?
     var soundPlayer: AVAudioPlayer?
@@ -616,7 +613,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
         random = MyRandom(level: levelIndex, gameNumber: gameNumber)
         
-        stopTimer(&countUp)
+        stopTimer(&countUpTimer)
         
         tippArray.removeAll()
         gameArray.removeAll()
@@ -710,22 +707,22 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         let settingsTexture = SKTexture(image: images.getSettings())
         settingsButton = MySKButton(texture: settingsTexture, frame: CGRect(x: buttonXPosNormalized * 1, y: buttonYPos, width: buttonSize, height: buttonSize))
-        settingsButton!.name = "settings"
+        settingsButton!.name = settingsButtonName
         addChild(settingsButton!)
         
         let restartTexture = SKTexture(image: images.getRestart())
         restartButton = MySKButton(texture: restartTexture, frame: CGRect(x: buttonXPosNormalized * 2.5, y: buttonYPos, width: buttonSize, height: buttonSize))
-        restartButton!.name = "restart"
+        restartButton!.name = restartButtonName
         addChild(restartButton!)
         
         let undoTexture = SKTexture(image: images.getUndo())
         undoButton = MySKButton(texture: undoTexture, frame: CGRect(x: buttonXPosNormalized * 9.0, y: buttonYPos, width: buttonSize, height: buttonSize))
-        undoButton!.name = "undo"
+        undoButton!.name = undoButtonName
         addChild(undoButton!)
         
         let helpTexture = atlas.textureNamed("help")
         helpButton = MySKButton(texture: helpTexture, frame: CGRect(x: buttonXPosNormalized * 6.0, y: buttonYPos, width: buttonSize, height: buttonSize))
-        helpButton!.name = "help"
+        helpButton!.name = helpButtonName
         addChild(helpButton!)
         
         
@@ -1105,11 +1102,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             return
         }
         inGeneratingCards = true
-//        if countMovingCards > 0 {
-//            waitForMovingCards()
-//            print("countMovingCards: \(countMovingCards)")
-////            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1))  {}
-//        }
         var waitForStart: TimeInterval = 0.0
         let cardArray = cardManager!.findNewCardsForGameArray()
         showCardCount()
@@ -1146,27 +1138,25 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             let actionFadeAlpha = SKAction.fadeAlpha(to: 1, duration: 0.2)
             let actionMoveAndFadeIn = SKAction.group([actionMove, actionFadeAlpha])
+            self.movingCards.append(card)
             let actionAddCardToMovingCards = SKAction.run {
-                self.movingCards.append(card)
+//                self.movingCards.append(card)
             }
             let actionRemoveCardFromMovingCards = SKAction.run {
                 self.movingCards.remove(at: self.movingCards.index(where: { $0 === card })!)
             }
-//            let actionCountMovingCards = SKAction.run {
-//                self.countMovingCards -= 1
-//            }
-//            countMovingCards += 1
-            card.run(SKAction.sequence([actionAddCardToMovingCards, waitingAction, zPositionPlus, actionMoveAndFadeIn, zPositionMinus, actionHideEmptyCard, /*actionCountMovingCards,*/ actionRemoveCardFromMovingCards]))
+            card.run(SKAction.sequence([actionAddCardToMovingCards, waitingAction, zPositionPlus, actionMoveAndFadeIn, zPositionMinus, actionHideEmptyCard, /*actionCountMovingCards,*/ actionRemoveCardFromMovingCards]), withKey: "index")
             if cardStack.count(type: .MySKCardType) == 0 {
                 cardPackage!.changeButtonPicture(SKTexture(imageNamed: "emptycard"))
                 cardPackage!.alpha = 0.3
             }
         }
         
-        self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.waitForMovingCards), userInfo: nil, repeats: false) // start timer for check
+        waitForMovingCards()
+//        self.waitForSKActionEndedTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(self.waitForMovingCards), userInfo: nil, repeats: false) // start timer for check
 
         if generatingType == .first {
-            countUp = Timer.scheduledTimer(timeInterval: doCountUpSleepTime, target: self, selector: Selector(doCountUpSelector), userInfo: nil, repeats: true)
+            countUpTimer = Timer.scheduledTimer(timeInterval: doCountUpSleepTime, target: self, selector: #selector(showTime), userInfo: nil, repeats: true)
             doTimeCount = true
         }
         stopped = false
@@ -1574,12 +1564,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func checkGameFinished() {
         func checkNoMoreSteps() {
             if cardManager!.noMoreSteps && lastUsedTipp?.card1.colorIndex != NoColor
-//               || (lastUsedTipp?.card1.minValue == FirstCardValue && lastUsedTipp?.card2.maxValue == LastCardValue)
             {
-//                if countMovingCards > 0 {
-//                    waitForMovingCards()
-//                    self.pull(createTipps: false)
-//                }
                 self.pull(createTipps: true)
                 for (index, tipp) in tippArray.enumerated() {
                     if  tipp.card1 == lastUsedTipp!.card1 &&
@@ -1612,7 +1597,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         if cardCount == 0 { // Level completed, start a new game
             
-            stopTimer(&countUp)
+            stopTimer(&countUpTimer)
             playMusic("Winner", volume: GV.player!.musicVolume, loops: 0)
             playerCardCountLabel.text = "0"
 //            if playerType == .multiPlayer {
@@ -1841,7 +1826,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             childNode.removeFromParent()
         }
         
-        stopTimer(&countUp)
+        stopTimer(&countUpTimer)
         prepareNextGame(newGame: next)
         generateCards(generatingType: .first)
     }
@@ -2115,12 +2100,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
 
     func pull(createTipps: Bool) {
-//        if countMovingCards > 0 {
-//            print ("countMovingCards in pull(): \(countMovingCards)")
-//            waitForMovingCards()
-//            print ("countMovingCards in pull(): \(countMovingCards)")
-//        }
-        //printFunc(function: "pull", start: true)
         let duration = 0.5
         var actionMoveArray = [SKAction]()
         if let savedCard:SavedCard  = stack.pull() {
@@ -2334,7 +2313,32 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         myTouchesBegan(touchLocation: touchLocation)
     }
     
-    func myTouchesBegan(touchLocation: CGPoint) {
+    var touchLocationForMyTouchesBegan: CGPoint = CGPoint(x: 0, y: 0)
+    var waitingInMyTouchesBegan: Bool = false
+    
+    @objc func myTouchesBegan(touchLocation: CGPoint) {
+        var touchLocationParam: CGPoint// = CGPoint(x: 0, y: 0)
+        if waitingInMyTouchesBegan {
+            touchLocationParam = touchLocationForMyTouchesBegan
+        } else {
+            touchLocationParam = touchLocation
+        }
+        if movingCards.count == 0 {
+            waitingInMyTouchesBegan = false
+            myTouchesBeganContinued(touchLocation: touchLocationParam)
+        } else {
+            if !waitingInMyTouchesBegan {
+                touchLocationForMyTouchesBegan = touchLocation // save the orig
+                waitingInMyTouchesBegan = true
+            }
+            _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.myTouchesBegan(touchLocation: )), userInfo: touchLocationParam, repeats: false)
+            // start timer for check
+
+        }
+        
+    }
+    func myTouchesBeganContinued(touchLocation: CGPoint) {
+        
         oldFromToColumnRow = FromToColumnRow()
         lastPair.color = .none
         lineWidthMultiplier = lineWidthMultiplierNormal
@@ -2346,6 +2350,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             switch node  {
                 case is MySKButton:
                     movedFromNode = (node as! MySKButton) as MySKCard
+                    if movedFromNode.name! == helpButtonName && autoPlayerActive {
+                        autoPlayer!.stopAutoplay()
+                    }
                 case is MySKCard:
                     if (node as! MySKCard).type == .cardType {
                         movedFromNode = (node as! MySKCard)
@@ -2375,6 +2382,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             cardManager!.removeNodesWithName(myLineName)
         }
     }
+    
     
     func showValue(_ card: MySKCard)->SKSpriteNode {
         let score = SKLabelNode()
@@ -2562,10 +2570,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 }
                 //switch (aktNode as! MySKCard).name! {
                 switch MySKCard.name! {
-                case "settings": settingsButtonPressed()
-                case "undo": undoButtonPressed()
-                case "restart": restartButtonPressed()
-                case "help": helpButtonPressed()
+                case settingsButtonName: settingsButtonPressed()
+                case undoButtonName: undoButtonPressed()
+                case restartButtonName: restartButtonPressed()
+                case helpButtonName: helpButtonPressed()
                 default: specialButtonPressed(MySKCard.name!)
                 }
                 return
@@ -2585,9 +2593,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     @objc func waitWhileInGeneratingCards() {
         while inGeneratingCards {
-            self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(CardGameScene.waitWhileInGeneratingCards), userInfo: nil, repeats: false) // start timer for check
+            self.waitWhileInGeneratingCardsTimer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(CardGameScene.waitWhileInGeneratingCards), userInfo: nil, repeats: false) // start timer for check
         }
-        self.waitForSKActionEnded?.invalidate()
+        self.waitWhileInGeneratingCardsTimer?.invalidate()
     }
     
     func startMovingCard(touchLocation: CGPoint) {
@@ -2679,7 +2687,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         self.isUserInteractionEnabled = false  // userInteraction forbidden!
 //        countMovingCards = 1
-        self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(CardGameScene.waitForMovingCards), userInfo: nil, repeats: false) // start timer for check
+        waitForMovingCards()
+//        self.waitForSKActionEndedTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.waitForMovingCards), userInfo: nil, repeats: false) // start timer for check
         let actionAddCardToMovingCards = SKAction.run {
             self.movingCards.append(self.movedFromNode)
         }
@@ -2878,7 +2887,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
     func helpButtonPressed() {
         if autoPlayerActive {
-            autoPlayer!.makeStep()
+            autoPlayer!.stopAutoplay()
         } else {
             doTimeCount = false
             let url = GV.language.getText(.tcHelpURL)
@@ -2942,14 +2951,14 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
 
 
-    func startTimer( _ timer: inout Timer?, sleepTime: Double, selector: String, repeats: Bool)->Timer {
-        stopTimer(&timer)
-        let myTimer = Timer.scheduledTimer(timeInterval: sleepTime, target: self, selector: Selector(selector), userInfo: nil, repeats: repeats)
-        
-        return myTimer
-    }
+//    func startTimer( _ timer: inout Timer?, sleepTime: Double, selector: String, repeats: Bool)->Timer {
+//        stopTimer(&timer)
+//        let myTimer = Timer.scheduledTimer(timeInterval: sleepTime, target: self, selector: Selector(selector), userInfo: nil, repeats: repeats)
+//
+//        return myTimer
+//    }
     
-    func showTime() {
+    @objc func showTime() {
         
         if doTimeCount {
             timeCount += 1 // countUpAdder
@@ -2960,7 +2969,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     
-    @objc func waitForMovingCards() {
+    func waitForMovingCards() {
         countCheckCounts = 0
         checkCountMovingCards()
     }
@@ -2968,7 +2977,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     @objc func checkCountMovingCards() {
         if  movingCards.count > 0 && countCheckCounts < 1000 {
             countCheckCounts += 1
-            self.waitForSKActionEnded = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(CardGameScene.checkCountMovingCards), userInfo: nil, repeats: false)
+            self.waitForSKActionEndedTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.checkCountMovingCards), userInfo: nil, repeats: false)
         } else {
             countCheckCounts = 0
             self.isUserInteractionEnabled = true

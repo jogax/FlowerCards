@@ -66,7 +66,7 @@ class AutoPlayer {
 //        var lostGames: [String] = []
 //        var couldNotEndGames: [String] = []
         while levelID < maxLevelID {
-            let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and levelID = %d and ID != %d", GV.player!.ID, levelID, GV.actGame!.ID).sorted(byProperty: "gameNumber")
+            let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and levelID = %d and ID != %d", GV.player!.ID, levelID, GV.actGame!.ID).sorted(byKeyPath: "gameNumber")
             for game in errorGames  {
                 if game.countSteps == 0 {
                     realm.beginWrite()
@@ -151,11 +151,11 @@ class AutoPlayer {
     }
     
     func makeStep() {
-        
         testType = .stepByStep
         autoPlayStatus = .GetTipp
         stopTimer = false
-        timer = Timer.scheduledTimer(timeInterval: 0.001, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
+        timer.invalidate()
+//        timer = Timer.scheduledTimer(timeInterval: 0.001, target: self, selector: #selector(nextStep(timerX:)), userInfo: nil, repeats: false)
     }
     
     private func generateTestForTester() {

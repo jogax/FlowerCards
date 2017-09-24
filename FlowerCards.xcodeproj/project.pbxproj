@@ -55,6 +55,7 @@
 		202EEB5E1E268A990052E400 /* MyDebugCommands in Resources */ = {isa = PBXBuildFile; fileRef = 202EEB5D1E268A990052E400 /* MyDebugCommands */; };
 		2035F57E1E1685C200AEBE31 /* CardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035F57D1E1685C200AEBE31 /* CardManager.swift */; };
 		20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20389B541D5F7EB400ADD133 /* Mirror5.m4a */; };
+		203BD1731F77B18C002292F7 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203BD1721F77B18C002292F7 /* GameKit.framework */; };
 		2040E4CC1DE74F3600B16B19 /* AutoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2040E4CB1DE74F3600B16B19 /* AutoPlayer.swift */; };
 		20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20720A751D5B55E600389C0C /* Mirror4.m4a */; };
 		2087A2EB1DCA3D120085D711 /* ChooseLevelAndOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2087A2EA1DCA3D120085D711 /* ChooseLevelAndOptions.swift */; };
@@ -146,6 +147,7 @@
 		2035F57D1E1685C200AEBE31 /* CardManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardManager.swift; sourceTree = "<group>"; };
 		203632AE1F7574DE004DCB42 /* Podfile copy */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Podfile copy"; sourceTree = "<group>"; };
 		20389B541D5F7EB400ADD133 /* Mirror5.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror5.m4a; sourceTree = "<group>"; };
+		203BD1721F77B18C002292F7 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		2040E4CB1DE74F3600B16B19 /* AutoPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoPlayer.swift; sourceTree = "<group>"; };
 		20720A751D5B55E600389C0C /* Mirror4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror4.m4a; sourceTree = "<group>"; };
 		2087A2EA1DCA3D120085D711 /* ChooseLevelAndOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseLevelAndOptions.swift; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 				20AC12EB1F757958004C7BAC /* Realm.framework in Frameworks */,
 				20AC12E91F757958004C7BAC /* RealmSwift.framework in Frameworks */,
 				07AF521A31C5420D024D157A /* Pods_FlowerCards.framework in Frameworks */,
+				203BD1731F77B18C002292F7 /* GameKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -319,6 +322,7 @@
 		EF35DEF6D3AC2D9A50915C70 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				203BD1721F77B18C002292F7 /* GameKit.framework */,
 				725175D43267926E46840336 /* Pods_FlowerCards.framework */,
 			);
 			name = Frameworks;
@@ -381,6 +385,11 @@
 						DevelopmentTeam = WT499VC842;
 						LastSwiftMigration = 0800;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.GameCenter = {
+								enabled = 1;
+							};
+						};
 					};
 					202ED8561DD9EF380003D923 = {
 						CreatedOnToolsVersion = 8.1;
@@ -696,7 +705,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.FlowerCards;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = XXXTEST;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = TEST;
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;

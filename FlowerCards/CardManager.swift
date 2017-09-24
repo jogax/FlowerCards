@@ -520,7 +520,7 @@ class CardManager {
                         updateGameArrayCell(card: card)
                         cardArray.append(card)
                         for pair in newPairs {
-                            checkPathToFoundedCards(pair: pair as! Tipp)
+                            checkPathToFoundedCards(pair: pair)
                         }
                         actFillingsProcent = Double(countGameArrayItems) / Double(gameArraySize)
                     } else {
