@@ -45,31 +45,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         // Migration of realm models if neaded
             Realm.Configuration.defaultConfiguration = Realm.Configuration(
-                schemaVersion: 4,
+                schemaVersion: 5,
                 migrationBlock: { migration, oldSchemaVersion in
-                    if (oldSchemaVersion < 4) {
-                        // migrate GameModel
-                        migration.enumerateObjects(ofType: GameModel.className()) { oldObject, newObject in
-                            newObject!["levelID"] = (oldObject!["levelID"] as! Int) / MaxColorValue
-                            newObject!["countPackages"] = ((oldObject!["levelID"] as! Int) % 4) + 1
-                            // The enumerateObjects(ofType:_:) method iterates
-                            // over every Game object stored in the Realm file
-//                           newObject!["gameFinished"] = true
-                        }
+                    if (oldSchemaVersion < 5) {
                         // migrate PlayerModel
                         migration.enumerateObjects(ofType: PlayerModel.className()) { oldObject, newObject in
-                            newObject!["levelID"] = (oldObject!["levelID"] as! Int) / MaxColorValue
-                            newObject!["countPackages"] = ((oldObject!["levelID"] as! Int) % 4) + 1
+                            newObject!["GCEnabled"] = false // (oldObject!["levelID"] as! Int) / MaxColorValue
                             // The enumerateObjects(ofType:_:) method iterates
                             // over every Game object stored in the Realm file
                         }
-                        // migrate StatisticModel
-//                        migration.enumerateObjects(ofType: StatisticModel.className()) { oldObject, newObject in
-//                            newObject!["levelID"] = (oldObject!["levelID"] as! Int) / MaxColorValue
-//                            newObject!["countPackages"] = ((oldObject!["levelID"] as! Int) % 4) + 1
-//                            // The enumerateObjects(ofType:_:) method iterates
-//                            // over every Game object stored in the Realm file
-//                        }
                     }
             })
 

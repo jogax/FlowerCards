@@ -190,7 +190,7 @@ var allPackages: UInt8 = 0
 var maxPackage: UInt8 = 0
 var minPackage: UInt8 = 0
 let bitMaskForPackages: [UInt8] = [1, 2, 4, 8]
-let maxPackageCount = 4
+// let maxPackageCount = 4
 
 var stopCreateTippsInBackground = false
 var tippArray = [Tipp]()

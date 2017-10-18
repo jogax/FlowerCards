@@ -139,7 +139,12 @@ let deDictionary: [TextConstants: String] = [
     .tcNoMoreSteps:     "Hoppala! Dieser Schritt würde es unmöglich machen, das Spiel zu beenden -> so Schritt zurück",
     .tcThereIsNoPartner: "Keine Spieler in der nähe!",
     .tcIsPlayingWith:   " spielt mit %",
-    .tcWriteReview:     "Schreiben Sie eine Bewertung im App Store",
+    .tcWriteReview:     "Bewertung im App Store",
+    .tcConnectGC:       "Verbinden mit Gamecenter",
+    .tcDisconnectGC:    "Trennen vom Gamecenter",
+    .tcShowGameCenter:  "Zeige Game Center",
+    .tcMyScore:          "Mein bestes Ergebnis: %",
+    .tcBestPlayer:       "Bester Spieler: % %",
 ]
 
 

@@ -15,7 +15,7 @@ class RecordIDModel: Object {
     @objc dynamic var gameModelID = 0
     @objc dynamic var playerModelID = 0
     @objc dynamic var statisticModelID = 0
-    @objc dynamic var historyModelID = 0
+    @objc dynamic var highScoreModelID = 0
     override  class func primaryKey() -> String {
         return "ID"
     }

@@ -140,4 +140,9 @@ let enDictionary: [TextConstants: String] = [
     .tcThereIsNoPartner: "No Players found!",
     .tcIsPlayingWith:   " is playing with %",
     .tcWriteReview:     "Write Review on App Store",
+    .tcConnectGC:       "Connect to Gamecenter",
+    .tcDisconnectGC:    "Disconnect from Gamecenter",
+    .tcShowGameCenter:  "Show Game Center",
+    .tcMyScore:         "My highscore: %",
+    .tcBestPlayer:      "Best Player: % %"
 ]

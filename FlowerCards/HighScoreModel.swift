@@ -22,6 +22,4 @@ class HighScoreModel: Object {
     override  class func primaryKey() -> String {
         return "ID"
     }
-
 }
-

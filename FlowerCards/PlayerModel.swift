@@ -19,6 +19,7 @@ class PlayerModel: Object {
     @objc dynamic var soundVolume: Float = 0
     @objc dynamic var musicVolume: Float = 0
     @objc dynamic var created = Date()
+    @objc dynamic var GCEnabled = false
 
     override  class func primaryKey() -> String {
         return "ID"

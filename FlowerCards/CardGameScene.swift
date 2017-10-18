@@ -6,9 +6,12 @@
 //  Copyright © 2015. Jozsef Romhanyi. All rights reserved.
 //
 
+
 import SpriteKit
 import AVFoundation
 import MultipeerConnectivity
+import GameKit
+import RealmSwift
 
 struct GameArrayPositions {
     var used: Bool
@@ -144,10 +147,11 @@ var lastPair = PairStatus() {
     }
 }
 
-
-
-class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, PeerToPeerServiceManagerDelegate { //,  JGXLineDelegate { //MyGameScene {
-
+class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, PeerToPeerServiceManagerDelegate, GKGameCenterControllerDelegate {
+    func gameCenterViewControllerDidFinish(_ gameCenterViewController: GKGameCenterViewController) {
+            gameCenterViewController.dismiss(animated: true, completion: nil)
+    }
+    
     
     struct Opponent {
         enum FinishType: Int {
@@ -161,37 +165,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         var finish: FinishType = .none
     }
     
-//    struct Founded {
-//        let maxDistance: CGFloat = 100000.0
-//        var point: CGPoint
-//        var column: Int
-//        var row: Int
-//        var foundContainer: Bool
-//        var distanceToP1: CGFloat
-//        var distanceToP0: CGFloat
-//        init(column: Int, row: Int, foundContainer: Bool, point: CGPoint, distanceToP1: CGFloat, distanceToP0: CGFloat) {
-//            self.distanceToP1 = distanceToP1
-//            self.distanceToP0 = distanceToP0
-//            self.column = column
-//            self.row = row
-//            self.foundContainer = foundContainer
-//            self.point = point
-//        }
-//        init() {
-//            self.distanceToP1 = maxDistance
-//            self.distanceToP0 = maxDistance
-//            self.point = CGPoint(x: 0, y: 0)
-//            self.column = 0
-//            self.row = 0
-//            self.foundContainer = false
-//        }
-//    }
-//    
-//    enum ShowHelpLine: Int {
-//        case green = 0, cyan, hidden
-//    }
-//    
-
     enum CongratulationsType: Int {
         case No = 0, Won, Lost
     }
@@ -217,20 +190,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             used      = false
         }
     }
-    
-//    struct DrawHelpLinesParameters {
-//        var points: [CGPoint]
-//        var lineWidth: CGFloat
-//        var twoArrows: Bool
-//        var color: MyColors
-//        
-//        init() {
-//            points = [CGPoint]()
-//            lineWidth = 0
-//            twoArrows = false
-//            color = .red
-//        }
-//    }
     
     func calculateLen(points: [CGPoint]) -> CGFloat{
         var len: CGFloat = 0
@@ -379,6 +338,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var opponentScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var opponentCardCountLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     
+    var myHighScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var bestPlayerScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    
     var allGamesLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var onePkgLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var twoPkgLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
@@ -391,6 +353,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var helpLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var tippLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var undoLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    
     
 //    var showScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
 //    var opponentScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
@@ -420,6 +383,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var nextLevelButton: MySKButton?
     var targetScore = 0
     var maxCardCount = 0
+    var gameCenterSync = GameCenterSync()
 
     var cardCount = 0 {
         didSet {
@@ -515,6 +479,17 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     override func didMove(to view: SKView) {
         
         if !settingsSceneStarted {
+            if realm.objects(HighScoreModel.self).count < GV.maxPackageCount * GV.levelsForPlay.count() {
+                for packageNr in 1...GV.maxPackageCount {
+                    for levelID in 0..<GV.levelsForPlay.count() {
+                        if realm.objects(HighScoreModel.self).filter("levelID = %d and countPackages = %d", levelID, packageNr).count == 0 {
+                            GV.createNewHighScore(packageNr: packageNr, levelID: levelID)
+                        }
+                    }
+                }
+            }
+
+//            startSyncWithGameCenter()
             myView = view
             GV.mainScene = self
             
@@ -540,6 +515,18 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             prepareNextGame(newGame: true)
             generateCards(generatingType: .first)
             autoPlayer = AutoPlayer(scene: self)
+            let copyRight = "Copyright \u{00A9} 2017 " + GV.appName + "(Ver:" + GV.versionsNumber + " / Build:" + GV.buildNumber + ")"
+            let copyrightLabel = SKLabelNode(fontNamed: "ArialMT")
+            copyrightLabel.color = UIColor.white
+            copyrightLabel.text = copyRight
+            copyrightLabel.fontSize = self.frame.size.height * 0.01
+            copyrightLabel.position = CGPoint(x: self.frame.minX + (copyrightLabel.frame.size.width / 2) * 1.05, y: self.frame.minY + (copyrightLabel.frame.size.height / 2) * 1.03)
+           
+            self.addChild(copyrightLabel)
+            if GV.player!.GCEnabled {
+                authenticateLocalPlayer()
+                gameCenterSync.startGameCenterSync()
+            }
         } else {
             playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
             
@@ -547,6 +534,58 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        //printFunc(function: "didMove", start: false)
     }
     
+//    func startSyncWithGameCenter() {
+//        DispatchQueue.global(qos: .background).async {
+//            let myBackgroundRealm = try! Realm()
+//            let GCEnabled = myBackgroundRealm.objects(PlayerModel.self).filter("isActPlayer = true").first!.GCEnabled
+//            if GCEnabled {
+//                let myScoresToSend = myBackgroundRealm.objects(HighScoreModel.self).filter("sentToGameCenter = false")
+//
+//                for scoreToSend in myScoresToSend {
+//                    let packageNr = scoreToSend.countPackages
+//                    let levelID = scoreToSend.levelID
+//                    let score = scoreToSend.myHighScore
+//                    self.addScoreAndSubmitToGC(score: score, countPackages: packageNr, level: levelID)
+//                    myBackgroundRealm.beginWrite()
+//                    scoreToSend.sentToGameCenter = true
+//                    try! myBackgroundRealm.commitWrite()
+//                    print ("Count Packages: \(packageNr), LevelID: \(levelID), HighScore: \(score)")
+//                }
+//            }
+//            print("This is run on the background queue")
+//
+//            DispatchQueue.main.async {
+//                print("This is run on the main queue, after the previous code in outer block")
+//            }
+//        }
+//    }
+//
+    
+    func printHighScoreModel() {
+        let sortProperties = [SortDescriptor(keyPath: "countPackages", ascending: true), SortDescriptor(keyPath: "levelID", ascending: true)]
+        let myHighScores = realm.objects(HighScoreModel.self).sorted(by: sortProperties)
+        print ("countPkgs: levelID: myHighScore: bestPlayer: highScore:")
+        print ("---------- -------- ------------ ----------- ----------")
+        for highScoreRecord in myHighScores {
+            let actPkg = "    \(highScoreRecord.countPackages)     "
+            let actLevelInt = (highScoreRecord.levelID < 9 ? "0" : "") + "\(highScoreRecord.levelID + 1)"
+            let actLevel = "    \(actLevelInt)  "
+            var myScoreString = String(highScoreRecord.myHighScore)
+            while myScoreString.length < 8 {
+                myScoreString = " " + myScoreString
+            }
+            var bestPlayerString = "  " + String(highScoreRecord.bestPlayerName)
+            while bestPlayerString.length < 11 {
+                bestPlayerString += " "
+            }
+            var bestScoreString = String(highScoreRecord.bestPlayerHighScore) + "  "
+            while bestScoreString.length < 10 {
+                bestScoreString = " " + bestScoreString
+            }
+            let printString = actPkg + " " + actLevel + " " + myScoreString + " " + bestPlayerString + " " + bestScoreString
+            print(printString)
+        }
+    }
     func prepareNextGame(newGame: Bool) {
         labelFontSize = GV.onIpad ? self.size.height / 50 : self.size.height / 70
         lastChange.color = NoColor
@@ -570,9 +609,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //            try! realm.commitWrite()
 //        }
         levelIndex = GV.player!.levelID
-        if GV.player!.countPackages > maxPackageCount {
+        if GV.player!.countPackages > GV.maxPackageCount {
             realm.beginWrite()
-            GV.player!.countPackages = maxPackageCount
+            GV.player!.countPackages = GV.maxPackageCount
             try! realm.commitWrite()
         }
         countPackages = GV.player!.countPackages
@@ -644,27 +683,27 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         labelBackground.position = CGPoint(x: self.size.width / 2, y: self.size.height - labelBGHeight / 2 - 2)
         labelBackground.size = CGSize(width: self.size.width * 0.95, height: labelBGHeight)
         
-        let screw1 = SKSpriteNode(imageNamed: "screw.png")
-        let screw2 = SKSpriteNode(imageNamed: "screw.png")
-        let screw3 = SKSpriteNode(imageNamed: "screw.png")
-        let screw4 = SKSpriteNode(imageNamed: "screw.png")
-        let screwWidth = self.size.width * 0.025
-        let screwMultiplier = CGVector(dx: 0.48, dy: 0.35)
-
-        screw1.position = CGPoint(x: -labelBackground.size.width * screwMultiplier.dx, y: labelBackground.size.height * screwMultiplier.dy)
-        screw1.size = CGSize(width: screwWidth, height: screwWidth)
-        screw2.position = CGPoint(x: labelBackground.size.width * screwMultiplier.dx, y: labelBackground.size.height * screwMultiplier.dy)
-        screw2.size = CGSize(width: screwWidth, height: screwWidth)
-        screw3.position = CGPoint(x: -labelBackground.size.width * screwMultiplier.dx, y: -labelBackground.size.height * screwMultiplier.dy)
-        screw3.size = CGSize(width: screwWidth, height: screwWidth)
-        screw4.position = CGPoint(x: labelBackground.size.width * screwMultiplier.dx, y: -labelBackground.size.height * screwMultiplier.dy)
-        screw4.size = CGSize(width: screwWidth, height: screwWidth)
-        
-        labelBackground.addChild(screw1)
-        labelBackground.addChild(screw2)
-        labelBackground.addChild(screw3)
-        labelBackground.addChild(screw4)
-        
+//        let screw1 = SKSpriteNode(imageNamed: "screw.png")
+//        let screw2 = SKSpriteNode(imageNamed: "screw.png")
+//        let screw3 = SKSpriteNode(imageNamed: "screw.png")
+//        let screw4 = SKSpriteNode(imageNamed: "screw.png")
+//        let screwWidth = self.size.width * 0.025
+//        let screwMultiplier = CGVector(dx: 0.48, dy: 0.35)
+//
+//        screw1.position = CGPoint(x: -labelBackground.size.width * screwMultiplier.dx, y: labelBackground.size.height * screwMultiplier.dy)
+//        screw1.size = CGSize(width: screwWidth, height: screwWidth)
+//        screw2.position = CGPoint(x: labelBackground.size.width * screwMultiplier.dx, y: labelBackground.size.height * screwMultiplier.dy)
+//        screw2.size = CGSize(width: screwWidth, height: screwWidth)
+//        screw3.position = CGPoint(x: -labelBackground.size.width * screwMultiplier.dx, y: -labelBackground.size.height * screwMultiplier.dy)
+//        screw3.size = CGSize(width: screwWidth, height: screwWidth)
+//        screw4.position = CGPoint(x: labelBackground.size.width * screwMultiplier.dx, y: -labelBackground.size.height * screwMultiplier.dy)
+//        screw4.size = CGSize(width: screwWidth, height: screwWidth)
+//        
+//        labelBackground.addChild(screw1)
+//        labelBackground.addChild(screw2)
+//        labelBackground.addChild(screw3)
+//        labelBackground.addChild(screw4)
+//        
         self.addChild(labelBackground)
         
         let tippsTexture = SKTexture(image: images.getTipp())
@@ -781,6 +820,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let tippLabelText = GV.language.getText(.tcTipps)
         let undoLabelText = GV.language.getText(.tcUndo)
         
+        
         createLabels(label: gameNumberLabel, text: gameNumberText, row: 1, xPosProzent: gameNumberPos)
         createLabels(label: sizeLabel, text: sizeText, row: 1, xPosProzent: sizePos)
         createLabels(label: packageLabel, text: packageText, row: 1, xPosProzent: packagePos)
@@ -803,6 +843,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         createLabels(label: helpLabel, text: helpLabelText, row: 6, buttonLabel: .HelpButtonPos)
         createLabels(label: tippLabel, text: tippLabelText, row: 6, buttonLabel: .TippButtonPos)
         createLabels(label: undoLabel, text: undoLabelText, row: 6, buttonLabel: .UndoButtonPos)
+        
 
         if playerType == .multiPlayer {
             createLabels(label: opponentTypeLabel, text: whoIsTypeText2, row: 4, xPosProzent: whoIsPos)
@@ -810,32 +851,43 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             createLabels(label: opponentTimeLabel, text: "0", row: 4, xPosProzent: timePos)
             createLabels(label: opponentScoreLabel, text: String(opponent.score), row: 4, xPosProzent: scorePos)
             createLabels(label: opponentCardCountLabel, text: String(opponent.cardCount), row: 4, xPosProzent: cardCountPos)
+            
         } else {
-                playerType = .singlePlayer
-                opponentTypeLabel.isHidden = true
-                opponentNameLabel.isHidden = true
-                opponentTimeLabel.isHidden = true
-                opponentScoreLabel.isHidden = true
-                opponentCardCountLabel.isHidden = true
+            playerType = .singlePlayer
+            opponentTypeLabel.isHidden = true
+            opponentNameLabel.isHidden = true
+            opponentTimeLabel.isHidden = true
+            opponentScoreLabel.isHidden = true
+            opponentCardCountLabel.isHidden = true
+            let actResult = realm.objects(HighScoreModel.self).filter("countPackages = %d and levelID = %d", countPackages, levelIndex).first!
+            let myBestScore = actResult.myHighScore
+            let myHighScoreLabelText = GV.language.getText(.tcMyScore, values: String(myBestScore))
+            createLabels(label: myHighScoreLabel, text:myHighScoreLabelText, row: 4, xPosProzent: whoIsPos)
+            
+            let bestPlayer = actResult.bestPlayerName
+            let bestPlayerScore = actResult.bestPlayerHighScore
+            let bestPlayerScoreLabelText = GV.language.getText(.tcBestPlayer, values: bestPlayer, String(bestPlayerScore))
+            createLabels(label: bestPlayerScoreLabel, text:bestPlayerScoreLabelText, row: 4, xPosProzent: scorePos)
+
         }
         createLabels(label: cardCountLabel, text: cardCountText, row: 5, buttonLabel: .CardCountPos)
         createLabels(label: tippCountLabel, text: tippCountText, row: 5, buttonLabel: .TippButtonPos)
 
-        #if TEST
-            let pkgSize = 15
-            let allGamesLabelSize = 25
-            let allGamesLabelPos = 10
-            let onePkgLabelPos = allGamesLabelPos + allGamesLabelSize
-            let twoPkgLabelPos = onePkgLabelPos + pkgSize
-            let threePkgLabelPos = twoPkgLabelPos + pkgSize
-            let fourPkgLabelPos = threePkgLabelPos + pkgSize
-            createLabels(label: allGamesLabel, text: GV.language.getText(.tcAllGamesCount,values: "0"), row: 4, xPosProzent: allGamesLabelPos, fontSizeModifier: 0.7)
-            createLabels(label: onePkgLabel, text: GV.language.getText(.tcPkgTxt,values: "1", "0", "0"), row: 4, xPosProzent: onePkgLabelPos, fontSizeModifier: 0.7)
-            createLabels(label: twoPkgLabel, text: GV.language.getText(.tcPkgTxt,values: "2", "0", "0"), row: 4, xPosProzent: twoPkgLabelPos, fontSizeModifier: 0.7)
-            createLabels(label: threePkgLabel, text: GV.language.getText(.tcPkgTxt,values: "3", "0"), row: 4, xPosProzent: threePkgLabelPos, fontSizeModifier: 0.7)
-            createLabels(label: fourPkgLabel, text: GV.language.getText(.tcPkgTxt,values: "4", "0"), row: 4, xPosProzent: fourPkgLabelPos, fontSizeModifier: 0.7)
-            updateGameCountLabels()
-        #endif
+//        #if TEST
+//            let pkgSize = 15
+//            let allGamesLabelSize = 25
+//            let allGamesLabelPos = 10
+//            let onePkgLabelPos = allGamesLabelPos + allGamesLabelSize
+//            let twoPkgLabelPos = onePkgLabelPos + pkgSize
+//            let threePkgLabelPos = twoPkgLabelPos + pkgSize
+//            let fourPkgLabelPos = threePkgLabelPos + pkgSize
+//            createLabels(label: allGamesLabel, text: GV.language.getText(.tcAllGamesCount,values: "0"), row: 4, xPosProzent: allGamesLabelPos, fontSizeModifier: 0.7)
+//            createLabels(label: onePkgLabel, text: GV.language.getText(.tcPkgTxt,values: "1", "0", "0"), row: 4, xPosProzent: onePkgLabelPos, fontSizeModifier: 0.7)
+//            createLabels(label: twoPkgLabel, text: GV.language.getText(.tcPkgTxt,values: "2", "0", "0"), row: 4, xPosProzent: twoPkgLabelPos, fontSizeModifier: 0.7)
+//            createLabels(label: threePkgLabel, text: GV.language.getText(.tcPkgTxt,values: "3", "0"), row: 4, xPosProzent: threePkgLabelPos, fontSizeModifier: 0.7)
+//            createLabels(label: fourPkgLabel, text: GV.language.getText(.tcPkgTxt,values: "4", "0"), row: 4, xPosProzent: fourPkgLabelPos, fontSizeModifier: 0.7)
+//            updateGameCountLabels()
+//        #endif
         let mySortedPlays = realm.objects(GameModel.self).filter("playerID = %d and played = true", GV.player!.ID).sorted(byKeyPath: "levelID")
         if mySortedPlays.count > 0 {
             maxLevelIndex = mySortedPlays.last!.levelID
@@ -847,6 +899,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
 
     }
+    
     
     func createGameRecord(gameNumber: Int) {
 //        //printFunc(function: "createGameRecord", start: true)
@@ -1605,7 +1658,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //            }
             
             // get && modify the statistic record
-            
+            let levelOldHighScore = realm.objects(HighScoreModel.self).filter("countPackages = %d and levelID = %d", countPackages, levelIndex).first!
+            if levelOldHighScore.myHighScore < levelScore {
+                realm.beginWrite()
+                levelOldHighScore.myHighScore = levelScore
+                try! realm.commitWrite()
+            }
+            if GV.player!.GCEnabled {
+                gameCenterSync.sendScoreToGameCenter(score: levelScore, countPackages: countPackages, levelID: levelIndex)
+            }
             saveStatisticAndGame()
             if playerType == .multiPlayer {
                 GV.peerToPeerService?.sendInfo(.gameIsFinished, message: [String(levelScore)], new: false, toPeer: opponent.peerID!)
@@ -1883,6 +1944,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             alert.addAction(stopAction)
             
         } else {
+            if GV.player!.GCEnabled {
+                let gameCenterAction = UIAlertAction(title: GV.language.getText(.tcShowGameCenter), style: .default,
+                                                handler: {(paramAction:UIAlertAction!) in
+                                                    self.goToGameCenter(countPackages: GV.actGame!.countPackages, level: self.levelIndex + 1)
+                })
+                alert.addAction(gameCenterAction)
+            }
             if !firstStart {
                 let againAction = UIAlertAction(title: GV.language.getText(.tcGameAgain), style: .default,
                     handler: {(paramAction:UIAlertAction!) in
@@ -1892,21 +1960,60 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             }
             let newGameAction = UIAlertAction(title: GV.language.getText(TextConstants.tcNewGame), style: .default,
                 handler: {(paramAction:UIAlertAction!) in
-                    realm.beginWrite()
-                    GV.player!.levelID += 1
-                    GV.player!.levelID %= GV.levelsForPlay.count()
-                    if GV.player!.levelID == 0 {
-                        GV.player!.countPackages += 1
-                        if GV.player!.countPackages > maxPackageCount {
-                            GV.player!.countPackages = 1
-                        }
-                    }
-                    try! realm.commitWrite()
+//                    realm.beginWrite()
+//                    GV.player!.levelID += 1
+//                    GV.player!.levelID %= GV.levelsForPlay.count()
+//                    if GV.player!.levelID == 0 {
+//                        GV.player!.countPackages += 1
+//                        if GV.player!.countPackages > GV.maxPackageCount {
+//                            GV.player!.countPackages = 1
+//                        }
+//                    }
+//                    try! realm.commitWrite()
                     self.startNewGame(next: true)
                     //self.gameArrayChanged = true
 
             })
             alert.addAction(newGameAction)
+            
+            let nextLevelAction = UIAlertAction(title: GV.language.getText(TextConstants.tcNextLevel), style: .default,
+                                                handler: {(paramAction:UIAlertAction!) in
+                                                    realm.beginWrite()
+                                                    GV.player!.levelID += 1
+                                                    GV.player!.levelID %= GV.levelsForPlay.count()
+                                                    if GV.player!.levelID == 0 {
+                                                        GV.player!.countPackages += 1
+                                                        if GV.player!.countPackages > GV.maxPackageCount {
+                                                            GV.player!.countPackages = GV.maxPackageCount
+                                                            GV.player!.levelID = GV.levelsForPlay.count() - 1
+                                                        }
+                                                    }
+                                                    try! realm.commitWrite()
+                                                    self.startNewGame(next: true)
+                                                    //self.gameArrayChanged = true
+                                                    
+            })
+            alert.addAction(nextLevelAction)
+            
+            let previousLevelAction = UIAlertAction(title: GV.language.getText(TextConstants.tcPreviousLevel), style: .default,
+                                                handler: {(paramAction:UIAlertAction!) in
+                                                    realm.beginWrite()
+                                                    GV.player!.levelID -= 1
+//                                                    GV.player!.levelID %= GV.levelsForPlay.count()
+                                                    if GV.player!.levelID < 0 {
+                                                        GV.player!.levelID = GV.levelsForPlay.count() - 1
+                                                        GV.player!.countPackages -= 1
+                                                        if GV.player!.countPackages < 1 {
+                                                            GV.player!.countPackages = 1
+                                                            GV.player!.levelID = 1
+                                                        }
+                                                    }
+                                                    try! realm.commitWrite()
+                                                    self.startNewGame(next: true)
+                                                    //self.gameArrayChanged = true
+                                                    
+            })
+            alert.addAction(previousLevelAction)
             
             let chooseLevelAction = UIAlertAction(title: GV.language.getText(.tcChooseLevel), style: .default,
                                            handler: {(paramAction:UIAlertAction!) in
@@ -1922,31 +2029,31 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 })
                 alert.addAction(autoPlayActionNormal)
             
-                let autoPlayActionNewTest = UIAlertAction(title: GV.language.getText(.tcAutoPlayNewTest), style: .default,
-                                                   handler: {(paramAction:UIAlertAction!) in
-                                                    self.startAutoplay(testType: .newTest)
-                })
-                alert.addAction(autoPlayActionNewTest)
-
-                let autoPlayActionErrors = UIAlertAction(title: GV.language.getText(.tcAutoPlayErrors), style: .default,
-                                                   handler: {(paramAction:UIAlertAction!) in
-                                                    self.startAutoplay(testType: .fromDB)
-                })
-                alert.addAction(autoPlayActionErrors)
-
-                let autoPlayActionTable = UIAlertAction(title: GV.language.getText(.tcAutoPlayTable), style: .default,
-                                                         handler: {(paramAction:UIAlertAction!) in
-                                                            self.startAutoplay(testType: .fromTable)
-                })
-                alert.addAction(autoPlayActionTable)
-
-                let autoStepActionTable = UIAlertAction(title: GV.language.getText(.tcActivateAutoPlay), style: .default,
-                                                        handler: {(paramAction:UIAlertAction!) in
-                                                            self.autoPlayerActive = true
-                })
-                alert.addAction(autoStepActionTable)
-                
-                
+//                let autoPlayActionNewTest = UIAlertAction(title: GV.language.getText(.tcAutoPlayNewTest), style: .default,
+//                                                   handler: {(paramAction:UIAlertAction!) in
+//                                                    self.startAutoplay(testType: .newTest)
+//                })
+//                alert.addAction(autoPlayActionNewTest)
+//
+//                let autoPlayActionErrors = UIAlertAction(title: GV.language.getText(.tcAutoPlayErrors), style: .default,
+//                                                   handler: {(paramAction:UIAlertAction!) in
+//                                                    self.startAutoplay(testType: .fromDB)
+//                })
+//                alert.addAction(autoPlayActionErrors)
+//
+//                let autoPlayActionTable = UIAlertAction(title: GV.language.getText(.tcAutoPlayTable), style: .default,
+//                                                         handler: {(paramAction:UIAlertAction!) in
+//                                                            self.startAutoplay(testType: .fromTable)
+//                })
+//                alert.addAction(autoPlayActionTable)
+//
+//                let autoStepActionTable = UIAlertAction(title: GV.language.getText(.tcActivateAutoPlay), style: .default,
+//                                                        handler: {(paramAction:UIAlertAction!) in
+//                                                            self.autoPlayerActive = true
+//                })
+//                alert.addAction(autoStepActionTable)
+//
+//
             #endif
 
 
@@ -2901,17 +3008,178 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             doTimeCount = true
         }
     }
+    var SKPlayerObject: MySKPlayer?
+    var SKSliderObject: MySKSlider?
+    var SKLanguagesObject: MySKLanguages?
     
     func settingsButtonPressed() {
         playMusic("NoSound", volume: GV.player!.musicVolume, loops: 0)
         doTimeCount = false
 //        countUpAdder = 0
         inSettings = true
-        panel = MySKPanel(view: view!, frame: CGRect(x: self.frame.midX, y: self.frame.midY, width: self.frame.width * 0.5, height: self.frame.height * 0.5), type: .settings, parent: self, callBack: comeBackFromSettings)
-        panel = nil
+            let parentNode = SKSpriteNode()
+            self.addChild(parentNode)
+            let alert = UIAlertController(title: GV.language.getText(.tcSettings),
+                                          message: "",
+                                          preferredStyle: .alert)
+//            nameLabel.text = GV.language.getText(.tcChooseName)
+//            soundLabel.text = GV.language.getText(.tcSoundVolume)
+//            musicLabel.text = GV.language.getText(.tcMusicVolume)
+//            languageLabel.text = GV.language.getText(.tcLanguage)
+//            playerStatisticLabel.text = GV.language.getText(.tcStatistic)
+//            writeReviewLabel.text = GV.language.getText(.tcWriteReview)
+//            returnLabel.text = GV.language.getText(.tcReturn)
+            let chooseNameAction = UIAlertAction(title: GV.language.getText(.tcChooseName), style: .default,
+                                           handler: {(paramAction:UIAlertAction!) in
+                                            self.SKPlayerObject = MySKPlayer(parent: parentNode, view: self.view!, callBack: self.comeBackFromSettings)
+
+            })
+            alert.addAction(chooseNameAction)
+            let soundVolumeAction = UIAlertAction(title: GV.language.getText(.tcSoundVolume), style: .default,
+                                                 handler: {(paramAction:UIAlertAction!) in
+                                                    self.SKSliderObject = MySKSlider(parent: parentNode, soundType: .sound, callBack: self.comeBackFromSettings)
+            })
+            alert.addAction(soundVolumeAction)
+            let musicVolumeAction = UIAlertAction(title: GV.language.getText(.tcMusicVolume), style: .default,
+                                                  handler: {(paramAction:UIAlertAction!) in
+                                                    self.SKSliderObject = MySKSlider(parent: parentNode, soundType: .music, callBack: self.comeBackFromSettings)
+            })
+            alert.addAction(musicVolumeAction)
+            let chooseLanguageAction = UIAlertAction(title: GV.language.getText(.tcChooseLanguage), style: .default,
+                                                  handler: {(paramAction:UIAlertAction!) in
+                                                    self.SKLanguagesObject = MySKLanguages(parent: parentNode, callBack: self.comeBackFromSettings)
+            })
+            alert.addAction(chooseLanguageAction)
+            let playerStatisticAction = UIAlertAction(title: GV.language.getText(.tcStatistic), style: .default,
+                                                     handler: {(paramAction:UIAlertAction!) in
+                                                        let _ = MySKStatistic(parent: parentNode, callBack: self.comeBackFromSettingsWithStart)
+            })
+            alert.addAction(playerStatisticAction)
+            let writeReviewAction = UIAlertAction(title: GV.language.getText(.tcWriteReview), style: .default,
+                                                     handler: {(paramAction:UIAlertAction!) in
+                                                        let url = "https://itunes.apple.com/app/id1143924460"
+                                                        if let url = URL(string: url) {
+                                                            if #available(iOS 10.0, *) {
+                                                                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                                                            } else {
+                                                                UIApplication.shared.openURL(url)
+                                                            }
+                                                        }
+
+            })
+            alert.addAction(writeReviewAction)
+            let connectToGamecenter = UIAlertAction(title: GV.language.getText(GV.player!.GCEnabled ? .tcDisconnectGC : .tcConnectGC), style: .default,
+                                             handler: {(paramAction:UIAlertAction!) in
+//                                                self.GCEnabled = !self.GCEnabled
+                                                try! realm.write({
+                                                    GV.player!.GCEnabled = !GV.player!.GCEnabled
+                                                })
+
+                                                self.switchGameCenter()
+            })
+            alert.addAction(connectToGamecenter)
+            let returnAction = UIAlertAction(title: GV.language.getText(.tcReturn), style: .default,
+                                                     handler: {(paramAction:UIAlertAction!) in
+                                                        self.playMusic("MyMusic", volume: GV.player!.musicVolume, loops: self.playMusicForever)
+                                                        self.inSettings = false
+            })
+            alert.addAction(returnAction)
+
+            GV.mainViewController!.showAlert(alert, delay: 100)
+//            panel = MySKPanel(view: view!, frame: CGRect(x: self.frame.midX, y: self.frame.midY, width: self.frame.width * 0.5, height: self.frame.height * 0.5), type: .settings, parent: self, callBack: comeBackFromSettings)
+//            panel = nil
+    }
+//    var GCEnabled = false
+    var GCDefaultLederboard = String()
+    let LEADERBOARD_ID = "P1L1"
+    func comeBackFromSettings() {
+        playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
+        let name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
+        playerNameLabel.text = name
+        doTimeCount = true
+        SKPlayerObject = nil
+        SKSliderObject = nil
+        SKLanguagesObject = nil
+        inSettings = false
+    }
+    func comeBackFromSettingsWithStart(_ restart: Bool, gameNumber: Int, levelIndex: Int, countPackages: Int) {
+        inSettings = false
+        
+        if restart {
+            self.gameNumber = gameNumber
+            try! realm.write({
+                GV.player!.levelID = levelIndex
+                GV.player!.countPackages = countPackages
+            })
+            prepareNextGame(newGame: false) // start with choosed gamenumber
+            generateCards(generatingType: .first)
+        } else {
+            comeBackFromSettings()
+        }
+    }
+    func switchGameCenter() {
+        if GV.player!.GCEnabled {
+            authenticateLocalPlayer()
+            gameCenterSync.startGameCenterSync()
+        }
+    }
+    // AUTHENTICATE LOCAL PLAYER
+    func authenticateLocalPlayer() {
+        let localPlayer: GKLocalPlayer = GKLocalPlayer.localPlayer()
+        
+        localPlayer.authenticateHandler = {(ViewController, error) -> Void in
+            if((ViewController) != nil) {
+                // 1. Show login if player is not logged in
+                GV.mainViewController?.present(ViewController!, animated: true, completion: nil)
+            } else if (localPlayer.isAuthenticated) {
+                // 2. Player is already authenticated & logged in, load gamecenter
+//                self.gcEnabled = true
+                
+                // Get the default leaderboard ID
+                
+                localPlayer.loadDefaultLeaderboardIdentifier(completionHandler: { (leaderboardIdentifer, error) in
+                    if error != nil {
+                        print(error!)
+                    } else {
+                        self.GCDefaultLederboard = leaderboardIdentifer!
+                    }
+                })
+                
+            } else {
+                // 3. Game center is not enabled on the users device
+//                self.GCEnabled = false
+                GV.player!.GCEnabled = false
+                print("Local player could not be authenticated!")
+//                print(error)
+            }
+        }
     }
     
-
+    func addScoreAndSubmitToGC(score: Int, countPackages: Int, level: Int) {
+        let leaderBoardID = "P\(countPackages)L\(level)"
+        // Submit score to GC leaderboard
+        let bestScore = GKScore(leaderboardIdentifier: leaderBoardID)
+        bestScore.value = Int64(score)
+        let scoreArray = [bestScore]
+        GKScore.report(scoreArray) { (error) in
+            if error != nil {
+                print(error!.localizedDescription)
+            } else {
+                print("Best Score submitted to your Leaderboard!")
+            }
+        }
+    }
+    
+    func goToGameCenter(countPackages: Int, level: Int) {
+        // MARK: - OPEN GAME CENTER LEADERBOARD
+        let gcVC = GKGameCenterViewController()
+        gcVC.gameCenterDelegate = self
+        gcVC.viewState = .leaderboards
+        gcVC.leaderboardIdentifier = "P\(countPackages)L\(level)"
+        GV.mainViewController?.present(gcVC, animated: true, completion: nil)
+    }
+    
+    
     func comeBackFromSettings(_ restart: Bool, gameNumberChoosed: Bool, gameNumber: Int, levelIndex: Int, countPackages: Int) {
         inSettings = false
         

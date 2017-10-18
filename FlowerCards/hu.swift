@@ -140,4 +140,9 @@ let huDictionary: [TextConstants: String] = [
     .tcThereIsNoPartner: "Nincsenek játékosok a közelben!",
     .tcIsPlayingWith:   " ellenfele %",
     .tcWriteReview:     "Írj véleményt az App Store-ban",
+    .tcConnectGC:       "Kapcsolódás a Game Center-hez",
+    .tcDisconnectGC:    "Lekapcsolódás a Game Center-ről",
+    .tcShowGameCenter:  "Mutasd a Game Center-t",
+    .tcMyScore:          "Legjobb eredményem: %",
+    .tcBestPlayer:       "Legjobb játékos: % %",
 ]

@@ -111,7 +111,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcUndo:            "Назад",
     .tcStopCompetition: "Стоп cоревнование",
     .tcOpponentStoppedTheGame: "% остановил игру",
-    .tcAreYouSureToDelete: "Действитель удалить игрока %?\r\n" +
+    .tcAreYouSureToDelete: "Действительно удалить игрока %?\r\n" +
                            "Все его данные будут удалены!",
     .tcHelpURL:         "http://jogaxplay.hu/portl/ru",
     .tcj:               "В",
@@ -140,4 +140,9 @@ let ruDictionary: [TextConstants: String] = [
     .tcThereIsNoPartner: "Нет игроков поблизости!",
     .tcIsPlayingWith:   " играет с %",
     .tcWriteReview:     "Написать отзыв в App Store",
+    .tcConnectGC:       "Подключиться к Game Center",
+    .tcDisconnectGC:    "Отключиться от Game Center",
+    .tcShowGameCenter:  "Покажи Game Center",
+    .tcMyScore:          "Мой лучший результат: %",
+    .tcBestPlayer:       "Лучший игрок: % %",
 ]
