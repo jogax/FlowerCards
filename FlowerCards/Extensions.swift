@@ -8,6 +8,8 @@
 
 import UIKit
 
+let iPhone_X = "iPhone X"
+
 
 public extension UIDevice {
     enum UIDeviceTypes: Int {
@@ -57,6 +59,7 @@ public extension UIDevice {
                     case (414, 736):                            return "iPhone 6 Plus"
                     case (768, 1024):                           return "iPad Air"
                     case (1024, 1366):                          return "iPad Pro"
+                    case (375, 812):                            return iPhone_X
                     default:                                    return identifier
                 }
             default:                                        return identifier

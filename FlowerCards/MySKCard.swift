@@ -135,8 +135,8 @@ class MySKCard: SKSpriteNode {
     var origValue: Int
     var isCard = false
     var mirrored: Int
-    let device = GV.deviceType
-    let modelConstantLocal = UIDevice.current.modelName
+//    let device = GV.deviceType
+//    let modelConstantLocal = UIDevice.current.modelName
     var printValue: String {
         get {
             var value = String(type == .cardType ? "Card:" : "Cont:") + "color: " + MySKCard.colorNames[colorIndex]!

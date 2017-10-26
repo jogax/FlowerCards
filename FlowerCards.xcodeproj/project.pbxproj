@@ -59,6 +59,7 @@
 		20404DEC1F8E329100492033 /* GameCenterSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20404DEB1F8E329100492033 /* GameCenterSync.swift */; };
 		2040E4CC1DE74F3600B16B19 /* AutoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2040E4CB1DE74F3600B16B19 /* AutoPlayer.swift */; };
 		2046921D1F8CDF4000A105BD /* HighScoreModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2046921C1F8CDF4000A105BD /* HighScoreModel.swift */; };
+		204E0E0E1FA227DB00027366 /* MyToDos.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204E0E0D1FA227DB00027366 /* MyToDos.txt */; };
 		20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20720A751D5B55E600389C0C /* Mirror4.m4a */; };
 		2087A2EB1DCA3D120085D711 /* ChooseLevelAndOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2087A2EA1DCA3D120085D711 /* ChooseLevelAndOptions.swift */; };
 		20AC12E91F757958004C7BAC /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20AC12E71F757958004C7BAC /* RealmSwift.framework */; };
@@ -153,6 +154,7 @@
 		20404DEB1F8E329100492033 /* GameCenterSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterSync.swift; sourceTree = "<group>"; };
 		2040E4CB1DE74F3600B16B19 /* AutoPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoPlayer.swift; sourceTree = "<group>"; };
 		2046921C1F8CDF4000A105BD /* HighScoreModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighScoreModel.swift; sourceTree = "<group>"; };
+		204E0E0D1FA227DB00027366 /* MyToDos.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = MyToDos.txt; sourceTree = "<group>"; };
 		20720A751D5B55E600389C0C /* Mirror4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror4.m4a; sourceTree = "<group>"; };
 		2087A2EA1DCA3D120085D711 /* ChooseLevelAndOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseLevelAndOptions.swift; sourceTree = "<group>"; };
 		20AC12E71F757958004C7BAC /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = "../realm-swift-2.10.1/ios/swift-4.0/RealmSwift.framework"; sourceTree = "<group>"; };
@@ -233,6 +235,7 @@
 				202C7EBF1DDC931F00DC24BD /* RealmModels */,
 				20720A7A1D5B732B00389C0C /* Language */,
 				20720A791D5B72BB00389C0C /* Music */,
+				204E0E0D1FA227DB00027366 /* MyToDos.txt */,
 			);
 			path = FlowerCards;
 			sourceTree = "<group>";
@@ -440,6 +443,7 @@
 				2025F12D1D5B25C300561FBF /* Lost.m4a in Resources */,
 				2025F0C71D5B18F300561FBF /* Main.storyboard in Resources */,
 				202A53FD1DBE4B75001152F8 /* News Pro Version EN.rtf in Resources */,
+				204E0E0E1FA227DB00027366 /* MyToDos.txt in Resources */,
 				20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */,
 				2025F12E1D5B25C300561FBF /* Mirror1.m4a in Resources */,
 				2025F12F1D5B25C300561FBF /* Mirror2.m4a in Resources */,

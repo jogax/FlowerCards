@@ -369,6 +369,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     
+    var highScore: Int = 0
+    var timeBonus: Int = 0
+    
     var timeCount: Int = 0  { // seconds
         didSet {
             showLevelScore()
@@ -489,7 +492,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 }
             }
 
-//            startSyncWithGameCenter()
+//            startSyncWithGameCenter() --
             myView = view
             GV.mainScene = self
             
@@ -520,7 +523,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             copyrightLabel.color = UIColor.white
             copyrightLabel.text = copyRight
             copyrightLabel.fontSize = self.frame.size.height * 0.01
-            copyrightLabel.position = CGPoint(x: self.frame.minX + (copyrightLabel.frame.size.width / 2) * 1.05, y: self.frame.minY + (copyrightLabel.frame.size.height / 2) * 1.03)
+            let yPosCorrection: CGFloat = GV.deviceType == iPhone_X ? 15 : 0
+            copyrightLabel.position = CGPoint(x: self.frame.minX + (copyrightLabel.frame.size.width / 2) * 1.05, y: self.frame.minY + (copyrightLabel.frame.size.height / 2) * 1.03 + yPosCorrection)
            
             self.addChild(copyrightLabel)
             if GV.player!.GCEnabled {
@@ -534,38 +538,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        //printFunc(function: "didMove", start: false)
     }
     
-//    func startSyncWithGameCenter() {
-//        DispatchQueue.global(qos: .background).async {
-//            let myBackgroundRealm = try! Realm()
-//            let GCEnabled = myBackgroundRealm.objects(PlayerModel.self).filter("isActPlayer = true").first!.GCEnabled
-//            if GCEnabled {
-//                let myScoresToSend = myBackgroundRealm.objects(HighScoreModel.self).filter("sentToGameCenter = false")
-//
-//                for scoreToSend in myScoresToSend {
-//                    let packageNr = scoreToSend.countPackages
-//                    let levelID = scoreToSend.levelID
-//                    let score = scoreToSend.myHighScore
-//                    self.addScoreAndSubmitToGC(score: score, countPackages: packageNr, level: levelID)
-//                    myBackgroundRealm.beginWrite()
-//                    scoreToSend.sentToGameCenter = true
-//                    try! myBackgroundRealm.commitWrite()
-//                    print ("Count Packages: \(packageNr), LevelID: \(levelID), HighScore: \(score)")
-//                }
-//            }
-//            print("This is run on the background queue")
-//
-//            DispatchQueue.main.async {
-//                print("This is run on the main queue, after the previous code in outer block")
-//            }
-//        }
-//    }
-//
     
     func printHighScoreModel() {
         let sortProperties = [SortDescriptor(keyPath: "countPackages", ascending: true), SortDescriptor(keyPath: "levelID", ascending: true)]
         let myHighScores = realm.objects(HighScoreModel.self).sorted(by: sortProperties)
-        print ("countPkgs: levelID: myHighScore: bestPlayer: highScore:")
-        print ("---------- -------- ------------ ----------- ----------")
+        print ("countPkgs: levelID: myHighScore: bestPlayer:      highScore:")
+        print ("---------- -------- ------------ ---------------- ----------")
         for highScoreRecord in myHighScores {
             let actPkg = "    \(highScoreRecord.countPackages)     "
             let actLevelInt = (highScoreRecord.levelID < 9 ? "0" : "") + "\(highScoreRecord.levelID + 1)"
@@ -575,7 +553,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 myScoreString = " " + myScoreString
             }
             var bestPlayerString = "  " + String(highScoreRecord.bestPlayerName)
-            while bestPlayerString.length < 11 {
+            while bestPlayerString.length < 16 {
                 bestPlayerString += " "
             }
             var bestScoreString = String(highScoreRecord.bestPlayerHighScore) + "  "
@@ -680,7 +658,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         labelBackground.color = UIColor.white
         labelBackground.alpha = 0.7
         let labelBGHeight = CGFloat(countLabelRows) * labelFontSize + labelRowCorr * 100
-        labelBackground.position = CGPoint(x: self.size.width / 2, y: self.size.height - labelBGHeight / 2 - 2)
+        if GV.deviceType == iPhone_X {
+            labelBackground.position = CGPoint(x: self.size.width / 2, y: self.size.height - labelBGHeight / 2 - 40)
+        } else {
+            labelBackground.position = CGPoint(x: self.size.width / 2, y: self.size.height - labelBGHeight / 2 - 2)
+        }
         labelBackground.size = CGSize(width: self.size.width * 0.95, height: labelBGHeight)
         
 //        let screw1 = SKSpriteNode(imageNamed: "screw.png")
@@ -740,7 +722,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         bgAdder = 0.1
         
         bgImage!.anchorPoint = CGPoint.zero
-//        bgImage!.position = self.position //CGPointMake(0, 0)
         bgImage!.zPosition = -15
         self.addChild(bgImage!)
         
@@ -1649,6 +1630,17 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        let finishGame = cardCount == 0
         
         if cardCount == 0 { // Level completed, start a new game
+            let countPlayedCards = countCardsProContainer! * countContainers * countPackages
+            let optimalValue = 15000 // milliseconds / Card -> 15 sec / Card
+            let milliSecondsProCard = (1000 * timeCount) / countPlayedCards
+            let milliSecondsProCardCorrected = milliSecondsProCard + 0 < optimalValue ? milliSecondsProCard : optimalValue + (milliSecondsProCard - optimalValue) / 32
+            let bonusProcent: Double = Double(optimalValue - milliSecondsProCardCorrected) / 5000.0
+            timeBonus = Int(Double(levelScore) * bonusProcent)
+            highScore = levelScore + timeBonus
+            if highScore < 0 {
+                highScore = 0
+            }
+            
             
             stopTimer(&countUpTimer)
             playMusic("Winner", volume: GV.player!.musicVolume, loops: 0)
@@ -1658,14 +1650,16 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //            }
             
             // get && modify the statistic record
+            
+            
             let levelOldHighScore = realm.objects(HighScoreModel.self).filter("countPackages = %d and levelID = %d", countPackages, levelIndex).first!
-            if levelOldHighScore.myHighScore < levelScore {
+            if levelOldHighScore.myHighScore < highScore {
                 realm.beginWrite()
-                levelOldHighScore.myHighScore = levelScore
+                levelOldHighScore.myHighScore = highScore
                 try! realm.commitWrite()
             }
             if GV.player!.GCEnabled {
-                gameCenterSync.sendScoreToGameCenter(score: levelScore, countPackages: countPackages, levelID: levelIndex)
+                gameCenterSync.sendScoreToGameCenter(score: highScore, countPackages: countPackages, levelID: levelIndex)
             }
             saveStatisticAndGame()
             if playerType == .multiPlayer {
@@ -1899,34 +1893,50 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         switch congratulations {
         case .Won, .Lost:
-            let actGames = realm.objects(GameModel.self).filter("levelID = %d and gameNumber = %d and countPackages = %d",
-                levelIndex, GV.actGame!.gameNumber, GV.actGame!.countPackages)
+//            let actGames = realm.objects(GameModel.self).filter("levelID = %d and gameNumber = %d and countPackages = %d",
+//                levelIndex, GV.actGame!.gameNumber, GV.actGame!.countPackages)
+//            if actGames.count > 0 {
+//                bestGameScore = actGames.max(ofProperty: "playerScore")!
+//                let bestScorePlayerID = actGames.filter("playerScore = %d", bestGameScore).first!.playerID
+//                bestScorePlayerName = realm.objects(PlayerModel.self).filter("ID = %d",bestScorePlayerID).first!.name
+//            }
+//
             var bestGameScore = 0
             var bestScorePlayerName = ""
-            if actGames.count > 0 {
-                bestGameScore = actGames.max(ofProperty: "playerScore")!
-                let bestScorePlayerID = actGames.filter("playerScore = %d", bestGameScore).first!.playerID
-                bestScorePlayerName = realm.objects(PlayerModel.self).filter("ID = %d",bestScorePlayerID).first!.name
+            var myName = ""
+            if let name = GKLocalPlayer.localPlayer().alias {
+                myName = name
+            } else {
+                myName = playerName
             }
+            
+            let highScoreRecord = realm.objects(HighScoreModel.self).filter("countPackages = %d and levelID = %d", countPackages, levelIndex)
+            if highScoreRecord.count > 0 {
+                bestGameScore = highScoreRecord.first!.bestPlayerHighScore
+                bestScorePlayerName = highScoreRecord.first!.bestPlayerName
+            }
+            
             
             tippCountLabel.text = String(0)
 //            let statistic = realm.objects(StatisticModel.self).filter("playerID = %d and levelID = %d and countPackages = %d",
 //                            GV.player!.ID, GV.player!.levelID, GV.player!.countPackages).first!
 
-            congratulationsTxt = GV.language.getText(.tcLevelAndPackage, values: String(levelIndex + 1), String(countPackages), "\(countColumns)x\(countRows)")
+            congratulationsTxt = GV.language.getText(.tcLevelAndPackage, values: String(countPackages), String(levelIndex + 1), "\(countColumns)x\(countRows)")
             congratulationsTxt += "\r\n" + GV.language.getText(.tcGameComplete, values: String(gameNumber + 1))
-            congratulationsTxt += "\r\n" + GV.language.getText(TextConstants.tcCongratulations) + playerName
+            congratulationsTxt += "\r\n" + GV.language.getText(TextConstants.tcCongratulations) + myName
             congratulationsTxt += "\r\n ============== \r\n"
             
-            if actGames.count > 1 {
-                if bestScorePlayerName != GV.player!.name {
-                    congratulationsTxt += "\r\n" + GV.language.getText(.tcYourScore, values: String(levelScore))
+            if highScoreRecord.count > 0 {
+//                if bestScorePlayerName != myName {
+                    congratulationsTxt += "\r\n" + GV.language.getText(.tcReachedScore, values: String(levelScore))
+                    congratulationsTxt += "\r\n" + GV.language.getText(.tcTimeBonus, values: String(timeBonus))
+                    congratulationsTxt += "\r\n" + GV.language.getText(.tcYourScore, values: String(highScore))
                     congratulationsTxt += "\r\n" + GV.language.getText(.tcBestScoreOfGame, values: String(bestGameScore), bestScorePlayerName)
-                } else {
-                    congratulationsTxt += "\r\n" + GV.language.getText(.tcYouAreTheBest, values: String(bestGameScore))
-                }
+//                } else {
+//                    congratulationsTxt += "\r\n" + GV.language.getText(.tcYouAreTheBest, values: String(bestGameScore))
+//                }
             } else {
-                congratulationsTxt += "\r\n" + GV.language.getText(.tcLevelScore, values: " \(bestGameScore)")
+                congratulationsTxt += "\r\n" + GV.language.getText(.tcLevelScore, values: " \(highScore)")
             }
             congratulationsTxt += "\r\n" + GV.language.getText(.tcActTime) + String(timeCount.HourMin)
         case .No:

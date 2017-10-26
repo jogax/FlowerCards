@@ -1,0 +1,5 @@
+
+- In CardGameScene
+    func makeLineAroundGameboard(_ linePosition: LinePosition) {
+        for iPhone X rounded edges
+    }

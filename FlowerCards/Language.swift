@@ -79,6 +79,8 @@ enum TextConstants: Int {
     tcPlayerStatisticLevel,
     tcStatisticOfGame,
     tcBestScoreOfGame,
+    tcReachedScore,
+    tcTimeBonus,
     tcYourScore,
     tcYouAreTheBest,
     tcGameNumber,
