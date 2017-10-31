@@ -13,6 +13,7 @@ class HighScoreModel: Object {
     @objc dynamic var ID = 0
     @objc dynamic var levelID = 0
     @objc dynamic var countPackages = 0
+    @objc dynamic var myRank = 0
     @objc dynamic var myHighScore = 0
     @objc dynamic var sentToGameCenter = false
     @objc dynamic var bestPlayerName = ""

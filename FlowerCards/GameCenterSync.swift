@@ -17,7 +17,7 @@ class GameCenterSync {
     
     
     
-    @objc func waitForLocalPlayer() {
+    @objc private func waitForLocalPlayer() {
         if GKLocalPlayer.localPlayer().isAuthenticated == false {
             timer = Timer.scheduledTimer(timeInterval: 10.0, target: self, selector: #selector(waitForLocalPlayer), userInfo: nil, repeats: false)
         } else {
@@ -33,7 +33,7 @@ class GameCenterSync {
         DispatchQueue.global(qos: .background).async {
             let myBackgroundRealm = try! Realm()
             let GCEnabled = myBackgroundRealm.objects(PlayerModel.self).filter("isActPlayer = true").first!.GCEnabled
-            if GCEnabled {
+            if GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
                 let sortProperties = [SortDescriptor(keyPath: "countPackages", ascending: true), SortDescriptor(keyPath: "levelID", ascending: true)]
                 let myHighScores = myBackgroundRealm.objects(HighScoreModel.self).sorted(by: sortProperties)
 
@@ -72,11 +72,33 @@ class GameCenterSync {
             }
         }
     }
-    func importBestScoreFromGameCenter(countPackages: Int, levelID: Int) {
+    private func importBestScoreFromGameCenter(countPackages: Int, levelID: Int) {
 //        if GKLocalPlayer.localPlayer().isAuthenticated == false {return}
         let leaderboardID = "P\(countPackages)L\(levelID + 1)"
 //        print("Downloading Score for leaderboardID: \(leaderboardID) started")
-        
+        // first downloading my Rank
+        let myLeaderBoard = GKLeaderboard(players: [GKLocalPlayer.localPlayer()])
+        myLeaderBoard.identifier = leaderboardID
+        myLeaderBoard.loadScores(completionHandler: {
+            (scores, error) in
+            if error != nil {
+                print("Error by downloading scores for \(leaderboardID): \(error!.localizedDescription)")
+            } else {
+                if scores != nil {
+                    let myRealm = try! Realm()
+                    let actResult = myRealm.objects(HighScoreModel.self).filter("countPackages = %d and levelID = %d", countPackages, levelID).first!
+                    realm.beginWrite()
+                    actResult.myRank = (scores?.first!.rank)!
+                    if let intValue = scores?.first!.value {
+                        if actResult.myHighScore < scores!.first!.value {
+                            actResult.myHighScore = Int(intValue)
+                        }
+                    } 
+                    //                    print("Bestplayer: \(actResult.bestPlayerName) with score: \(actResult.bestPlayerHighScore) saved to \(leaderboardID)")
+                    try! realm.commitWrite()
+                }
+            }
+        })
         let leaderBoard = GKLeaderboard()
         leaderBoard.identifier = leaderboardID
         leaderBoard.playerScope = .global
@@ -102,5 +124,31 @@ class GameCenterSync {
             }
         })
     }
-
+    
+    func printAllGamers() {
+        for countPackages in 1...4 {
+            for levelID in 1...26 {
+                let leaderboardID = "P\(countPackages)L\(levelID)"
+                let leaderBoard = GKLeaderboard()
+                leaderBoard.identifier = leaderboardID
+                leaderBoard.playerScope = .global
+//                leaderBoard.range = NSMakeRange(1,1000)
+                leaderBoard.loadScores(completionHandler: {
+                    (scores, error) in
+                    if error != nil {
+                        print("Error by downloading scores for \(leaderboardID): \(error!.localizedDescription)")
+                    } else {
+                        if scores != nil && scores!.count > 1 {
+                            print("PackageNr: \(countPackages), levelID: \(levelID), countPlayers: \(String(describing: scores!.count))")
+                            for score in scores! {
+                                if let alias = score.player!.alias {
+                                    print("rank: \(score.rank), player: \(String(describing: alias))")
+                                }
+                            }
+                        }
+                    }
+                })
+            }
+        }
+    }
 }

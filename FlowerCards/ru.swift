@@ -145,6 +145,10 @@ let ruDictionary: [TextConstants: String] = [
     .tcConnectGC:       "Подключиться к Game Center",
     .tcDisconnectGC:    "Отключиться от Game Center",
     .tcShowGameCenter:  "Покажи Game Center",
-    .tcMyScore:          "Мой лучший результат: %",
-    .tcBestPlayer:       "Лучший игрок: % %",
+    .tcMyPlace:          "%. Место (я): %",
+    .tcBestPlace:        "1. Место (%): - %",
+    .tcAskForGameCenter: "Теперь вы можете подключиться к Игровому центру,\r\n" +
+                         "чтобы узнать, сколько очков у других игроков.",
+    .tcAskLater:        "Спроси меня позже",
+    .tcAskNoMore:       "Не спрашивай меня больше",
 ]

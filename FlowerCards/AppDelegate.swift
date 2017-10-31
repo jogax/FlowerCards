@@ -45,15 +45,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         // Migration of realm models if neaded
             Realm.Configuration.defaultConfiguration = Realm.Configuration(
-                schemaVersion: 5,
+                schemaVersion: 7,
                 migrationBlock: { migration, oldSchemaVersion in
-                    if (oldSchemaVersion < 5) {
+                    switch oldSchemaVersion {
+                    case 0...4:
+                        break
+                    case 5:
                         // migrate PlayerModel
                         migration.enumerateObjects(ofType: PlayerModel.className()) { oldObject, newObject in
                             newObject!["GCEnabled"] = false // (oldObject!["levelID"] as! Int) / MaxColorValue
                             // The enumerateObjects(ofType:_:) method iterates
                             // over every Game object stored in the Realm file
+                            if oldObject!["GCEnabled"] as! Bool {
+                                newObject!["GCEnabled"] = GCEnabledType.GameCenterEnabled.rawValue
+                            } else {
+                                newObject!["GCEnabled"] = GCEnabledType.AskForGameCenter.rawValue
+                            }
                         }
+                    default:
+                        break
                     }
             })
 

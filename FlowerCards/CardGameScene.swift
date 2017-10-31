@@ -134,6 +134,9 @@ var lastUsedTipp: Tipp?
 let myBuildVersion = GV.buildNumber + "/" + GV.versionsNumber
 var cardTabRect = CGRect.zero
 
+enum GCEnabledType: Int {
+    case AskForGameCenter = 0, GameCenterEnabled, GameCenterSupressed
+}
 
 
 
@@ -164,6 +167,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         var cardCount: Int = 0
         var finish: FinishType = .none
     }
+    
     
     enum CongratulationsType: Int {
         case No = 0, Won, Lost
@@ -338,9 +342,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var opponentScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var opponentCardCountLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     
-    var myHighScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    var bestPlayerScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
-    
     var allGamesLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var onePkgLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var twoPkgLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
@@ -353,6 +354,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var helpLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var tippLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var undoLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    
+    var bestPlaceLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    var myPlaceLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    
+
     
     
 //    var showScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
@@ -468,6 +474,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     let backgroundQueue = DispatchQueue.global(qos: DispatchQoS.QoSClass.background)
     let playMusicForever = -1
     
+    var whoIsPos = 0
+    var scorePos = 0
+    
     var autoPlayerActive = false
     var autoPlayer: AutoPlayer?
     var replaying = false
@@ -527,15 +536,63 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             copyrightLabel.position = CGPoint(x: self.frame.minX + (copyrightLabel.frame.size.width / 2) * 1.05, y: self.frame.minY + (copyrightLabel.frame.size.height / 2) * 1.03 + yPosCorrection)
            
             self.addChild(copyrightLabel)
-            if GV.player!.GCEnabled {
-                authenticateLocalPlayer()
-                gameCenterSync.startGameCenterSync()
+            switch GV.player!.GCEnabled {
+                case GCEnabledType.GameCenterEnabled.rawValue:
+                    if !GKLocalPlayer.localPlayer().isAuthenticated {
+                        authenticateLocalPlayer()
+                    }
+//                    if GKLocalPlayer.localPlayer().isAuthenticated {
+//                        gameCenterSync.startGameCenterSync()
+//                    } else {
+//                        // when not authenticated, set to GC Not enabled
+//                        realm.beginWrite()
+//                        GV.player!.GCEnabled = GCEnabledType.AskForGameCenter.rawValue
+//                        try! realm.commitWrite()
+//                    }
+                case GCEnabledType.AskForGameCenter.rawValue:
+                    let alert = UIAlertController(title: GV.language.getText(.tcAskForGameCenter),
+                                                  message: "",
+                                                  preferredStyle: .alert)
+                    let connectAction = UIAlertAction(title: GV.language.getText(.tcConnectGC), style: .default,
+                                                       handler: {(paramAction:UIAlertAction!) in
+                                                        self.connectToGameCenter()
+                        })
+                    
+                    alert.addAction(connectAction)
+                    
+                    let askLaterAction = UIAlertAction(title: GV.language.getText(.tcAskLater), style: .default,
+                                                      handler: {(paramAction:UIAlertAction!) in
+                    })
+                    
+                    alert.addAction(askLaterAction)
+                    let askNoMoreAction = UIAlertAction(title: GV.language.getText(.tcAskNoMore), style: .default,
+                                                       handler: {(paramAction:UIAlertAction!) in
+                                                        try! realm.write({
+                                                                GV.player!.GCEnabled = GCEnabledType.GameCenterSupressed.rawValue
+                                                        })
+                    })
+                    
+                    alert.addAction(askNoMoreAction)
+                    myAlert = alert
+                    waitForShow()
+                default:
+                    break
+                
             }
         } else {
             playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
             
         }
 //        //printFunc(function: "didMove", start: false)
+    }
+    
+    var myAlert: UIAlertController?
+    @objc func waitForShow() {
+        if movingCards.count > 0 {
+            _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(waitForShow), userInfo: nil, repeats: false)
+        } else {
+            GV.mainViewController!.showAlert(myAlert!)
+        }
     }
     
     
@@ -564,6 +621,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             print(printString)
         }
     }
+    
     func prepareNextGame(newGame: Bool) {
         labelFontSize = GV.onIpad ? self.size.height / 50 : self.size.height / 70
         lastChange.color = NoColor
@@ -759,8 +817,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let cardCountText: String = String(cardStack.count(type: .MySKCardType))
         let tippCountText: String = "\(tippArray.count)"
 //        let showScoreText: String = GV.language.getText(.TCGameScore, values: "\(levelScore)")
-        let name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
-        
         let gameNumberText = GV.language.getText(.tcGameNumber) + "\(gameNumber + 1)"
         let size = " \(GV.levelsForPlay.aktLevel.countColumns) x \(GV.levelsForPlay.aktLevel.countRows)"
         let sizeText = GV.language.getText(.tcSize) + size
@@ -772,7 +828,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let whoIsLenght = max(whoIsText.length, whoIsTypeText1.length, whoIsTypeText2.length) * 2
         
         let playerHeaderText = GV.language.getText(.tcName)
-        let playerNameText = name
+        let playerNameText = getName()
         let opponentNameText = opponent.name
         let playerNameLength = max(playerHeaderText.length + 4, playerNameText.length, opponentNameText.length) * 2
         
@@ -787,10 +843,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let packagePos = sizePos + sizeText.length * 2
         let levelPos = packagePos + packageText.length * 2
         
-        let whoIsPos = 10
+        whoIsPos = 10
         let playerNamePos = whoIsPos + whoIsLenght
         let timePos = playerNamePos + playerNameLength
-        let scorePos = timePos + timeLength
+        scorePos = timePos + timeLength
         
         
         let cardCountPos = scorePos + scoreLength
@@ -840,15 +896,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             opponentTimeLabel.isHidden = true
             opponentScoreLabel.isHidden = true
             opponentCardCountLabel.isHidden = true
-            let actResult = realm.objects(HighScoreModel.self).filter("countPackages = %d and levelID = %d", countPackages, levelIndex).first!
-            let myBestScore = actResult.myHighScore
-            let myHighScoreLabelText = GV.language.getText(.tcMyScore, values: String(myBestScore))
-            createLabels(label: myHighScoreLabel, text:myHighScoreLabelText, row: 4, xPosProzent: whoIsPos)
             
-            let bestPlayer = actResult.bestPlayerName
-            let bestPlayerScore = actResult.bestPlayerHighScore
-            let bestPlayerScoreLabelText = GV.language.getText(.tcBestPlayer, values: bestPlayer, String(bestPlayerScore))
-            createLabels(label: bestPlayerScoreLabel, text:bestPlayerScoreLabelText, row: 4, xPosProzent: scorePos)
+// This Code is running if connect to Game Center - therefore is not required here
+//            if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+//                let (bestPlaceLabelText, myPlaceLabelText) = setRankingLabels()
+//                createLabels(label: bestPlaceLabel, text:bestPlaceLabelText, row: 4, xPosProzent: whoIsPos)
+//                createLabels(label: myPlaceLabel, text:myPlaceLabelText, row: 4, xPosProzent: scorePos)
+//            }
 
         }
         createLabels(label: cardCountLabel, text: cardCountText, row: 5, buttonLabel: .CardCountPos)
@@ -1057,7 +1111,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func changeLanguage()->Bool {
         //printFunc(function: "changeLanguage", start: true)
-        let name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
         
         whoIsHeaderLabel.text = GV.language.getText(.tcWhoIs)
         playerHeaderLabel.text = GV.language.getText(.tcName)
@@ -1065,7 +1118,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         scoreHeaderLabel.text = GV.language.getText(.tcScoreHead)
         cardCountHeaderLabel.text = GV.language.getText(.tcCardHead)
         
-        playerNameLabel.text = name
+        playerNameLabel.text = getName()
         whoIsLabel.text = GV.language.getText(.tcPlayerType)
 
         levelLabel.text = GV.language.getText(.tcLevel) + ": \(levelIndex + 1)"
@@ -1079,11 +1132,38 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         tippLabel.text = GV.language.getText(.tcTipps)
         undoLabel.text = GV.language.getText(.tcUndo)
 
+        if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+            let (bestPlaceLabelText, myPlaceLabelText) = setRankingLabels()
+            bestPlaceLabel.text = bestPlaceLabelText
+            myPlaceLabel.text = myPlaceLabelText
+        }
         showCardCount()
         showTippCount()
         showLevelScore()
         //printFunc(function: "changeLanguage", start: false)
         return true
+    }
+    
+    func getName() -> String {
+        var name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
+        if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+            if GKLocalPlayer.localPlayer().alias != nil {
+                name = GKLocalPlayer.localPlayer().alias!
+            }
+        }
+        return name
+    }
+    
+    func setRankingLabels() -> (String, String) {
+        let actResult = realm.objects(HighScoreModel.self).filter("countPackages = %d and levelID = %d", countPackages, levelIndex).first!
+        let bestPlayer = actResult.bestPlayerName
+        let bestPlayerScore = actResult.bestPlayerHighScore
+        let myPlace = actResult.myRank
+        let myBestScore = actResult.myHighScore
+        
+        let bestPlaceLabelText = GV.language.getText(.tcBestPlace, values: bestPlayer, String(bestPlayerScore))
+        let myPlaceLabelText = GV.language.getText(.tcMyPlace, values: String(myPlace), String(myBestScore))
+        return (bestPlaceLabelText, myPlaceLabelText)
     }
     
     func showTippCount() {
@@ -1301,6 +1381,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                         }
                 }
             }
+            
 
         }
         lastUpdateSec = sec10
@@ -1308,7 +1389,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             restartGame = false
             startNewGame(next: false)
         }
-        
         checkMultiplayer()
         cardManager!.checkColoredLines()
         
@@ -1651,15 +1731,17 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             // get && modify the statistic record
             
-            
+            var sentToGameCenter = false
+            if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+                gameCenterSync.sendScoreToGameCenter(score: highScore, countPackages: countPackages, levelID: levelIndex)
+                sentToGameCenter = true
+            }
             let levelOldHighScore = realm.objects(HighScoreModel.self).filter("countPackages = %d and levelID = %d", countPackages, levelIndex).first!
             if levelOldHighScore.myHighScore < highScore {
                 realm.beginWrite()
                 levelOldHighScore.myHighScore = highScore
+                levelOldHighScore.sentToGameCenter = sentToGameCenter
                 try! realm.commitWrite()
-            }
-            if GV.player!.GCEnabled {
-                gameCenterSync.sendScoreToGameCenter(score: highScore, countPackages: countPackages, levelID: levelIndex)
             }
             saveStatisticAndGame()
             if playerType == .multiPlayer {
@@ -1954,7 +2036,35 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             alert.addAction(stopAction)
             
         } else {
-            if GV.player!.GCEnabled {
+            switch GV.player!.GCEnabled {
+                case GCEnabledType.AskForGameCenter.rawValue, GCEnabledType.GameCenterSupressed.rawValue:
+                    let connectToGamecenter = UIAlertAction(title: GV.language.getText(.tcConnectGC), style: .default,
+                                                            handler: {(paramAction:UIAlertAction!) in
+                                                                
+                                                                self.connectToGameCenter()
+                                                                try! realm.write({
+                                                                    if GKLocalPlayer.localPlayer().isAuthenticated {
+                                                                        GV.player!.GCEnabled = GCEnabledType.GameCenterEnabled.rawValue
+                                                                    }
+                                                                })
+                                                                
+                    })
+                    alert.addAction(connectToGamecenter)
+//                case GCEnabledType.GameCenterEnabled.rawValue:
+//                    let connectToGamecenter = UIAlertAction(title: GV.language.getText(.tcDisconnectGC), style: .default,
+//                                                            handler: {(paramAction:UIAlertAction!) in
+//                                                                //                                                self.GCEnabled = !self.GCEnabled
+//                                                                try! realm.write({
+//                                                                    GV.player!.GCEnabled = GCEnabledType.AskForGameCenter.rawValue
+//                                                                })
+//
+//                    })
+//                    alert.addAction(connectToGamecenter)
+                default:
+                    break
+            }
+
+            if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
                 let gameCenterAction = UIAlertAction(title: GV.language.getText(.tcShowGameCenter), style: .default,
                                                 handler: {(paramAction:UIAlertAction!) in
                                                     self.goToGameCenter(countPackages: GV.actGame!.countPackages, level: self.levelIndex + 1)
@@ -3023,6 +3133,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var SKLanguagesObject: MySKLanguages?
     
     func settingsButtonPressed() {
+        gameCenterSync.printAllGamers()
         playMusic("NoSound", volume: GV.player!.musicVolume, loops: 0)
         doTimeCount = false
 //        countUpAdder = 0
@@ -3078,29 +3189,30 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
             })
             alert.addAction(writeReviewAction)
-            let connectToGamecenter = UIAlertAction(title: GV.language.getText(GV.player!.GCEnabled ? .tcDisconnectGC : .tcConnectGC), style: .default,
-                                             handler: {(paramAction:UIAlertAction!) in
-//                                                self.GCEnabled = !self.GCEnabled
-                                                try! realm.write({
-                                                    GV.player!.GCEnabled = !GV.player!.GCEnabled
-                                                })
-
-                                                self.switchGameCenter()
-            })
-            alert.addAction(connectToGamecenter)
+            if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+                let connectToGamecenter = UIAlertAction(title: GV.language.getText(.tcDisconnectGC), style: .default,
+                                                        handler: {(paramAction:UIAlertAction!) in
+                                                            //                                                self.GCEnabled = !self.GCEnabled
+                                                            try! realm.write({
+                                                                GV.player!.GCEnabled = GCEnabledType.AskForGameCenter.rawValue
+                                                            })
+                                                            
+                })
+                alert.addAction(connectToGamecenter)
+            }
             let returnAction = UIAlertAction(title: GV.language.getText(.tcReturn), style: .default,
                                                      handler: {(paramAction:UIAlertAction!) in
                                                         self.playMusic("MyMusic", volume: GV.player!.musicVolume, loops: self.playMusicForever)
                                                         self.inSettings = false
             })
             alert.addAction(returnAction)
+        
 
             GV.mainViewController!.showAlert(alert, delay: 100)
 //            panel = MySKPanel(view: view!, frame: CGRect(x: self.frame.midX, y: self.frame.midY, width: self.frame.width * 0.5, height: self.frame.height * 0.5), type: .settings, parent: self, callBack: comeBackFromSettings)
 //            panel = nil
     }
 //    var GCEnabled = false
-    var GCDefaultLederboard = String()
     let LEADERBOARD_ID = "P1L1"
     func comeBackFromSettings() {
         playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
@@ -3127,11 +3239,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             comeBackFromSettings()
         }
     }
-    func switchGameCenter() {
-        if GV.player!.GCEnabled {
+    func connectToGameCenter() {
+        if !GKLocalPlayer.localPlayer().isAuthenticated {
             authenticateLocalPlayer()
-            gameCenterSync.startGameCenterSync()
         }
+//        gameCenterSync.startGameCenterSync()
     }
     // AUTHENTICATE LOCAL PLAYER
     func authenticateLocalPlayer() {
@@ -3149,19 +3261,28 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 
                 localPlayer.loadDefaultLeaderboardIdentifier(completionHandler: { (leaderboardIdentifer, error) in
                     if error != nil {
-                        print(error!)
+                        realm.beginWrite()
+                        GV.player!.GCEnabled = GCEnabledType.AskForGameCenter.rawValue
+                        try! realm.commitWrite()
                     } else {
-                        self.GCDefaultLederboard = leaderboardIdentifer!
+                        realm.beginWrite()
+                        GV.player!.GCEnabled = GCEnabledType.GameCenterEnabled.rawValue
+                        self.gameCenterSync.startGameCenterSync()
+                        let (bestPlaceLabelText, myPlaceLabelText) = self.setRankingLabels()
+                        self.createLabels(label: self.bestPlaceLabel, text:bestPlaceLabelText, row: 4, xPosProzent: self.whoIsPos)
+                        self.createLabels(label: self.myPlaceLabel, text:myPlaceLabelText, row: 4, xPosProzent: self.scorePos)
+                        self.playerNameLabel.text = self.getName()
+                        try! realm.commitWrite()
+//                        self.gameCenterSync.printAllGamers()
                     }
                 })
                 
-            } else {
-                // 3. Game center is not enabled on the users device
-//                self.GCEnabled = false
-                GV.player!.GCEnabled = false
-                print("Local player could not be authenticated!")
-//                print(error)
             }
+        }
+        if !GKLocalPlayer.localPlayer().isAuthenticated {
+            realm.beginWrite()
+            GV.player!.GCEnabled = GCEnabledType.AskForGameCenter.rawValue
+            try! realm.commitWrite()
         }
     }
     
