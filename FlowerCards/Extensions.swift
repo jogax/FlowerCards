@@ -246,14 +246,14 @@ extension String {
     }
     
     var length: Int {
-        return characters.count
+        return self.count
     }
     
     func dataFromHexadecimalString() -> Data? {
-        let data = NSMutableData(capacity: characters.count / 2)
+        let data = NSMutableData(capacity: self.count / 2)
         
         let regex = try! NSRegularExpression(pattern: "[0-9a-f]{1,2}", options: .caseInsensitive)
-        regex.enumerateMatches(in: self, options: [], range: NSMakeRange(0, characters.count)) { match, flags, stop in
+        regex.enumerateMatches(in: self, options: [], range: NSMakeRange(0, self.count)) { match, flags, stop in
             let byteString = (self as NSString).substring(with: match!.range)
             let num = UInt8(byteString.withCString { strtoul($0, nil, 16) })
             data?.append([num], length: 1)
@@ -272,7 +272,7 @@ extension String {
     }
     
     func pad(with character: String = "0", toLength length: Int = 8) -> String {
-        let padCount = length - self.characters.count
+        let padCount = length - self.count
         guard padCount > 0 else { return self }
         
         return String(repeating: character, count: padCount) + self

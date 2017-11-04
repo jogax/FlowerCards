@@ -230,7 +230,7 @@ class Language {
     
     func getPreferredLanguage()->String {
         let deviceLanguage = Locale.preferredLanguages[0]
-        let languageKey = deviceLanguage[deviceLanguage.startIndex..<deviceLanguage.characters.index(deviceLanguage.startIndex, offsetBy: 2)]
+        let languageKey = deviceLanguage[deviceLanguage.startIndex..<deviceLanguage.self.index(deviceLanguage.startIndex, offsetBy: 2)]
         return String(languageKey)
     }
     

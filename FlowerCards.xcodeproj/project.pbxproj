@@ -59,13 +59,11 @@
 		20404DEC1F8E329100492033 /* GameCenterSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20404DEB1F8E329100492033 /* GameCenterSync.swift */; };
 		2040E4CC1DE74F3600B16B19 /* AutoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2040E4CB1DE74F3600B16B19 /* AutoPlayer.swift */; };
 		2046921D1F8CDF4000A105BD /* HighScoreModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2046921C1F8CDF4000A105BD /* HighScoreModel.swift */; };
+		2047D9E11FACD1B100502857 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2047D9CC1FACBD6000502857 /* Realm.framework */; };
+		2047D9E21FACD1B100502857 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2047D9CD1FACBD6000502857 /* RealmSwift.framework */; };
 		204E0E0E1FA227DB00027366 /* MyToDos.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204E0E0D1FA227DB00027366 /* MyToDos.txt */; };
 		20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20720A751D5B55E600389C0C /* Mirror4.m4a */; };
 		2087A2EB1DCA3D120085D711 /* ChooseLevelAndOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2087A2EA1DCA3D120085D711 /* ChooseLevelAndOptions.swift */; };
-		20AC12E91F757958004C7BAC /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20AC12E71F757958004C7BAC /* RealmSwift.framework */; };
-		20AC12EA1F757958004C7BAC /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 20AC12E71F757958004C7BAC /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		20AC12EB1F757958004C7BAC /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20AC12E81F757958004C7BAC /* Realm.framework */; };
-		20AC12EC1F757958004C7BAC /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 20AC12E81F757958004C7BAC /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1051D5B445300963590 /* MyMusic.m4a */; };
 		20B1F10A1D5B454700963590 /* OK.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1091D5B454700963590 /* OK.m4a */; };
 		20B1F10C1D5B458E00963590 /* Container.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F10B1D5B458E00963590 /* Container.m4a */; };
@@ -82,21 +80,6 @@
 			remoteInfo = FlowerCards;
 		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		2025F0EA1D5B208900561FBF /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				20AC12EC1F757958004C7BAC /* Realm.framework in Embed Frameworks */,
-				20AC12EA1F757958004C7BAC /* RealmSwift.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		2025F0BA1D5B18F300561FBF /* FlowerCards.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlowerCards.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -154,11 +137,13 @@
 		20404DEB1F8E329100492033 /* GameCenterSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterSync.swift; sourceTree = "<group>"; };
 		2040E4CB1DE74F3600B16B19 /* AutoPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoPlayer.swift; sourceTree = "<group>"; };
 		2046921C1F8CDF4000A105BD /* HighScoreModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighScoreModel.swift; sourceTree = "<group>"; };
+		2047D9CC1FACBD6000502857 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
+		2047D9CD1FACBD6000502857 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
+		2047D9D91FACC5C800502857 /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2047D9DA1FACC5C800502857 /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		204E0E0D1FA227DB00027366 /* MyToDos.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = MyToDos.txt; sourceTree = "<group>"; };
 		20720A751D5B55E600389C0C /* Mirror4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror4.m4a; sourceTree = "<group>"; };
 		2087A2EA1DCA3D120085D711 /* ChooseLevelAndOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseLevelAndOptions.swift; sourceTree = "<group>"; };
-		20AC12E71F757958004C7BAC /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = "../realm-swift-2.10.1/ios/swift-4.0/RealmSwift.framework"; sourceTree = "<group>"; };
-		20AC12E81F757958004C7BAC /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../realm-swift-2.10.1/ios/swift-4.0/Realm.framework"; sourceTree = "<group>"; };
 		20B1F1051D5B445300963590 /* MyMusic.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = MyMusic.m4a; sourceTree = "<group>"; };
 		20B1F1091D5B454700963590 /* OK.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = OK.m4a; sourceTree = "<group>"; };
 		20B1F10B1D5B458E00963590 /* Container.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Container.m4a; sourceTree = "<group>"; };
@@ -174,8 +159,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				20AC12EB1F757958004C7BAC /* Realm.framework in Frameworks */,
-				20AC12E91F757958004C7BAC /* RealmSwift.framework in Frameworks */,
+				2047D9E11FACD1B100502857 /* Realm.framework in Frameworks */,
+				2047D9E21FACD1B100502857 /* RealmSwift.framework in Frameworks */,
 				07AF521A31C5420D024D157A /* Pods_FlowerCards.framework in Frameworks */,
 				203BD1731F77B18C002292F7 /* GameKit.framework in Frameworks */,
 			);
@@ -194,8 +179,6 @@
 		2025F0B11D5B18F300561FBF = {
 			isa = PBXGroup;
 			children = (
-				20AC12E81F757958004C7BAC /* Realm.framework */,
-				20AC12E71F757958004C7BAC /* RealmSwift.framework */,
 				203632AE1F7574DE004DCB42 /* Podfile copy */,
 				2025F0BC1D5B18F300561FBF /* FlowerCards */,
 				2025F0BB1D5B18F300561FBF /* Products */,
@@ -331,6 +314,10 @@
 		EF35DEF6D3AC2D9A50915C70 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2047D9D91FACC5C800502857 /* Realm.framework */,
+				2047D9DA1FACC5C800502857 /* RealmSwift.framework */,
+				2047D9CC1FACBD6000502857 /* Realm.framework */,
+				2047D9CD1FACBD6000502857 /* RealmSwift.framework */,
 				203BD1721F77B18C002292F7 /* GameKit.framework */,
 				725175D43267926E46840336 /* Pods_FlowerCards.framework */,
 			);
@@ -350,7 +337,6 @@
 				2025F0B81D5B18F300561FBF /* Resources */,
 				0CCC029B3BF36829731D03AF /* [CP] Embed Pods Frameworks */,
 				756EF9E3547834ADC75C523D /* [CP] Copy Pods Resources */,
-				2025F0EA1D5B208900561FBF /* Embed Frameworks */,
 				203BD1741F77D1EC002292F7 /* ShellScript */,
 			);
 			buildRules = (
@@ -387,7 +373,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0810;
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 0910;
 				ORGANIZATIONNAME = "Jozsef Romhanyi";
 				TargetAttributes = {
 					2025F0B91D5B18F300561FBF = {
@@ -474,9 +460,14 @@
 			files = (
 			);
 			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-FlowerCards/Pods-FlowerCards-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
+				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -485,16 +476,17 @@
 		};
 		203BD1741F77D1EC002292F7 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			files = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/Realm.framework<br />$(SRCROOT)/Carthage/Build/iOS/RealmSwift.framework",
 			);
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh\"";
+			shellScript = "//bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh\"\n/usr/local/bin/carthage copy-frameworks\n";
 		};
 		756EF9E3547834ADC75C523D /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -621,14 +613,20 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -673,14 +671,20 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -712,7 +716,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A065615B6AD5E1D3F361DAA3 /* Pods-FlowerCards.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -720,6 +723,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -740,7 +744,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9F99F687559AAFCBCA68B0F5 /* Pods-FlowerCards.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -748,6 +751,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = FlowerCards/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
