@@ -139,8 +139,6 @@
 		2046921C1F8CDF4000A105BD /* HighScoreModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighScoreModel.swift; sourceTree = "<group>"; };
 		2047D9CC1FACBD6000502857 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
 		2047D9CD1FACBD6000502857 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
-		2047D9D91FACC5C800502857 /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		2047D9DA1FACC5C800502857 /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		204E0E0D1FA227DB00027366 /* MyToDos.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = MyToDos.txt; sourceTree = "<group>"; };
 		20720A751D5B55E600389C0C /* Mirror4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror4.m4a; sourceTree = "<group>"; };
 		2087A2EA1DCA3D120085D711 /* ChooseLevelAndOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseLevelAndOptions.swift; sourceTree = "<group>"; };
@@ -314,8 +312,6 @@
 		EF35DEF6D3AC2D9A50915C70 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				2047D9D91FACC5C800502857 /* Realm.framework */,
-				2047D9DA1FACC5C800502857 /* RealmSwift.framework */,
 				2047D9CC1FACBD6000502857 /* Realm.framework */,
 				2047D9CD1FACBD6000502857 /* RealmSwift.framework */,
 				203BD1721F77B18C002292F7 /* GameKit.framework */,
@@ -337,7 +333,6 @@
 				2025F0B81D5B18F300561FBF /* Resources */,
 				0CCC029B3BF36829731D03AF /* [CP] Embed Pods Frameworks */,
 				756EF9E3547834ADC75C523D /* [CP] Copy Pods Resources */,
-				203BD1741F77D1EC002292F7 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -473,20 +468,6 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FlowerCards/Pods-FlowerCards-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
-		};
-		203BD1741F77D1EC002292F7 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 8;
-			files = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/Carthage/Build/iOS/Realm.framework<br />$(SRCROOT)/Carthage/Build/iOS/RealmSwift.framework",
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-			shellPath = /bin/sh;
-			shellScript = "//bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework/strip-frameworks.sh\"\n/usr/local/bin/carthage copy-frameworks\n";
 		};
 		756EF9E3547834ADC75C523D /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
