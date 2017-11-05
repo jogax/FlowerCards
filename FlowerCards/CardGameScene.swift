@@ -898,7 +898,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             opponentTimeLabel.isHidden = true
             opponentScoreLabel.isHidden = true
             opponentCardCountLabel.isHidden = true
-            
+            createLabelsForBestPlace()
 // This Code is running if connect to Game Center - therefore is not required here
 //            if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
 //                let (bestPlaceLabelText, myPlaceLabelText) = setRankingLabels()
@@ -1748,6 +1748,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 levelOldHighScore.sentToGameCenter = sentToGameCenter
                 try! realm.commitWrite()
             }
+            if levelOldHighScore.bestPlayerHighScore < highScore {
+                realm.beginWrite()
+                levelOldHighScore.bestPlayerHighScore = highScore
+                levelOldHighScore.bestPlayerName = GKLocalPlayer.localPlayer().alias!
+                try! realm.commitWrite()
+            }
+
             saveStatisticAndGame()
             if playerType == .multiPlayer {
                 GV.peerToPeerService?.sendInfo(.gameIsFinished, message: [String(levelScore)], new: false, toPeer: opponent.peerID!)
@@ -3214,6 +3221,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                                                      handler: {(paramAction:UIAlertAction!) in
                                                         self.playMusic("MyMusic", volume: GV.player!.musicVolume, loops: self.playMusicForever)
                                                         self.inSettings = false
+                                                        self.doTimeCount = true
             })
             alert.addAction(returnAction)
         
