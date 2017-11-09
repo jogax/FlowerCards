@@ -146,7 +146,7 @@ let enDictionary: [TextConstants: String] = [
     .tcDisconnectGC:    "Disconnect from Gamecenter",
     .tcShowGameCenter:  "Show Game Center",
     .tcMyPlace:         "%. Place (me): %",
-    .tcBestPlace:       "1. Place (%): - %",
+    .tcBestPlace:       "1. Place (%): %",
     .tcAskForGameCenter: "You can now connect to the Game Center \r\n" +
                          "to see what scores other players have.",
     .tcAskLater:        "Ask me Later",

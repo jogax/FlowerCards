@@ -138,7 +138,7 @@ class GameCenterSync {
                     if error != nil {
                         print("Error by downloading scores for \(leaderboardID): \(error!.localizedDescription)")
                     } else {
-                        if scores != nil && scores!.count > 1 {
+                        if scores != nil {
                             print("PackageNr: \(countPackages), levelID: \(levelID), countPlayers: \(String(describing: scores!.count))")
                             for score in scores! {
                                 if let alias = score.player!.alias {
