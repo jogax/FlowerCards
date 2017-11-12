@@ -151,4 +151,5 @@ let huDictionary: [TextConstants: String] = [
                          "hogy megnézze, hány pontja van a többi játékosnak.",
     .tcAskLater:        "Kérdezz később",
     .tcAskNoMore:       "Ne kérdezz többé",
+    .tcOnlineGame:      "Online Játék",
 ]

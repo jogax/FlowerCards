@@ -150,7 +150,15 @@ var lastPair = PairStatus() {
     }
 }
 
-class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, PeerToPeerServiceManagerDelegate, GKGameCenterControllerDelegate {
+class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, PeerToPeerServiceManagerDelegate, GKGameCenterControllerDelegate, GKMatchmakerViewControllerDelegate, GKMatchDelegate {
+    func matchmakerViewControllerWasCancelled(_ viewController: GKMatchmakerViewController) {
+        
+    }
+    
+    func matchmakerViewController(_ viewController: GKMatchmakerViewController, didFailWithError error: Error) {
+        
+    }
+    
     func gameCenterViewControllerDidFinish(_ gameCenterViewController: GKGameCenterViewController) {
             gameCenterViewController.dismiss(animated: true, completion: nil)
     }
@@ -392,7 +400,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var nextLevelButton: MySKButton?
     var targetScore = 0
     var maxCardCount = 0
-    var gameCenterSync = GameCenterSync()
+    var gameCenterSync = GameCenter()
 
     var cardCount = 0 {
         didSet {
@@ -2192,6 +2200,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                                                     
             })
             alert.addAction(competitionAction)
+            if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+                let onlineGameAction = UIAlertAction(title: GV.language.getText(.tcOnlineGame), style: .default,
+                                                      handler: {(paramAction:UIAlertAction!) in
+                                                        self.makeMatch()
+                                                        //self.gameArrayChanged = true
+                                                        
+                })
+                alert.addAction(onlineGameAction)
+            }
                 
         }
         let cancelAction = UIAlertAction(title: GV.language.getText(TextConstants.tcCancel), style: .default,
@@ -2199,6 +2216,40 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         })
         alert.addAction(cancelAction)
         return alert
+    }
+    
+    var matchRequest: GKMatchRequest?
+    var matchMakerViewController: GKMatchmakerViewController?
+    var match: GKMatch?
+    var matchStarted = false
+    func makeMatch() {
+        matchRequest = GKMatchRequest()
+        matchRequest!.minPlayers = 2
+        matchRequest!.maxPlayers = 2
+        matchRequest!.defaultNumberOfPlayers = 2
+        matchRequest!.playerGroup = 0
+        
+        let matchMaker = GKMatchmaker.shared()
+        matchMaker.findMatch(for: matchRequest!, withCompletionHandler: { (match: GKMatch!, error: NSError!) -> Void in
+            
+            if error != nil {
+                print("matchmaking canceled")
+                return
+            }
+            
+            self.match = match
+            self.match!.delegate = self
+            if self.matchStarted == false && match.expectedPlayerCount == 0 {
+                print("in here")
+                //self.lookupPlayers()
+                matchMaker.finishMatchmaking(for: self.match!)
+            }
+        } as? (GKMatch?, Error?) -> Void )
+
+//        matchMakerViewController = GKMatchmakerViewController()
+//        matchMakerViewController!.matchmakerDelegate = self
+//        GV.mainViewController?.present(matchMakerViewController!, animated: true, completion: nil)
+        
     }
     
     func stopCompetition() {

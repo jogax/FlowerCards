@@ -56,7 +56,7 @@
 		2035F57E1E1685C200AEBE31 /* CardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035F57D1E1685C200AEBE31 /* CardManager.swift */; };
 		20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20389B541D5F7EB400ADD133 /* Mirror5.m4a */; };
 		203BD1731F77B18C002292F7 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203BD1721F77B18C002292F7 /* GameKit.framework */; };
-		20404DEC1F8E329100492033 /* GameCenterSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20404DEB1F8E329100492033 /* GameCenterSync.swift */; };
+		20404DEC1F8E329100492033 /* GameCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20404DEB1F8E329100492033 /* GameCenter.swift */; };
 		2040E4CC1DE74F3600B16B19 /* AutoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2040E4CB1DE74F3600B16B19 /* AutoPlayer.swift */; };
 		2046921D1F8CDF4000A105BD /* HighScoreModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2046921C1F8CDF4000A105BD /* HighScoreModel.swift */; };
 		2047D9E11FACD1B100502857 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2047D9CC1FACBD6000502857 /* Realm.framework */; };
@@ -134,7 +134,7 @@
 		203632AE1F7574DE004DCB42 /* Podfile copy */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Podfile copy"; sourceTree = "<group>"; };
 		20389B541D5F7EB400ADD133 /* Mirror5.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror5.m4a; sourceTree = "<group>"; };
 		203BD1721F77B18C002292F7 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
-		20404DEB1F8E329100492033 /* GameCenterSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterSync.swift; sourceTree = "<group>"; };
+		20404DEB1F8E329100492033 /* GameCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenter.swift; sourceTree = "<group>"; };
 		2040E4CB1DE74F3600B16B19 /* AutoPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoPlayer.swift; sourceTree = "<group>"; };
 		2046921C1F8CDF4000A105BD /* HighScoreModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighScoreModel.swift; sourceTree = "<group>"; };
 		2047D9CC1FACBD6000502857 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
@@ -197,7 +197,7 @@
 		2025F0BC1D5B18F300561FBF /* FlowerCards */ = {
 			isa = PBXGroup;
 			children = (
-				20404DEB1F8E329100492033 /* GameCenterSync.swift */,
+				20404DEB1F8E329100492033 /* GameCenter.swift */,
 				2025F1051D5B226E00561FBF /* PeerToPeerServiceManager.swift */,
 				2025F0F51D5B21AC00561FBF /* MyStructs.swift */,
 				2025F0BD1D5B18F300561FBF /* AppDelegate.swift */,
@@ -528,7 +528,7 @@
 				2025F1001D5B21AC00561FBF /* MySKGameStatistic.swift in Sources */,
 				2025F0F11D5B219C00561FBF /* MySKLanguages.swift in Sources */,
 				2035F57E1E1685C200AEBE31 /* CardManager.swift in Sources */,
-				20404DEC1F8E329100492033 /* GameCenterSync.swift in Sources */,
+				20404DEC1F8E329100492033 /* GameCenter.swift in Sources */,
 				2025F1241D5B253900561FBF /* CardGameScene.swift in Sources */,
 				2025F0FD1D5B21AC00561FBF /* MySKTable.swift in Sources */,
 				2025F1061D5B226E00561FBF /* PlayerModel.swift in Sources */,

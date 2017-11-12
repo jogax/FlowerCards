@@ -151,4 +151,5 @@ let enDictionary: [TextConstants: String] = [
                          "to see what scores other players have.",
     .tcAskLater:        "Ask me Later",
     .tcAskNoMore:       "Ask me no more",
+    .tcOnlineGame:      "Online Game",
 ]

@@ -152,6 +152,7 @@ let deDictionary: [TextConstants: String] = [
                          "welche Ergebnisse andere Spieler haben.",
     .tcAskLater:        "Frag mich später",
     .tcAskNoMore:       "Frag mich nie mehr",
+    .tcOnlineGame:      "Online Spiel",
 ]
 
 

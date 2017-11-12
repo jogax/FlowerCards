@@ -10,7 +10,7 @@ import Foundation
 import GameKit
 import RealmSwift
 
-class GameCenterSync {
+class GameCenter {
     var timer: Timer?
     init() {
     }

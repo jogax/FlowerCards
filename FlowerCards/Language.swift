@@ -140,8 +140,8 @@ enum TextConstants: Int {
     tcBestPlace,
     tcAskForGameCenter,
     tcAskLater,
-    tcAskNoMore
-//    tcScoreLine
+    tcAskNoMore,
+    tcOnlineGame
 }
 
     let LanguageEN = "en" // index 0

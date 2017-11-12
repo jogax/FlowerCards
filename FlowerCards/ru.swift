@@ -151,4 +151,5 @@ let ruDictionary: [TextConstants: String] = [
                          "чтобы узнать, сколько очков у других игроков.",
     .tcAskLater:        "Спроси меня позже",
     .tcAskNoMore:       "Не спрашивай меня больше",
+    .tcOnlineGame:      "Online Игра",
 ]
