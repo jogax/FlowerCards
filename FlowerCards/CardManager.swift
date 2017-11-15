@@ -201,7 +201,7 @@ var cardSize:CGSize = CGSize(width: 0, height: 0)
 
 let myLineName = "myLine"
 
-var lineWidthMultiplierNormal = CGFloat(0.04) //(0.0625)
+var lineWidthMultiplierNormal = CGFloat(0.02) //(0.0625)
 let lineWidthMultiplierSpecial = CGFloat(0.125)
 var lineWidthMultiplier: CGFloat?
 let fixationTime = 0.1
@@ -694,7 +694,7 @@ class CardManager {
         //printFunc(function: "getTipps", start: true)
         if tippArray.count > 0 {
             stopTrembling()
-            drawHelpLines(points: tippArray[tippIndex].innerTipps.last!.points, lineWidth: cardSize.width, twoArrows: tippArray[tippIndex].innerTipps.last!.twoArrows, color: .green)
+            drawHelpLines(points: tippArray[tippIndex].innerTipps.last!.points, lineWidth: cardSize.width, twoArrows: tippArray[tippIndex].innerTipps.last!.twoArrows, color: .green, score: 0)
 
             addCardToTremblingCards(tippArray[tippIndex].card1.position)
             addCardToTremblingCards(tippArray[tippIndex].card2.position)
@@ -818,7 +818,8 @@ class CardManager {
         
         if showLines {
             let color = calculateLineColor(foundedPoint: foundedPoint!, movedFrom:  movedFrom)
-            drawHelpLines(points: pointArray, lineWidth: lineSize, twoArrows: false, color: color)
+            let score = gameArray[movedFrom.column][movedFrom.row].card.countScore * (pointArray.count - 1)
+            drawHelpLines(points: pointArray, lineWidth: lineSize, twoArrows: false, color: color, score: score)
         }
         
         return (foundedPoint, pointArray)
@@ -922,11 +923,12 @@ class CardManager {
         return false
     }
     
-    private func drawHelpLines(points: [CGPoint], lineWidth: CGFloat, twoArrows: Bool, color: MyColors) {
+    private func drawHelpLines(points: [CGPoint], lineWidth: CGFloat, twoArrows: Bool, color: MyColors, score: Int) {
         lastDrawHelpLinesParameters.points = points
         lastDrawHelpLinesParameters.lineWidth = lineWidth
         lastDrawHelpLinesParameters.twoArrows = twoArrows
         lastDrawHelpLinesParameters.color = color
+        lastDrawHelpLinesParameters.scores = score
         drawHelpLinesSpec()
     }
     
@@ -939,12 +941,57 @@ class CardManager {
         
         let twoArrows = lastDrawHelpLinesParameters.twoArrows
         let color = lastDrawHelpLinesParameters.color
+        let score = lastDrawHelpLinesParameters.scores
         let arrowLength = cardSize.width * 0.30
         
         let pathToDraw:CGMutablePath = CGMutablePath()
         let myLine:SKShapeNode = SKShapeNode(path:pathToDraw)
         removeNodesWithName(myLineName)
-        myLine.lineWidth = lineWidth * lineWidthMultiplier!
+        let headWidth: CGFloat = 20
+        let headLength: CGFloat = 30
+        let tailWidth: CGFloat = 10
+        if lineWidthMultiplier == lineWidthMultiplierSpecial {
+            let arrow = UIBezierPath.arrow(from: CGPoint(x:points[0].x, y:points[0].y), to: CGPoint(x:(points.last?.x)!, y:(points.last?.y)!),tailWidth: tailWidth, headWidth: headWidth, headLength: headLength)
+            let arrowNode = SKShapeNode()
+            arrowNode.path = arrow.cgPath
+            arrowNode.name = myLineName
+            arrowNode.fillColor = UIColor.green
+            arrowNode.strokeColor = UIColor.green
+            arrowNode.zPosition = 150
+            GV.mainScene!.addChild(arrowNode)
+            if score > 0 {
+                
+                let circlePath = CGMutablePath()
+                let deltaX = points.first!.x - points.last!.x
+                let deltaY = points.first!.y - points.last!.y
+                let center = CGPoint(x: points.first!.x - deltaX / 2, y: points.first!.y - deltaY / 2)
+                circlePath.addArc(center: center, radius: CGFloat(headWidth / 1.5), startAngle: 0, endAngle: CGFloat(2 * Pi), clockwise: true)
+
+                let circleNode = SKShapeNode()
+                circleNode.fillColor = UIColor.white
+                circleNode.strokeColor = UIColor.green
+                circleNode.lineWidth = 5
+                circleNode.name = myLineName
+                circleNode.path = circlePath
+                circleNode.zPosition = 155
+                GV.mainScene!.addChild(circleNode)
+                let scoreLabel = SKLabelNode()
+                scoreLabel.name = myLineName
+                scoreLabel.text = String(score)
+                scoreLabel.fontColor = UIColor.red
+                scoreLabel.zPosition = 160
+                scoreLabel.horizontalAlignmentMode = .center
+                scoreLabel.verticalAlignmentMode = .center
+                scoreLabel.position.x = points.first!.x - deltaX / 2
+                scoreLabel.position.y = points.first!.y - deltaY / 2
+                scoreLabel.fontSize = 12
+                scoreLabel.color = UIColor.white
+                scoreLabel.fontName = "ArialMT"
+                GV.mainScene!.addChild(scoreLabel)
+            }
+        }
+//        myLine.lineWidth = lineWidth * lineWidthMultiplier!
+        myLine.lineWidth = lineWidth * lineWidthMultiplierNormal
         myLine.name = myLineName
         
         // check if valid data

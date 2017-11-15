@@ -9,6 +9,7 @@
 
 import SpriteKit
 import AVFoundation
+import Foundation
 import MultipeerConnectivity
 import GameKit
 import RealmSwift
@@ -102,12 +103,14 @@ struct DrawHelpLinesParameters {
     var lineWidth: CGFloat
     var twoArrows: Bool
     var color: MyColors
+    var scores: Int
     
     init() {
         points = [CGPoint]()
         lineWidth = 0
         twoArrows = false
         color = .red
+        scores = 0
     }
 }
 
@@ -533,7 +536,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             copyrightLabel.text = copyRight
             copyrightLabel.fontSize = self.frame.size.height * 0.01
             let yPosCorrection: CGFloat = GV.deviceType == iPhone_X ? 15 : 0
-            copyrightLabel.position = CGPoint(x: self.frame.minX + (copyrightLabel.frame.size.width / 2) * 1.05, y: self.frame.minY + (copyrightLabel.frame.size.height / 2) * 1.03 + yPosCorrection)
+            copyrightLabel.position = CGPoint(x: self.frame.minX + (copyrightLabel.frame.size.width / 2) * 1.15, y: self.frame.minY + (copyrightLabel.frame.size.height / 2) * 1.03 + yPosCorrection)
            
             self.addChild(copyrightLabel)
             switch GV.player!.GCEnabled {
@@ -629,21 +632,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         durationMultiplier = durationMultiplierForPlayer
         waitForStartConst = waitForStartForPlayer
         supressedTipps.removeAll()
-//        let playedGamesOnLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and countPackages = %d and played = true",
-//                                GV.player!.ID, GV.player!.levelID, GV.player!.countPackages).count
-//        if /*playedGamesOnLevel >= countGamesToPlay && */ newGame {
-//            realm.beginWrite()
-//            GV.player!.levelID += 1
-//            GV.player!.levelID %= GV.levelsForPlay.count()
-//            if GV.player!.levelID == 0 {
-//                GV.player!.countPackages += 1
-//                if GV.player!.countPackages > maxPackageCount {
-//                    GV.player!.countPackages = 1
-////                    countGamesToPlay += MaxCountGamesToPlayInARound
-//                }
-//            }
-//            try! realm.commitWrite()
-//        }
         levelIndex = GV.player!.levelID
         if GV.player!.countPackages > GV.maxPackageCount {
             realm.beginWrite()
@@ -659,10 +647,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         } else {
             getGameRecord(gameNumber: gameNumber)
         }
-//        realm.beginWrite()
-//            realm.delete(realm.objects(HistoryModel.self).filter("gameID = %d", actGame!.ID))
-//        try! realm.commitWrite()
-        
+
         cardManager = CardManager()
         freeUndoCounter = freeAmount
         freeTippCounter = freeAmount
@@ -703,48 +688,17 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         // calvulate card Positions
         
-//        for column in 0..<countColumns {
-//            for row in 0..<countRows {
-//                let columnRow = calculateColumnRowFromPosition(gameArray[column][row].position)
-//                if column != columnRow.column || row != columnRow.row {
-////                    print("column:", column, "row:",row, "calculated:", columnRow, column != columnRow.column || row != columnRow.row ? "Error" : "")
-//                    dummy = 0
-//                }
-//            }
-//        }
-        
         labelBackground.color = UIColor.white
         labelBackground.alpha = 0.7
         let labelBGHeight = CGFloat(countLabelRows) * labelFontSize + labelRowCorr * 100
         if GV.deviceType == iPhone_X {
             labelBackground.position = CGPoint(x: self.size.width / 2, y: self.size.height - labelBGHeight / 2 - 40)
         } else {
-            labelBackground.position = CGPoint(x: self.size.width / 2, y: self.size.height - labelBGHeight / 2 - 2)
+            labelBackground.position = CGPoint(x: self.size.width / 2, y: self.size.height - labelBGHeight / 2 - 20)
         }
         labelBackground.size = CGSize(width: self.size.width * 0.95, height: labelBGHeight)
         
-//        let screw1 = SKSpriteNode(imageNamed: "screw.png")
-//        let screw2 = SKSpriteNode(imageNamed: "screw.png")
-//        let screw3 = SKSpriteNode(imageNamed: "screw.png")
-//        let screw4 = SKSpriteNode(imageNamed: "screw.png")
-//        let screwWidth = self.size.width * 0.025
-//        let screwMultiplier = CGVector(dx: 0.48, dy: 0.35)
-//
-//        screw1.position = CGPoint(x: -labelBackground.size.width * screwMultiplier.dx, y: labelBackground.size.height * screwMultiplier.dy)
-//        screw1.size = CGSize(width: screwWidth, height: screwWidth)
-//        screw2.position = CGPoint(x: labelBackground.size.width * screwMultiplier.dx, y: labelBackground.size.height * screwMultiplier.dy)
-//        screw2.size = CGSize(width: screwWidth, height: screwWidth)
-//        screw3.position = CGPoint(x: -labelBackground.size.width * screwMultiplier.dx, y: -labelBackground.size.height * screwMultiplier.dy)
-//        screw3.size = CGSize(width: screwWidth, height: screwWidth)
-//        screw4.position = CGPoint(x: labelBackground.size.width * screwMultiplier.dx, y: -labelBackground.size.height * screwMultiplier.dy)
-//        screw4.size = CGSize(width: screwWidth, height: screwWidth)
-//        
-//        labelBackground.addChild(screw1)
-//        labelBackground.addChild(screw2)
-//        labelBackground.addChild(screw3)
-//        labelBackground.addChild(screw4)
-//        
-        self.addChild(labelBackground)
+      self.addChild(labelBackground)
         
         let tippsTexture = SKTexture(image: images.getTipp())
         tippsButton = MySKButton(texture: tippsTexture, frame: CGRect(x: buttonXPosNormalized * 7.5, y: buttonYPos, width: buttonSize, height: buttonSize))
@@ -779,6 +733,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         bgImage = setBGImageNode()
         bgAdder = 0.1
         
+        if GV.deviceType == iPhone_X {
+            bgImage!.position.y = -590
+        }
         bgImage!.anchorPoint = CGPoint.zero
         bgImage!.zPosition = -15
         self.addChild(bgImage!)
@@ -808,10 +765,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         physicsWorld.gravity = CGVector(dx: 0, dy: 0)
         physicsWorld.contactDelegate = self
         
-        makeLineAroundGameboard(.upperHorizontal)
-        makeLineAroundGameboard(.rightVertical)
-        makeLineAroundGameboard(.bottomHorizontal)
-        makeLineAroundGameboard(.leftVertical)
+//        makeLineAroundGameboard(.upperHorizontal)
+//        makeLineAroundGameboard(.rightVertical)
+//        makeLineAroundGameboard(.bottomHorizontal)
+//        makeLineAroundGameboard(.leftVertical)
+        makeLinesAroundGameboard(color: GV.deviceType == iPhone_X ? UIColor.white : UIColor.green)
         //        self.inFirstGenerateCards = false
         cardCount = Int(CGFloat(countContainers * countCardsProContainer! * countPackages))
         let cardCountText: String = String(cardStack.count(type: .MySKCardType))
@@ -1156,6 +1114,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func setRankingLabels() -> (String, String) {
         let actResult = realm.objects(HighScoreModel.self).filter("countPackages = %d and levelID = %d", countPackages, levelIndex).first!
+        if actResult.myHighScore > actResult.bestPlayerHighScore {
+            gameCenterSync.sendScoreToGameCenter(score: actResult.myHighScore, countPackages: countPackages, levelID: levelIndex)
+            realm.beginWrite()
+            actResult.bestPlayerName = getName()
+            actResult.bestPlayerHighScore = actResult.myHighScore
+            try! realm.commitWrite()
+        }
         let bestPlayer = actResult.bestPlayerName
         let bestPlayerScore = actResult.bestPlayerHighScore
         let myPlace = actResult.myRank
@@ -1716,11 +1681,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         if cardCount == 0 { // Level completed, start a new game
             let countPlayedCards = countCardsProContainer! * countContainers * countPackages
-            let optimalValue = 15000 // milliseconds / Card -> 15 sec / Card
+            let optimalValue = 30000 // milliseconds / Card -> 30 sec / Card
             let milliSecondsProCard = (1000 * timeCount) / countPlayedCards
             let milliSecondsProCardCorrected = milliSecondsProCard + 0 < optimalValue ? milliSecondsProCard : optimalValue + (milliSecondsProCard - optimalValue) / 32
             let bonusProcent: Double = Double(optimalValue - milliSecondsProCardCorrected) / 5000.0
             timeBonus = Int(Double(levelScore) * bonusProcent)
+            timeBonus = timeBonus > 0 ? timeBonus : 0
             highScore = levelScore + timeBonus
             if highScore < 0 {
                 highScore = 0
@@ -3040,42 +3006,105 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        return columnRow
 //    }
 //    
-    func makeLineAroundGameboard(_ linePosition: LinePosition) {
-        var myWallP1: CGPoint
-        var myWallP2: CGPoint
-        
+//    func makeLineAroundGameboard(_ linePosition: LinePosition) {
+//        var myWallP1: CGPoint
+//        var myWallP2: CGPoint
+//
+//        let lineSize: CGFloat = size.width / 100
+//        switch linePosition {
+//        case .bottomHorizontal:
+//            myWallP1 = CGPoint(x: position.x, y: position.y)
+//            myWallP2 = CGPoint(x: size.width, y: myWallP1.y)
+//        case .rightVertical:
+//            myWallP1 = CGPoint(x: position.x + size.width, y: position.y)
+//            myWallP2 = CGPoint(x: myWallP1.x, y: size.height)
+//        case .upperHorizontal:
+//            myWallP1 = CGPoint(x: position.x, y: position.y + size.height)
+//            myWallP2 = CGPoint(x: size.width, y: myWallP1.y)
+//        case .leftVertical:
+//            myWallP1 = CGPoint(x: position.x, y: position.y)
+//            myWallP2 = CGPoint(x: myWallP1.x, y: size.height)
+//         }
+//
+//        let pathToDraw:CGMutablePath = CGMutablePath()
+//
+//        let myWallLine:SKShapeNode = SKShapeNode()
+//        myWallLine.lineWidth = lineSize
+//        myWallLine.name = linePosition.linePositionName
+//        pathToDraw.move(to: myWallP1)
+//        pathToDraw.addLine(to: myWallP2)
+//
+//        myWallLine.path = pathToDraw
+//
+//        myWallLine.strokeColor = UIColor.green
+//
+//        self.addChild(myWallLine)
+//    }
+//
+    func makeLinesAroundGameboard(color: UIColor) {
         let lineSize: CGFloat = size.width / 100
-        switch linePosition {
-        case .bottomHorizontal:
-            myWallP1 = CGPoint(x: position.x, y: position.y)
-            myWallP2 = CGPoint(x: size.width, y: myWallP1.y)
-        case .rightVertical:
-            myWallP1 = CGPoint(x: position.x + size.width, y: position.y)
-            myWallP2 = CGPoint(x: myWallP1.x, y: size.height)
-        case .upperHorizontal:
-            myWallP1 = CGPoint(x: position.x, y: position.y + size.height)
-            myWallP2 = CGPoint(x: size.width, y: myWallP1.y)
-        case .leftVertical:
-            myWallP1 = CGPoint(x: position.x, y: position.y)
-            myWallP2 = CGPoint(x: myWallP1.x, y: size.height)
-         }
-        
-        let pathToDraw:CGMutablePath = CGMutablePath()
-        
+        let path:CGMutablePath = CGMutablePath()
+        if GV.deviceType == iPhone_X {
+            let adder = lineSize / 2
+            let radius: CGFloat = size.width / 9.7
+            let upperRadius = size.width / 70
+            let bottomRadius = size.width / 16.5
+            let sensorBarSize = CGSize(width: size.width * 0.41, height: size.height * 0.0390)
+            let point1 = CGPoint(x: position.x + radius, y: position.y + adder)
+            path.move(to: point1)
+            let point2 = CGPoint(x: size.width - radius - adder, y: position.y + adder)
+            path.addLine(to: point2)
+            let center1 = CGPoint(x: point2.x, y: position.y + radius + adder)
+            path.addArc(center: center1, radius: radius, startAngle: 270 * GV.oneGrad, endAngle: 0 * GV.oneGrad, clockwise: false)
+            let point3 = CGPoint(x: size.width - adder, y: size.height - radius - adder)
+            path.addLine(to: point3)
+            let center2 = CGPoint(x: point2.x, y: point3.y)
+            path.addArc(center: center2, radius: radius, startAngle: 360 * GV.oneGrad, endAngle: 90 * GV.oneGrad, clockwise: false)
+            let point4X = size.width - ((size.width - sensorBarSize.width) / 2 - radius - adder + upperRadius)
+            let point4 = CGPoint(x: point4X, y: size.height - adder)
+            path.addLine(to: point4)
+            let center3 = CGPoint(x: point4.x, y: size.height - upperRadius - adder)
+            path.addArc(center: center3, radius: upperRadius, startAngle: 90 * GV.oneGrad, endAngle: 180 * GV.oneGrad, clockwise: false)
+            let point5 = CGPoint(x: point4.x - upperRadius, y: size.height - sensorBarSize.height + bottomRadius)
+            path.addLine(to: point5)
+            let center4 = CGPoint(x: point5.x - bottomRadius, y: size.height - sensorBarSize.height + bottomRadius - adder / 2)
+            path.addArc(center: center4, radius: bottomRadius, startAngle: 360 * GV.oneGrad, endAngle: 270 * GV.oneGrad, clockwise: true)
+            let point6 = CGPoint(x: size.width - point5.x + bottomRadius, y: point5.y - bottomRadius - adder / 2)
+            path.addLine(to: point6)
+            let center5 = CGPoint(x: point6.x + adder, y: center4.y)
+            path.addArc(center: center5, radius: bottomRadius, startAngle: 90 * GV.oneGrad, endAngle: 180 * GV.oneGrad, clockwise: true)
+            let point7 = CGPoint(x: point6.x - bottomRadius, y: center3.y)
+            path.addLine(to: point7)
+            let center6 = CGPoint(x: point7.x - upperRadius, y: center3.y)
+            path.addArc(center: center6, radius: upperRadius, startAngle: 360 * GV.oneGrad, endAngle: 90 * GV.oneGrad, clockwise: false)
+            let point8 = CGPoint(x: point1.x, y: size.height - adder)
+            path.addLine(to: point8)
+            let center7 = CGPoint(x: position.x + radius + adder, y: size.height - radius - adder / 1.2)
+            path.addArc(center: center7, radius: radius, startAngle: 90 * GV.oneGrad, endAngle: 180 * GV.oneGrad, clockwise: false)
+            let point9 = CGPoint(x: position.x + adder, y: position.y + radius + adder)
+            path.addLine(to: point9)
+            let center8 = CGPoint(x: position.x + radius + adder, y: position.y + radius + adder)
+            path.addArc(center: center8, radius: radius, startAngle: 180 * GV.oneGrad, endAngle: 270 * GV.oneGrad, clockwise: false)
+        } else {
+            let points: [CGPoint] =
+            [
+                CGPoint(x: position.x, y: position.y),
+                CGPoint(x: size.width, y: position.y),
+                CGPoint(x: size.width, y: size.height),
+                CGPoint(x: position.x, y: size.height),
+                CGPoint(x: position.x, y: position.y),
+            ]
+            path.addLines(between: points)
+        }
         let myWallLine:SKShapeNode = SKShapeNode()
+        myWallLine.path = path
+        myWallLine.strokeColor = color
         myWallLine.lineWidth = lineSize
-        myWallLine.name = linePosition.linePositionName
-        pathToDraw.move(to: myWallP1)
-        pathToDraw.addLine(to: myWallP2)
-        
-        myWallLine.path = pathToDraw
-        
-        myWallLine.strokeColor = UIColor.green
+
         
         self.addChild(myWallLine)
     }
-    
-    
+
     func push(_ card: MySKCard, status: CardStatusInStack) {
         var savedCard = SavedCard()
         savedCard.card = card
@@ -3150,7 +3179,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var SKLanguagesObject: MySKLanguages?
     
     func settingsButtonPressed() {
+        #if TEST
+            let arrow = UIBezierPath.arrow(from: CGPoint(x:10, y:10), to: CGPoint(x:200, y:180),tailWidth: 10, headWidth: 30, headLength: 40)
+            let shapeLayer = CAShapeLayer()
+            shapeLayer.path = arrow.cgPath
         gameCenterSync.printAllGamers()
+        #endif
         playMusic("NoSound", volume: GV.player!.musicVolume, loops: 0)
         doTimeCount = false
 //        countUpAdder = 0
