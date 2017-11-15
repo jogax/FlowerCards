@@ -692,9 +692,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         labelBackground.alpha = 0.7
         let labelBGHeight = CGFloat(countLabelRows) * labelFontSize + labelRowCorr * 100
         if GV.deviceType == iPhone_X {
-            labelBackground.position = CGPoint(x: self.size.width / 2, y: self.size.height - labelBGHeight / 2 - 40)
+            labelBackground.position = CGPoint(x: self.size.width / 2, y: self.size.height - labelBGHeight / 2 - 50)
         } else {
-            labelBackground.position = CGPoint(x: self.size.width / 2, y: self.size.height - labelBGHeight / 2 - 20)
+            labelBackground.position = CGPoint(x: self.size.width / 2, y: self.size.height - labelBGHeight / 2 - 30)
         }
         labelBackground.size = CGSize(width: self.size.width * 0.95, height: labelBGHeight)
         
@@ -733,9 +733,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         bgImage = setBGImageNode()
         bgAdder = 0.1
         
-        if GV.deviceType == iPhone_X {
-            bgImage!.position.y = -590
-        }
+        bgImage!.position.y = GV.deviceType == iPhone_X ? -592 : 10
         bgImage!.anchorPoint = CGPoint.zero
         bgImage!.zPosition = -15
         self.addChild(bgImage!)
@@ -1499,7 +1497,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             //                              fromColumn: movingCard.column, fromRow: movingCard.row, fromMinValue: movingCard.minValue, fromMaxValue: movingCard.maxValue,
             //                              toColumn: container.column,   toRow: container.row,   toMinValue: container.minValue,   toMaxValue: container.maxValue)
             //
-            self.addChild(showCountScore("+\(movingCard.countScore)", position: movingCard.position))
+//            self.addChild(showCountScore("+\(movingCard.countScore)", position: movingCard.position))
             
             levelScore += movingCard.countScore
             levelScore += movingCard.getMirroredScore()
@@ -1557,7 +1555,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             //                              toColumn: card.column,   toRow: card.row,   toMinValue: card.minValue,   toMaxValue: card.maxValue)
             //
             //
-            self.addChild(showCountScore("+\(movingCard.countScore)", position: movingCard.position))
+//            self.addChild(showCountScore("+\(movingCard.countScore)", position: movingCard.position))
             levelScore += movingCard.countScore
             levelScore += movingCard.getMirroredScore()
             
@@ -1630,20 +1628,20 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         tippsButton!.activateButton(true)
     }
     
-    func showCountScore(_ text: String, position: CGPoint)->SKLabelNode {
-        let score = SKLabelNode()
-        score.position = position
-        score.text = text
-        score.fontColor = UIColor.red
-        score.fontName = "ArialMT"
-        score.fontSize = 30
-        score.zPosition = 1000
-        let showAction = SKAction.moveTo(y: position.y + 1000, duration: 3.0)
-        let hideAction = SKAction.sequence([SKAction.fadeOut(withDuration: 3.0), SKAction.removeFromParent()])
-        let scoreActions = SKAction.group([showAction, hideAction])
-        score.run(scoreActions)
-        return score
-    }
+//    func showCountScore(_ text: String, position: CGPoint)->SKLabelNode {
+//        let score = SKLabelNode()
+//        score.position = position
+//        score.text = text
+//        score.fontColor = UIColor.red
+//        score.fontName = "ArialMT"
+//        score.fontSize = 30
+//        score.zPosition = 1000
+//        let showAction = SKAction.moveTo(y: position.y + 1000, duration: 3.0)
+//        let hideAction = SKAction.sequence([SKAction.fadeOut(withDuration: 3.0), SKAction.removeFromParent()])
+//        let scoreActions = SKAction.group([showAction, hideAction])
+//        score.run(scoreActions)
+//        return score
+//    }
     
     func checkGameFinished() {
         func checkNoMoreSteps() {
@@ -1681,17 +1679,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         if cardCount == 0 { // Level completed, start a new game
             let countPlayedCards = countCardsProContainer! * countContainers * countPackages
-            let optimalValue = 30000 // milliseconds / Card -> 30 sec / Card
+            let optimalValue = 45000 // milliseconds / Card -> 45 sec / Card
             let milliSecondsProCard = (1000 * timeCount) / countPlayedCards
             let milliSecondsProCardCorrected = milliSecondsProCard + 0 < optimalValue ? milliSecondsProCard : optimalValue + (milliSecondsProCard - optimalValue) / 32
-            let bonusProcent: Double = Double(optimalValue - milliSecondsProCardCorrected) / 5000.0
+            let bonusProcent: Double = Double(optimalValue - milliSecondsProCardCorrected) / 30000.0
             timeBonus = Int(Double(levelScore) * bonusProcent)
             timeBonus = timeBonus > 0 ? timeBonus : 0
             highScore = levelScore + timeBonus
-            if highScore < 0 {
-                highScore = 0
-            }
-            
             
             stopTimer(&countUpTimer)
             playMusic("Winner", volume: GV.player!.musicVolume, loops: 0)
@@ -2855,7 +2849,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 if color == .green {
                     actionArray.append(SKAction.run({
                         self.movedFromNode.mirrored += 1
-                        self.addChild(self.showCountScore("+\(self.movedFromNode.countScore)", position: (card?.position)!))
+//                        self.addChild(self.showCountScore("+\(self.movedFromNode.countScore)", position: (card?.position)!))
                         self.playSound(soundArray[pointsIndex - 2], volume: GV.player!.soundVolume, soundPlayerIndex: pointsIndex - 2)
                     }))
                 }
@@ -2917,7 +2911,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         var actions = [SKAction]()
         if color == .green {
             actions.append(SKAction.run({
-                self.addChild(self.showCountScore("+\(adder)", position: card.position))
+//                self.addChild(self.showCountScore("+\(adder)", position: card.position))
                 self.push(card, status: .mirrored)
             }))
         }
@@ -3047,44 +3041,18 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         if GV.deviceType == iPhone_X {
             let adder = lineSize / 2
             let radius: CGFloat = size.width / 9.7
-            let upperRadius = size.width / 70
-            let bottomRadius = size.width / 16.5
-            let sensorBarSize = CGSize(width: size.width * 0.41, height: size.height * 0.0390)
-            let point1 = CGPoint(x: position.x + radius, y: position.y + adder)
+            let point1 = CGPoint(x: position.x + adder, y: size.height - radius + adder)
             path.move(to: point1)
-            let point2 = CGPoint(x: size.width - radius - adder, y: position.y + adder)
+            let point2 = CGPoint(x: point1.x, y: position.y + radius + adder)
             path.addLine(to: point2)
-            let center1 = CGPoint(x: point2.x, y: position.y + radius + adder)
-            path.addArc(center: center1, radius: radius, startAngle: 270 * GV.oneGrad, endAngle: 0 * GV.oneGrad, clockwise: false)
-            let point3 = CGPoint(x: size.width - adder, y: size.height - radius - adder)
+            let center1 = CGPoint(x: position.x + radius + adder, y: position.y + radius + adder)
+            path.addArc(center: center1, radius: radius, startAngle: 180 * GV.oneGrad, endAngle: 270 * GV.oneGrad, clockwise: false)
+            let point3 = CGPoint(x: size.width - radius - adder, y: position.y + adder)
             path.addLine(to: point3)
-            let center2 = CGPoint(x: point2.x, y: point3.y)
-            path.addArc(center: center2, radius: radius, startAngle: 360 * GV.oneGrad, endAngle: 90 * GV.oneGrad, clockwise: false)
-            let point4X = size.width - ((size.width - sensorBarSize.width) / 2 - radius - adder + upperRadius)
-            let point4 = CGPoint(x: point4X, y: size.height - adder)
+            let center2 = CGPoint(x: point3.x, y: position.y + radius + adder)
+            path.addArc(center: center2, radius: radius, startAngle: 270 * GV.oneGrad, endAngle: 0 * GV.oneGrad, clockwise: false)
+            let point4 = CGPoint(x: size.width - adder, y: size.height - radius + adder)
             path.addLine(to: point4)
-            let center3 = CGPoint(x: point4.x, y: size.height - upperRadius - adder)
-            path.addArc(center: center3, radius: upperRadius, startAngle: 90 * GV.oneGrad, endAngle: 180 * GV.oneGrad, clockwise: false)
-            let point5 = CGPoint(x: point4.x - upperRadius, y: size.height - sensorBarSize.height + bottomRadius)
-            path.addLine(to: point5)
-            let center4 = CGPoint(x: point5.x - bottomRadius, y: size.height - sensorBarSize.height + bottomRadius - adder / 2)
-            path.addArc(center: center4, radius: bottomRadius, startAngle: 360 * GV.oneGrad, endAngle: 270 * GV.oneGrad, clockwise: true)
-            let point6 = CGPoint(x: size.width - point5.x + bottomRadius, y: point5.y - bottomRadius - adder / 2)
-            path.addLine(to: point6)
-            let center5 = CGPoint(x: point6.x + adder, y: center4.y)
-            path.addArc(center: center5, radius: bottomRadius, startAngle: 90 * GV.oneGrad, endAngle: 180 * GV.oneGrad, clockwise: true)
-            let point7 = CGPoint(x: point6.x - bottomRadius, y: center3.y)
-            path.addLine(to: point7)
-            let center6 = CGPoint(x: point7.x - upperRadius, y: center3.y)
-            path.addArc(center: center6, radius: upperRadius, startAngle: 360 * GV.oneGrad, endAngle: 90 * GV.oneGrad, clockwise: false)
-            let point8 = CGPoint(x: point1.x, y: size.height - adder)
-            path.addLine(to: point8)
-            let center7 = CGPoint(x: position.x + radius + adder, y: size.height - radius - adder / 1.2)
-            path.addArc(center: center7, radius: radius, startAngle: 90 * GV.oneGrad, endAngle: 180 * GV.oneGrad, clockwise: false)
-            let point9 = CGPoint(x: position.x + adder, y: position.y + radius + adder)
-            path.addLine(to: point9)
-            let center8 = CGPoint(x: position.x + radius + adder, y: position.y + radius + adder)
-            path.addArc(center: center8, radius: radius, startAngle: 180 * GV.oneGrad, endAngle: 270 * GV.oneGrad, clockwise: false)
         } else {
             let points: [CGPoint] =
             [
