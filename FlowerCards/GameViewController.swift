@@ -102,8 +102,6 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
     func startScene() {
         self.view.isMultipleTouchEnabled = false
         skView = self.view as? SKView
-        skView!.showsFPS = true
-        skView!.showsNodeCount = true
         cardsScene = nil
 //        flowersScene = nil
         
@@ -137,8 +135,8 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
         let deviceName = UIDevice.current.name
         GV.peerToPeerService = PeerToPeerServiceManager(peerType: appName, identifier: myName, deviceName: deviceName)  // Start connection
 
-        skView!.showsFPS = true
-        skView!.showsNodeCount = true
+        skView!.showsFPS = false
+        skView!.showsNodeCount = false
         skView!.ignoresSiblingOrder = true
         
 //        if GV.actGameParam.gameModus == GameModusCards {

@@ -126,6 +126,8 @@ class GameCenter {
     }
     
     func printAllGamers() {
+        var players: [String] = []
+        var countLevels = 0
         for countPackages in 1...4 {
             for levelID in 1...26 {
                 let leaderboardID = "P\(countPackages)L\(levelID)"
@@ -136,14 +138,26 @@ class GameCenter {
                 leaderBoard.loadScores(completionHandler: {
                     (scores, error) in
                     if error != nil {
+                        countLevels += 1
                         print("Error by downloading scores for \(leaderboardID): \(error!.localizedDescription)")
                     } else {
                         if scores != nil {
                             print("PackageNr: \(countPackages), levelID: \(levelID), countPlayers: \(String(describing: scores!.count))")
                             for score in scores! {
                                 if let alias = score.player!.alias {
-                                    print("rank: \(score.rank), player: \(String(describing: alias))")
+                                    if !players.contains(alias) {
+                                        players.append(alias)
+                                    }
+                                    print("rank: \(score.rank), player: \(String(describing: alias)), Score: \(score.value)")
                                 }
+                            }
+                        }
+                        countLevels += 1
+                        if countLevels > 103 {
+                            print("-------------------------------------")
+                            print ("List of Players: (\(players.count))")
+                            for player in players {
+                                print(player)
                             }
                         }
                     }
