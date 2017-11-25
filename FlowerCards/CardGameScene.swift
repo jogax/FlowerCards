@@ -733,7 +733,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         bgImage = setBGImageNode()
         bgAdder = 0.1
         
-        bgImage!.position.y = GV.deviceType == iPhone_X ? -592 : 10
+        bgImage!.position.y = GV.deviceType == iPhone_X ? -595 : 0
         bgImage!.anchorPoint = CGPoint.zero
         bgImage!.zPosition = -15
         self.addChild(bgImage!)
