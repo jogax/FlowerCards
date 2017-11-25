@@ -54,52 +54,52 @@ class AutoPlayer {
     init(scene: CardGameScene) {
         self.scene = scene
         self.stopTimer = false
-        #if TEST
-            printOldGames()
-        #endif
+//        #if TEST
+//            printOldGames()
+//        #endif
     }
-    #if TEST
-    func printOldGames () {
-        var oldLevelID: Int = -1
-        let maxLevelID = GV.levelsForPlay.count()
-        var levelID = 0
-//        var lostGames: [String] = []
-//        var couldNotEndGames: [String] = []
-        while levelID < maxLevelID {
-            let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and levelID = %d and ID != %d", GV.player!.ID, levelID, GV.actGame!.ID).sorted(byKeyPath: "gameNumber")
-            for game in errorGames  {
-                if game.countSteps == 0 {
-                    realm.beginWrite()
-                    realm.delete(game)
-                    try! realm.commitWrite()                    
-                } else {
-                    if game.levelID != oldLevelID {
-                        oldLevelID = game.levelID
-                    }
-                    let lineGameToPlay = "GameToPlay(level: \(game.levelID + 1), countPackages: \(game.countPackages), gameNumber: \(game.gameNumber + 1)), // at Step: \(game.countSteps)"
-                    print (lineGameToPlay)
-                }
-            }
-            levelID += 1
-        }
-        let allGamesCount = realm.objects(GameModel.self).filter("playerID = %d", GV.player!.ID).count
-        let errorGamesCount = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and ID != %d", GV.player!.ID, GV.actGame!.ID).count
-        if allGamesCount > 0 {
-            print ("AllGames: \(allGamesCount), Errorgames: \(errorGamesCount), Procent errorgames: \((Double(errorGamesCount) * 100.0 / Double(allGamesCount)).twoDecimals)%")
-            for countPkgs in 1...4 {
-                let gameCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d", GV.player!.ID, countPkgs).count
-                let errorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d and gameFinished = false and (ID != %d or levelID != %d)", GV.player!.ID, countPkgs, GV.actGame!.ID, GV.actGame!.levelID).count
-                if gameCount > 0 {
-                    print ("Pack \(countPkgs): \(gameCount), Errorgames: \(errorCount), Procent errorgames: \((Double(errorCount) * 100.0 / Double(gameCount)).twoDecimals)%")
-                } else {
-                    print ("Pack \(countPkgs): \(gameCount), Errorgames: \(errorCount), Procent errorgames: 0%")
-                }
-            }
-        } else {
-            print ("AllGames: \(allGamesCount), Errorgames: \(errorGamesCount), Procent errorgames: 0%")
-        }
-    }
-    #endif
+//    #if TEST
+//    func printOldGames () {
+//        var oldLevelID: Int = -1
+//        let maxLevelID = GV.levelsForPlay.count()
+//        var levelID = 0
+////        var lostGames: [String] = []
+////        var couldNotEndGames: [String] = []
+//        while levelID < maxLevelID {
+//            let errorGames = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and levelID = %d and ID != %d", GV.player!.ID, levelID, GV.actGame!.ID).sorted(byKeyPath: "gameNumber")
+//            for game in errorGames  {
+//                if game.countSteps == 0 {
+//                    realm.beginWrite()
+//                    realm.delete(game)
+//                    try! realm.commitWrite()                    
+//                } else {
+//                    if game.levelID != oldLevelID {
+//                        oldLevelID = game.levelID
+//                    }
+//                    let lineGameToPlay = "GameToPlay(level: \(game.levelID + 1), countPackages: \(game.countPackages), gameNumber: \(game.gameNumber + 1)), // at Step: \(game.countSteps)"
+//                    print (lineGameToPlay)
+//                }
+//            }
+//            levelID += 1
+//        }
+//        let allGamesCount = realm.objects(GameModel.self).filter("playerID = %d", GV.player!.ID).count
+//        let errorGamesCount = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and ID != %d", GV.player!.ID, GV.actGame!.ID).count
+//        if allGamesCount > 0 {
+//            print ("AllGames: \(allGamesCount), Errorgames: \(errorGamesCount), Procent errorgames: \((Double(errorGamesCount) * 100.0 / Double(allGamesCount)).twoDecimals)%")
+//            for countPkgs in 1...4 {
+//                let gameCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d", GV.player!.ID, countPkgs).count
+//                let errorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d and gameFinished = false and (ID != %d or levelID != %d)", GV.player!.ID, countPkgs, GV.actGame!.ID, GV.actGame!.levelID).count
+//                if gameCount > 0 {
+//                    print ("Pack \(countPkgs): \(gameCount), Errorgames: \(errorCount), Procent errorgames: \((Double(errorCount) * 100.0 / Double(gameCount)).twoDecimals)%")
+//                } else {
+//                    print ("Pack \(countPkgs): \(gameCount), Errorgames: \(errorCount), Procent errorgames: 0%")
+//                }
+//            }
+//        } else {
+//            print ("AllGames: \(allGamesCount), Errorgames: \(errorGamesCount), Procent errorgames: 0%")
+//        }
+//    }
+//    #endif
     func startPlay(testType: TestType = .runOnce) {
         stopTimer = false
         gameIndex = 0

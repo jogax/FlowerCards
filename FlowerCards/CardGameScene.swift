@@ -153,17 +153,11 @@ var lastPair = PairStatus() {
     }
 }
 
-class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, PeerToPeerServiceManagerDelegate, GKGameCenterControllerDelegate, GKMatchmakerViewControllerDelegate, GKMatchDelegate {
-    func matchmakerViewControllerWasCancelled(_ viewController: GKMatchmakerViewController) {
-        
-    }
-    
-    func matchmakerViewController(_ viewController: GKMatchmakerViewController, didFailWithError error: Error) {
-        
-    }
-    
+class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, PeerToPeerServiceManagerDelegate, GKGameCenterControllerDelegate, GKMatchmakerViewControllerDelegate, GKMatchDelegate, GKLocalPlayerListener {
+
     func gameCenterViewControllerDidFinish(_ gameCenterViewController: GKGameCenterViewController) {
-            gameCenterViewController.dismiss(animated: true, completion: nil)
+        gameCenterViewController.dismiss(animated: true, completion: nil)
+        doTimeCount = true
     }
     
     
@@ -403,7 +397,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var nextLevelButton: MySKButton?
     var targetScore = 0
     var maxCardCount = 0
-    var gameCenterSync = GameCenter()
+//    var gameCenterSync = GameCenter()
 
     var cardCount = 0 {
         didSet {
@@ -498,9 +492,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     let waitForStartForPlayer = 0.1
     let waitForStartForAutoplayer = 0.001
     var cardManager: CardManager?
+    var matchMakerViewControllerForInvites: GKMatchmakerViewController?
+    var match: GKMatch?
     
     override func didMove(to view: SKView) {
-        
         if !settingsSceneStarted {
             if realm.objects(HighScoreModel.self).count < GV.maxPackageCount * GV.levelsForPlay.count() {
                 for packageNr in 1...GV.maxPackageCount {
@@ -515,7 +510,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //            startSyncWithGameCenter() --
             myView = view
             GV.mainScene = self
-            
             GV.peerToPeerService!.delegate = self
             let width:CGFloat = 64.0
             let height: CGFloat = 89.0
@@ -549,8 +543,8 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             self.addChild(copyrightLabel)
             switch GV.player!.GCEnabled {
                 case GCEnabledType.GameCenterEnabled.rawValue:
-                    if !GKLocalPlayer.localPlayer().isAuthenticated {
-                        authenticateLocalPlayer()
+                    if GCHelper.sharedInstance.authenticateStatus == GCHelper.AuthenticatingStatus.notAuthenticated {
+                        GCHelper.sharedInstance.authenticateLocalUser()
                     }
 //                    if GKLocalPlayer.localPlayer().isAuthenticated {
 //                        gameCenterSync.startGameCenterSync()
@@ -737,11 +731,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
         showCardFromStack = nil
         
-        
         bgImage = setBGImageNode()
         bgAdder = 0.1
         
-        bgImage!.position.y = GV.deviceType == iPhone_X ? -592 : 10
+        
+        bgImage!.position.y = GV.deviceType == iPhone_X ? -595 : 0
         bgImage!.anchorPoint = CGPoint.zero
         bgImage!.zPosition = -15
         self.addChild(bgImage!)
@@ -1121,7 +1115,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func setRankingLabels() -> (String, String) {
         let actResult = realm.objects(HighScoreModel.self).filter("countPackages = %d and levelID = %d", countPackages, levelIndex).first!
         if actResult.myHighScore > actResult.bestPlayerHighScore {
-            gameCenterSync.sendScoreToGameCenter(score: actResult.myHighScore, countPackages: countPackages, levelID: levelIndex)
+            GCHelper.sharedInstance.sendScoreToGameCenter(score: actResult.myHighScore, countPackages: countPackages, levelID: levelIndex)
             realm.beginWrite()
             actResult.bestPlayerName = getName()
             actResult.bestPlayerHighScore = actResult.myHighScore
@@ -1706,7 +1700,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             
             var sentToGameCenter = false
             if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
-                gameCenterSync.sendScoreToGameCenter(score: highScore, countPackages: countPackages, levelID: levelIndex)
+                GCHelper.sharedInstance.sendScoreToGameCenter(score: highScore, countPackages: countPackages, levelID: levelIndex)
                 sentToGameCenter = true
             }
             let levelOldHighScore = realm.objects(HighScoreModel.self).filter("countPackages = %d and levelID = %d", countPackages, levelIndex).first!
@@ -1846,6 +1840,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
         let returnAction = UIAlertAction(title: GV.language.getText(.tcReturn), style: .cancel,
                                          handler: {(paramAction:UIAlertAction!) in
+                                            self.doTimeCount = true
                                             
         })
         alert.addAction(returnAction)
@@ -1892,6 +1887,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         let OKAction = UIAlertAction(title: GV.language.getText(.tcok), style: .default,
                                         handler: {(paramAction:UIAlertAction!) in
+                                            self.doTimeCount = true
                                             
         })
         alert.addAction(OKAction)
@@ -1902,11 +1898,15 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func chooseLevelAndOptions() {
-        _ = ChooseLevelAndOptions(callBackFromChooseLevelAndOptions)
+        _ = ChooseLevelAndOptions(callBack: callBackFromChooseLevelAndOptions)
     }
     
-    func callBackFromChooseLevelAndOptions() {
-        startNewGame(next: true)
+    func callBackFromChooseLevelAndOptions(startGame: Bool) {
+        if startGame {
+            startNewGame(next: true)
+        } else {
+            doTimeCount = true
+        }
     }
 
     
@@ -1952,6 +1952,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        let playerName = GV.player!.name
         let statisticsTxt = ""
         var congratulationsTxt = GV.language.getText(.tcChooseGame)
+        doTimeCount = false
         
         switch congratulations {
         case .Won, .Lost:
@@ -2163,7 +2164,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
                 let onlineGameAction = UIAlertAction(title: GV.language.getText(.tcOnlineGame), style: .default,
                                                       handler: {(paramAction:UIAlertAction!) in
+//                                                        GCHelper.sharedInstance.findMatchWithMinPlayers(2, maxPlayers: 4, viewController: GV.mainViewController!, delegate: self as! GCHelperDelegate)
                                                         self.makeMatch()
+//                                                        self.findMatch()
                                                         //self.gameArrayChanged = true
                                                         
                 })
@@ -2173,6 +2176,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
         let cancelAction = UIAlertAction(title: GV.language.getText(TextConstants.tcCancel), style: .default,
             handler: {(paramAction:UIAlertAction!) in
+                self.doTimeCount = true
         })
         alert.addAction(cancelAction)
         return alert
@@ -2180,36 +2184,213 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     var matchRequest: GKMatchRequest?
     var matchMakerViewController: GKMatchmakerViewController?
-    var match: GKMatch?
     var matchStarted = false
+    
+    func findMatch() {
+        let request = GKMatchRequest()
+        request.minPlayers = 2
+        request.maxPlayers = 2
+        request.defaultNumberOfPlayers = 2
+        var recipients: [GKPlayer] = []
+        for player in GV.gkPlayers  {
+            if player.value.alias  == "jogax" {
+                recipients.append(player.value)
+            }
+        }
+        request.inviteMessage = "Hallo!"
+//        request.recipients = recipients
+//        request.recipientResponseHandler = {(player: GKPlayer, response: GKInviteRecipientResponse) -> Void in
+//            print("recipient responsed!")
+//        }
+        
+        GKMatchmaker.shared().findMatch(for: request, withCompletionHandler: {(match, error) -> Void in
+            if error != nil {
+                // Process the error.
+                
+                print("Error finding match")
+//                print(error?.localizedDescription as Any)
+                
+//                self.show_match_error();
+                
+                
+                
+                
+            }
+            else if match != nil {
+                
+                
+                self.match = match!
+                
+                self.match?.delegate = self
+                
+                
+                // Use a retaining property to retain the match.
+                
+                if !self.matchStarted && self.match?.expectedPlayerCount == 1
+                {
+                    self.matchStarted = true
+                    // Insert game-specific code to begin the match.
+                    
+                    print("Match Started")
+                    
+                }
+                
+                
+            }
+            else
+            {
+                print("Match is nill")
+            }
+            
+        })
+
+    }
+    
+    func match(_ theMatch: GKMatch, player playerID: String, didChange state: GKPlayerConnectionState) {
+        /*recall when is desconnect match = nil*/
+        guard match == theMatch else {
+            return
+        }
+        
+        switch state {
+        /// Connected /
+        case .stateConnected where match != nil && theMatch.expectedPlayerCount == 0:
+            if #available(iOS 8.0, *) {
+                
+                lookupPlayers();
+                
+                
+            }
+        /// Lost deconnection /
+        case .stateDisconnected:
+            print("match disconnected")
+            
+//            show_match_error();
+            matchStarted = false;
+        default:
+            break
+        }
+    }
+    
+    // match state change error
+    func match(_ theMatch: GKMatch, didFailWithError error: Error?) {
+        guard match == theMatch else {
+            return
+        }
+        
+        guard error == nil else {
+            print("Match failed with error: \(String(describing: error?.localizedDescription))")
+            match?.disconnect()
+            matchStarted = false;
+            return
+        }
+    }
+    
+    func lookupPlayers() {
+        
+        guard let match =  match else {
+            print("No Match")
+            return
+        }
+        
+        
+        let playerIDs = match.players.map { $0.playerID }
+        
+        guard let hasePlayerIDS = playerIDs as? [String] else {
+            print("No Player")
+            return
+        }
+        
+        //Load an array of players
+        GKPlayer.loadPlayers(forIdentifiers: hasePlayerIDS) {
+            (players, error) in
+            
+            guard error == nil else {
+                print("Error retrieving player info: \(error!.localizedDescription)")
+                self.match?.disconnect()
+                return
+            }
+            
+            guard let players = players else {
+                print("Error retrieving players; returned nil")
+                return
+            }
+            
+            
+            for player in players {
+                print("Found player: \(String(describing: player.alias))")
+            }
+            
+            
+//            if let arrayPlayers = players as [GKPlayer]? { self.playersInMatch = Set(arrayPlayers) }
+            
+            GKMatchmaker.shared().finishMatchmaking(for: match)
+            
+            //(Static.delegate as? EGCDelegate)?.EGCMatchStarted?()
+            
+        }
+        
+        
+//        selectHost()
+        
+    }
+    
     func makeMatch() {
         matchRequest = GKMatchRequest()
         matchRequest!.minPlayers = 2
         matchRequest!.maxPlayers = 2
         matchRequest!.defaultNumberOfPlayers = 2
         matchRequest!.playerGroup = 0
+        var recipients: [GKPlayer] = []
+        for player in GV.gkPlayers  {
+            if player.value.alias  == "jogax" || player.value.alias == "jogax71" {
+                recipients.append(player.value)
+            }
+        }
+//        matchRequest!.recipients = recipients
+//        matchRequest!.recipientResponseHandler = {recipientResponsed}
         
         let matchMaker = GKMatchmaker.shared()
-        matchMaker.findMatch(for: matchRequest!, withCompletionHandler: { (match: GKMatch!, error: NSError!) -> Void in
-            
-            if error != nil {
-                print("matchmaking canceled")
-                return
-            }
-            
-            self.match = match
-            self.match!.delegate = self
-            if self.matchStarted == false && match.expectedPlayerCount == 0 {
-                print("in here")
-                //self.lookupPlayers()
-                matchMaker.finishMatchmaking(for: self.match!)
-            }
-        } as? (GKMatch?, Error?) -> Void )
-
-//        matchMakerViewController = GKMatchmakerViewController()
-//        matchMakerViewController!.matchmakerDelegate = self
-//        GV.mainViewController?.present(matchMakerViewController!, animated: true, completion: nil)
         
+        matchMakerViewController = GKMatchmakerViewController(matchRequest: matchRequest!)
+        matchMakerViewController!.matchmakerDelegate = self
+        GV.mainViewController?.present(matchMakerViewController!, animated: true, completion: nil)
+        
+        matchRequest?.recipients = nil
+//        matchMaker.findMatch(for: matchRequest!, withCompletionHandler: { (match: GKMatch!, error: NSError!) -> Void in
+//
+//            if error != nil {
+//                print("matchmaking canceled")
+//                return
+//            }
+//
+//            self.match = match
+//            self.match!.delegate = self
+//            if self.matchStarted == false && match.expectedPlayerCount == 0 {
+//                print("in here")
+//                //self.lookupPlayers()
+//                matchMaker.finishMatchmaking(for: self.match!)
+//            }
+//        } as? (GKMatch?, Error?) -> Void )
+        doTimeCount = true
+        
+    }
+    
+    func recipientResponsed() {
+        
+    }
+    
+    func matchmakerViewControllerWasCancelled(_ viewController: GKMatchmakerViewController) {
+        matchMakerViewController?.dismiss(animated: true, completion: nil)
+        print("cancelled")
+    }
+    
+    func matchmakerViewController(_ viewController: GKMatchmakerViewController, didFailWithError error: Error) {
+        print("error")
+    }
+    
+    private func matchmakerViewController(didFind: GKMatch) {
+        print("didFind")
     }
     
     func stopCompetition() {
@@ -3087,7 +3268,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //    }
 //
     func makeLinesAroundGameboard(color: UIColor) {
-        let lineSize: CGFloat = size.width / 100
+        let lineSize: CGFloat = size.width / 150
         let path:CGMutablePath = CGMutablePath()
         if GV.deviceType == iPhone_X {
             let adder = lineSize / 2
@@ -3199,10 +3380,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func settingsButtonPressed() {
         #if TEST
-            let arrow = UIBezierPath.arrow(from: CGPoint(x:10, y:10), to: CGPoint(x:200, y:180),tailWidth: 10, headWidth: 30, headLength: 40)
-            let shapeLayer = CAShapeLayer()
-            shapeLayer.path = arrow.cgPath
-        gameCenterSync.printAllGamers()
+            GCHelper.sharedInstance.getAllPlayers(timeScope: .allTime)
+            GCHelper.sharedInstance.getAllPlayers(timeScope: .week)
+            GCHelper.sharedInstance.getAllPlayers(timeScope: .today)
         #endif
         playMusic("NoSound", volume: GV.player!.musicVolume, loops: 0)
         doTimeCount = false
@@ -3317,48 +3497,89 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     func connectToGameCenter() {
-        if !GKLocalPlayer.localPlayer().isAuthenticated {
-            authenticateLocalPlayer()
+        GCHelper.sharedInstance.authenticateLocalUser()
+        if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+            self.createLabelsForBestPlace()
         }
+
+//        if !GKLocalPlayer.localPlayer().isAuthenticated {
+//            authenticateLocalPlayer()
+//        }
 //        gameCenterSync.startGameCenterSync()
     }
     // AUTHENTICATE LOCAL PLAYER
-    func authenticateLocalPlayer() {
-        let localPlayer: GKLocalPlayer = GKLocalPlayer.localPlayer()
+//    func authenticateLocalPlayer() {
+//        let localPlayer: GKLocalPlayer = GKLocalPlayer.localPlayer()
+//
+//        localPlayer.authenticateHandler = {(ViewController, error) -> Void in
+//            if((ViewController) != nil) {
+//                // 1. Show login if player is not logged in
+//                GV.mainViewController?.present(ViewController!, animated: true, completion: nil)
+//            } else if (localPlayer.isAuthenticated) {
+//                // 2. Player is already authenticated & logged in, load gamecenter
+////                self.gcEnabled = true
+//
+//                // Get the default leaderboard ID
+//
+//                localPlayer.loadDefaultLeaderboardIdentifier(completionHandler: { (leaderboardIdentifer, error) in
+//                    if error != nil {
+//                        realm.beginWrite()
+//                        GV.player!.GCEnabled = GCEnabledType.AskForGameCenter.rawValue
+//                        try! realm.commitWrite()
+//                    } else {
+//                        realm.beginWrite()
+//                        GV.player!.GCEnabled = GCEnabledType.GameCenterEnabled.rawValue
+//                        self.createLabelsForBestPlace()
+//                        GV.peerToPeerService!.changeIdentifier(GKLocalPlayer.localPlayer().alias!)
+//                        self.gameCenterSync.getAllPlayers()
+//                        self.gameCenterSync.startGameCenterSync()
+//                        GKLocalPlayer.localPlayer().unregisterAllListeners()
+//                        GKLocalPlayer.localPlayer().register(self)
+//
+//                        try! realm.commitWrite()
+////                        self.gameCenterSync.printAllGamers()
+//                    }
+//                })
+//
+//            }
+//        }
+//        if !GKLocalPlayer.localPlayer().isAuthenticated {
+//            realm.beginWrite()
+//            GV.player!.GCEnabled = GCEnabledType.AskForGameCenter.rawValue
+//            try! realm.commitWrite()
+//        }
+//    }
+    
+    func player(_ player: GKPlayer, didRequestMatchWithRecipients recipientPlayers: [GKPlayer]) {
+        print("hier")
+    }
+    
+    func player(_ player: GKPlayer, didAccept invite: GKInvite) {
         
-        localPlayer.authenticateHandler = {(ViewController, error) -> Void in
-            if((ViewController) != nil) {
-                // 1. Show login if player is not logged in
-                GV.mainViewController?.present(ViewController!, animated: true, completion: nil)
-            } else if (localPlayer.isAuthenticated) {
-                // 2. Player is already authenticated & logged in, load gamecenter
-//                self.gcEnabled = true
+        GKMatchmaker.shared().match (for: invite, completionHandler: {(InvitedMatch, error) in
+            
+            if InvitedMatch != nil {
+                self.match=InvitedMatch
                 
-                // Get the default leaderboard ID
+//                LocalGame=false
                 
-                localPlayer.loadDefaultLeaderboardIdentifier(completionHandler: { (leaderboardIdentifer, error) in
-                    if error != nil {
-                        realm.beginWrite()
-                        GV.player!.GCEnabled = GCEnabledType.AskForGameCenter.rawValue
-                        try! realm.commitWrite()
-                    } else {
-                        realm.beginWrite()
-                        GV.player!.GCEnabled = GCEnabledType.GameCenterEnabled.rawValue
-                        self.createLabelsForBestPlace()
-                        GV.peerToPeerService!.changeIdentifier(GKLocalPlayer.localPlayer().alias!)
-                        self.gameCenterSync.startGameCenterSync()
-                        try! realm.commitWrite()
-//                        self.gameCenterSync.printAllGamers()
-                    }
-                })
-                
+//                if let scene = GameScene.unarchiveFromFile(environment_Prefix!+"GameScene") as? GameScene {
+//                    // Configure the view.
+//                    let skView = self.view as SKView!
+//                    //skView.showsFPS = true
+//                    //skView.showsNodeCount = true
+//                    
+//                    /* Sprite Kit applies additional optimizations to improve rendering performance */
+//                    skView.ignoresSiblingOrder = true
+//                    
+//                    /* Set the scale mode to scale to fit the window */
+//                    scene.scaleMode = .Fill
+//                    
+//                    skView.presentScene(scene, transition: SKTransition.flipVerticalWithDuration(2.0))
+//                    
+//                }
             }
-        }
-        if !GKLocalPlayer.localPlayer().isAuthenticated {
-            realm.beginWrite()
-            GV.player!.GCEnabled = GCEnabledType.AskForGameCenter.rawValue
-            try! realm.commitWrite()
-        }
+        })
     }
     
     func createLabelsForBestPlace() {
@@ -3393,6 +3614,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func goToGameCenter(countPackages: Int, level: Int) {
+        doTimeCount = false
         // MARK: - OPEN GAME CENTER LEADERBOARD
         let gcVC = GKGameCenterViewController()
         gcVC.gameCenterDelegate = self
@@ -3604,6 +3826,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
 
     func alertStartMultiPlay(fromPeer: MCPeerID, message: [String], messageNr: Int) {
+        doTimeCount = false
         let alert = UIAlertController(title: GV.language.getText(.tcWantToPlayWithYou, values: message[0]),
                                       message: "",
                                       preferredStyle: .alert)
@@ -3632,6 +3855,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let cancelAction = UIAlertAction(title: GV.language.getText(.tcCancel), style: .default,
                                          handler: {(paramAction:UIAlertAction!) in
                                             GV.peerToPeerService!.sendAnswer(messageNr: messageNr, answer: [self.answerNo])
+                                            self.doTimeCount = true
         })
         alert.addAction(cancelAction)
         DispatchQueue.main.async(execute: {

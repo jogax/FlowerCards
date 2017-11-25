@@ -50,6 +50,7 @@ struct GV {
     static var buildNumber: String = ""
     static var deviceSessionID: String = ""
     static let maxPackageCount = 4
+    static var gkPlayers: [String:GKPlayer] = [:]
     
     
 

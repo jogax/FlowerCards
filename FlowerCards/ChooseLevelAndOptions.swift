@@ -12,7 +12,7 @@ import SpriteKit
 
 
 class ChooseLevelAndOptions: MySKTable {
-    var callBack: () -> ()
+    var callBack: (Bool) -> ()
     let myDetailedColumnWidths: [CGFloat] = [20, 20, 20, 20, 20] // in %
     let chooseLevelColumn = 0
     let showPackageNrColumn = 2
@@ -25,7 +25,7 @@ class ChooseLevelAndOptions: MySKTable {
     let xxx = SKSpriteNode()
     let startImage = DrawImages.getStartImage(CGSize(width: 20, height: 20))
     
-    init(_ callBack: @escaping ()->()) {
+    init(callBack: @escaping (Bool)->()) {
         self.playerID = GV.player!.ID
         let playerName = realm.objects(PlayerModel.self).filter("ID = %d", playerID).first!.name
         countColumns = myDetailedColumnWidths.count
@@ -89,9 +89,10 @@ class ChooseLevelAndOptions: MySKTable {
         switch (row, column) {
         case (0, 0):
             removeFromParent()
+            callBack(false)
         case (2..<1000, 1...4):
             setLevel(level: row - 2, countPackages: column)
-            callBack()  // start a new Game at this level            
+            callBack(true)  // start a new Game at this level            
             break
         default:
             break

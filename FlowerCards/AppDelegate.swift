@@ -66,12 +66,45 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         break
                     }
             })
+        let notificationTypes: UIUserNotificationType = [UIUserNotificationType.alert, UIUserNotificationType.badge, UIUserNotificationType.sound]
+        let pushNotificationSettings = UIUserNotificationSettings(types: notificationTypes, categories: nil)
 
+        application.registerUserNotificationSettings(pushNotificationSettings)
+        application.registerForRemoteNotifications()
+        if let player = realm.objects(PlayerModel.self).filter("isActPlayer = TRUE").first {
+            GV.player = player
+            if player.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+                GCHelper.sharedInstance.authenticateLocalUser()
+            }
+        }
         return true
     }
     
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        print("DEVICE TOKEN = \(String(describing: deviceToken.hexString))")
+    }
+    
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print(error)
+    }
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        
+        completionHandler(UIBackgroundFetchResult.noData)
+        print("\(userInfo.description)")
+        
+        UserDefaults.standard.set(true, forKey: "didReceiveRemoteNotification")
+        UserDefaults.standard.synchronize()
+        
+        
+    }
+    
+//    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
+//        print(userInfo)
+//    }
     func migrationToShemaVersion1 () {
     }
+    
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.

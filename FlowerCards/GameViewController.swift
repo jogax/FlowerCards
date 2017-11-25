@@ -111,11 +111,17 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
 
         
         if realm.objects(PlayerModel.self).count == 0 {
-              _ = GV.createNewPlayer(true)
+            _ = GV.createNewPlayer(true)
+            GV.player = realm.objects(PlayerModel.self).filter("isActPlayer = TRUE").first!
         }
         
+        if GV.deviceType != iPhone_X {
+//            navigationController?.preferredStatusBarStyle = .lightContent
+            UIApplication.shared.statusBarStyle = .lightContent
+        }
+
         
-        GV.player = realm.objects(PlayerModel.self).filter("isActPlayer = TRUE").first!
+        
  
 //        if realm.objects(StatisticModel.self).filter("playerID = %d", GV.player!.ID).count == 0 {
 //            let statistic = StatisticModel()
