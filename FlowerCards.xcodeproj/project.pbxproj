@@ -29,7 +29,7 @@
 		2025F1061D5B226E00561FBF /* PlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1011D5B226E00561FBF /* PlayerModel.swift */; };
 		2025F1081D5B226E00561FBF /* GamePredefinitions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1031D5B226E00561FBF /* GamePredefinitions.swift */; };
 		2025F1091D5B226E00561FBF /* GameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1041D5B226E00561FBF /* GameModel.swift */; };
-		2025F10A1D5B226E00561FBF /* PeerToPeerServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1051D5B226E00561FBF /* PeerToPeerServiceManager.swift */; };
+		2025F10A1D5B226E00561FBF /* P2PHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F1051D5B226E00561FBF /* P2PHelper.swift */; };
 		2025F10C1D5B231200561FBF /* LevelsForPlayWithCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F10B1D5B231200561FBF /* LevelsForPlayWithCards.swift */; };
 		2025F1121D5B236E00561FBF /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F10D1D5B236E00561FBF /* Language.swift */; };
 		2025F1131D5B236E00561FBF /* ru.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025F10E1D5B236E00561FBF /* ru.swift */; };
@@ -63,7 +63,7 @@
 		2047D9E21FACD1B100502857 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2047D9CD1FACBD6000502857 /* RealmSwift.framework */; };
 		204E0E0E1FA227DB00027366 /* MyToDos.txt in Resources */ = {isa = PBXBuildFile; fileRef = 204E0E0D1FA227DB00027366 /* MyToDos.txt */; };
 		20720A761D5B55E600389C0C /* Mirror4.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20720A751D5B55E600389C0C /* Mirror4.m4a */; };
-		2076C8FC1FC5CB5D00FE6C48 /* GameKitHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2076C8FB1FC5CB5D00FE6C48 /* GameKitHelper.swift */; };
+		2076C8FC1FC5CB5D00FE6C48 /* GCHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2076C8FB1FC5CB5D00FE6C48 /* GCHelper.swift */; };
 		2087A2EB1DCA3D120085D711 /* ChooseLevelAndOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2087A2EA1DCA3D120085D711 /* ChooseLevelAndOptions.swift */; };
 		20B1F1061D5B445300963590 /* MyMusic.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1051D5B445300963590 /* MyMusic.m4a */; };
 		20B1F10A1D5B454700963590 /* OK.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F1091D5B454700963590 /* OK.m4a */; };
@@ -105,7 +105,7 @@
 		2025F1011D5B226E00561FBF /* PlayerModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerModel.swift; sourceTree = "<group>"; };
 		2025F1031D5B226E00561FBF /* GamePredefinitions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GamePredefinitions.swift; sourceTree = "<group>"; };
 		2025F1041D5B226E00561FBF /* GameModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameModel.swift; sourceTree = "<group>"; };
-		2025F1051D5B226E00561FBF /* PeerToPeerServiceManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PeerToPeerServiceManager.swift; sourceTree = "<group>"; };
+		2025F1051D5B226E00561FBF /* P2PHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = P2PHelper.swift; sourceTree = "<group>"; };
 		2025F10B1D5B231200561FBF /* LevelsForPlayWithCards.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelsForPlayWithCards.swift; sourceTree = "<group>"; };
 		2025F10D1D5B236E00561FBF /* Language.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
 		2025F10E1D5B236E00561FBF /* ru.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ru.swift; sourceTree = "<group>"; };
@@ -143,7 +143,7 @@
 		204E0E0D1FA227DB00027366 /* MyToDos.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = MyToDos.txt; sourceTree = "<group>"; };
 		20720A751D5B55E600389C0C /* Mirror4.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror4.m4a; sourceTree = "<group>"; };
 		2076C8FA1FC5AFC200FE6C48 /* FlowerCards.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FlowerCards.entitlements; sourceTree = "<group>"; };
-		2076C8FB1FC5CB5D00FE6C48 /* GameKitHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameKitHelper.swift; sourceTree = "<group>"; };
+		2076C8FB1FC5CB5D00FE6C48 /* GCHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCHelper.swift; sourceTree = "<group>"; };
 		2087A2EA1DCA3D120085D711 /* ChooseLevelAndOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChooseLevelAndOptions.swift; sourceTree = "<group>"; };
 		20B1F1051D5B445300963590 /* MyMusic.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = MyMusic.m4a; sourceTree = "<group>"; };
 		20B1F1091D5B454700963590 /* OK.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = OK.m4a; sourceTree = "<group>"; };
@@ -202,8 +202,8 @@
 			children = (
 				2076C8FA1FC5AFC200FE6C48 /* FlowerCards.entitlements */,
 				20404DEB1F8E329100492033 /* GameCenter.swift */,
-				2076C8FB1FC5CB5D00FE6C48 /* GameKitHelper.swift */,
-				2025F1051D5B226E00561FBF /* PeerToPeerServiceManager.swift */,
+				2076C8FB1FC5CB5D00FE6C48 /* GCHelper.swift */,
+				2025F1051D5B226E00561FBF /* P2PHelper.swift */,
 				2025F0F51D5B21AC00561FBF /* MyStructs.swift */,
 				2025F0BD1D5B18F300561FBF /* AppDelegate.swift */,
 				2025F0D31D5B1A1E00561FBF /* GameViewController.swift */,
@@ -528,7 +528,7 @@
 				2025F0F21D5B219C00561FBF /* MySKSlider.swift in Sources */,
 				2040E4CC1DE74F3600B16B19 /* AutoPlayer.swift in Sources */,
 				2025F1191D5B23BB00561FBF /* StatisticModel.swift in Sources */,
-				2025F10A1D5B226E00561FBF /* PeerToPeerServiceManager.swift in Sources */,
+				2025F10A1D5B226E00561FBF /* P2PHelper.swift in Sources */,
 				2025F0FB1D5B21AC00561FBF /* MyStructs.swift in Sources */,
 				2025F11E1D5B23F600561FBF /* DrawImages.swift in Sources */,
 				2025F1131D5B236E00561FBF /* ru.swift in Sources */,
@@ -550,7 +550,7 @@
 				2025F1161D5B236E00561FBF /* hu.swift in Sources */,
 				2046921D1F8CDF4000A105BD /* HighScoreModel.swift in Sources */,
 				2025F0D51D5B1A1E00561FBF /* GameViewController.swift in Sources */,
-				2076C8FC1FC5CB5D00FE6C48 /* GameKitHelper.swift in Sources */,
+				2076C8FC1FC5CB5D00FE6C48 /* GCHelper.swift in Sources */,
 				2025F1141D5B236E00561FBF /* de.swift in Sources */,
 				2025F1121D5B236E00561FBF /* Language.swift in Sources */,
 				2025F0BE1D5B18F300561FBF /* AppDelegate.swift in Sources */,

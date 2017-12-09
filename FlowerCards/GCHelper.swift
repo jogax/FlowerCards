@@ -37,10 +37,11 @@ public protocol GCHelperDelegate: class {
     func matchStarted()
     
     /// Method called when the device received data about the match from another device in the match.
-    func match(_ match: GKMatch, didReceiveData: Data, fromPlayer: String)
+    func match(_ match: GKMatch, didReceive didReceiveData: Data, fromPlayer: String)
     
     /// Method called when the match has ended.
     func matchEnded()
+    func localPlayerAuthenticated()
 }
 
 /// A GCHelper instance represents a wrapper around a GameKit match.
@@ -61,6 +62,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     fileprivate var invitedPlayer: GKPlayer!
     fileprivate var playersDict = [String: AnyObject]()
     fileprivate weak var presentingViewController: UIViewController!
+
     
     fileprivate var authenticated = false {
         didSet {
@@ -121,34 +123,37 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         }
     }
     
+    
+    
     // MARK: User functions
     
+    
     /// Authenticates the user with their Game Center account if possible
-    public func authenticateLocalUser() {
-        print("Authenticating local user...")
+    public func authenticateLocalUser(theDelegate: GCHelperDelegate) {
+        delegate = theDelegate
+//        if let _ = delegate{
+//            print ("delegate OK")
+//        }else{
+//            print("The delegate is nil")
+//        }
+//        print("Authenticating local user...")
         authenticateStatus = .authenticatingInProgress
-        
         if GKLocalPlayer.localPlayer().isAuthenticated == false {
             GKLocalPlayer.localPlayer().authenticateHandler = { (view, error) in
                 guard error == nil else {
                     print("Authentication error: \(String(describing: error?.localizedDescription))")
                     return
                 }
-                realm.beginWrite()
+                self.delegate?.localPlayerAuthenticated()
                 self.authenticateStatus = .authenticated
-                GV.player!.GCEnabled = GCEnabledType.GameCenterEnabled.rawValue
-                try! realm.commitWrite()
-                if let name = GKLocalPlayer.localPlayer().alias {
-                    GV.peerToPeerService!.changeIdentifier(name)
-                }
+                self.authenticated = true
                 self.getAllPlayers()
                 self.startGameCenterSync()
                 GKLocalPlayer.localPlayer().unregisterAllListeners()
                 GKLocalPlayer.localPlayer().register(self)
-                self.authenticated = true
             }
         } else {
-            print("Already authenticated")
+//            print("Already authenticated")
         }
     }
     
@@ -312,7 +317,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             return
         }
         
-        delegate?.match(theMatch, didReceiveData: data, fromPlayer: playerID)
+        delegate?.match(theMatch, didReceive: data, fromPlayer: playerID)
     }
     
     public func match(_ theMatch: GKMatch, player playerID: String, didChange state: GKPlayerConnectionState) {

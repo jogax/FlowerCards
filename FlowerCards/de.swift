@@ -55,6 +55,7 @@ let deDictionary: [TextConstants: String] = [
     .tcNewGame:          "Neues Spiel",
     .tcGameAgain:        "Spiel wiederholen",
     .tcChooseGame:       "Wähle bitte: ",
+    .tcCompetitionHeader:"Wettbewerb mit %",
     .tcTippCount:        "Anzahl der möglichen Züge: ",
     .tcStatistics:       "Statistik des Spiels % auf Ebene %",
     .tcActTime:          "Zeit für das Spiel: ",
@@ -90,18 +91,20 @@ let deDictionary: [TextConstants: String] = [
     .tcWantToPlayWithYou:"% will mit Dir spielen!!",
     .tcOpponent:         "Gegner: %",
     .tcOpponentHasFinished: "% hat das Spiel #% beendet!\r\n" +
-                         "sein Bonus: %\r\n" +
-                         "seine Punkte: %\r\n" +
+                        "seine Punkte: %\r\n" +
+                         "sein Zeitbonus: %\r\n" +
+                         "sein Ergebnis: %\r\n" +
                          "deine Punkte: %\r\n ",
     .tcHeWon:            "% hat gewonnen % - %!\r\n" +
                          "Schade :-(",
     .tcYouWon:           "Du hast gewonnen % - %!\r\n" +
                          "Gratuliere!!!",
     .tcYouHaveFinished:  "Du hast gas Spiel #% beendet!\r\n" +
-                         "Dein Bonus: %\r\n" +
-                         "Deine Punkte : %\r\n" +
+                         "Deine Punkte: %\r\n" +
+                         "Dein Zeitbonus: %\r\n" +
+                         "Dein Ergebnis : %\r\n" +
                          "% Punkte: %\r\n ",
-    .tcOpponentNotPlay: "% will nicht spielen mit Dir!",
+    .tcOpponentNotPlay: "% will nicht mit Dir spielen!",
     .tcPeerToPeerVersionIsHigher: "% hat höhere Kommunikation Version, Du muss Flowercards updaten für ein Wettbewerb mit ihm",
     .tcPeerToPeerVersionIsLower: "% hat niedrigere Kommunikation Version, er muss Flowercards updaten  für ein Wettbewerb mit Dir",
     .tcGameArt:         "Art",
@@ -121,7 +124,7 @@ let deDictionary: [TextConstants: String] = [
     .tck:               "K",
     .tcWhoIs:           "Wer",
     .tcName:            "Name",
-    .tcPlayerType:      "Spieler",
+    .tcPlayerType:      "Ich",
     .tcOpponentType:    "Gegner",
     .tcBestPlayerType:  "Beste Spieler",
     .tcChooseLevel:     "Wähle Ebene und Optionen",
@@ -153,6 +156,7 @@ let deDictionary: [TextConstants: String] = [
     .tcAskLater:        "Frag mich später",
     .tcAskNoMore:       "Frag mich nie mehr",
     .tcOnlineGame:      "Online Spiel",
+//    .tcYouHaveToWait:   "% spielt noch, du musst warten!",
 ]
 
 

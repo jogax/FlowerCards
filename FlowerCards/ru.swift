@@ -55,6 +55,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcNewGame:          "Новая игра",
     .tcGameAgain:        "Повторить игру",
     .tcChooseGame:       "Выберите пожалуйста:",
+    .tcCompetitionHeader:"Соревнование c %",
     .tcTippCount:        "Kоличество возможных ходов: ",
     .tcStatistics:       "Игра % на уровне %",
     .tcActTime:          "Продолжительность игры: ",
@@ -90,12 +91,14 @@ let ruDictionary: [TextConstants: String] = [
     .tcWantToPlayWithYou:"% хочет с тобой поиграть!",
     .tcOpponent:         "Противник:%",
     .tcOpponentHasFinished: "% закончил игру #%!\r\n" +
-                        "его/ee бонус: %\r\n" +
                         "его/ee очки: %\r\n" +
+                        "его/ee бонус: %\r\n" +
+                        "его/ee результат: %\r\n" +
                         "твои очки: %\r\n ",
     .tcYouHaveFinished: "ты закончил игру #%!\r\n" +
-                        "твой бонус: %\r\n" +
                         "твои очки: %\r\n" +
+                        "твой бонус: %\r\n" +
+                        "твой результат: %\r\n" +
                         "% очки: %\r\n ",
     .tcHeWon:           "% победил нa % - %!\r\n" +
                         "K сожалению :-(",
@@ -121,7 +124,7 @@ let ruDictionary: [TextConstants: String] = [
     .tck:               "К",
     .tcWhoIs:           "Кто",
     .tcName:            "Имя",
-    .tcPlayerType:      "Игрок",
+    .tcPlayerType:      "Я",
     .tcOpponentType:    "Противник",
     .tcBestPlayerType:  "Лучший игрок",
     .tcChooseLevel:     "Выберите уровень и параметры",
@@ -152,4 +155,5 @@ let ruDictionary: [TextConstants: String] = [
     .tcAskLater:        "Спроси меня позже",
     .tcAskNoMore:       "Не спрашивай меня больше",
     .tcOnlineGame:      "Online Игра",
+//    .tcYouHaveToWait:   "% все еще играет, вам нужно подождать!",
 ]

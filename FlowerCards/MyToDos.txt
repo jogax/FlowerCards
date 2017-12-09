@@ -1,5 +1,15 @@
 
-- In CardGameScene
-    func makeLineAroundGameboard(_ linePosition: LinePosition) {
-        for iPhone X rounded edges
-    }
+1) OK In CardGameScene
+        game center competition - on winners screen no won message!!
+        bei anderen ist schon!!!
+
+
+2) der andere spieler soll noch 5 minuten haben, um sein spiel zu beenden!
+
+3) OK wenn beide are fertig, die können den match fortsetzen mit einem anderen spiel an der nächste ebene
+
+4) each player kann wählen mit wem er spielen will, oder kann im egal sein - choose all players
+
+5) OK changelnguage function soll die ellenfél zeile auch beinhalten!!!
+
+6) OK ha multiplay esetén szintet vált, a partner marad az eredeti szintjén. nincs szinkron!

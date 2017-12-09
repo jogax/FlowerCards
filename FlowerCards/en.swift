@@ -55,6 +55,7 @@ let enDictionary: [TextConstants: String] = [
     .tcNewGame:          "New Game",
     .tcGameAgain:        "Restart Game",
     .tcChooseGame:       "Choose Please:",
+    .tcCompetitionHeader: "Competition with %",
     .tcTippCount:        "Number of possible steps: ",
     .tcStatistics:       "Statistics of game % on Level %",
     .tcActTime:          "Time for game: ",
@@ -90,16 +91,18 @@ let enDictionary: [TextConstants: String] = [
     .tcWantToPlayWithYou:"% want play with you!",
     .tcOpponent:          "Opponent: %",
     .tcOpponentHasFinished: "% has finished the Game #%!\r\n" +
-                            "his bonus: %\r\n" +
-                            "his score : %\r\n" +
+                            "his score: %\r\n" +
+                            "his timeBonus: %\r\n" +
+                            "his total score : %\r\n" +
                             "your score: %\r\n ",
     .tcHeWon:               "% won % - %!\r\n" +
                             "Sorry :-(",
     .tcYouWon:              "You won % - %! \r\n" +
                             "Congratulations!!!",
     .tcYouHaveFinished: "You have finished the Game #%!\r\n" +
+                        "your score: %\r\n" +
                         "your bonus: %\r\n" +
-                        "your score : %\r\n" +
+                        "your total score : %\r\n" +
                         "% score: %\r\n ",
     .tcOpponentNotPlay: "% does not want to play with you!",
     .tcPeerToPeerVersionIsHigher: "% has a higher Communication Version, you must update Flowercards for a competition with him",
@@ -121,7 +124,7 @@ let enDictionary: [TextConstants: String] = [
     .tck:               "K",
     .tcWhoIs:           "Who",
     .tcName:            "Name",
-    .tcPlayerType:      "Player",
+    .tcPlayerType:      "Me",
     .tcOpponentType:    "Opponent",
     .tcBestPlayerType:  "Best Player",
     .tcChooseLevel:     "Choose level and options",
@@ -152,4 +155,9 @@ let enDictionary: [TextConstants: String] = [
     .tcAskLater:        "Ask me Later",
     .tcAskNoMore:       "Ask me no more",
     .tcOnlineGame:      "Online Game",
+//    .tcYouHaveToWait:   "You have the game finished!\r\n" +
+//                        "your score: % \r\n" +
+//                        "your time bonus: % \r\n" +
+//                        "your total score: %\r\n" +
+//                        "% still is playing, you have to wait!",
 ]

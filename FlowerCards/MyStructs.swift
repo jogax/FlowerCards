@@ -24,7 +24,7 @@ struct GV {
     static var notificationCenter = NotificationCenter.default
     static var mainScene: CardGameScene?
     static let freeGameCount = 1000
-    static var peerToPeerService: PeerToPeerServiceManager?
+    static var peerToPeerService: P2PHelper?
 //    static let peerToPeerVersion = "1.0" // 2017-06-21
     static let peerToPeerVersion = "1.1" // 2017-09-01
     static var dX: CGFloat = 0
@@ -51,6 +51,7 @@ struct GV {
     static var deviceSessionID: String = ""
     static let maxPackageCount = 4
     static var gkPlayers: [String:GKPlayer] = [:]
+    static var separator = "°"
     
     
 
@@ -367,10 +368,10 @@ enum CardStatusInStack: Int, CustomStringConvertible {
     
 }
 
-enum PeerToPeerCommands: Int {
+public enum CommunicationCommands: Int {
     case errorValue = 0,
     myNameIs,
-            //          
+            //
             //      parameters: 1 - myName
     myNameIsChanged,
     //
@@ -392,9 +393,11 @@ enum PeerToPeerCommands: Int {
     gameIsFinished, //sendInfo
             //
             //      parameters: 1: Score
+            //                  2: TimeBonus
+            //                  3: Total Score
     didEnterBackGround, // sendInfo
             //
-            //      parameter:  
+            //      parameter:
     stopCompetition, // sendInfo
             //
             //      parameter:
@@ -405,7 +408,12 @@ enum PeerToPeerCommands: Int {
     myStatusIsPlaying,
     //
     //      parameters: 1 - opponentName
-    
+    startGame,
+    //
+    //      parameters: 1 . myName
+    //                  2 - countPackages
+    //                  3 - levelIndex
+    //                  4 - gameNumber
 
     maxValue
     
@@ -413,10 +421,10 @@ enum PeerToPeerCommands: Int {
         return String(self.rawValue)
     }
     
-    static func decodeCommand(_ commandName: String)->PeerToPeerCommands {
+    static func decodeCommand(_ commandName: String)->CommunicationCommands {
         if let command = Int(commandName) {
-            if command < PeerToPeerCommands.maxValue.rawValue && command > PeerToPeerCommands.errorValue.rawValue {
-                return PeerToPeerCommands(rawValue: command)!
+            if command < CommunicationCommands.maxValue.rawValue && command > CommunicationCommands.errorValue.rawValue {
+                return CommunicationCommands(rawValue: command)!
             } else {
                 return errorValue
             }

@@ -10,15 +10,23 @@
 import Foundation
 import MultipeerConnectivity
 
+protocol PeerToPeerServiceManagerDelegate {
+    
+    func connectedDevicesChanged(_ manager : P2PHelper, connectedDevices: [String])
+    func messageReceived(_ fromPeer : MCPeerID, command: CommunicationCommands, message: [String], messageNr: Int)
+    
+}
 
-class PeerToPeerServiceManager: NSObject {
+
+
+class P2PHelper: NSObject {
 
     let separator = "°"
     let Nobody = ""
     var identifier: String
     var iAmPlayingWith: String
     struct MessageContent {
-        var command: PeerToPeerCommands
+        var command: CommunicationCommands
         var messages: [String]
         var answers: [String]
         var fromPeer: MCPeerID
@@ -37,7 +45,6 @@ class PeerToPeerServiceManager: NSObject {
     var messageArray = [Int:MessageContent]()
     var answerArray = [Int:MessageContent]()
     var messageNr = 0
-
     
     lazy var session : MCSession = {
         let session = MCSession(peer: self.myPeerID, securityIdentity: nil, encryptionPreference: MCEncryptionPreference.required)
@@ -73,25 +80,25 @@ class PeerToPeerServiceManager: NSObject {
     func changeIdentifier(_ newIdentifier: String) {
         self.identifier = newIdentifier
         for index in 0..<session.connectedPeers.count {
-            sendInfo(.myNameIs, message: [identifier, iAmPlayingWith], toPeer: session.connectedPeers[index])
+            sendInfo(command: .myNameIs, message: [identifier, iAmPlayingWith], toPeer: session.connectedPeers[index])
         }
     }
     
     func changeStatusToFree() {
         for index in 0..<session.connectedPeers.count {
             iAmPlayingWith = Nobody
-            sendInfo(.myStatusIsFree, message: [], toPeer: session.connectedPeers[index])
+            sendInfo(command: .myStatusIsFree, message: [], toPeer: session.connectedPeers[index])
         }
     }
     
     func changeStatusToIsPlaying(isPlayingWith: String) {
         iAmPlayingWith = isPlayingWith
         for index in 0..<session.connectedPeers.count {
-            sendInfo(.myStatusIsPlaying, message: [isPlayingWith], toPeer: session.connectedPeers[index])
+            sendInfo(command: .myStatusIsPlaying, message: [isPlayingWith], toPeer: session.connectedPeers[index])
         }
     }
     
-    func sendData(command: PeerToPeerCommands, messageNr: Int, message : [String], new: Bool = true, toPeer: MCPeerID, answer: Bool = false) {
+    func sendData(command: CommunicationCommands, messageNr: Int, message : [String], new: Bool = true, toPeer: MCPeerID, answer: Bool = false) {
         var founded = false
         var peer: MCPeerID? = nil
         for actPeer in session.connectedPeers {
@@ -118,13 +125,13 @@ class PeerToPeerServiceManager: NSObject {
             
     }
     
-    func sendInfo(_ command: PeerToPeerCommands, message : [String], new: Bool = true, toPeer: MCPeerID) {
+    func sendInfo(command: CommunicationCommands, message : [String], new: Bool = true, toPeer: MCPeerID) {
         sendData(command: command, messageNr: messageNr, message: message, new: true, toPeer: toPeer, answer: false)
         messageArray.removeValue(forKey: messageNr)
         messageNr += 1
     }
 
-    func sendMessage(command: PeerToPeerCommands, message : [String], toPeer: MCPeerID)->[String] {
+    func sendMessage(command: CommunicationCommands, message : [String], toPeer: MCPeerID)->[String] {
         let myMessageNr = messageNr
         messageNr += 1
         sendData(command: command, messageNr: myMessageNr, message: message, new: true, toPeer: toPeer, answer: false)
@@ -175,7 +182,7 @@ extension MCSessionState {
 }
 
 
-extension PeerToPeerServiceManager : MCNearbyServiceAdvertiserDelegate {
+extension P2PHelper : MCNearbyServiceAdvertiserDelegate {
     @available(iOS 7.0, *)
     public func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
         invitationHandler(true, self.session)
@@ -198,7 +205,7 @@ extension PeerToPeerServiceManager : MCNearbyServiceAdvertiserDelegate {
 
 }
 
-extension PeerToPeerServiceManager : MCNearbyServiceBrowserDelegate {
+extension P2PHelper : MCNearbyServiceBrowserDelegate {
 
     private func browser(_ browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: NSError) {
         print("didNotStartBrowsingForPeers: \(error)")
@@ -219,12 +226,12 @@ extension PeerToPeerServiceManager : MCNearbyServiceBrowserDelegate {
     }
 }
 
-extension PeerToPeerServiceManager : MCSessionDelegate {
+extension P2PHelper : MCSessionDelegate {
     
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         //        self.delegate?.connectedDevicesChanged(self, connectedDevices: session.connectedPeers.map({$0.displayName}))
         if state == .connected {
-            sendInfo(.myNameIs, message:  [identifier, iAmPlayingWith], toPeer: peerID)
+            sendInfo(command: .myNameIs, message:  [identifier, iAmPlayingWith], toPeer: peerID)
             print ("connected to \(peerID.displayName), countConnections: \(self.session.connectedPeers.count)")
         }
 //        print("peer \(String(describing: peerID.displayName)) didChangeState: \(state.stringValue())")
@@ -234,7 +241,7 @@ extension PeerToPeerServiceManager : MCSessionDelegate {
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         let receivedString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
         let stringTable = receivedString.components(separatedBy: separator)
-        let command = PeerToPeerCommands.decodeCommand(stringTable[0])
+        let command = CommunicationCommands.decodeCommand(stringTable[0])
         let messageNr = Int(stringTable[1])
         let new = stringTable[2] == "true" ? true : false
         var parameterString = [String]()
@@ -330,10 +337,4 @@ extension MCPeerID {
     }
 }
 
-protocol PeerToPeerServiceManagerDelegate {
-    
-    func connectedDevicesChanged(_ manager : PeerToPeerServiceManager, connectedDevices: [String])
-    func messageReceived(_ fromPeer : MCPeerID, command: PeerToPeerCommands, message: [String], messageNr: Int)
-    
-}
 

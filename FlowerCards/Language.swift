@@ -57,6 +57,7 @@ enum TextConstants: Int {
     tcNewGame,
     tcRestart,
     tcChooseGame,
+    tcCompetitionHeader,
     tcTippCount,
     tcStatistics,
     tcActScore,
@@ -141,7 +142,8 @@ enum TextConstants: Int {
     tcAskForGameCenter,
     tcAskLater,
     tcAskNoMore,
-    tcOnlineGame
+    tcOnlineGame //,
+//    tcYouHaveToWait
 }
 
     let LanguageEN = "en" // index 0

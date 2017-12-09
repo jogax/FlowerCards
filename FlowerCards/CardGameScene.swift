@@ -153,14 +153,98 @@ var lastPair = PairStatus() {
     }
 }
 
-class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, PeerToPeerServiceManagerDelegate, GKGameCenterControllerDelegate, GKMatchmakerViewControllerDelegate, GKMatchDelegate, GKLocalPlayerListener {
+class CardGameScene:    SKScene,
+                        SKPhysicsContactDelegate,
+                        AVAudioPlayerDelegate,
+                        PeerToPeerServiceManagerDelegate,
+                        GKGameCenterControllerDelegate,
+                        GKMatchDelegate,
+                        GKLocalPlayerListener,
+                        GCHelperDelegate {
+    
+    var iAmTheMaster = false
+    
+    func startNewGameForMultiplayer() {
+        gameNumber = randomGameNumber()
+        createGameRecord(gameNumber: gameNumber)
+        let message = [GKLocalPlayer.localPlayer().alias!, String(countPackages), String(levelIndex), String(gameNumber)]
+        if opponent.WIFI {
+            GV.peerToPeerService!.sendInfo(command: .startGame, message: message, toPeer: opponent.peerID!)
+        } else {
+            GCHelper.sharedInstance.sendInfo(command: .startGame, message: message)
+        }
+        startNewGame(next: false)
+    }
+ 
+    func matchStarted() {
+        print ("matchStarted delegate called")
+        GCHelper.sharedInstance.sendInfo(command: CommunicationCommands.myNameIs, message: [GKLocalPlayer.localPlayer().alias!])
+        let iMyPlayerID = Int(GKLocalPlayer.localPlayer().playerID!.mySubString(startPos: 2))
+        let iPartnerPlayerID = Int(GCHelper.sharedInstance.match.players.first!.playerID!.mySubString(startPos: 2))
+        /// The player with higher playerID is the master
+        iAmTheMaster = (iMyPlayerID! > iPartnerPlayerID! ? true : false)
+        if iAmTheMaster {
+            self.gameArt = .multiGame
+            opponent.WIFI = false
+            startNewGameForMultiplayer()
+        }
+    }
+    
+    func match(_ match: GKMatch, didReceive didReceiveData: Data, fromPlayer: String) {
+        if match.players[0].alias != nil {
+            let (command, parameters) = GCHelper.sharedInstance.decodeData(data: didReceiveData)
+            switch command {
+            case .myNameIs:
+                opponent.name = parameters[0]
+            case .startGame:
+//                GCHelper.sharedInstance.sendInfo(command: CommunicationCommands.myNameIs, message: [GKLocalPlayer.localPlayer().alias!])
+                opponent.WIFI = false
+                prepareNewMultiGame(parameters: parameters)
+            case .myScoreHasChanged:
+                updateScore(parameters: parameters)
+            case .stopCompetition:
+                self.gameIsStopped()
+            case .gameIsFinished:
+                gameIsFinished(parameters: parameters)
+            default: break
+            }
+        }
+    }
+    
+    func matchEnded() {
+        self.gameArt = .singleGame
+        print ( "matchEnded delegate called")
+    }
+    
+    func localPlayerAuthenticated() {
+        print ("localPlayerAuthenticated delegate called")
+        realm.beginWrite()
+        GV.player!.GCEnabled = GCEnabledType.GameCenterEnabled.rawValue
+        try! realm.commitWrite()
+        if let name = GKLocalPlayer.localPlayer().alias {
+            GV.peerToPeerService!.changeIdentifier(name)
+        }
+        createLabelsForBestPlace()
+    }
+    
 
     func gameCenterViewControllerDidFinish(_ gameCenterViewController: GKGameCenterViewController) {
         gameCenterViewController.dismiss(animated: true, completion: nil)
         doTimeCount = true
     }
     
-    
+    func prepareNewMultiGame(parameters: [String]) {
+        let realm: Realm = try! Realm()
+        realm.beginWrite()
+//        opponent.name = parameters[0]
+        GV.player!.countPackages = Int(parameters[1])!
+        GV.player!.levelID = Int(parameters[2])!
+        gameNumber = Int(parameters[3])!
+        try! realm.commitWrite()
+        self.gameArt = .multiGame
+        startNewGame(next: false)
+    }
+
     struct Opponent {
         enum FinishType: Int {
             case none = 0, finished, interrupted
@@ -169,16 +253,25 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         var ID = 0
         var name: String = ""
         var score: Int = 0
+        var timeBonus: Int = 0
+        var highScore: Int = 0
         var cardCount: Int = 0
         var finish: FinishType = .none
+        var startGame: Bool = false
+        var gameParams: [String] = []
+        var WIFI: Bool = true
     }
     
     
     enum CongratulationsType: Int {
         case No = 0, Won, Lost
     }
-    enum PlayerType: Int {
-        case singlePlayer = 0, multiPlayer, bestPlayer
+//    enum PlayerType: Int {
+//        case singlePlayer = 0, multiPlayerWIFI, multiPlayerGC, bestPlayer
+//    }
+    
+    enum GameArt: Int {
+        case none = 0, singleGame, multiGame
     }
     
     enum CardGeneratingType: Int {
@@ -374,8 +467,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var levelScore: Int = 0 {
         didSet {
             showLevelScore()
-            if playerType == .multiPlayer {
-                GV.peerToPeerService!.sendInfo(.myScoreHasChanged, message: [String(levelScore), String(cardCount)], toPeer: opponent.peerID!)
+            if gameArt == .multiGame {
+                if opponent.WIFI {
+                    GV.peerToPeerService!.sendInfo(command: .myScoreHasChanged, message: [String(levelScore), String(cardCount)], toPeer: opponent.peerID!)
+                } else {
+                    GCHelper.sharedInstance.sendInfo(command: .myScoreHasChanged, message: [String(levelScore), String(cardCount)])
+                }
             }
         }
     }
@@ -401,8 +498,12 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 
     var cardCount = 0 {
         didSet {
-            if playerType == .multiPlayer {
-                GV.peerToPeerService!.sendInfo(.myScoreHasChanged, message: [String(levelScore), String(cardCount)], new: false, toPeer: opponent.peerID!)
+            if gameArt == .multiGame {
+                if opponent.WIFI {
+                    GV.peerToPeerService!.sendInfo(command: .myScoreHasChanged, message: [String(levelScore), String(cardCount)], new: false, toPeer: opponent.peerID!)
+                } else {
+                    GCHelper.sharedInstance.sendInfo(command: .myScoreHasChanged, message: [String(levelScore), String(cardCount)])
+                }
             }
         }
     }
@@ -459,7 +560,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     var doTimeCount: Bool = false
     
     
-    var playerType: PlayerType = .singlePlayer
+//    var playerType: PlayerType = .singlePlayer
+    var gameArt: GameArt = .singleGame
+    var oldGameArt: GameArt = .none
     var opponent = Opponent()
     var startGetNextPlayArt = false
     var restartGame: Bool = false
@@ -492,7 +595,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     let waitForStartForPlayer = 0.1
     let waitForStartForAutoplayer = 0.001
     var cardManager: CardManager?
-    var matchMakerViewControllerForInvites: GKMatchmakerViewController?
     var match: GKMatch?
     
     override func didMove(to view: SKView) {
@@ -507,7 +609,10 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 }
             }
 
-//            startSyncWithGameCenter() --
+            if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+                GCHelper.sharedInstance.authenticateLocalUser(theDelegate: self)
+            }
+
             myView = view
             GV.mainScene = self
             GV.peerToPeerService!.delegate = self
@@ -529,6 +634,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             buttonYPos = self.size.height * 0.09
             buttonXPosNormalized = self.size.width / 10
             self.name = "CardGameScene"
+//            GCHelper.setDelegate(self)
             prepareNextGame(newGame: true)
             generateCards(generatingType: .first)
             autoPlayer = AutoPlayer(scene: self)
@@ -544,7 +650,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             switch GV.player!.GCEnabled {
                 case GCEnabledType.GameCenterEnabled.rawValue:
                     if GCHelper.sharedInstance.authenticateStatus == GCHelper.AuthenticatingStatus.notAuthenticated {
-                        GCHelper.sharedInstance.authenticateLocalUser()
+                        GCHelper.sharedInstance.authenticateLocalUser(theDelegate: self)
                     }
 //                    if GKLocalPlayer.localPlayer().isAuthenticated {
 //                        gameCenterSync.startGameCenterSync()
@@ -841,46 +947,13 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         createLabels(label: cardCountLabel, text: cardCountText, row: 5, buttonLabel: .CardCountPos)
         createLabels(label: tippCountLabel, text: tippCountText, row: 5, buttonLabel: .TippButtonPos)
+        
+        createLabels(label: opponentTypeLabel, text: whoIsTypeText2, row: 4, xPosProzent: whoIsPos)
+        createLabels(label: opponentNameLabel, text: opponentNameText, row: 4, xPosProzent: playerNamePos)
+        createLabels(label: opponentTimeLabel, text: "0", row: 4, xPosProzent: timePos)
+        createLabels(label: opponentScoreLabel, text: String(opponent.score), row: 4, xPosProzent: scorePos)
+        createLabels(label: opponentCardCountLabel, text: String(opponent.cardCount), row: 4, xPosProzent: cardCountPos)
 
-        if playerType == .multiPlayer {
-            createLabels(label: opponentTypeLabel, text: whoIsTypeText2, row: 4, xPosProzent: whoIsPos)
-            createLabels(label: opponentNameLabel, text: opponentNameText, row: 4, xPosProzent: playerNamePos)
-            createLabels(label: opponentTimeLabel, text: "0", row: 4, xPosProzent: timePos)
-            createLabels(label: opponentScoreLabel, text: String(opponent.score), row: 4, xPosProzent: scorePos)
-            createLabels(label: opponentCardCountLabel, text: String(opponent.cardCount), row: 4, xPosProzent: cardCountPos)
-            
-        } else {
-            playerType = .singlePlayer
-            opponentTypeLabel.isHidden = true
-            opponentNameLabel.isHidden = true
-            opponentTimeLabel.isHidden = true
-            opponentScoreLabel.isHidden = true
-            opponentCardCountLabel.isHidden = true
-            createLabelsForBestPlace()
-// This Code is running if connect to Game Center - therefore is not required here
-//            if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
-//                let (bestPlaceLabelText, myPlaceLabelText) = setRankingLabels()
-//                createLabels(label: bestPlaceLabel, text:bestPlaceLabelText, row: 4, xPosProzent: whoIsPos)
-//                createLabels(label: myPlaceLabel, text:myPlaceLabelText, row: 4, xPosProzent: scorePos)
-//            }
-
-        }
-
-//        #if TEST
-//            let pkgSize = 15
-//            let allGamesLabelSize = 25
-//            let allGamesLabelPos = 10
-//            let onePkgLabelPos = allGamesLabelPos + allGamesLabelSize
-//            let twoPkgLabelPos = onePkgLabelPos + pkgSize
-//            let threePkgLabelPos = twoPkgLabelPos + pkgSize
-//            let fourPkgLabelPos = threePkgLabelPos + pkgSize
-//            createLabels(label: allGamesLabel, text: GV.language.getText(.tcAllGamesCount,values: "0"), row: 4, xPosProzent: allGamesLabelPos, fontSizeModifier: 0.7)
-//            createLabels(label: onePkgLabel, text: GV.language.getText(.tcPkgTxt,values: "1", "0", "0"), row: 4, xPosProzent: onePkgLabelPos, fontSizeModifier: 0.7)
-//            createLabels(label: twoPkgLabel, text: GV.language.getText(.tcPkgTxt,values: "2", "0", "0"), row: 4, xPosProzent: twoPkgLabelPos, fontSizeModifier: 0.7)
-//            createLabels(label: threePkgLabel, text: GV.language.getText(.tcPkgTxt,values: "3", "0"), row: 4, xPosProzent: threePkgLabelPos, fontSizeModifier: 0.7)
-//            createLabels(label: fourPkgLabel, text: GV.language.getText(.tcPkgTxt,values: "4", "0"), row: 4, xPosProzent: fourPkgLabelPos, fontSizeModifier: 0.7)
-//            updateGameCountLabels()
-//        #endif
         let mySortedPlays = realm.objects(GameModel.self).filter("playerID = %d and played = true", GV.player!.ID).sorted(byKeyPath: "levelID")
         if mySortedPlays.count > 0 {
             maxLevelIndex = mySortedPlays.last!.levelID
@@ -888,15 +961,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             maxLevelIndex = 0
         }
         prepareCards()
-//        //printFunc(function: "prepareNextGame", start: false)
-
 
     }
     
     
     func createGameRecord(gameNumber: Int) {
-//        //printFunc(function: "createGameRecord", start: true)
-
         let gameNew = GameModel()
         gameNew.ID = GV.createNewRecordID(.gameModel)
         gameNew.gameNumber = gameNumber
@@ -981,7 +1050,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func showLevelScore() {
         playerScoreLabel.text = String(levelScore)
         playerCardCountLabel.text = String(cardCount)
-        if playerType == .multiPlayer {
+        if gameArt == .multiGame {
             opponentScoreLabel.text = String(opponent.score)
             opponentCardCountLabel.text = String(opponent.cardCount)
         }
@@ -1078,6 +1147,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
         playerNameLabel.text = getName()
         whoIsLabel.text = GV.language.getText(.tcPlayerType)
+        opponentTypeLabel.text = GV.language.getText(.tcOpponentType)
 
         levelLabel.text = GV.language.getText(.tcLevel) + ": \(levelIndex + 1)"
         gameNumberLabel.text = GV.language.getText(.tcGameNumber) + "\(gameNumber + 1)"
@@ -1089,7 +1159,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         helpLabel.text = GV.language.getText(.tcHelp)
         tippLabel.text = GV.language.getText(.tcTipps)
         undoLabel.text = GV.language.getText(.tcUndo)
-
+        
         if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
             let (bestPlaceLabelText, myPlaceLabelText) = setRankingLabels()
             bestPlaceLabel.text = bestPlaceLabelText
@@ -1247,6 +1317,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func startAutoplay(testType: AutoPlayer.TestType) {
+        doTimeCount = true
         autoPlayerActive = true
         durationMultiplier = durationMultiplierForAutoplayer
         waitForStartConst = waitForStartForAutoplayer
@@ -1364,46 +1435,56 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     }
     
     func checkMultiplayer() {
-        if playerType == .multiPlayer {
-            opponentNameLabel.text = opponent.name
-            opponentTypeLabel.isHidden = false
-            opponentNameLabel.isHidden = false
-            opponentScoreLabel.isHidden = false
-            opponentTimeLabel.isHidden = false
-            opponentCardCountLabel.isHidden = false
-            showLevelScore()
+        if gameArt != oldGameArt {
+            if gameArt == .multiGame {
+                opponentNameLabel.text = opponent.name
+                opponentTypeLabel.isHidden = false
+                opponentNameLabel.isHidden = false
+                opponentScoreLabel.isHidden = false
+                opponentTimeLabel.isHidden = false
+                opponentCardCountLabel.isHidden = false
+                bestPlaceLabel.isHidden = true
+                myPlaceLabel.isHidden = true
+            } else {
+                opponentTypeLabel.isHidden = true
+                opponentNameLabel.isHidden = true
+                opponentTimeLabel.isHidden = true
+                opponentScoreLabel.isHidden = true
+                opponentCardCountLabel.isHidden = true
+                bestPlaceLabel.isHidden = false
+                myPlaceLabel.isHidden = false
+                createLabelsForBestPlace()
+            }
+            oldGameArt = gameArt
         }
-        
+        showLevelScore()
+
         if startGetNextPlayArt {
             startGetNextPlayArt = false
             let alert = getNextPlayArt(congratulations: .No)
             GV.mainViewController!.showAlert(alert)
         }
         
-        if opponent.finish == .finished || opponent.finish == .interrupted {
+        if opponent.finish == .interrupted || opponent.finish == .finished {
             animateFinishGame()
-            if opponent.finish == .finished {
-                saveStatisticAndGame()
-            }
             opponent.finish = .none
-            playerType = .singlePlayer
-            GV.peerToPeerService!.changeStatusToFree()
-            doTimeCount = false
-            opponentTypeLabel.isHidden = true
-            opponentNameLabel.isHidden = true
-            opponentTimeLabel.isHidden = true
-            opponentScoreLabel.isHidden = true
-            opponentCardCountLabel.isHidden = true
-            createLabelsForBestPlace()
-            showLevelScore()
+        }
+        if opponent.startGame {
+            let parameters = opponent.gameParams
+            opponent.startGame = false
+            opponent.gameParams = []
+            prepareNewMultiGame(parameters: parameters)
+
         }
     }
     
+    
+    
     func animateFinishGame() {
-        for gameRow in gameArray {
-            for game in gameRow {
-                if game.used {
-                    let cardToMove = game.card
+        for row in gameArray {
+            for position in row {
+                if position.used {
+                    let cardToMove = position.card
                     makeEmptyCard(cardToMove.column, row: cardToMove.row)
                     animateMovingCard(cardToMove)
                 }
@@ -1417,6 +1498,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 }
             } while true
         }
+        self.cardCount = 0
     }
     
     func animateMovingCard(_ card: MySKCard) {
@@ -1680,23 +1762,11 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
 //        let finishGame = cardCount == 0
         
         if cardCount == 0 { // Level completed, start a new game
-            let countPlayedCards = countCardsProContainer! * countContainers * countPackages
-            let optimalValue = 45000 // milliseconds / Card -> 45 sec / Card
-            let milliSecondsProCard = (1000 * timeCount) / countPlayedCards
-            let milliSecondsProCardCorrected = milliSecondsProCard + 0 < optimalValue ? milliSecondsProCard : optimalValue + (milliSecondsProCard - optimalValue) / 32
-            let bonusProcent: Double = Double(optimalValue - milliSecondsProCardCorrected) / 30000.0
-            timeBonus = Int(Double(levelScore) * bonusProcent)
-            timeBonus = timeBonus > 0 ? timeBonus : 0
-            highScore = levelScore + timeBonus
-            
+            let (timeBonus, highScore) = calculateHighScore(score: levelScore)
+
             stopTimer(&countUpTimer)
             playMusic("Winner", volume: GV.player!.musicVolume, loops: 0)
             playerCardCountLabel.text = "0"
-//            if playerType == .multiPlayer {
-//                GV.peerToPeerService?.sendInfo(.gameIsFinished, message: [String(levelScore)], toPeerIndex: opponent.peerIndex)
-//            }
-            
-            // get && modify the statistic record
             
             var sentToGameCenter = false
             if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
@@ -1718,9 +1788,14 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             }
 
             saveStatisticAndGame()
-            if playerType == .multiPlayer {
-                GV.peerToPeerService?.sendInfo(.gameIsFinished, message: [String(levelScore)], new: false, toPeer: opponent.peerID!)
-                alertIHaveGameFinished()
+            if gameArt == .multiGame {
+                if opponent.WIFI {
+                    GV.peerToPeerService?.sendInfo(command: .gameIsFinished, message: [String(levelScore), String(timeBonus), String(highScore)], new: false, toPeer: opponent.peerID!)
+                    alertIHaveGameFinished(score: levelScore, timeBonus: timeBonus, highScore: highScore)
+                } else {
+                    GCHelper.sharedInstance.sendInfo(command: .gameIsFinished, message: [String(levelScore), String(timeBonus), String(highScore)])
+                    alertIHaveGameFinished(score: levelScore, timeBonus: timeBonus, highScore: highScore)
+                }
             } else {
                 let alert = getNextPlayArt(congratulations: .Won)
                 GV.mainViewController!.showAlert(alert)
@@ -1740,65 +1815,34 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     
+    func calculateHighScore(score: Int)->(timeBonus: Int, highScore: Int) {
+        let countPlayedCards = countCardsProContainer! * countContainers * countPackages
+        let optimalValue = 45000 // milliseconds / Card -> 45 sec / Card
+        let milliSecondsProCard = (1000 * timeCount) / countPlayedCards
+        let milliSecondsProCardCorrected = milliSecondsProCard + 0 < optimalValue ? milliSecondsProCard : optimalValue + (milliSecondsProCard - optimalValue) / 32
+        let bonusProcent: Double = Double(optimalValue - milliSecondsProCardCorrected) / 30000.0
+        timeBonus = Int(Double(score) * bonusProcent)
+        timeBonus = timeBonus > 0 ? timeBonus : 0
+        highScore = score + timeBonus
+        return (timeBonus, highScore)
+    }
+    
     func saveStatisticAndGame () {
         realm.beginWrite()
-//        if realm.objects(StatisticModel.self).filter("playerID = %d and levelID = %d and countPackages = %d",
-//            GV.player!.ID, GV.player!.levelID, GV.player!.countPackages).count == 0 {
-//            // create a new Statistic record if required
-//            let statistic = StatisticModel()
-//            statistic.ID = GV.createNewRecordID(.statisticModel)
-//            statistic.playerID = GV.player!.ID
-//            statistic.levelID = GV.player!.levelID
-//            statistic.countPackages = GV.player!.countPackages
-//            try! realm.write({
-//                realm.add(statistic)
-//            })
-//        }
-//
-//        let statistic = realm.objects(StatisticModel.self).filter("playerID = %d and levelID = %d and countPackages = %d",
-//            GV.player!.ID, GV.player!.levelID, GV.player!.countPackages).first!        
-//        statistic.actTime = timeCount
-//        statistic.allTime += timeCount
-//        
-//        if statistic.bestTime == 0 || timeCount < statistic.bestTime {
-//            statistic.bestTime = timeCount
-//        }
-//        
-//        
-//        statistic.actScore = levelScore
-//        if cardCount == 0 {
-//            statistic.levelScore += levelScore
-//            if statistic.bestScore < levelScore {
-//                statistic.bestScore = levelScore
-//            }
-//            if statistic.bestScore < levelScore {
-//                statistic.bestScore = levelScore
-//            }
-//        }
         GV.actGame!.countSteps = maxCardCount - cardCount
         GV.actGame!.time = timeCount
         GV.actGame!.playerScore = levelScore
         GV.actGame!.played = true
         GV.actGame!.created = Date()
-//        #if REALM_V2
         if cardCount > 0 {
             GV.actGame!.gameFinished = false
         } else {
             GV.actGame!.gameFinished = true
         }
-//        #endif
-        if playerType == .multiPlayer {
+        if gameArt == .multiGame {
             GV.actGame!.multiPlay = true
             GV.actGame!.opponentName = opponent.name
             GV.actGame!.opponentScore = opponent.score
-//            statistic.countMultiPlays += 1
-//            if opponent.score > levelScore {
-//                statistic.defeats += 1
-//            } else {
-//                statistic.victorys += 1
-//            }
-        } else if cardCount == 0 {  // countPlays only when game is finished
-//            statistic.countPlays += 1
         }
         try! realm.commitWrite()
 
@@ -1854,26 +1898,24 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         var answer = GV.peerToPeerService!.sendMessage(command: .iWantToPlayWithYou, message: [myName, GV.peerToPeerVersion, String(levelIndex), String(countPackages), String(gameNumber)], toPeer: peerID)
         switch answer[0] {
         case answerYes:
-            self.playerType = .multiPlayer
+            self.gameArt = .multiGame
             self.gameNumber = gameNumber
             self.opponent.name = identity
+            self.opponent.WIFI = true
             self.opponent.score = 0
             self.restartGame = true
             GV.peerToPeerService!.changeStatusToIsPlaying(isPlayingWith: opponent.name)
         case answerNo, GV.IAmBusy, GV.timeOut:
             alertOpponentDoesNotWantPlay(alert: .tcOpponentNotPlay)
             self.opponent = Opponent()
-            self.playerType = .singlePlayer
             GV.peerToPeerService!.changeStatusToFree()
         case peerToPeerVersionOfOpponentIsHigher:
             alertOpponentDoesNotWantPlay(alert: .tcPeerToPeerVersionIsHigher, opponentName: identity)
             self.opponent = Opponent()
-            self.playerType = .singlePlayer
             GV.peerToPeerService!.changeStatusToFree()
         case peerToPeerVersionOfOpponentIsLower:
             alertOpponentDoesNotWantPlay(alert: .tcPeerToPeerVersionIsLower, opponentName: identity)
             self.opponent = Opponent()
-            self.playerType = .singlePlayer
             GV.peerToPeerService!.changeStatusToFree()
        default:
             break
@@ -1933,8 +1975,14 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             cardManager!.lastNextPoint = nil
         }
         
+        /// delete all not finished games:
         realm.beginWrite()
-        realm.delete(realm.objects(GameModel.self).filter("played = false"))
+        let filterText1 = "(countSteps < 52 and countPackages = 1) or "
+        let filterText2 = "(countSteps < 104 and countPackages = 2) or "
+        let filterText3 = "(countSteps < 156 and countPackages = 3) or "
+        let filterText4 = "(countSteps < 208 and countPackages = 4)"
+        let notFinishedGames = realm.objects(GameModel.self).filter(filterText1 + filterText2 + filterText3 + filterText4)
+        realm.delete(notFinishedGames)
         try! realm.commitWrite()
         
         stopCreateTippsInBackground = true
@@ -1951,7 +1999,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     func getNextPlayArt(congratulations: CongratulationsType, firstStart: Bool = false)->UIAlertController {
 //        let playerName = GV.player!.name
         let statisticsTxt = ""
-        var congratulationsTxt = GV.language.getText(.tcChooseGame)
+        var congratulationsTxt = gameArt == .multiGame ? GV.language.getText(.tcCompetitionHeader, values: opponent.name) : GV.language.getText(.tcChooseGame)
         doTimeCount = false
         
         switch congratulations {
@@ -2005,12 +2053,25 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             message: statisticsTxt,
             preferredStyle: .alert)
         
-        if playerType == .multiPlayer {
+        if gameArt == .multiGame {
             let stopAction = UIAlertAction(title: GV.language.getText(.tcStopCompetition), style: .default,
                                             handler: {(paramAction:UIAlertAction!) in
                                                 self.stopCompetition()
             })
             alert.addAction(stopAction)
+            if cardCount <= 0 {
+                alert.addAction(newGameAction())
+                alert.addAction(nextLevelAction())
+                alert.addAction(previousLevelAction())
+            }
+            #if TEST
+                let autoPlayActionNormal = UIAlertAction(title: GV.language.getText(.tcAutoPlayNormal), style: .default,
+                                                         handler: {(paramAction:UIAlertAction!) in
+                                                            self.startAutoplay(testType: .runOnce)
+                })
+                alert.addAction(autoPlayActionNormal)
+            #endif
+            
             
         } else {
             switch GV.player!.GCEnabled {
@@ -2027,16 +2088,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                                                                 
                     })
                     alert.addAction(connectToGamecenter)
-//                case GCEnabledType.GameCenterEnabled.rawValue:
-//                    let connectToGamecenter = UIAlertAction(title: GV.language.getText(.tcDisconnectGC), style: .default,
-//                                                            handler: {(paramAction:UIAlertAction!) in
-//                                                                //                                                self.GCEnabled = !self.GCEnabled
-//                                                                try! realm.write({
-//                                                                    GV.player!.GCEnabled = GCEnabledType.AskForGameCenter.rawValue
-//                                                                })
-//
-//                    })
-//                    alert.addAction(connectToGamecenter)
                 default:
                     break
             }
@@ -2055,63 +2106,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 })
                 alert.addAction(againAction)
             }
-            let newGameAction = UIAlertAction(title: GV.language.getText(TextConstants.tcNewGame), style: .default,
-                handler: {(paramAction:UIAlertAction!) in
-//                    realm.beginWrite()
-//                    GV.player!.levelID += 1
-//                    GV.player!.levelID %= GV.levelsForPlay.count()
-//                    if GV.player!.levelID == 0 {
-//                        GV.player!.countPackages += 1
-//                        if GV.player!.countPackages > GV.maxPackageCount {
-//                            GV.player!.countPackages = 1
-//                        }
-//                    }
-//                    try! realm.commitWrite()
-                    self.startNewGame(next: true)
-                    //self.gameArrayChanged = true
-
-            })
-            alert.addAction(newGameAction)
-            
-            let nextLevelAction = UIAlertAction(title: GV.language.getText(TextConstants.tcNextLevel), style: .default,
-                                                handler: {(paramAction:UIAlertAction!) in
-                                                    realm.beginWrite()
-                                                    GV.player!.levelID += 1
-                                                    GV.player!.levelID %= GV.levelsForPlay.count()
-                                                    if GV.player!.levelID == 0 {
-                                                        GV.player!.countPackages += 1
-                                                        if GV.player!.countPackages > GV.maxPackageCount {
-                                                            GV.player!.countPackages = GV.maxPackageCount
-                                                            GV.player!.levelID = GV.levelsForPlay.count() - 1
-                                                        }
-                                                    }
-                                                    try! realm.commitWrite()
-                                                    self.startNewGame(next: true)
-                                                    //self.gameArrayChanged = true
-                                                    
-            })
-            alert.addAction(nextLevelAction)
-            
-            let previousLevelAction = UIAlertAction(title: GV.language.getText(TextConstants.tcPreviousLevel), style: .default,
-                                                handler: {(paramAction:UIAlertAction!) in
-                                                    realm.beginWrite()
-                                                    GV.player!.levelID -= 1
-//                                                    GV.player!.levelID %= GV.levelsForPlay.count()
-                                                    if GV.player!.levelID < 0 {
-                                                        GV.player!.levelID = GV.levelsForPlay.count() - 1
-                                                        GV.player!.countPackages -= 1
-                                                        if GV.player!.countPackages < 1 {
-                                                            GV.player!.countPackages = 1
-                                                            GV.player!.levelID = 1
-                                                        }
-                                                    }
-                                                    try! realm.commitWrite()
-                                                    self.startNewGame(next: true)
-                                                    //self.gameArrayChanged = true
-                                                    
-            })
-            alert.addAction(previousLevelAction)
-            
+            alert.addAction(newGameAction())
+            alert.addAction(nextLevelAction())
+            alert.addAction(previousLevelAction())
             let chooseLevelAction = UIAlertAction(title: GV.language.getText(.tcChooseLevel), style: .default,
                                            handler: {(paramAction:UIAlertAction!) in
                                             self.chooseLevelAndOptions()
@@ -2126,31 +2123,6 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 })
                 alert.addAction(autoPlayActionNormal)
             
-//                let autoPlayActionNewTest = UIAlertAction(title: GV.language.getText(.tcAutoPlayNewTest), style: .default,
-//                                                   handler: {(paramAction:UIAlertAction!) in
-//                                                    self.startAutoplay(testType: .newTest)
-//                })
-//                alert.addAction(autoPlayActionNewTest)
-//
-//                let autoPlayActionErrors = UIAlertAction(title: GV.language.getText(.tcAutoPlayErrors), style: .default,
-//                                                   handler: {(paramAction:UIAlertAction!) in
-//                                                    self.startAutoplay(testType: .fromDB)
-//                })
-//                alert.addAction(autoPlayActionErrors)
-//
-//                let autoPlayActionTable = UIAlertAction(title: GV.language.getText(.tcAutoPlayTable), style: .default,
-//                                                         handler: {(paramAction:UIAlertAction!) in
-//                                                            self.startAutoplay(testType: .fromTable)
-//                })
-//                alert.addAction(autoPlayActionTable)
-//
-//                let autoStepActionTable = UIAlertAction(title: GV.language.getText(.tcActivateAutoPlay), style: .default,
-//                                                        handler: {(paramAction:UIAlertAction!) in
-//                                                            self.autoPlayerActive = true
-//                })
-//                alert.addAction(autoStepActionTable)
-//
-//
             #endif
 
 
@@ -2164,10 +2136,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
             if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
                 let onlineGameAction = UIAlertAction(title: GV.language.getText(.tcOnlineGame), style: .default,
                                                       handler: {(paramAction:UIAlertAction!) in
-//                                                        GCHelper.sharedInstance.findMatchWithMinPlayers(2, maxPlayers: 4, viewController: GV.mainViewController!, delegate: self as! GCHelperDelegate)
-                                                        self.makeMatch()
-//                                                        self.findMatch()
-                                                        //self.gameArrayChanged = true
+                                                        GCHelper.sharedInstance.findMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!, delegate: self)
                                                         
                 })
                 alert.addAction(onlineGameAction)
@@ -2182,235 +2151,88 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         return alert
     }
     
-    var matchRequest: GKMatchRequest?
-    var matchMakerViewController: GKMatchmakerViewController?
-    var matchStarted = false
-    
-    func findMatch() {
-        let request = GKMatchRequest()
-        request.minPlayers = 2
-        request.maxPlayers = 2
-        request.defaultNumberOfPlayers = 2
-        var recipients: [GKPlayer] = []
-        for player in GV.gkPlayers  {
-            if player.value.alias  == "jogax" {
-                recipients.append(player.value)
-            }
-        }
-        request.inviteMessage = "Hallo!"
-//        request.recipients = recipients
-//        request.recipientResponseHandler = {(player: GKPlayer, response: GKInviteRecipientResponse) -> Void in
-//            print("recipient responsed!")
-//        }
+    func newGameAction()->UIAlertAction {
         
-        GKMatchmaker.shared().findMatch(for: request, withCompletionHandler: {(match, error) -> Void in
-            if error != nil {
-                // Process the error.
-                
-                print("Error finding match")
-//                print(error?.localizedDescription as Any)
-                
-//                self.show_match_error();
-                
-                
-                
-                
-            }
-            else if match != nil {
-                
-                
-                self.match = match!
-                
-                self.match?.delegate = self
-                
-                
-                // Use a retaining property to retain the match.
-                
-                if !self.matchStarted && self.match?.expectedPlayerCount == 1
-                {
-                    self.matchStarted = true
-                    // Insert game-specific code to begin the match.
-                    
-                    print("Match Started")
-                    
-                }
-                
-                
-            }
-            else
-            {
-                print("Match is nill")
-            }
-            
-        })
+        return UIAlertAction(title: GV.language.getText(TextConstants.tcNewGame), style: .default,
+                                                       handler: {(paramAction:UIAlertAction!) in
+                                                            if self.gameArt == .multiGame {
+                                                                self.startNewGameForMultiplayer()
+                                                            } else {
+                                                                self.startNewGame(next: true)
+                                                            }
+                                                        })
+    }
+    
+    func nextLevelAction()->UIAlertAction {
+        return UIAlertAction(title: GV.language.getText(TextConstants.tcNextLevel), style: .default,
+                                            handler: {(paramAction:UIAlertAction!) in
+                                                realm.beginWrite()
+                                                GV.player!.levelID += 1
+                                                GV.player!.levelID %= GV.levelsForPlay.count()
+                                                if GV.player!.levelID == 0 {
+                                                    GV.player!.countPackages += 1
+                                                    if GV.player!.countPackages > GV.maxPackageCount {
+                                                        GV.player!.countPackages = GV.maxPackageCount
+                                                        GV.player!.levelID = GV.levelsForPlay.count() - 1
+                                                    }
+                                                }
+                                                try! realm.commitWrite()
+                                                self.levelIndex = GV.player!.levelID
+                                                countPackages = GV.player!.countPackages
+                                                if self.gameArt == .multiGame {
+                                                    self.startNewGameForMultiplayer()
+                                                } else {
+                                                    self.startNewGame(next: true)
+                                                }
+                                            })
 
     }
     
-    func match(_ theMatch: GKMatch, player playerID: String, didChange state: GKPlayerConnectionState) {
-        /*recall when is desconnect match = nil*/
-        guard match == theMatch else {
-            return
-        }
-        
-        switch state {
-        /// Connected /
-        case .stateConnected where match != nil && theMatch.expectedPlayerCount == 0:
-            if #available(iOS 8.0, *) {
-                
-                lookupPlayers();
-                
-                
-            }
-        /// Lost deconnection /
-        case .stateDisconnected:
-            print("match disconnected")
-            
-//            show_match_error();
-            matchStarted = false;
-        default:
-            break
-        }
+    func previousLevelAction()->UIAlertAction {
+        return UIAlertAction(title: GV.language.getText(TextConstants.tcPreviousLevel), style: .default,
+                                                handler: {(paramAction:UIAlertAction!) in
+                                                    realm.beginWrite()
+                                                    GV.player!.levelID -= 1
+                                                    //                                                    GV.player!.levelID %= GV.levelsForPlay.count()
+                                                    if GV.player!.levelID < 0 {
+                                                        GV.player!.levelID = GV.levelsForPlay.count() - 1
+                                                        GV.player!.countPackages -= 1
+                                                        if GV.player!.countPackages < 1 {
+                                                            GV.player!.countPackages = 1
+                                                            GV.player!.levelID = 1
+                                                        }
+                                                    }
+                                                    self.levelIndex = GV.player!.levelID
+                                                    countPackages = GV.player!.countPackages
+                                                    try! realm.commitWrite()
+                                                    if self.gameArt == .multiGame {
+                                                        self.startNewGameForMultiplayer()
+                                                    } else {
+                                                        self.startNewGame(next: true)
+                                                    }                                                })
     }
-    
-    // match state change error
-    func match(_ theMatch: GKMatch, didFailWithError error: Error?) {
-        guard match == theMatch else {
-            return
-        }
-        
-        guard error == nil else {
-            print("Match failed with error: \(String(describing: error?.localizedDescription))")
-            match?.disconnect()
-            matchStarted = false;
-            return
-        }
-    }
-    
-    func lookupPlayers() {
-        
-        guard let match =  match else {
-            print("No Match")
-            return
-        }
-        
-        
-        let playerIDs = match.players.map { $0.playerID }
-        
-        guard let hasePlayerIDS = playerIDs as? [String] else {
-            print("No Player")
-            return
-        }
-        
-        //Load an array of players
-        GKPlayer.loadPlayers(forIdentifiers: hasePlayerIDS) {
-            (players, error) in
-            
-            guard error == nil else {
-                print("Error retrieving player info: \(error!.localizedDescription)")
-                self.match?.disconnect()
-                return
-            }
-            
-            guard let players = players else {
-                print("Error retrieving players; returned nil")
-                return
-            }
-            
-            
-            for player in players {
-                print("Found player: \(String(describing: player.alias))")
-            }
-            
-            
-//            if let arrayPlayers = players as [GKPlayer]? { self.playersInMatch = Set(arrayPlayers) }
-            
-            GKMatchmaker.shared().finishMatchmaking(for: match)
-            
-            //(Static.delegate as? EGCDelegate)?.EGCMatchStarted?()
-            
-        }
-        
-        
-//        selectHost()
-        
-    }
-    
-    func makeMatch() {
-        matchRequest = GKMatchRequest()
-        matchRequest!.minPlayers = 2
-        matchRequest!.maxPlayers = 2
-        matchRequest!.defaultNumberOfPlayers = 2
-        matchRequest!.playerGroup = 0
-        var recipients: [GKPlayer] = []
-        for player in GV.gkPlayers  {
-            if player.value.alias  == "jogax" || player.value.alias == "jogax71" {
-                recipients.append(player.value)
-            }
-        }
-//        matchRequest!.recipients = recipients
-//        matchRequest!.recipientResponseHandler = {recipientResponsed}
-        
-        let matchMaker = GKMatchmaker.shared()
-        
-        matchMakerViewController = GKMatchmakerViewController(matchRequest: matchRequest!)
-        matchMakerViewController!.matchmakerDelegate = self
-        GV.mainViewController?.present(matchMakerViewController!, animated: true, completion: nil)
-        
-        matchRequest?.recipients = nil
-//        matchMaker.findMatch(for: matchRequest!, withCompletionHandler: { (match: GKMatch!, error: NSError!) -> Void in
-//
-//            if error != nil {
-//                print("matchmaking canceled")
-//                return
-//            }
-//
-//            self.match = match
-//            self.match!.delegate = self
-//            if self.matchStarted == false && match.expectedPlayerCount == 0 {
-//                print("in here")
-//                //self.lookupPlayers()
-//                matchMaker.finishMatchmaking(for: self.match!)
-//            }
-//        } as? (GKMatch?, Error?) -> Void )
-        doTimeCount = true
-        
-    }
-    
-    func recipientResponsed() {
-        
-    }
-    
-    func matchmakerViewControllerWasCancelled(_ viewController: GKMatchmakerViewController) {
-        matchMakerViewController?.dismiss(animated: true, completion: nil)
-        print("cancelled")
-    }
-    
-    func matchmakerViewController(_ viewController: GKMatchmakerViewController, didFailWithError error: Error) {
-        print("error")
-    }
-    
-    private func matchmakerViewController(didFind: GKMatch) {
-        print("didFind")
-    }
-    
     func stopCompetition() {
-        GV.peerToPeerService!.sendInfo(.stopCompetition, message: [], toPeer: opponent.peerID!)
-        opponent.finish = .interrupted
-        playerType = .singlePlayer
-        GV.peerToPeerService!.changeStatusToFree()
-        checkMultiplayer()
-//        showBestPlaceLineIfNeaded()
-    }
-
-    func showBestPlaceLineIfNeaded() {
-        let realm = try! Realm()
-        let GCEnabled = realm.objects(PlayerModel.self).filter("isActPlayer = true").first!.GCEnabled
-        if GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
-            bestPlaceLabel.isHidden = false
-            myPlaceLabel.isHidden = false
+        if gameArt == .multiGame {
+            if opponent.WIFI {
+                GV.peerToPeerService!.sendInfo(command: .stopCompetition, message: [], toPeer: opponent.peerID!)
+                GV.peerToPeerService!.changeStatusToFree()
+            } else {
+                GCHelper.sharedInstance.sendInfo(command: .stopCompetition, message: [])
+            }
+            opponent.finish = .interrupted
+            gameArt = .singleGame
         }
     }
 
+//    func showBestPlaceLineIfNeaded() {
+//        let realm = try! Realm()
+//        let GCEnabled = realm.objects(PlayerModel.self).filter("isActPlayer = true").first!.GCEnabled
+//        if GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+//            bestPlaceLabel.isHidden = false
+//            myPlaceLabel.isHidden = false
+//        }
+//    }
+//
     func setLevel(_ next: Bool) {
         if next {
             levelIndex = GV.levelsForPlay.getNextLevel()
@@ -3380,7 +3202,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
     
     func settingsButtonPressed() {
         #if TEST
-            GCHelper.sharedInstance.getAllPlayers(timeScope: .allTime)
+//            GCHelper.sharedInstance.getAllPlayers(timeScope: .allTime)
             GCHelper.sharedInstance.getAllPlayers(timeScope: .week)
             GCHelper.sharedInstance.getAllPlayers(timeScope: .today)
         #endif
@@ -3497,94 +3319,17 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
     func connectToGameCenter() {
-        GCHelper.sharedInstance.authenticateLocalUser()
+        GCHelper.sharedInstance.authenticateLocalUser(theDelegate: self)
         if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
             self.createLabelsForBestPlace()
         }
 
-//        if !GKLocalPlayer.localPlayer().isAuthenticated {
-//            authenticateLocalPlayer()
-//        }
-//        gameCenterSync.startGameCenterSync()
-    }
-    // AUTHENTICATE LOCAL PLAYER
-//    func authenticateLocalPlayer() {
-//        let localPlayer: GKLocalPlayer = GKLocalPlayer.localPlayer()
-//
-//        localPlayer.authenticateHandler = {(ViewController, error) -> Void in
-//            if((ViewController) != nil) {
-//                // 1. Show login if player is not logged in
-//                GV.mainViewController?.present(ViewController!, animated: true, completion: nil)
-//            } else if (localPlayer.isAuthenticated) {
-//                // 2. Player is already authenticated & logged in, load gamecenter
-////                self.gcEnabled = true
-//
-//                // Get the default leaderboard ID
-//
-//                localPlayer.loadDefaultLeaderboardIdentifier(completionHandler: { (leaderboardIdentifer, error) in
-//                    if error != nil {
-//                        realm.beginWrite()
-//                        GV.player!.GCEnabled = GCEnabledType.AskForGameCenter.rawValue
-//                        try! realm.commitWrite()
-//                    } else {
-//                        realm.beginWrite()
-//                        GV.player!.GCEnabled = GCEnabledType.GameCenterEnabled.rawValue
-//                        self.createLabelsForBestPlace()
-//                        GV.peerToPeerService!.changeIdentifier(GKLocalPlayer.localPlayer().alias!)
-//                        self.gameCenterSync.getAllPlayers()
-//                        self.gameCenterSync.startGameCenterSync()
-//                        GKLocalPlayer.localPlayer().unregisterAllListeners()
-//                        GKLocalPlayer.localPlayer().register(self)
-//
-//                        try! realm.commitWrite()
-////                        self.gameCenterSync.printAllGamers()
-//                    }
-//                })
-//
-//            }
-//        }
-//        if !GKLocalPlayer.localPlayer().isAuthenticated {
-//            realm.beginWrite()
-//            GV.player!.GCEnabled = GCEnabledType.AskForGameCenter.rawValue
-//            try! realm.commitWrite()
-//        }
-//    }
-    
-    func player(_ player: GKPlayer, didRequestMatchWithRecipients recipientPlayers: [GKPlayer]) {
-        print("hier")
     }
     
-    func player(_ player: GKPlayer, didAccept invite: GKInvite) {
-        
-        GKMatchmaker.shared().match (for: invite, completionHandler: {(InvitedMatch, error) in
-            
-            if InvitedMatch != nil {
-                self.match=InvitedMatch
-                
-//                LocalGame=false
-                
-//                if let scene = GameScene.unarchiveFromFile(environment_Prefix!+"GameScene") as? GameScene {
-//                    // Configure the view.
-//                    let skView = self.view as SKView!
-//                    //skView.showsFPS = true
-//                    //skView.showsNodeCount = true
-//                    
-//                    /* Sprite Kit applies additional optimizations to improve rendering performance */
-//                    skView.ignoresSiblingOrder = true
-//                    
-//                    /* Set the scale mode to scale to fit the window */
-//                    scene.scaleMode = .Fill
-//                    
-//                    skView.presentScene(scene, transition: SKTransition.flipVerticalWithDuration(2.0))
-//                    
-//                }
-            }
-        })
-    }
     
     func createLabelsForBestPlace() {
         let bestPlaceLabelName = "bestPlaceLabelName"
-        if self.playerType == .singlePlayer {
+        if self.gameArt == .singleGame {
             let (bestPlaceLabelText, myPlaceLabelText) = self.setRankingLabels()
             if self.childNode(withName: bestPlaceLabelName) == nil {
                 self.createLabels(label: self.bestPlaceLabel, text:bestPlaceLabelText, row: 4, xPosProzent: self.whoIsPos)
@@ -3595,6 +3340,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                 self.myPlaceLabel.text = myPlaceLabelText
             }
             self.playerNameLabel.text = self.getName()
+        } else {
+            self.bestPlaceLabel.isHidden = true
+            self.myPlaceLabel.isHidden = true
         }
     }
     
@@ -3675,7 +3423,7 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         if doTimeCount {
             timeCount += 1 // countUpAdder
             playerTimeLabel.text = timeCount.HourMinSec
-            if playerType == .multiPlayer {
+            if gameArt == .multiGame {
                 opponentTimeLabel.text = timeCount.HourMinSec
             }
         }
@@ -3696,60 +3444,78 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         }
     }
 
-    func connectedDevicesChanged(_ manager : PeerToPeerServiceManager, connectedDevices: [String]) {
+    func connectedDevicesChanged(_ manager : P2PHelper, connectedDevices: [String]) {
         
     }
     
-    func messageReceived(_ fromPeer: MCPeerID, command: PeerToPeerCommands, message: [String], messageNr:Int) {
+    func messageReceived(_ fromPeer: MCPeerID, command: CommunicationCommands, message: [String], messageNr:Int) {
         switch command {
         case .myNameIs: break
         case .iWantToPlayWithYou:
             if inSettings {
                 GV.peerToPeerService!.sendAnswer(messageNr: messageNr, answer: [GV.IAmBusy])
-            } else if message[1] > GV.peerToPeerVersion { // want the opponent play an other peerToPeerVerion ?
-                GV.peerToPeerService!.sendAnswer(messageNr: messageNr, answer: [peerToPeerVersionOfOpponentIsLower])
             } else if message[1] < GV.peerToPeerVersion { // want the opponent play an other peerToPeerVerion ?
                 GV.peerToPeerService!.sendAnswer(messageNr: messageNr, answer: [peerToPeerVersionOfOpponentIsHigher])
-            } else if playerType == .multiPlayer {
+            } else if gameArt == .multiGame {
                 GV.peerToPeerService!.sendAnswer(messageNr: messageNr, answer: [GV.IAmPlaying])
             } else {
                 alertStartMultiPlay(fromPeer: fromPeer, message: message, messageNr: messageNr)
             }
         case .myScoreHasChanged:
-            if playerType == .multiPlayer {
-                opponent.score = Int(message[0])!
-                opponent.cardCount = Int(message[1])!
-            }
+            updateScore(parameters: message)
         case .gameIsFinished:
-            if playerType == .multiPlayer {
-                opponent.score = Int(message[0])!
-                opponent.finish = .finished // save in update!!!
-                alertOpponentHasGameFinished()
-            }
+            gameIsFinished(parameters: message)
         case .stopCompetition:
-            if playerType == .multiPlayer {
-                opponent.finish = .interrupted
-                alertStopCompetetion()
-                showBestPlaceLineIfNeaded()
-            }
+            gameIsStopped()
+        case .startGame:
+            opponent.startGame = true
+            opponent.gameParams = message
         default:
             return
         }
 //        print("message received - command: \(command), message: \(message)")
     }
     
+    func updateScore(parameters: [String]) {
+        if gameArt == .multiGame {
+            opponent.score = Int(parameters[0])!
+            opponent.cardCount = Int(parameters[1])!
+        }
+    }
+    
+    func gameIsFinished(parameters: [String]) {
+        if gameArt == .multiGame {
+            opponent.score = Int(parameters[0])!
+            opponent.timeBonus = Int(parameters[1])!
+            opponent.highScore = Int(parameters[2])!
+            opponent.finish = .finished // save in update!!!
+            alertOpponentHasGameFinished()
+        }
+
+    }
+    
+    func gameIsStopped() {
+        if gameArt == .multiGame {
+            opponent.finish = .interrupted
+            alertStopCompetetion()
+            gameArt = .singleGame
+            if opponent.WIFI {
+                GV.peerToPeerService!.changeStatusToFree()
+            }
+        }
+
+    }
+    
     func alertOpponentHasGameFinished() {
-        let bonus = opponent.score / 10
-        let hisScore = opponent.score + bonus
-        let opponentWon = hisScore > levelScore
-        let wonText = opponentWon ? GV.language.getText(.tcHeWon, values: self.opponent.name, String(hisScore), String(levelScore)) : GV.language.getText(.tcYouWon, values: String(levelScore), String(hisScore))
+        let opponentWon = opponent.highScore > levelScore
+        let wonText = opponentWon ? GV.language.getText(.tcHeWon, values: self.opponent.name, String(opponent.highScore), String(levelScore)) : GV.language.getText(.tcYouWon, values: String(levelScore), String(opponent.highScore))
         let alert = UIAlertController(title: GV.language.getText(.tcOpponentHasFinished,
             values: self.opponent.name,
                     String(gameNumber),
-                    String(bonus),
-                    String(self.opponent.score),
+                    String(opponent.score),
+                    String(opponent.timeBonus),
+                    String(opponent.highScore),
                     String(levelScore)) +
-            "\r\n" +
             "\r\n" +
             wonText,
             message: "",
@@ -3789,20 +3555,22 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         
     }
     
-    func calculateWinner()->(bonus:Int, myScore:Int, IWon: Bool){
-        let bonus = levelScore / 10
-        let myScore = levelScore + bonus
-        let IWon = myScore > opponent.score
-        return(bonus, myScore, IWon)
-    }
+//    func calculateWinner()->(bonus:Int, myScore:Int, IWon: Bool){
+//        let bonus = levelScore / 10
+//        let myScore = levelScore + bonus
+//        let IWon = myScore > opponent.score
+//        return(bonus, myScore, IWon)
+//    }
     
-    func alertIHaveGameFinished() {
-        let (bonus, myScore, IWon) = calculateWinner()
-        let wonText = IWon ? GV.language.getText(.tcYouWon, values: String(myScore), String(opponent.score)) : GV.language.getText(.tcHeWon, values: opponent.name, String(opponent.score), String(myScore) )
+    func alertIHaveGameFinished(score: Int, timeBonus: Int, highScore: Int) {
+//        let (bonus, myScore, IWon) = calculateWinner()
+        let iWon = highScore > opponent.score
+        let wonText = iWon ? GV.language.getText(.tcYouWon, values: String(highScore), String(opponent.score)) : GV.language.getText(.tcHeWon, values: opponent.name, String(opponent.score), String(highScore) )
         let alert = UIAlertController(title: GV.language.getText(.tcYouHaveFinished,
             values: String(gameNumber),
-            String(bonus),
-            String(levelScore),
+            String(score),
+            String(timeBonus),
+            String(highScore),
             opponent.name,
             String(self.opponent.score)) +
             "\r\n" +
@@ -3818,13 +3586,9 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
                                         }
         })
         alert.addAction(OKAction)
-        playerType = .singlePlayer
-        GV.peerToPeerService!.changeStatusToFree()
-        GV.mainViewController!.showAlert(alert, delay: 20)
-        
+        GV.mainViewController!.showAlert(alert)
     }
     
-
     func alertStartMultiPlay(fromPeer: MCPeerID, message: [String], messageNr: Int) {
         doTimeCount = false
         let alert = UIAlertController(title: GV.language.getText(.tcWantToPlayWithYou, values: message[0]),
@@ -3834,17 +3598,18 @@ class CardGameScene: SKScene, SKPhysicsContactDelegate, AVAudioPlayerDelegate, P
         let OKAction = UIAlertAction(title: GV.language.getText(.tcok), style: .default,
                                      handler: {(paramAction:UIAlertAction!) in
                                         DispatchQueue.main.async {
-                                            self.playerType = .multiPlayer
+                                            self.opponent.WIFI = true
+                                            self.gameArt = .multiGame
                                             self.opponent.name = message[0]
                                             self.opponent.peerID = fromPeer
                                             self.opponent.score = 0
-                                            try! realm.write({ 
-                                                GV.player!.levelID = Int(message[2])!
-                                                GV.player!.countPackages = Int(message[3])!
-                                            })
                                             self.levelIndex = Int(message[2])!
                                             countPackages = Int(message[3])!
                                             self.gameNumber = Int(message[4])!
+                                            try! realm.write({
+                                                GV.player!.levelID = self.levelIndex
+                                                GV.player!.countPackages = countPackages
+                                            })
                                             self.restartGame = true
                                             GV.peerToPeerService!.changeStatusToIsPlaying(isPlayingWith: self.opponent.name)
                                             GV.peerToPeerService!.sendAnswer(messageNr: messageNr, answer: [self.answerYes])

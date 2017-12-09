@@ -54,6 +54,7 @@ let huDictionary: [TextConstants: String] = [
     .tcNewGame:          "Új játék",
     .tcGameAgain:        "Újra játszom",
     .tcChooseGame:       "Válassz:",
+    .tcCompetitionHeader:"Verseny % partnerrel",
     .tcTippCount:        "Lehetséges lépések száma: ",
     .tcStatistics:       "%. játék %. szint",
     .tcActTime:          "A játék időtartama: ",
@@ -90,16 +91,18 @@ let huDictionary: [TextConstants: String] = [
     .tcWantToPlayWithYou:"% szeretne veled játszani!",
     .tcOpponent:          "Ellenfél: %",
     .tcOpponentHasFinished: "% befejezte a #% játékot!\r\n" +
-                            "bonuszpontjai: %\r\n" +
                             "pontszáma: %\r\n" +
+                            "bonuszpontjai: %\r\n" +
+                            "totál pontszáma: %\r\n" +
                             "a te pontszámod: %\r\n ",
     .tcHeWon:               "% győzött % - %\r\n" +
                             "Sajnálom :-(",
     .tcYouWon:              "Te győztél % - %!\r\n" +
                             "Gratulálok ;-) !!!",
     .tcYouHaveFinished: "Befejezted a #% játékot!\r\n" +
-                        "Bónuszpontok: %\r\n" +
                         "Pontjaid: %\r\n" +
+                        "Bónuszpontjaid: %\r\n" +
+                        "Totál Pontszámod: %\r\n" +
                         "% pontjai: %\r\n ",
     .tcOpponentNotPlay: "% nem akar veled játszani!",
     .tcPeerToPeerVersionIsHigher: "% Kommunikációs Verziója magasabb, töltsd le a játék legújabb verzióját, hogy vele versenyezhess!",
@@ -121,7 +124,7 @@ let huDictionary: [TextConstants: String] = [
     .tck:               "K",
     .tcWhoIs:           "Kicsoda",
     .tcName:            "Név",
-    .tcPlayerType:      "Játékos",
+    .tcPlayerType:      "Én",
     .tcOpponentType:    "Ellenfél",
     .tcBestPlayerType:  "Legjobb játékos",
     .tcChooseLevel:     "Válassz szintet és opciókat",
@@ -152,4 +155,5 @@ let huDictionary: [TextConstants: String] = [
     .tcAskLater:        "Kérdezz később",
     .tcAskNoMore:       "Ne kérdezz többé",
     .tcOnlineGame:      "Online Játék",
+//    .tcYouHaveToWait:   "% még játszik, várnod kell rá!",
 ]

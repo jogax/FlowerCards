@@ -277,6 +277,11 @@ extension String {
         
         return String(repeating: character, count: padCount) + self
     }
+    
+    func mySubString(startPos: Int) -> String.SubSequence {
+        let indexStartOfText = self.index(self.startIndex, offsetBy: startPos)
+        return self[indexStartOfText...]
+    }
 }
 
 extension UIColor {
@@ -444,6 +449,46 @@ extension UIBezierPath {
     }
     
 }
+
+extension GCHelper {
+    
+    /// CommandFormat:
+    ///    xxx°yyy°zzz°www... -> xxx = CommandType
+//    public enum CommandType: Int {
+//        case none = 0, GameParams, Last
+//    }
+//    
+//    public func codeData(type: CommunicationCommands, packageNr: Int, level: Int, gameNr: Int)->Data {
+//        var command = String(type.rawValue)
+//        command += GV.separator
+//        command += String(packageNr)
+//        command += GV.separator
+//        command += String(level)
+//        command += GV.separator
+//        command += String(gameNr)
+//        let data = command.data(using: String.Encoding(rawValue: String.Encoding.utf8.rawValue))!
+//        return data
+//    }
+    
+    public func sendInfo(command: CommunicationCommands, message: [String]) {
+        var command = String(command.rawValue)
+        for param in message {
+            command += GV.separator
+            command += param
+        }
+        let data = command.data(using: String.Encoding(rawValue: String.Encoding.utf8.rawValue))!
+        try! GCHelper.sharedInstance.match.sendData(toAllPlayers: data , with: .reliable)
+    }
+    
+    public func decodeData(data: Data)->(command: CommunicationCommands, parameters: [String]) {
+        let commandString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
+        let stringTable = commandString.components(separatedBy: GV.separator)
+        let command = CommunicationCommands(rawValue: Int(stringTable[0])!) 
+        return (command: command!, parameters: Array(stringTable[1..<stringTable.count]))
+    }
+}
+
+
 
 
 

@@ -112,8 +112,9 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
         
         if realm.objects(PlayerModel.self).count == 0 {
             _ = GV.createNewPlayer(true)
-            GV.player = realm.objects(PlayerModel.self).filter("isActPlayer = TRUE").first!
         }
+        GV.player = realm.objects(PlayerModel.self).filter("isActPlayer = TRUE").first!
+
         
         if GV.deviceType != iPhone_X {
 //            navigationController?.preferredStatusBarStyle = .lightContent
@@ -139,7 +140,7 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
         
         let myName = GV.player!.name
         let deviceName = UIDevice.current.name
-        GV.peerToPeerService = PeerToPeerServiceManager(peerType: appName, identifier: myName, deviceName: deviceName)  // Start connection
+        GV.peerToPeerService = P2PHelper(peerType: appName, identifier: myName, deviceName: deviceName)  // Start connection
 
         skView!.showsFPS = false
         skView!.showsNodeCount = false

@@ -71,12 +71,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         application.registerUserNotificationSettings(pushNotificationSettings)
         application.registerForRemoteNotifications()
-        if let player = realm.objects(PlayerModel.self).filter("isActPlayer = TRUE").first {
-            GV.player = player
-            if player.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
-                GCHelper.sharedInstance.authenticateLocalUser()
-            }
-        }
         return true
     }
     
