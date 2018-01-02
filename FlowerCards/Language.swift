@@ -142,8 +142,17 @@ enum TextConstants: Int {
     tcAskForGameCenter,
     tcAskLater,
     tcAskNoMore,
-    tcOnlineGame //,
-//    tcYouHaveToWait
+    tcOnlineGame,
+    tcMatchDisconnected,
+    tcIChooseTheParams,
+    tcPartnerChooseTheParams,
+    tcPartnerParametersAre,
+    tcYes,
+    tcNo,
+    tcNoWait,
+    tcFriend,
+    tcWaitForOpponent,
+    tcAllPlayers
 }
 
     let LanguageEN = "en" // index 0

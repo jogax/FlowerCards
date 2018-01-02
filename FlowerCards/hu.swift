@@ -155,5 +155,21 @@ let huDictionary: [TextConstants: String] = [
     .tcAskLater:        "Kérdezz később",
     .tcAskNoMore:       "Ne kérdezz többé",
     .tcOnlineGame:      "Online Játék",
-//    .tcYouHaveToWait:   "% még játszik, várnod kell rá!",
+    .tcMatchDisconnected: "% kiszállt a versenyből",
+    .tcIChooseTheParams: "%: Csomag:%, Szint:%\r\n" +
+                              "Én: Csomag:%, Szint:%\r\n" +
+                            "Elfogadom a Paramétereit?",
+    .tcPartnerChooseTheParams: "%: Csomag:%, Szint:%\r\n" +
+                                "Én: Csomag:%, Szint:%\r\n" +
+                                "Várakozás % döntésére!",
+    .tcPartnerParametersAre: "% és Én (%)\r\n" +
+                                "azonos szinten:\r\n" +
+                                "Csomag:%, Szint:%",
+    .tcNoWait:                  "Nem várok tovább!",
+    .tcYes:                     "Igen",
+    .tcNo:                      "Nem",
+    .tcFriend:                  "Barát: ",
+    .tcWaitForOpponent:           "Ellenfél keresése\r\n" +
+                                "Kérlek várj!",
+    .tcAllPlayers:          "Automatikus játékosválasztás",
 ]

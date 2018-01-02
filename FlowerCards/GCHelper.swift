@@ -40,12 +40,12 @@ public protocol GCHelperDelegate: class {
     func match(_ match: GKMatch, didReceive didReceiveData: Data, fromPlayer: String)
     
     /// Method called when the match has ended.
-    func matchEnded()
+    func matchEnded(error: String)
     func localPlayerAuthenticated()
 }
 
 /// A GCHelper instance represents a wrapper around a GameKit match.
-public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCenterControllerDelegate, GKMatchDelegate, GKLocalPlayerListener {
+public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCenterControllerDelegate, GKMatchDelegate, GKLocalPlayerListener, GKInviteEventListener {
     
     /// An array of retrieved achievements. `loadAllAchievements(completion:)` must be called in advance.
     public var achievements = [String: GKAchievement]()
@@ -60,7 +60,8 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     fileprivate weak var delegate: GCHelperDelegate?
     fileprivate var invite: GKInvite!
     fileprivate var invitedPlayer: GKPlayer!
-    fileprivate var playersDict = [String: AnyObject]()
+    fileprivate var playersDict = [String: GKPlayer]()
+    fileprivate var allPlayers = [String:GKPlayer]()
     fileprivate weak var presentingViewController: UIViewController!
 
     
@@ -97,13 +98,15 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     }
     
     fileprivate func lookupPlayers() {
+        print ("\(match.players.count)")
         let playerIDs = match.players.map { $0.playerID } as! [String]
         
         GKPlayer.loadPlayers(forIdentifiers: playerIDs) { (players, error) in
             guard error == nil else {
                 print("Error retrieving player info: \(String(describing: error?.localizedDescription))")
                 self.matchStarted = false
-                self.delegate?.matchEnded()
+                let errorText = String(describing: error?.localizedDescription)
+                self.delegate?.matchEnded(error: errorText)
                 return
             }
             
@@ -181,6 +184,139 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         
         presentingViewController.present(mmvc, animated: true, completion: nil)
     }
+    
+    public func customFindMatchWithMinPlayers(_ minPlayers: Int, maxPlayers: Int, viewController: UIViewController, delegate theDelegate: GCHelperDelegate) {
+        matchStarted = false
+        match = nil
+        presentingViewController = viewController
+        delegate = theDelegate
+        presentingViewController.dismiss(animated: false, completion: nil)
+        
+        let waitAlert = UIAlertController(title: GV.language.getText(.tcWaitForOpponent),
+                                          message: "",
+                                          preferredStyle: .alert)
+        let noMoreWaitAction = UIAlertAction(title: GV.language.getText(.tcNoWait), style: .default,
+                                             handler: {(paramAction:UIAlertAction!) in
+                                                GV.mainViewController!.stopAlert()
+                                                if self.match != nil {
+                                                    self.match.disconnect()
+                                                }
+        })
+        waitAlert.addAction(noMoreWaitAction)
+        GV.mainViewController!.showAlert(waitAlert)
+        let request = GKMatchRequest()
+        request.minPlayers = minPlayers
+        request.maxPlayers = maxPlayers
+        let matchMaker = GKMatchmaker()
+        matchMaker.findMatch(for: request, withCompletionHandler: {
+            
+            (match, error) in
+            if ((error) != nil) {
+                // Process the error.
+            } else if (match != nil) {
+                self.match = match
+                self.match.delegate = self
+                if !self.matchStarted && match?.expectedPlayerCount == 0 {
+//                    print("Ready to start match: count Players: \(String(describing: match!.players.count))")
+                    self.lookupPlayers()
+                }
+            }
+        })
+    }
+    
+
+//    private func createAction (playerName: String, minPlayers: Int, maxPlayers: Int, foundedPlayerID: String) ->UIAlertAction {
+//        let playerAction = UIAlertAction(title: playerName, style: .default,
+//                                         handler: {(paramAction:UIAlertAction!) in
+//                                            let waitAlert = UIAlertController(title: GV.language.getText(.tcWaitForOpponent),
+//                                                                              message: "",
+//                                                                              preferredStyle: .alert)
+//                                            let noMoreWaitAction = UIAlertAction(title: GV.language.getText(.tcNoWait), style: .default,
+//                                                                                 handler: {(paramAction:UIAlertAction!) in
+//                                                                                    GV.mainViewController!.stopAlert()
+//                                                                                    if self.match != nil {
+//                                                                                        self.match.disconnect()
+//                                                                                    }
+//                                            })
+//                                            waitAlert.addAction(noMoreWaitAction)
+//                                            GV.mainViewController!.showAlert(waitAlert)
+//                                            let request = GKMatchRequest()
+//                                            request.minPlayers = minPlayers
+//                                            request.maxPlayers = maxPlayers
+//                                            request.recipients = [self.allPlayers[foundedPlayerID]!]
+//                                            request.inviteMessage = "Your Custom Invitation Message Here"
+//                                            request.recipientResponseHandler = {(player, response) in
+//                                                print("\(player) -> \(response)")
+//                                            }
+//                                            let matchMaker = GKMatchmaker()
+//                                            matchMaker.findMatch(for: request, withCompletionHandler: {
+//
+//                                                (match, error) in
+//                                                if ((error) != nil) {
+//                                                    // Process the error.
+//                                                } else if (match != nil) {
+//                                                    self.match = match
+//                                                    self.match.delegate = self
+//                                                    if !self.matchStarted && match?.expectedPlayerCount == 0 {
+//                                                        print("Ready to start match: count Players: \(String(describing: match!.players.count))")
+//                                                        self.lookupPlayers()
+//                                                    }
+//
+//                                                    //                                                            self.match = match; // Use a retaining property to retain the match.
+//                                                    //                                                            self.match.delegate = self;
+//                                                    //                                                            if (!self.matchStarted && match?.expectedPlayerCount == 0) {
+//                                                    //                                                                self.matchStarted = true;
+//                                                    //                                                            }
+//                                                }
+//                                            })
+//
+//
+//
+//        })
+//        return playerAction
+//    }
+//
+//    private func createAllPlayersAction(minPlayers: Int, maxPlayers: Int)->UIAlertAction {
+//        let playerAction = UIAlertAction(title: GV.language.getText(.tcAllPlayers), style: .default,
+//                                         handler: {(paramAction:UIAlertAction!) in
+//                                            let waitAlert = UIAlertController(title: GV.language.getText(.tcWaitForOpponent),
+//                                                                              message: "",
+//                                                                              preferredStyle: .alert)
+//                                            let noMoreWaitAction = UIAlertAction(title: GV.language.getText(.tcNoWait), style: .default,
+//                                                                                 handler: {(paramAction:UIAlertAction!) in
+//                                                                                    GV.mainViewController!.stopAlert()
+//                                                                                    if self.match != nil {
+//                                                                                        self.match.disconnect()
+//                                                                                    }
+//                                            })
+//                                            waitAlert.addAction(noMoreWaitAction)
+//                                            GV.mainViewController!.showAlert(waitAlert)
+//                                            let request = GKMatchRequest()
+//                                            request.minPlayers = minPlayers
+//                                            request.maxPlayers = maxPlayers
+//                                            let matchMaker = GKMatchmaker()
+//                                            matchMaker.findMatch(for: request, withCompletionHandler: {
+//
+//                                                (match, error) in
+//                                                if ((error) != nil) {
+//                                                    // Process the error.
+//                                                } else if (match != nil) {
+//                                                    self.match = match
+//                                                    self.match.delegate = self
+//                                                    if !self.matchStarted && match?.expectedPlayerCount == 0 {
+//                                                        print("Ready to start match")
+//                                                        self.lookupPlayers()
+//                                                    }
+//
+//                                                }
+//                                            })
+//
+//
+//
+//        })
+//        return playerAction
+//    }
+//
     
     /**
      Reports progress on an achievement to GameKit if the achievement has not been completed already
@@ -320,6 +456,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         delegate?.match(theMatch, didReceive: data, fromPlayer: playerID)
     }
     
+    
     public func match(_ theMatch: GKMatch, player playerID: String, didChange state: GKPlayerConnectionState) {
         if match != theMatch {
             return
@@ -330,7 +467,12 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             lookupPlayers()
         case .stateDisconnected:
             matchStarted = false
-            delegate?.matchEnded()
+            guard let playerName = playersDict[playerID]?.alias! else {
+                print("playerName is empty!")
+                break
+            }
+            
+            delegate?.matchEnded(error: GV.language.getText(.tcMatchDisconnected, values: playerName))
             match = nil
         default:
             break
@@ -344,7 +486,8 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         
         print("Match failed with error: \(String(describing: error?.localizedDescription))")
         matchStarted = false
-        delegate?.matchEnded()
+        let errorText = String(describing: error?.localizedDescription)
+        delegate?.matchEnded(error: errorText)
     }
     
     // MARK: GKLocalPlayerListener
@@ -357,6 +500,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     
     public func getAllPlayers() {
         if GV.gkPlayers.count == 0 {
+            let myBackgroundRealm = try! Realm()
             for countPackages in 1...4 {
                 for levelID in 1...26 {
                     let leaderboardID = "P\(countPackages)L\(levelID)"
@@ -372,6 +516,23 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                                 if let playerID = score.player!.playerID {
                                     if GV.gkPlayers[playerID] == nil {
                                         GV.gkPlayers[playerID] = score.player!
+                                    }
+                                    let foundedPlayers = myBackgroundRealm.objects(GCPlayerModel.self).filter("playerID = %d", playerID)
+                                    myBackgroundRealm.beginWrite()
+                                    if foundedPlayers.count == 0 {
+                                        let playerObject = GCPlayerModel()
+                                        playerObject.playerID = playerID
+                                        playerObject.name = score.player!.alias!
+                                        playerObject.isMyFriend = false
+                                        myBackgroundRealm.add(playerObject)
+                                    } else {
+                                        if foundedPlayers.first!.name != score.player!.alias! {
+                                            foundedPlayers.first!.name = score.player!.alias!
+                                        }
+                                    }
+                                    try! myBackgroundRealm.commitWrite()
+                                    if self.allPlayers[playerID] == nil {
+                                        self.allPlayers[playerID] = score.player!
                                     }
                                 }
                             }
@@ -439,6 +600,19 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         }
     }
     
+    public func sendGameCountToGameCenter(gameCount: Int) {
+        let bestGameCount = GKScore(leaderboardIdentifier: "GC", player: GKLocalPlayer.localPlayer())
+        bestGameCount.value = Int64(gameCount)
+        let countArray = [bestGameCount]
+        GKScore.report(countArray) { (error) in
+            if error != nil {
+                print("Error by send score to GameCenter: \(error!.localizedDescription)")
+            } else {
+                //                print("Best Score: \(score) of \(String(describing: GKLocalPlayer.localPlayer().alias))! sent to Leaderboard: \("P\(countPackages)L\(levelID + 1)")")
+            }
+        }
+    }
+    
     private func importBestScoreFromGameCenter(countPackages: Int, levelID: Int) {
         //        if GKLocalPlayer.localPlayer().isAuthenticated == false {return}
         let leaderboardID = "P\(countPackages)L\(levelID + 1)"
@@ -491,50 +665,5 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             }
         })
     }
-    public func getAllPlayers(timeScope: GKLeaderboardTimeScope) {
-            var players: [String: Int] = [:]
-            var countLevels = 0
-            for countPackages in 1...4 {
-                for levelID in 1...26 {
-                    let leaderboardID = "P\(countPackages)L\(levelID)"
-                    let leaderBoard = GKLeaderboard()
-                    leaderBoard.identifier = leaderboardID
-                    leaderBoard.playerScope = .global
-                    leaderBoard.timeScope = timeScope
-    //                leaderBoard.range = NSMakeRange(1,1000)
-                    leaderBoard.loadScores(completionHandler: {
-                        (scores, error) in
-                        if error != nil {
-                            countLevels += 1
-                            print("Error by downloading scores for \(leaderboardID): \(error!.localizedDescription)")
-                        } else {
-                            if scores != nil {
-                                print("PackageNr: \(countPackages), levelID: \(levelID), countPlayers: \(String(describing: scores!.count))")
-                                for score in scores! {
-                                    if let alias = score.player!.alias {
-                                        if players[alias] != nil {
-                                            players[alias]! = players[alias]! + 1
-                                        } else {
-                                            players[alias] = 1
-                                        }
-                                        print("rank: \(score.rank), player: \(String(describing: alias)), Score: \(score.value)")
-                                    }
-                                }
-                            }
-                            countLevels += 1
-                            if countLevels > 103 {
-                                print("-------------------------------------")
-                                let timeScopeTxt = timeScope == .allTime ? "allTime" : timeScope == .week ? "week" : "today"
-                                print ("List of Players for timeScope \(timeScopeTxt): (\(players.count))")
-                                for player in players {
-                                    print(player)
-                                }
-                            }
-                        }
-                    })
-                }
-            }
-        }
-
 
 }

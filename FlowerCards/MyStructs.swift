@@ -26,7 +26,8 @@ struct GV {
     static let freeGameCount = 1000
     static var peerToPeerService: P2PHelper?
 //    static let peerToPeerVersion = "1.0" // 2017-06-21
-    static let peerToPeerVersion = "1.1" // 2017-09-01
+//    static let peerToPeerVersion = "1.1" // 2017-09-01
+    static let peerToPeerVersion = "1.2" // 2017-12-11
     static var dX: CGFloat = 0
     static var speed: CGSize = CGSize.zero
     static var touchPoint = CGPoint.zero
@@ -381,8 +382,11 @@ public enum CommunicationCommands: Int {
     iWantToPlayWithYou, //sendMessage
             //
             //      parameters: 1 - myName
-            //                  2 - levelID
-            //                  3 - gameNumber to play
+            //                  2 - PeerToPeerVersion
+            //                  3 - levelID
+            //                  4 - countPackages
+            //                  5 - gameNumber to play
+            //                  6 - Device Type
             //      answer: "OK" - play starts
             //              "LevelTooHigh" - for opponent is this level vorbidden
             //              "Cancel" - opponent will not play
@@ -410,10 +414,11 @@ public enum CommunicationCommands: Int {
     //      parameters: 1 - opponentName
     startGame,
     //
-    //      parameters: 1 . myName
+    //      parameters: 1 - myName
     //                  2 - countPackages
     //                  3 - levelIndex
     //                  4 - gameNumber
+    
 
     maxValue
     

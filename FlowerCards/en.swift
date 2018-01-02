@@ -155,9 +155,21 @@ let enDictionary: [TextConstants: String] = [
     .tcAskLater:        "Ask me Later",
     .tcAskNoMore:       "Ask me no more",
     .tcOnlineGame:      "Online Game",
-//    .tcYouHaveToWait:   "You have the game finished!\r\n" +
-//                        "your score: % \r\n" +
-//                        "your time bonus: % \r\n" +
-//                        "your total score: %\r\n" +
-//                        "% still is playing, you have to wait!",
+    .tcMatchDisconnected: "% has the match disconnected",
+    .tcIChooseTheParams:    "%: Packages:%, Level:%\r\n" +
+                             "Me: Packages:%, Level:%\r\n" +
+                             "Accept his parameters?",
+    .tcPartnerChooseTheParams: "%: Packages:%, Level:%\r\n" +
+                                "Me: Packages:%, Level:%\r\n" +
+                                "waiting for % to choose!",
+    .tcPartnerParametersAre: "% and I (%)\r\n" +
+                              "have the same\r\n" +
+                              "Packages:%, Level:%",
+    .tcNoWait:               "Stop waiting",
+    .tcYes:                     "Yes",
+    .tcNo:                      "No",
+    .tcFriend:              "Friend: ",
+    .tcWaitForOpponent:       "Search for an opponent\r\n" +
+                            "Please wait!",
+    .tcAllPlayers:          "Autodetect a player",
 ]

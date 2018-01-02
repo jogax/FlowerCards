@@ -40,6 +40,13 @@ public extension UIDevice {
             case "iPhone7,1":                               return "iPhone 6 Plus"
             case "iPhone8,1":                               return "iPhone 6s"
             case "iPhone8,2":                               return "iPhone 6s Plus"
+            case "iPhone8,4":                               return "iPhone SE"
+            case "iPhone9,1", "iPhone9,3":                  return "iPhone 7"
+            case "iPhone9,2", "iPhone9,4":                  return "iPhone 7 Plus"
+            case "iPhone10,1", "iPhone10,4":                return "iPhone 8"
+            case "iPhone10,2", "iPhone10,5":                return "iPhone 8 Plus"
+            case "iPhone10,3", "iPhone10,6":                return iPhone_X
+            
             case "iPad2,1", "iPad2,2", "iPad2,3", "iPad2,4":return "iPad 2"
             case "iPad3,1", "iPad3,2", "iPad3,3":           return "iPad 3"
             case "iPad3,4", "iPad3,5", "iPad3,6":           return "iPad 4"
@@ -401,6 +408,13 @@ extension UIViewController {
     
     }
     
+    func stopAlert() {
+        if (presentedViewController != nil) {
+            dismiss(animated: true, completion: {} )
+                
+        }
+    }
+    
     
 }
 
@@ -480,12 +494,17 @@ extension GCHelper {
         try! GCHelper.sharedInstance.match.sendData(toAllPlayers: data , with: .reliable)
     }
     
+    public func disconnectFromMatch() {
+        match.disconnect()
+    }
+    
     public func decodeData(data: Data)->(command: CommunicationCommands, parameters: [String]) {
         let commandString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
         let stringTable = commandString.components(separatedBy: GV.separator)
         let command = CommunicationCommands(rawValue: Int(stringTable[0])!) 
         return (command: command!, parameters: Array(stringTable[1..<stringTable.count]))
     }
+    
 }
 
 

@@ -155,5 +155,21 @@ let ruDictionary: [TextConstants: String] = [
     .tcAskLater:        "Спроси меня позже",
     .tcAskNoMore:       "Не спрашивай меня больше",
     .tcOnlineGame:      "Online Игра",
-//    .tcYouHaveToWait:   "% все еще играет, вам нужно подождать!",
+    .tcMatchDisconnected: "% вышел из игры",
+    .tcIChooseTheParams: "%: Колоды:%, Уровень:%\r\n" +
+                        "Я: Колоды:%, Уровень:%\r\n" +
+                        "Принять его параметры?",
+    .tcPartnerChooseTheParams: "%: Колоды:%, Уровень:%\r\n" +
+                                "Я: Колоды:%, Уровень:%\r\n" +
+                                "% будет выбирать, подожди пожалуйста!",
+    .tcPartnerParametersAre: "% и Я (%)\r\n" +
+                                "на том же уровне:\r\n" +
+                                "Колоды:%, Уровень:%",
+    .tcNoWait:                  "Я больше не буду ждать!",
+    .tcYes:                     "Да",
+    .tcNo:                      "Нет",
+    .tcFriend:                  "Друг: ",
+    .tcWaitForOpponent:           "Поиск соперника\r\n" +
+                                "Подожди пожалуйста!",
+    .tcAllPlayers:              "Автоопределение игрока",
 ]

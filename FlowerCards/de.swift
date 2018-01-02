@@ -156,7 +156,23 @@ let deDictionary: [TextConstants: String] = [
     .tcAskLater:        "Frag mich später",
     .tcAskNoMore:       "Frag mich nie mehr",
     .tcOnlineGame:      "Online Spiel",
-//    .tcYouHaveToWait:   "% spielt noch, du musst warten!",
+    .tcMatchDisconnected: "? hat den Wettbewerb verlassen",
+    .tcIChooseTheParams: "%: Pakete:%, Ebene:%\r\n" +
+                            "Ich: Pakete:%, Ebene:%\r\n" +
+                            "Akzeptieren seine Parameter?",
+    .tcPartnerChooseTheParams: "%: Pakete:%, Ebene:%\r\n" +
+                            "Ich: Pakete:%, Ebene:%%\r\n" +
+                            "Warten auf %",
+    .tcPartnerParametersAre: "% und Ich (%)\r\n" +
+                                "haben die selbe\r\n" +
+                                "Pakete:%, Ebene:%",
+    .tcNoWait:              "Ich warte nicht länger!",
+    .tcYes:                 "Ja",
+    .tcNo:                  "Nein",
+    .tcFriend:              "Freund: ",
+    .tcWaitForOpponent:       "Suche nach einem Gegner\r\n" +
+                            "Bitte warten!",
+    .tcAllPlayers:          "Autodetect einen Spieler",
 ]
 
 

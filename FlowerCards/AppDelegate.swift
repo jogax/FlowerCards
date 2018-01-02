@@ -45,7 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         // Migration of realm models if neaded
             Realm.Configuration.defaultConfiguration = Realm.Configuration(
-                schemaVersion: 7,
+                schemaVersion: 8,
                 migrationBlock: { migration, oldSchemaVersion in
                     switch oldSchemaVersion {
                     case 0...4:
@@ -62,6 +62,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                 newObject!["GCEnabled"] = GCEnabledType.AskForGameCenter.rawValue
                             }
                         }
+                    case 6:
+                        break
                     default:
                         break
                     }
