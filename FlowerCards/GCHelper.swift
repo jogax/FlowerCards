@@ -42,6 +42,7 @@ public protocol GCHelperDelegate: class {
     /// Method called when the match has ended.
     func matchEnded(error: String)
     func localPlayerAuthenticated()
+    func continueTimeCount()
 }
 
 /// A GCHelper instance represents a wrapper around a GameKit match.
@@ -201,6 +202,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                                                 if self.match != nil {
                                                     self.match.disconnect()
                                                 }
+                                                self.delegate?.continueTimeCount()
         })
         waitAlert.addAction(noMoreWaitAction)
         GV.mainViewController!.showAlert(waitAlert)
@@ -223,7 +225,46 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             }
         })
     }
-    
+
+    public func autoFindMatchWithMinPlayers(_ minPlayers: Int, maxPlayers: Int, viewController: UIViewController, delegate theDelegate: GCHelperDelegate) {
+        matchStarted = false
+        match = nil
+        presentingViewController = viewController
+        delegate = theDelegate
+        presentingViewController.dismiss(animated: false, completion: nil)
+        let searchAlert = UIAlertController(title: GV.language.getText(.tcSearchOpponent),
+                                          message: "",
+                                          preferredStyle: .alert)
+        let OKAction = UIAlertAction(title: GV.language.getText(.tcok), style: .default,
+                                             handler: {(paramAction:UIAlertAction!) in
+                                                GV.mainViewController!.stopAlert()
+                                                if self.match != nil {
+                                                    self.match.disconnect()
+                                                }
+                                                self.delegate?.continueTimeCount()
+        })
+        searchAlert.addAction(OKAction)
+        GV.mainViewController!.showAlert(searchAlert, delay: 10)
+
+        let request = GKMatchRequest()
+        request.minPlayers = minPlayers
+        request.maxPlayers = maxPlayers
+        let matchMaker = GKMatchmaker()
+        matchMaker.findMatch(for: request, withCompletionHandler: {
+            
+            (match, error) in
+            if ((error) != nil) {
+                // Process the error.
+            } else if (match != nil) {
+                self.match = match
+                self.match.delegate = self
+                if !self.matchStarted && match?.expectedPlayerCount == 0 {
+                    self.lookupPlayers()
+                }
+            }
+        })
+    }
+
 
 //    private func createAction (playerName: String, minPlayers: Int, maxPlayers: Int, foundedPlayerID: String) ->UIAlertAction {
 //        let playerAction = UIAlertAction(title: playerName, style: .default,

@@ -172,4 +172,9 @@ let enDictionary: [TextConstants: String] = [
     .tcWaitForOpponent:       "Search for an opponent\r\n" +
                             "Please wait!",
     .tcAllPlayers:          "Autodetect a player",
+    .tcSearchOpponent:      "searching for opponent via Game Center",
+    .tcEnableAutoSearch:    "Enable Auto Opponent Search",
+    .tcDisableAutoSearch:    "Disable Auto Opponent Search",
+    .tcWantToPlayWithYouGC: "% want play with you!\r\n" +
+                            "Start the Game?",
 ]

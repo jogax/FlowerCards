@@ -172,4 +172,9 @@ let ruDictionary: [TextConstants: String] = [
     .tcWaitForOpponent:           "Поиск соперника\r\n" +
                                 "Подожди пожалуйста!",
     .tcAllPlayers:              "Автоопределение игрока",
+    .tcSearchOpponent:          "поиск противника через Game Center",
+    .tcEnableAutoSearch:        "Включить автоматический поиск противника",
+    .tcDisableAutoSearch:       "Отключить автоматический поиск противника",
+    .tcWantToPlayWithYouGC:     "% хочет поиграть с тобой!\r\n" +
+                                "Начать игру?",
 ]

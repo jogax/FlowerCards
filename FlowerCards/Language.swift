@@ -152,7 +152,11 @@ enum TextConstants: Int {
     tcNoWait,
     tcFriend,
     tcWaitForOpponent,
-    tcAllPlayers
+    tcAllPlayers,
+    tcSearchOpponent,
+    tcEnableAutoSearch,
+    tcDisableAutoSearch,
+    tcWantToPlayWithYouGC
 }
 
     let LanguageEN = "en" // index 0

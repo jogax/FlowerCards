@@ -172,4 +172,9 @@ let huDictionary: [TextConstants: String] = [
     .tcWaitForOpponent:           "Ellenfél keresése\r\n" +
                                 "Kérlek várj!",
     .tcAllPlayers:          "Automatikus játékosválasztás",
+    .tcSearchOpponent:      "ellenfél keresése a Game Center segítségével",
+    .tcEnableAutoSearch:    "Automatikus ellenfél keresés engedélyezés",
+    .tcDisableAutoSearch:    "Automatikus ellenfél keresés tiltása",
+    .tcWantToPlayWithYouGC: "% szeretne játszani veled!\r\n" +
+                                "Játék inditása?",
 ]

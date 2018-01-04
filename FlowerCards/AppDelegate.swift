@@ -45,7 +45,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         // Migration of realm models if neaded
             Realm.Configuration.defaultConfiguration = Realm.Configuration(
-                schemaVersion: 8,
+//                schemaVersion: 8,
+                schemaVersion: 9,   // new param in PlayerModel: onlineCompetitionEnabled (Bool)
+
                 migrationBlock: { migration, oldSchemaVersion in
                     switch oldSchemaVersion {
                     case 0...4:
@@ -64,6 +66,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         }
                     case 6:
                         break
+                    case 8:
+                        migration.enumerateObjects(ofType: PlayerModel.className()) { oldObject, newObject in
+                            newObject!["onlineCompetitionEnabled"] = true
+                        }
                     default:
                         break
                     }

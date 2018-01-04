@@ -20,6 +20,7 @@ class PlayerModel: Object {
     @objc dynamic var musicVolume: Float = 0
     @objc dynamic var created = Date()
     @objc dynamic var GCEnabled = 0 // 0 - ask, 1 - enabled, 2 - supressed
+    @objc dynamic var onlineCompetitionEnabled = true
 
     override  class func primaryKey() -> String {
         return "ID"
