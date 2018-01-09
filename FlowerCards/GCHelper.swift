@@ -244,7 +244,8 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                                                 self.delegate?.continueTimeCount()
         })
         searchAlert.addAction(OKAction)
-        GV.mainViewController!.showAlert(searchAlert, delay: 10)
+        presentingViewController.showAlert(searchAlert, delay: 1)
+        
 
         let request = GKMatchRequest()
         request.minPlayers = minPlayers
@@ -263,102 +264,10 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                 }
             }
         })
+        self.delegate?.continueTimeCount()
     }
 
 
-//    private func createAction (playerName: String, minPlayers: Int, maxPlayers: Int, foundedPlayerID: String) ->UIAlertAction {
-//        let playerAction = UIAlertAction(title: playerName, style: .default,
-//                                         handler: {(paramAction:UIAlertAction!) in
-//                                            let waitAlert = UIAlertController(title: GV.language.getText(.tcWaitForOpponent),
-//                                                                              message: "",
-//                                                                              preferredStyle: .alert)
-//                                            let noMoreWaitAction = UIAlertAction(title: GV.language.getText(.tcNoWait), style: .default,
-//                                                                                 handler: {(paramAction:UIAlertAction!) in
-//                                                                                    GV.mainViewController!.stopAlert()
-//                                                                                    if self.match != nil {
-//                                                                                        self.match.disconnect()
-//                                                                                    }
-//                                            })
-//                                            waitAlert.addAction(noMoreWaitAction)
-//                                            GV.mainViewController!.showAlert(waitAlert)
-//                                            let request = GKMatchRequest()
-//                                            request.minPlayers = minPlayers
-//                                            request.maxPlayers = maxPlayers
-//                                            request.recipients = [self.allPlayers[foundedPlayerID]!]
-//                                            request.inviteMessage = "Your Custom Invitation Message Here"
-//                                            request.recipientResponseHandler = {(player, response) in
-//                                                print("\(player) -> \(response)")
-//                                            }
-//                                            let matchMaker = GKMatchmaker()
-//                                            matchMaker.findMatch(for: request, withCompletionHandler: {
-//
-//                                                (match, error) in
-//                                                if ((error) != nil) {
-//                                                    // Process the error.
-//                                                } else if (match != nil) {
-//                                                    self.match = match
-//                                                    self.match.delegate = self
-//                                                    if !self.matchStarted && match?.expectedPlayerCount == 0 {
-//                                                        print("Ready to start match: count Players: \(String(describing: match!.players.count))")
-//                                                        self.lookupPlayers()
-//                                                    }
-//
-//                                                    //                                                            self.match = match; // Use a retaining property to retain the match.
-//                                                    //                                                            self.match.delegate = self;
-//                                                    //                                                            if (!self.matchStarted && match?.expectedPlayerCount == 0) {
-//                                                    //                                                                self.matchStarted = true;
-//                                                    //                                                            }
-//                                                }
-//                                            })
-//
-//
-//
-//        })
-//        return playerAction
-//    }
-//
-//    private func createAllPlayersAction(minPlayers: Int, maxPlayers: Int)->UIAlertAction {
-//        let playerAction = UIAlertAction(title: GV.language.getText(.tcAllPlayers), style: .default,
-//                                         handler: {(paramAction:UIAlertAction!) in
-//                                            let waitAlert = UIAlertController(title: GV.language.getText(.tcWaitForOpponent),
-//                                                                              message: "",
-//                                                                              preferredStyle: .alert)
-//                                            let noMoreWaitAction = UIAlertAction(title: GV.language.getText(.tcNoWait), style: .default,
-//                                                                                 handler: {(paramAction:UIAlertAction!) in
-//                                                                                    GV.mainViewController!.stopAlert()
-//                                                                                    if self.match != nil {
-//                                                                                        self.match.disconnect()
-//                                                                                    }
-//                                            })
-//                                            waitAlert.addAction(noMoreWaitAction)
-//                                            GV.mainViewController!.showAlert(waitAlert)
-//                                            let request = GKMatchRequest()
-//                                            request.minPlayers = minPlayers
-//                                            request.maxPlayers = maxPlayers
-//                                            let matchMaker = GKMatchmaker()
-//                                            matchMaker.findMatch(for: request, withCompletionHandler: {
-//
-//                                                (match, error) in
-//                                                if ((error) != nil) {
-//                                                    // Process the error.
-//                                                } else if (match != nil) {
-//                                                    self.match = match
-//                                                    self.match.delegate = self
-//                                                    if !self.matchStarted && match?.expectedPlayerCount == 0 {
-//                                                        print("Ready to start match")
-//                                                        self.lookupPlayers()
-//                                                    }
-//
-//                                                }
-//                                            })
-//
-//
-//
-//        })
-//        return playerAction
-//    }
-//
-    
     /**
      Reports progress on an achievement to GameKit if the achievement has not been completed already
      

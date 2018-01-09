@@ -119,6 +119,10 @@ enum ShowHelpLine: Int {
     case green = 0, cyan, hidden
 }
 
+enum GameStatus: Int {
+    case Off = 0, Searching, On
+}
+
 
 // Global Variable and Constants
 let countContainers = 4
@@ -187,6 +191,7 @@ class CardGameScene:    SKScene,
         
         /// The player with higher playerID is the master
         self.gameArt = .multiGame
+        self.gameStatus = .On
         opponent.WIFI = false
     }
     
@@ -274,6 +279,7 @@ class CardGameScene:    SKScene,
     
     func matchEnded(error: String) {
         self.gameArt = .singleGame
+        self.gameStatus = .Off
         let alert = UIAlertController(title: error,
                                       message: "",
                                       preferredStyle: .alert)
@@ -307,6 +313,7 @@ class CardGameScene:    SKScene,
         GCHelper.sharedInstance.sendGameCountToGameCenter(gameCount: gameCounter)
         if GV.player!.onlineCompetitionEnabled {
             GCHelper.sharedInstance.autoFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!, delegate: self)
+            gameStatus = .Searching
         }
     }
     
@@ -346,7 +353,8 @@ class CardGameScene:    SKScene,
         var WIFI: Bool = true
     }
     
-    
+    var gameStatus: GameStatus = .Off
+
     enum CongratulationsType: Int {
         case No = 0, Won, Lost
     }
@@ -555,7 +563,9 @@ class CardGameScene:    SKScene,
                 if opponent.WIFI {
                     GV.peerToPeerService!.sendInfo(command: .myScoreHasChanged, message: [String(levelScore), String(cardCount)], toPeer: opponent.peerID!)
                 } else {
-                    GCHelper.sharedInstance.sendInfo(command: .myScoreHasChanged, message: [String(levelScore), String(cardCount)])
+                    if GCHelper.sharedInstance.match != nil {
+                        GCHelper.sharedInstance.sendInfo(command: .myScoreHasChanged, message: [String(levelScore), String(cardCount)])
+                    }
                 }
             }
         }
@@ -578,6 +588,9 @@ class CardGameScene:    SKScene,
     var nextLevelButton: MySKButton?
     var targetScore = 0
     var maxCardCount = 0
+    var onShape = MyShape(type: .On)
+    var offShape = MyShape(type: .Off)
+    var searchShape = MyShape(type: .Searching)
 //    var gameCenterSync = GameCenter()
 
     var cardCount = 0 {
@@ -1005,7 +1018,6 @@ class CardGameScene:    SKScene,
         let tippLabelText = GV.language.getText(.tcTipps)
         let undoLabelText = GV.language.getText(.tcUndo)
         
-        
         createLabels(label: gameNumberLabel, text: gameNumberText, row: 1, xPosProzent: gameNumberPos)
         createLabels(label: sizeLabel, text: sizeText, row: 1, xPosProzent: sizePos)
         createLabels(label: packageLabel, text: packageText, row: 1, xPosProzent: packagePos)
@@ -1038,6 +1050,10 @@ class CardGameScene:    SKScene,
         createLabels(label: opponentScoreLabel, text: String(opponent.score), row: 4, xPosProzent: scorePos)
         createLabels(label: opponentCardCountLabel, text: String(opponent.cardCount), row: 4, xPosProzent: cardCountPos)
         createLabelsForBestPlace()
+        
+        createShape(shape: offShape, toLabel: gameNumberLabel)
+        createShape(shape: searchShape, toLabel: whoIsHeaderLabel)
+        createShape(shape: onShape, toLabel: whoIsLabel)
 
         let mySortedPlays = realm.objects(GameModel.self).filter("playerID = %d and played = true", GV.player!.ID).sorted(byKeyPath: "levelID")
         if mySortedPlays.count > 0 {
@@ -1047,6 +1063,12 @@ class CardGameScene:    SKScene,
         }
         prepareCards()
 
+    }
+    
+    func createShape(shape: MyShape, toLabel: SKLabelNode) {
+        shape.position = CGPoint(x: toLabel.position.x / 2, y: toLabel.position.y + toLabel.frame.size.height / 2)
+        shape.setColor(gameStatus: gameStatus)
+        self.addChild(shape)
     }
     
     
@@ -1516,6 +1538,9 @@ class CardGameScene:    SKScene,
         }
         checkMultiplayer()
         cardManager!.checkColoredLines()
+        offShape.setColor(gameStatus: gameStatus)
+        onShape.setColor(gameStatus: gameStatus)
+        searchShape.setColor(gameStatus: gameStatus)
         
     }
     
@@ -1956,7 +1981,9 @@ class CardGameScene:    SKScene,
         if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
             let onlineGameAction = UIAlertAction(title: GV.language.getText(.tcOnlineGame), style: .default,
                                                   handler: {(paramAction:UIAlertAction!) in
-                                                    GCHelper.sharedInstance.customFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!, delegate: self)
+                                                    self.gameStatus = .Searching
+
+                                                    GCHelper.sharedInstance.autoFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!, delegate: self)
 
             })
             alert.addAction(onlineGameAction)
@@ -1978,6 +2005,7 @@ class CardGameScene:    SKScene,
                                                     handler: {(paramAction:UIAlertAction!) in
                                                         self.opponent.name = identity
                                                         self.opponent.score = 0
+                                                        self.gameStatus = .On
                                                         self.callPartner(peerID: peerID, identity: identity)
                     })
                     alert.addAction(nameAction)
@@ -2236,14 +2264,6 @@ class CardGameScene:    SKScene,
                                                     
             })
             alert.addAction(competitionAction)
-//            if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
-//                let onlineGameAction = UIAlertAction(title: GV.language.getText(.tcOnlineGame), style: .default,
-//                                                      handler: {(paramAction:UIAlertAction!) in
-//                                                        GCHelper.sharedInstance.customFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!, delegate: self)
-//
-//                })
-//                alert.addAction(onlineGameAction)
-//            }
             
         }
         let cancelAction = UIAlertAction(title: GV.language.getText(TextConstants.tcCancel), style: .default,
@@ -3371,15 +3391,25 @@ class CardGameScene:    SKScene,
                                                             try! realm.write({
                                                                 GV.player!.GCEnabled = GCEnabledType.AskForGameCenter.rawValue
                                                             })
+                                                            self.doTimeCount = true
                                                             
                 })
                 alert.addAction(connectToGamecenter)
-                let enableAutoSearch = UIAlertAction(title: GV.language.getText(GV.player!.onlineCompetitionEnabled ? .tcEnableAutoSearch : .tcDisableAutoSearch), style: .default,
-                                                        handler: {(paramAction:UIAlertAction!) in
-                                                            try! realm.write({
-                                                                GV.player!.onlineCompetitionEnabled = !GV.player!.onlineCompetitionEnabled
-                                                            })
-                                                            
+                let enableAutoSearch = UIAlertAction(title: GV.language.getText(GV.player!.onlineCompetitionEnabled ? .tcDisableAutoSearch : .tcEnableAutoSearch), style: .default,
+                    handler: {(paramAction:UIAlertAction!) in
+                        try! realm.write({
+                            GV.player!.onlineCompetitionEnabled = !GV.player!.onlineCompetitionEnabled
+                        })
+                        if GV.player!.onlineCompetitionEnabled {
+                            GCHelper.sharedInstance.autoFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!, delegate: self)
+                            self.gameStatus = .Searching
+                            print("Gamestatus = Searching")
+                        } else {
+                            self.gameStatus = .Off
+                            print("Gamestatus = Off")
+                        }
+                        self.doTimeCount = true
+
                 })
                 alert.addAction(enableAutoSearch)
            }
@@ -3614,6 +3644,7 @@ class CardGameScene:    SKScene,
             opponent.finish = .interrupted
             alertStopCompetetion()
             gameArt = .singleGame
+            gameStatus = .Off
             if opponent.WIFI {
                 GV.peerToPeerService!.changeStatusToFree()
             }
@@ -3728,6 +3759,7 @@ class CardGameScene:    SKScene,
                                                 GV.player!.countPackages = countPackages
                                             })
                                             self.restartGame = true
+                                            self.gameStatus = .On
                                             GV.peerToPeerService!.changeStatusToIsPlaying(isPlayingWith: self.opponent.name)
                                             GV.peerToPeerService!.sendAnswer(messageNr: messageNr, answer: [self.answerYes])
                                         }

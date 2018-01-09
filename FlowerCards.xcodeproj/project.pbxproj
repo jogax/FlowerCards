@@ -57,6 +57,7 @@
 		20389B551D5F7EB400ADD133 /* Mirror5.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20389B541D5F7EB400ADD133 /* Mirror5.m4a */; };
 		203BD1731F77B18C002292F7 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203BD1721F77B18C002292F7 /* GameKit.framework */; };
 		2040E4CC1DE74F3600B16B19 /* AutoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2040E4CB1DE74F3600B16B19 /* AutoPlayer.swift */; };
+		2043349F2004FB9200F26206 /* MyShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2043349E2004FB9200F26206 /* MyShape.swift */; };
 		2046921D1F8CDF4000A105BD /* HighScoreModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2046921C1F8CDF4000A105BD /* HighScoreModel.swift */; };
 		2047D9E11FACD1B100502857 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2047D9CC1FACBD6000502857 /* Realm.framework */; };
 		2047D9E21FACD1B100502857 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2047D9CD1FACBD6000502857 /* RealmSwift.framework */; };
@@ -136,6 +137,7 @@
 		20389B541D5F7EB400ADD133 /* Mirror5.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = Mirror5.m4a; sourceTree = "<group>"; };
 		203BD1721F77B18C002292F7 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		2040E4CB1DE74F3600B16B19 /* AutoPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoPlayer.swift; sourceTree = "<group>"; };
+		2043349E2004FB9200F26206 /* MyShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyShape.swift; sourceTree = "<group>"; };
 		2046921C1F8CDF4000A105BD /* HighScoreModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighScoreModel.swift; sourceTree = "<group>"; };
 		2047D9CC1FACBD6000502857 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
 		2047D9CD1FACBD6000502857 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
@@ -258,6 +260,7 @@
 			children = (
 				2025F1031D5B226E00561FBF /* GamePredefinitions.swift */,
 				2025F1231D5B253900561FBF /* CardGameScene.swift */,
+				2043349E2004FB9200F26206 /* MyShape.swift */,
 				2025F0EF1D5B219C00561FBF /* MySKCard.swift */,
 				2035F57D1E1685C200AEBE31 /* CardManager.swift */,
 				2040E4CB1DE74F3600B16B19 /* AutoPlayer.swift */,
@@ -528,6 +531,7 @@
 				2025F0F21D5B219C00561FBF /* MySKSlider.swift in Sources */,
 				2040E4CC1DE74F3600B16B19 /* AutoPlayer.swift in Sources */,
 				2025F1191D5B23BB00561FBF /* StatisticModel.swift in Sources */,
+				2043349F2004FB9200F26206 /* MyShape.swift in Sources */,
 				2025F10A1D5B226E00561FBF /* P2PHelper.swift in Sources */,
 				2025F0FB1D5B21AC00561FBF /* MyStructs.swift in Sources */,
 				2025F11E1D5B23F600561FBF /* DrawImages.swift in Sources */,

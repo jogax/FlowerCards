@@ -491,11 +491,15 @@ extension GCHelper {
             command += param
         }
         let data = command.data(using: String.Encoding(rawValue: String.Encoding.utf8.rawValue))!
-        try! GCHelper.sharedInstance.match.sendData(toAllPlayers: data , with: .reliable)
+        if match != nil {
+            try! match.sendData(toAllPlayers: data , with: .reliable)
+        } 
     }
     
     public func disconnectFromMatch() {
-        match.disconnect()
+        if match != nil {
+            match.disconnect()
+        }
     }
     
     public func decodeData(data: Data)->(command: CommunicationCommands, parameters: [String]) {

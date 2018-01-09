@@ -174,8 +174,8 @@ let deDictionary: [TextConstants: String] = [
                             "Bitte warten!",
     .tcAllPlayers:          "Autodetect einen Spieler",
     .tcSearchOpponent:      "Suche nach Gegner über Game Center",
-    .tcEnableAutoSearch:    "Aktiviere die automatische Gegner Suche",
-    .tcDisableAutoSearch:    "Deaktiviere die automatische Gegner Suche",
+    .tcEnableAutoSearch:    "Autosuche Ein",
+    .tcDisableAutoSearch:    "Autosuche Aus",
     .tcWantToPlayWithYouGC: "% will mit dir spielen!\r\n" +
                             "Starten das Spiel?",
 ]
