@@ -164,14 +164,23 @@ class CardGameScene:    SKScene,
                         GKGameCenterControllerDelegate,
                         GKMatchDelegate,
                         GKLocalPlayerListener,
-                        GCHelperDelegate {
+GCHelperDelegate {
+    func firstPlaceFounded() {
+        createLabelsForBestPlace()
+    }
+    
+    func myPlaceFounded() {
+        createLabelsForBestPlace()
+    }
+    
     
     enum IAmTheMaster: Int {
         case NoMatter = 0, Yes, No
     }
     var iAmTheMaster: IAmTheMaster = .NoMatter
-    
+    var multiPlayerGameStarted = false
     func startNewGameForMultiplayer() {
+        multiPlayerGameStarted = true
         gameNumber = randomGameNumber()
         createGameRecord(gameNumber: gameNumber)
         let message = [GKLocalPlayer.localPlayer().alias!, String(countPackages), String(levelIndex), String(gameNumber)]
@@ -195,6 +204,8 @@ class CardGameScene:    SKScene,
         opponent.WIFI = false
     }
     
+    var iHaveStoppedTheGame = false
+    
     func match(_ match: GKMatch, didReceive didReceiveData: Data, fromPlayer: String) {
         if match.players[0].alias != nil {
             let (command, parameters) = GCHelper.sharedInstance.decodeData(data: didReceiveData)
@@ -207,25 +218,16 @@ class CardGameScene:    SKScene,
                 if GV.peerToPeerVersion < parameters[1] {
                     
                 }
-                if countPackages < Int(parameters[3])! {
+                if countPackages > Int(parameters[3])! {
                     iAmTheMaster = .Yes
-                } else if countPackages > Int(parameters[3])! {
+                } else if countPackages < Int(parameters[3])! {
                     iAmTheMaster = .No
-                } else if levelIndex < Int(parameters[2])! {
-                    iAmTheMaster = .Yes
                 } else if levelIndex > Int(parameters[2])! {
+                    iAmTheMaster = .Yes
+                } else if levelIndex < Int(parameters[2])! {
                     iAmTheMaster = .No
                 }
                 var text: String
-//                let hisLevelToShow = String(Int(parameters[2])! + 1)
-//                let myLevelToShow = String(self.levelIndex + 1)
-//                if iAmTheMaster == .Yes {
-//                    text = GV.language.getText(.tcIChooseTheParams, values: parameters[0], parameters[3], hisLevelToShow, String(countPackages), myLevelToShow)
-//                } else if iAmTheMaster == .No {
-//                    text = GV.language.getText(.tcPartnerChooseTheParams, values: parameters[0], parameters[3], hisLevelToShow, String(countPackages), myLevelToShow)
-//                } else {
-//                    text = GV.language.getText(.tcPartnerParametersAre, values: parameters[0], GKLocalPlayer.localPlayer().alias!, parameters[3], hisLevelToShow)
-//                }
                 text = GV.language.getText(.tcWantToPlayWithYouGC, values: self.opponent.name)
                 let alert = UIAlertController(title: text,
                                               message: "",
@@ -250,6 +252,8 @@ class CardGameScene:    SKScene,
                 /// continue with my game parameters
                 let noAction = UIAlertAction(title: GV.language.getText(.tcNo), style: .default,
                                               handler: {(paramAction:UIAlertAction!) in
+                                                print("iHaveStoppedTheGame = true")
+                                                self.iHaveStoppedTheGame = true
                                                 GCHelper.sharedInstance.sendInfo(command: .stopCompetition, message: [])
                                                 GCHelper.sharedInstance.disconnectFromMatch()
                                                 self.gameIsStopped()
@@ -278,21 +282,25 @@ class CardGameScene:    SKScene,
     }
     
     func matchEnded(error: String) {
+        print("iHaveStoppedTheGame = \(iHaveStoppedTheGame)")
+        print("\(error)")
         self.gameArt = .singleGame
         self.gameStatus = .Off
-        let alert = UIAlertController(title: error,
-                                      message: "",
-                                      preferredStyle: .alert)
+        if !iHaveStoppedTheGame {
+            let alert = UIAlertController(title: error,
+                                          message: "",
+                                          preferredStyle: .alert)
 
-        let OKAction = UIAlertAction(title: GV.language.getText(.tcok), style: .default,
-                                     handler: {(paramAction:UIAlertAction!) in
-        })
-        alert.addAction(OKAction)
-        
-        DispatchQueue.main.async(execute: {
-            GV.mainViewController!.showAlert(alert)
-        })
-
+            let OKAction = UIAlertAction(title: GV.language.getText(.tcok), style: .default,
+                                         handler: {(paramAction:UIAlertAction!) in
+            })
+            alert.addAction(OKAction)
+            DispatchQueue.main.async(execute: {
+                GV.mainViewController!.showAlert(alert)
+            })
+        } else {
+            iHaveStoppedTheGame = false
+        }
     }
     
     func continueTimeCount() {
@@ -309,10 +317,10 @@ class CardGameScene:    SKScene,
             GV.peerToPeerService!.changeIdentifier(name)
         }
         createLabelsForBestPlace()
-        let gameCounter = realm.objects(GameModel.self).filter("gameFinished = true").count
+        let gameCounter = realm.objects(GameModel.self).filter("played = true").count
         GCHelper.sharedInstance.sendGameCountToGameCenter(gameCount: gameCounter)
         if GV.player!.onlineCompetitionEnabled {
-            GCHelper.sharedInstance.autoFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!, delegate: self)
+            GCHelper.sharedInstance.autoFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!)
             gameStatus = .Searching
         }
     }
@@ -844,6 +852,7 @@ class CardGameScene:    SKScene,
             try! realm.commitWrite()
         }
         countPackages = GV.player!.countPackages
+        GCHelper.sharedInstance.importBestScoreFromGameCenter(countPackages: countPackages, levelID: levelIndex)
         GV.levelsForPlay.setAktLevel(levelIndex)
         specialPrepareFuncFirst()
         if newGame {
@@ -1191,7 +1200,7 @@ class CardGameScene:    SKScene,
         let pkgLabels = [onePkgLabel, twoPkgLabel, threePkgLabel, fourPkgLabel]
         for pkgNr in 1...4 {
             let pkgCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d", GV.player!.ID, pkgNr).count
-            let pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d and gameFinished = false and ID != %d", GV.player!.ID, pkgNr, GV.actGame!.ID).count
+            let pkgErrorCount = realm.objects(GameModel.self).filter("playerID = %d and countPackages = %d and played = false and ID != %d", GV.player!.ID, pkgNr, GV.actGame!.ID).count
             pkgLabels[pkgNr - 1].text = GV.language.getText(.tcPkgTxt, values: "\(pkgNr)", "\(pkgErrorCount)", "\(pkgCount)")
         }
     }
@@ -1575,7 +1584,8 @@ class CardGameScene:    SKScene,
             GV.mainViewController!.showAlert(alert)
         }
         
-        if opponent.finish == .interrupted || opponent.finish == .finished {
+        if (opponent.finish == .interrupted || opponent.finish == .finished) && multiPlayerGameStarted {
+            multiPlayerGameStarted = false
             animateFinishGame()
             opponent.finish = .none
         }
@@ -1873,7 +1883,7 @@ class CardGameScene:    SKScene,
         
         if cardCount == 0 { // Level completed, start a new game
             let (timeBonus, highScore) = calculateHighScore(score: levelScore)
-
+            multiPlayerGameStarted = false
             stopTimer(&countUpTimer)
             playMusic("Winner", volume: GV.player!.musicVolume, loops: 0)
             playerCardCountLabel.text = "0"
@@ -1953,11 +1963,11 @@ class CardGameScene:    SKScene,
         GV.actGame!.playerScore = levelScore
         GV.actGame!.played = true
         GV.actGame!.created = Date()
-        if cardCount > 0 {
-            GV.actGame!.gameFinished = false
-        } else {
-            GV.actGame!.gameFinished = true
-        }
+//        if cardCount > 0 {
+//            GV.actGame!.gameFinished = false
+//        } else {
+//            GV.actGame!.gameFinished = true
+//        }
         if gameArt == .multiGame {
             GV.actGame!.multiPlay = true
             GV.actGame!.opponentName = opponent.name
@@ -1983,7 +1993,7 @@ class CardGameScene:    SKScene,
                                                   handler: {(paramAction:UIAlertAction!) in
                                                     self.gameStatus = .Searching
 
-                                                    GCHelper.sharedInstance.autoFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!, delegate: self)
+                                                    GCHelper.sharedInstance.autoFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!)
 
             })
             alert.addAction(onlineGameAction)
@@ -2341,6 +2351,7 @@ class CardGameScene:    SKScene,
                 GV.peerToPeerService!.changeStatusToFree()
             } else {
                 GCHelper.sharedInstance.sendInfo(command: .stopCompetition, message: [])
+                iHaveStoppedTheGame = true
                 GCHelper.sharedInstance.disconnectFromMatch()
             }
             opponent.finish = .interrupted
@@ -3401,7 +3412,7 @@ class CardGameScene:    SKScene,
                             GV.player!.onlineCompetitionEnabled = !GV.player!.onlineCompetitionEnabled
                         })
                         if GV.player!.onlineCompetitionEnabled {
-                            GCHelper.sharedInstance.autoFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!, delegate: self)
+                            GCHelper.sharedInstance.autoFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!)
                             self.gameStatus = .Searching
                             print("Gamestatus = Searching")
                         } else {
@@ -3633,6 +3644,7 @@ class CardGameScene:    SKScene,
             opponent.timeBonus = Int(parameters[1])!
             opponent.highScore = Int(parameters[2])!
             opponent.finish = .finished // save in update!!!
+            highScore = levelScore
             saveResults()
             alertOpponentHasGameFinished()
         }
@@ -3642,7 +3654,9 @@ class CardGameScene:    SKScene,
     func gameIsStopped() {
         if gameArt == .multiGame {
             opponent.finish = .interrupted
-            alertStopCompetetion()
+            if !iHaveStoppedTheGame {
+                alertStopCompetetion()
+            }
             gameArt = .singleGame
             gameStatus = .Off
             if opponent.WIFI {
@@ -3683,7 +3697,7 @@ class CardGameScene:    SKScene,
     }
     
     func alertStopCompetetion() {
-        let alert = UIAlertController(title: GV.language.getText(.tcOpponentStoppedTheGame,
+        let alert = UIAlertController(title: GV.language.getText((multiPlayerGameStarted ? .tcOpponentStoppedTheGame : .tcOpponentNotPlay),
             values: self.opponent.name),
           message: "",
           preferredStyle: .alert)

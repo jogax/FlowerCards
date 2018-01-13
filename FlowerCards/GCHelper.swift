@@ -43,6 +43,8 @@ public protocol GCHelperDelegate: class {
     func matchEnded(error: String)
     func localPlayerAuthenticated()
     func continueTimeCount()
+    func firstPlaceFounded()
+    func myPlaceFounded()
 }
 
 /// A GCHelper instance represents a wrapper around a GameKit match.
@@ -169,11 +171,11 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
      :param: viewController The view controller to present required GameKit view controllers from.
      :param: delegate The delegate receiving data from GCHelper.
      */
-    public func findMatchWithMinPlayers(_ minPlayers: Int, maxPlayers: Int, viewController: UIViewController, delegate theDelegate: GCHelperDelegate) {
+    public func findMatchWithMinPlayers(_ minPlayers: Int, maxPlayers: Int, viewController: UIViewController) {
         matchStarted = false
         match = nil
         presentingViewController = viewController
-        delegate = theDelegate
+//        delegate = theDelegate
         presentingViewController.dismiss(animated: false, completion: nil)
         
         let request = GKMatchRequest()
@@ -186,11 +188,11 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         presentingViewController.present(mmvc, animated: true, completion: nil)
     }
     
-    public func customFindMatchWithMinPlayers(_ minPlayers: Int, maxPlayers: Int, viewController: UIViewController, delegate theDelegate: GCHelperDelegate) {
+    public func customFindMatchWithMinPlayers(_ minPlayers: Int, maxPlayers: Int, viewController: UIViewController) {
         matchStarted = false
         match = nil
         presentingViewController = viewController
-        delegate = theDelegate
+//        delegate = theDelegate
         presentingViewController.dismiss(animated: false, completion: nil)
         
         let waitAlert = UIAlertController(title: GV.language.getText(.tcWaitForOpponent),
@@ -226,11 +228,11 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         })
     }
 
-    public func autoFindMatchWithMinPlayers(_ minPlayers: Int, maxPlayers: Int, viewController: UIViewController, delegate theDelegate: GCHelperDelegate) {
+    public func autoFindMatchWithMinPlayers(_ minPlayers: Int, maxPlayers: Int, viewController: UIViewController) {
         matchStarted = false
         match = nil
         presentingViewController = viewController
-        delegate = theDelegate
+//        delegate = theDelegate
         presentingViewController.dismiss(animated: false, completion: nil)
         let searchAlert = UIAlertController(title: GV.language.getText(.tcSearchOpponent),
                                           message: "",
@@ -524,7 +526,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                         actHighScore.sentToGameCenter = true
                         try! myBackgroundRealm.commitWrite()
                     }
-                    self.importBestScoreFromGameCenter(countPackages: countPackages, levelID: levelID)
+//                    self.importBestScoreFromGameCenter(countPackages: countPackages, levelID: levelID)
                 }
             }
             //            print("This is run on the background queue")
@@ -563,7 +565,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         }
     }
     
-    private func importBestScoreFromGameCenter(countPackages: Int, levelID: Int) {
+    func importBestScoreFromGameCenter(countPackages: Int, levelID: Int) {
         //        if GKLocalPlayer.localPlayer().isAuthenticated == false {return}
         let leaderboardID = "P\(countPackages)L\(levelID + 1)"
         //        print("Downloading Score for leaderboardID: \(leaderboardID) started")
@@ -587,6 +589,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                     }
                     //                    print("Bestplayer: \(actResult.bestPlayerName) with score: \(actResult.bestPlayerHighScore) saved to \(leaderboardID)")
                     try! realm.commitWrite()
+                    self.delegate?.myPlaceFounded()
                 }
             }
         })
@@ -611,6 +614,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                     }
                     //                    print("Bestplayer: \(actResult.bestPlayerName) with score: \(actResult.bestPlayerHighScore) saved to \(leaderboardID)")
                     try! realm.commitWrite()
+                    self.delegate?.myPlaceFounded()
                 }
             }
         })
