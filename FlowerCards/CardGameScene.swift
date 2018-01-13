@@ -323,6 +323,7 @@ GCHelperDelegate {
             GCHelper.sharedInstance.autoFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!)
             gameStatus = .Searching
         }
+        GCHelper.sharedInstance.importBestScoreFromGameCenter(countPackages: countPackages, levelID: levelIndex)
     }
     
 
