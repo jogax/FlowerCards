@@ -82,24 +82,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        print("DEVICE TOKEN = \(String(describing: deviceToken.hexString))")
-    }
-    
-    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        print(error)
-    }
-    
-    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        
-        completionHandler(UIBackgroundFetchResult.noData)
-        print("\(userInfo.description)")
-        
-        UserDefaults.standard.set(true, forKey: "didReceiveRemoteNotification")
-        UserDefaults.standard.synchronize()
-        
-        
-    }
+//    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+//        print("DEVICE TOKEN = \(String(describing: deviceToken.hexString))")
+//    }
+//    
+//    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+//        print(error)
+//    }
+//    
+//    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+//        
+//        completionHandler(UIBackgroundFetchResult.noData)
+//        print("\(userInfo.description)")
+//        
+//        UserDefaults.standard.set(true, forKey: "didReceiveRemoteNotification")
+//        UserDefaults.standard.synchronize()
+//        
+//        
+//    }
     
 //    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
 //        print(userInfo)
