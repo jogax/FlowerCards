@@ -118,7 +118,7 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
         
         if GV.deviceType != iPhone_X {
 //            navigationController?.preferredStatusBarStyle = .lightContent
-            UIApplication.shared.statusBarStyle = .lightContent
+//            UIApplication.shared.preferredStatusBarStyle = .lightContent
         }
 
         

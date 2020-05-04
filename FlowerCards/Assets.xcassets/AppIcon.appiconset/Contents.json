@@ -1,116 +1,116 @@
 {
   "images" : [
     {
-      "size" : "20x20",
+      "filename" : "AppIcon40.png",
       "idiom" : "iphone",
-      "filename" : "FlyingFlowersAppIcon40-1.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "20x20"
     },
     {
-      "size" : "20x20",
+      "filename" : "AppIcon60.png",
       "idiom" : "iphone",
-      "filename" : "FlyingFlowersAppIcon60.png",
-      "scale" : "3x"
+      "scale" : "3x",
+      "size" : "20x20"
     },
     {
-      "size" : "29x29",
+      "filename" : "AppIcon58.png",
       "idiom" : "iphone",
-      "filename" : "FlyingFlowersAppIcon58.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "29x29"
     },
     {
-      "size" : "29x29",
+      "filename" : "AppIcon87.png",
       "idiom" : "iphone",
-      "filename" : "FlyingFlowersAppIcon87.png",
-      "scale" : "3x"
+      "scale" : "3x",
+      "size" : "29x29"
     },
     {
-      "size" : "40x40",
+      "filename" : "AppIcon80.png",
       "idiom" : "iphone",
-      "filename" : "FlyingFlowersAppIcon80.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "40x40"
     },
     {
-      "size" : "40x40",
+      "filename" : "AppIcon120.png",
       "idiom" : "iphone",
-      "filename" : "FlyingFlowersAppIcon120.png",
-      "scale" : "3x"
+      "scale" : "3x",
+      "size" : "40x40"
     },
     {
-      "size" : "60x60",
+      "filename" : "AppIcon120-1.png",
       "idiom" : "iphone",
-      "filename" : "FlyingFlowersAppIcon120-1.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "60x60"
     },
     {
-      "size" : "60x60",
+      "filename" : "AppIcon180.png",
       "idiom" : "iphone",
-      "filename" : "FlyingFlowersAppIcon180.png",
-      "scale" : "3x"
+      "scale" : "3x",
+      "size" : "60x60"
     },
     {
-      "size" : "20x20",
+      "filename" : "AppIcon20.png",
       "idiom" : "ipad",
-      "filename" : "FlyingFlowersAppIcon20.png",
-      "scale" : "1x"
+      "scale" : "1x",
+      "size" : "20x20"
     },
     {
-      "size" : "20x20",
+      "filename" : "AppIcon40-1.png",
       "idiom" : "ipad",
-      "filename" : "FlyingFlowersAppIcon40-2.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "20x20"
     },
     {
-      "size" : "29x29",
+      "filename" : "AppIcon29.png",
       "idiom" : "ipad",
-      "filename" : "FlyingFlowersAppIcon29.png",
-      "scale" : "1x"
+      "scale" : "1x",
+      "size" : "29x29"
     },
     {
-      "size" : "29x29",
+      "filename" : "AppIcon58-1.png",
       "idiom" : "ipad",
-      "filename" : "FlyingFlowersAppIcon58-1.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "29x29"
     },
     {
-      "size" : "40x40",
+      "filename" : "AppIcon40-2.png",
       "idiom" : "ipad",
-      "filename" : "FlyingFlowersAppIcon40.png",
-      "scale" : "1x"
+      "scale" : "1x",
+      "size" : "40x40"
     },
     {
-      "size" : "40x40",
+      "filename" : "AppIcon80-1.png",
       "idiom" : "ipad",
-      "filename" : "FlyingFlowersAppIcon80-1.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "40x40"
     },
     {
-      "size" : "76x76",
+      "filename" : "AppIcon76.png",
       "idiom" : "ipad",
-      "filename" : "FlyingFlowersAppIcon76.png",
-      "scale" : "1x"
+      "scale" : "1x",
+      "size" : "76x76"
     },
     {
-      "size" : "76x76",
+      "filename" : "AppIcon152.png",
       "idiom" : "ipad",
-      "filename" : "FlyingFlowersAppIcon152.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "76x76"
     },
     {
-      "size" : "83.5x83.5",
+      "filename" : "AppIcon167.png",
       "idiom" : "ipad",
-      "filename" : "FlyingFlowersAppIcon167.png",
-      "scale" : "2x"
+      "scale" : "2x",
+      "size" : "83.5x83.5"
     },
     {
-      "size" : "1024x1024",
+      "filename" : "AppIcon1024.png",
       "idiom" : "ios-marketing",
-      "filename" : "FlyingFlowersAppIcon1024-1.png",
-      "scale" : "1x"
+      "scale" : "1x",
+      "size" : "1024x1024"
     }
   ],
   "info" : {
-    "version" : 1,
-    "author" : "xcode"
+    "author" : "xcode",
+    "version" : 1
   }
 }

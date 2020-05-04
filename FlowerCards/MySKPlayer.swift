@@ -176,8 +176,8 @@
                 let newIndex = indexOfPlayerID(newActPlayer!.ID)
                 nameTable[oldIndex!].isActPlayer = false
                 nameTable[newIndex!].isActPlayer = true
-                realm.add(oldActPlayer!, update: true)
-                realm.add(newActPlayer!, update: true)
+//                realm.add(oldActPlayer!, update: true)
+//                realm.add(newActPlayer!, update: true)
                 GV.player = newActPlayer
             })
             GV.language.setLanguage(GV.player!.aktLanguageKey)
@@ -277,7 +277,7 @@
                     realm.delete(playerToDelete)
                     let playerToSetActPlayer = nameTable[0]
                     playerToSetActPlayer.isActPlayer = true
-                    realm.add(playerToSetActPlayer, update: true)
+//                    realm.add(playerToSetActPlayer, update: true)
                     GV.player = playerToSetActPlayer
                     //                        nameTable.removeAtIndex(nameTableIndex)
                 })

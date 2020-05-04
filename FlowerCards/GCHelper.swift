@@ -93,7 +93,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     // MARK: Private functions
     
     @objc fileprivate func authenticationChanged() {
-        if GKLocalPlayer.localPlayer().isAuthenticated && !authenticated {
+        if GKLocalPlayer.local.isAuthenticated && !authenticated {
             authenticated = true
         } else {
             authenticated = false
@@ -102,7 +102,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     
     fileprivate func lookupPlayers() {
         print ("\(match.players.count)")
-        let playerIDs = match.players.map { $0.playerID } as! [String]
+        let playerIDs = match.players.map { $0.playerID } 
         
         GKPlayer.loadPlayers(forIdentifiers: playerIDs) { (players, error) in
             guard error == nil else {
@@ -120,7 +120,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             
             for player in players {
                 print("Found player: \(String(describing: player.alias))")
-                self.playersDict[player.playerID!] = player
+                self.playersDict[player.playerID] = player
             }
             
             self.matchStarted = true
@@ -144,8 +144,8 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
 //        }
 //        print("Authenticating local user...")
         authenticateStatus = .authenticatingInProgress
-        if GKLocalPlayer.localPlayer().isAuthenticated == false {
-            GKLocalPlayer.localPlayer().authenticateHandler = { (view, error) in
+        if GKLocalPlayer.local.isAuthenticated == false {
+            GKLocalPlayer.local.authenticateHandler = { (view, error) in
                 guard error == nil else {
                     print("Authentication error: \(String(describing: error?.localizedDescription))")
                     return
@@ -155,8 +155,8 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                 self.authenticated = true
                 self.getAllPlayers()
                 self.startGameCenterSync()
-                GKLocalPlayer.localPlayer().unregisterAllListeners()
-                GKLocalPlayer.localPlayer().register(self)
+                GKLocalPlayer.local.unregisterAllListeners()
+                GKLocalPlayer.local.register(self)
             }
         } else {
 //            print("Already authenticated")
@@ -305,8 +305,9 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             }
             
             for achievement in achievements {
-                if let id = achievement.identifier {
-                    self.achievements[id] = achievement
+                let id: String? = achievement.identifier
+                if id != nil {
+                    self.achievements[id!] = achievement
                 }
             }
             
@@ -415,11 +416,11 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         }
         
         switch state {
-        case .stateConnected where !matchStarted && theMatch.expectedPlayerCount == 0:
+        case .connected where !matchStarted && theMatch.expectedPlayerCount == 0:
             lookupPlayers()
-        case .stateDisconnected:
+        case .disconnected:
             matchStarted = false
-            guard let playerName = playersDict[playerID]?.alias! else {
+            guard let playerName = playersDict[playerID]?.alias else {
                 print("playerName is empty!")
                 break
             }
@@ -465,27 +466,26 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                         (scores, error) in
                         if scores != nil {
                             for score in scores! {
-                                if let playerID = score.player!.playerID {
-                                    if GV.gkPlayers[playerID] == nil {
-                                        GV.gkPlayers[playerID] = score.player!
+                                let playerID = score.player.playerID
+                                if GV.gkPlayers[playerID] == nil {
+                                    GV.gkPlayers[playerID] = score.player
+                                }
+                                let foundedPlayers = myBackgroundRealm.objects(GCPlayerModel.self).filter("playerID = %d", playerID)
+                                myBackgroundRealm.beginWrite()
+                                if foundedPlayers.count == 0 {
+                                    let playerObject = GCPlayerModel()
+                                    playerObject.playerID = playerID
+                                    playerObject.name = score.player.alias
+                                    playerObject.isMyFriend = false
+                                    myBackgroundRealm.add(playerObject)
+                                } else {
+                                    if foundedPlayers.first!.name != score.player.alias {
+                                        foundedPlayers.first!.name = score.player.alias
                                     }
-                                    let foundedPlayers = myBackgroundRealm.objects(GCPlayerModel.self).filter("playerID = %d", playerID)
-                                    myBackgroundRealm.beginWrite()
-                                    if foundedPlayers.count == 0 {
-                                        let playerObject = GCPlayerModel()
-                                        playerObject.playerID = playerID
-                                        playerObject.name = score.player!.alias!
-                                        playerObject.isMyFriend = false
-                                        myBackgroundRealm.add(playerObject)
-                                    } else {
-                                        if foundedPlayers.first!.name != score.player!.alias! {
-                                            foundedPlayers.first!.name = score.player!.alias!
-                                        }
-                                    }
-                                    try! myBackgroundRealm.commitWrite()
-                                    if self.allPlayers[playerID] == nil {
-                                        self.allPlayers[playerID] = score.player!
-                                    }
+                                }
+                                try! myBackgroundRealm.commitWrite()
+                                if self.allPlayers[playerID] == nil {
+                                    self.allPlayers[playerID] = score.player
                                 }
                             }
                         }
@@ -497,7 +497,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     var timer: Timer?
     
     @objc private func waitForLocalPlayer() {
-        if GKLocalPlayer.localPlayer().isAuthenticated == false {
+        if GKLocalPlayer.local.isAuthenticated == false {
             timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(waitForLocalPlayer), userInfo: nil, repeats: false)
         } else {
             startSyncWithGameCenter()
@@ -540,7 +540,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     }
     public func sendScoreToGameCenter(score: Int, countPackages: Int, levelID: Int) {
         // Submit score to GC leaderboard
-        let bestScore = GKScore(leaderboardIdentifier: "P\(countPackages)L\(levelID + 1)", player: GKLocalPlayer.localPlayer())
+        let bestScore = GKScore(leaderboardIdentifier: "P\(countPackages)L\(levelID + 1)", player: GKLocalPlayer.local)
         bestScore.value = Int64(score)
         let scoreArray = [bestScore]
         GKScore.report(scoreArray) { (error) in
@@ -553,7 +553,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     }
     
     public func sendGameCountToGameCenter(gameCount: Int) {
-        let bestGameCount = GKScore(leaderboardIdentifier: "GC", player: GKLocalPlayer.localPlayer())
+        let bestGameCount = GKScore(leaderboardIdentifier: "GC", player: GKLocalPlayer.local)
         bestGameCount.value = Int64(gameCount)
         let countArray = [bestGameCount]
         GKScore.report(countArray) { (error) in
@@ -570,7 +570,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         let leaderboardID = "P\(countPackages)L\(levelID + 1)"
         //        print("Downloading Score for leaderboardID: \(leaderboardID) started")
         // first downloading my Rank
-        let myLeaderBoard = GKLeaderboard(players: [GKLocalPlayer.localPlayer()])
+        let myLeaderBoard = GKLeaderboard(players: [GKLocalPlayer.local])
         myLeaderBoard.identifier = leaderboardID
         myLeaderBoard.loadScores(completionHandler: {
             (scores, error) in
@@ -606,7 +606,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                     let myRealm = try! Realm()
                     let actResult = myRealm.objects(HighScoreModel.self).filter("countPackages = %d and levelID = %d", countPackages, levelID).first!
                     realm.beginWrite()
-                    actResult.bestPlayerName = (scores?.first!.player?.alias)!
+                    actResult.bestPlayerName = (scores?.first!.player.alias)!
                     if let intValue = scores?.first!.value {
                         actResult.bestPlayerHighScore = Int(intValue)
                     } else {

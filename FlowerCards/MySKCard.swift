@@ -73,11 +73,11 @@ class MySKCard: SKSpriteNode {
     }
     
     struct CardIndex: Hashable {
-        var hashValue: Int {
-            get {
-                return packageIndex * 1000 + colorIndex * 100 + origValue
-            }
-        }
+//        var hashValue: Int {
+//            get {
+//                return packageIndex * 1000 + colorIndex * 100 + origValue
+//            }
+//        }
         var packageIndex: Int
         var colorIndex: Int
         var origValue: Int

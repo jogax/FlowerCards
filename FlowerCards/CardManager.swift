@@ -745,7 +745,7 @@ class CardManager {
         }
         tippArray.sort(by: {checkForSort(t0: $0, t1: $1) })
         let createTippsEndedAt = Date()
-        tippArrayCreatedInSeconds = CFDateGetTimeIntervalSinceDate(createTippsEndedAt as CFDate!, createTippsStartedAt as CFDate!)
+        tippArrayCreatedInSeconds = CFDateGetTimeIntervalSinceDate(createTippsEndedAt as CFDate?, createTippsStartedAt as CFDate?)
         tippIndex = 0
     }
     
@@ -1739,7 +1739,7 @@ class CardManager {
                         if cardIndex == NoValue || packageIndex > countPackages - 1 {
                             cardMap[mapIndex] = Array(repeating: Array(repeating: NoValue, count: CountCardsInPackage), count: countPackages)
                             if cardMapIndexes.contains(mapIndex) {
-                                let indexToRemove = cardMapIndexes.index(of: mapIndex)
+                                let indexToRemove = cardMapIndexes.firstIndex(of: mapIndex)
                                 cardMapIndexes.remove(at: indexToRemove!)
                             }
 
@@ -1753,7 +1753,7 @@ class CardManager {
                         } else {
                             cardMap[mapIndex] = Array(repeating: Array(repeating: NoValue, count: CountCardsInPackage), count: countPackages)
                             if cardMapIndexes.contains(mapIndex) {
-                                let indexToRemove = cardMapIndexes.index(of: mapIndex)
+                                let indexToRemove = cardMapIndexes.firstIndex(of: mapIndex)
                                 cardMapIndexes.remove(at: indexToRemove!)
                             }
                             return

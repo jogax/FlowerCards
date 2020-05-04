@@ -183,7 +183,7 @@ GCHelperDelegate {
         multiPlayerGameStarted = true
         gameNumber = randomGameNumber()
         createGameRecord(gameNumber: gameNumber)
-        let message = [GKLocalPlayer.localPlayer().alias!, String(countPackages), String(levelIndex), String(gameNumber)]
+        let message = [GKLocalPlayer.local.alias, String(countPackages), String(levelIndex), String(gameNumber)]
         if opponent.WIFI {
             GV.peerToPeerService!.sendInfo(command: .startGame, message: message, toPeer: opponent.peerID!)
         } else {
@@ -195,7 +195,7 @@ GCHelperDelegate {
  
     func matchStarted() {
         let myDevice = UIDevice.current.model
-        let myParameters: [String] = [GKLocalPlayer.localPlayer().alias!, GV.peerToPeerVersion, String(self.levelIndex), String(countPackages), "0", myDevice ]
+        let myParameters: [String] = [GKLocalPlayer.local.alias, GV.peerToPeerVersion, String(self.levelIndex), String(countPackages), "0", myDevice ]
         GCHelper.sharedInstance.sendInfo(command: CommunicationCommands.iWantToPlayWithYou, message: myParameters)
         
         /// The player with higher playerID is the master
@@ -207,77 +207,75 @@ GCHelperDelegate {
     var iHaveStoppedTheGame = false
     
     func match(_ match: GKMatch, didReceive didReceiveData: Data, fromPlayer: String) {
-        if match.players[0].alias != nil {
-            let (command, parameters) = GCHelper.sharedInstance.decodeData(data: didReceiveData)
-            print("match did Receive Data: Command: \(command)\r\n, Parameters: \(parameters)")
-            switch command {
-            case .iWantToPlayWithYou:
-                GV.mainViewController!.stopAlert()
-                iAmTheMaster = .NoMatter
-                self.opponent.name = parameters[0]
-                if GV.peerToPeerVersion < parameters[1] {
-                    
-                }
-                if countPackages > Int(parameters[3])! {
-                    iAmTheMaster = .Yes
-                } else if countPackages < Int(parameters[3])! {
-                    iAmTheMaster = .No
-                } else if levelIndex > Int(parameters[2])! {
-                    iAmTheMaster = .Yes
-                } else if levelIndex < Int(parameters[2])! {
-                    iAmTheMaster = .No
-                }
-                var text: String
-                text = GV.language.getText(.tcWantToPlayWithYouGC, values: self.opponent.name)
-                let alert = UIAlertController(title: text,
-                                              message: "",
-                                              preferredStyle: .alert)
+        let (command, parameters) = GCHelper.sharedInstance.decodeData(data: didReceiveData)
+        print("match did Receive Data: Command: \(command)\r\n, Parameters: \(parameters)")
+        switch command {
+        case .iWantToPlayWithYou:
+            GV.mainViewController!.stopAlert()
+            iAmTheMaster = .NoMatter
+            self.opponent.name = parameters[0]
+            if GV.peerToPeerVersion < parameters[1] {
                 
-                
-                let yesAction = UIAlertAction(title: GV.language.getText(.tcYes), style: .default,
-                                             handler: {(paramAction:UIAlertAction!) in
-                                                if self.iAmTheMaster == .No {
-                                                    ///  Copy partners game parameters to me - setting the lower level
+            }
+            if countPackages > Int(parameters[3])! {
+                iAmTheMaster = .Yes
+            } else if countPackages < Int(parameters[3])! {
+                iAmTheMaster = .No
+            } else if levelIndex > Int(parameters[2])! {
+                iAmTheMaster = .Yes
+            } else if levelIndex < Int(parameters[2])! {
+                iAmTheMaster = .No
+            }
+            var text: String
+            text = GV.language.getText(.tcWantToPlayWithYouGC, values: self.opponent.name)
+            let alert = UIAlertController(title: text,
+                                          message: "",
+                                          preferredStyle: .alert)
+            
+            
+            let yesAction = UIAlertAction(title: GV.language.getText(.tcYes), style: .default,
+                                         handler: {(paramAction:UIAlertAction!) in
+                                            if self.iAmTheMaster == .No {
+                                                ///  Copy partners game parameters to me - setting the lower level
 
-                                                    realm.beginWrite()
-                                                        GV.player!.countPackages = Int(parameters[3])!
-                                                        GV.player!.levelID = Int(parameters[2])!
-                                                        self.levelIndex = GV.player!.levelID
-                                                        countPackages = GV.player!.countPackages
-                                                    try! realm.commitWrite()
-                                                }
-                                                self.startNewGameForMultiplayer()
-                })
-                alert.addAction(yesAction)
-                /// continue with my game parameters
-                let noAction = UIAlertAction(title: GV.language.getText(.tcNo), style: .default,
-                                              handler: {(paramAction:UIAlertAction!) in
-                                                print("iHaveStoppedTheGame = true")
-                                                self.iHaveStoppedTheGame = true
-                                                GCHelper.sharedInstance.sendInfo(command: .stopCompetition, message: [])
-                                                GCHelper.sharedInstance.disconnectFromMatch()
-                                                self.gameIsStopped()
-                })
-                alert.addAction(noAction)
-                GV.mainViewController!.present(alert, animated: true, completion: {})
+                                                realm.beginWrite()
+                                                    GV.player!.countPackages = Int(parameters[3])!
+                                                    GV.player!.levelID = Int(parameters[2])!
+                                                    self.levelIndex = GV.player!.levelID
+                                                    countPackages = GV.player!.countPackages
+                                                try! realm.commitWrite()
+                                            }
+                                            self.startNewGameForMultiplayer()
+            })
+            alert.addAction(yesAction)
+            /// continue with my game parameters
+            let noAction = UIAlertAction(title: GV.language.getText(.tcNo), style: .default,
+                                          handler: {(paramAction:UIAlertAction!) in
+                                            print("iHaveStoppedTheGame = true")
+                                            self.iHaveStoppedTheGame = true
+                                            GCHelper.sharedInstance.sendInfo(command: .stopCompetition, message: [])
+                                            GCHelper.sharedInstance.disconnectFromMatch()
+                                            self.gameIsStopped()
+            })
+            alert.addAction(noAction)
+            GV.mainViewController!.present(alert, animated: true, completion: {})
 //                DispatchQueue.main.async(execute: {
 //                    GV.mainViewController!.showAlert(alert)
 //                })
 
-            case .myNameIs:
-                opponent.name = parameters[0]
-            case .startGame:
-//                GCHelper.sharedInstance.sendInfo(command: CommunicationCommands.myNameIs, message: [GKLocalPlayer.localPlayer().alias!])
-                opponent.WIFI = false
-                prepareNewMultiGame(parameters: parameters)
-            case .myScoreHasChanged:
-                updateScore(parameters: parameters)
-            case .stopCompetition:
-                self.gameIsStopped()
-            case .gameIsFinished:
-                gameIsFinished(parameters: parameters)
-            default: break
-            }
+        case .myNameIs:
+            opponent.name = parameters[0]
+        case .startGame:
+//                GCHelper.sharedInstance.sendInfo(command: CommunicationCommands.myNameIs, message: [GKLocalPlayer.local.alias!])
+            opponent.WIFI = false
+            prepareNewMultiGame(parameters: parameters)
+        case .myScoreHasChanged:
+            updateScore(parameters: parameters)
+        case .stopCompetition:
+            self.gameIsStopped()
+        case .gameIsFinished:
+            gameIsFinished(parameters: parameters)
+        default: break
         }
     }
     
@@ -313,9 +311,9 @@ GCHelperDelegate {
         realm.beginWrite()
         GV.player!.GCEnabled = GCEnabledType.GameCenterEnabled.rawValue
         try! realm.commitWrite()
-        if let name = GKLocalPlayer.localPlayer().alias {
-            GV.peerToPeerService!.changeIdentifier(name)
-        }
+        let name = GKLocalPlayer.local.alias
+        GV.peerToPeerService!.changeIdentifier(name)
+
         createLabelsForBestPlace()
         let gameCounter = realm.objects(GameModel.self).filter("played = true").count
         GCHelper.sharedInstance.sendGameCountToGameCenter(gameCount: gameCounter)
@@ -758,7 +756,7 @@ GCHelperDelegate {
                     if GCHelper.sharedInstance.authenticateStatus == GCHelper.AuthenticatingStatus.notAuthenticated {
                         GCHelper.sharedInstance.authenticateLocalUser(theDelegate: self)
                     }
-//                    if GKLocalPlayer.localPlayer().isAuthenticated {
+//                    if GKLocalPlayer.local.isAuthenticated {
 //                        gameCenterSync.startGameCenterSync()
 //                    } else {
 //                        // when not authenticated, set to GC Not enabled
@@ -1292,9 +1290,7 @@ GCHelperDelegate {
     func getName() -> String {
         var name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
         if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
-            if GKLocalPlayer.localPlayer().alias != nil {
-                name = GKLocalPlayer.localPlayer().alias!
-            }
+            name = GKLocalPlayer.local.alias
         }
         return name
     }
@@ -1413,7 +1409,7 @@ GCHelperDelegate {
 //                self.movingCards.append(card)
             }
             let actionRemoveCardFromMovingCards = SKAction.run {
-                self.movingCards.remove(at: self.movingCards.index(where: { $0 === card })!)
+                self.movingCards.remove(at: self.movingCards.firstIndex(where: { $0 === card })!)
             }
             card.run(SKAction.sequence([actionAddCardToMovingCards, waitingAction, zPositionPlus, actionMoveAndFadeIn, zPositionMinus, actionHideEmptyCard, /*actionCountMovingCards,*/ actionRemoveCardFromMovingCards]), withKey: "index")
             if cardStack.count(type: .MySKCardType) == 0 {
@@ -1659,7 +1655,7 @@ GCHelperDelegate {
             self.movingCards.append(card)
         }
         let actionRemoveCardFromMovingCards = SKAction.run {
-            self.movingCards.remove(at: self.movingCards.index(where: { $0 === card })!)
+            self.movingCards.remove(at: self.movingCards.firstIndex(where: { $0 === card })!)
         }
         let allActions = SKAction.group([moveToContainerAction, rotateAction])
         let action = SKAction.sequence([actionAddCardToMovingCards, allActions, hideAction, countAction, actionRemoveCardFromMovingCards])
@@ -1938,7 +1934,7 @@ GCHelperDelegate {
         if levelOldHighScore.bestPlayerHighScore < highScore {
             realm.beginWrite()
             levelOldHighScore.bestPlayerHighScore = highScore
-            levelOldHighScore.bestPlayerName = GKLocalPlayer.localPlayer().alias!
+            levelOldHighScore.bestPlayerName = GKLocalPlayer.local.alias
             try! realm.commitWrite()
         }
         
@@ -2037,7 +2033,7 @@ GCHelperDelegate {
         let gameNumber = randomGameNumber()
         opponent.peerID = peerID
         let myName = getName()
-        var answer = GV.peerToPeerService!.sendMessage(command: .iWantToPlayWithYou, message: [myName, GV.peerToPeerVersion, String(levelIndex), String(countPackages), String(gameNumber)], toPeer: peerID)
+        let answer = GV.peerToPeerService!.sendMessage(command: .iWantToPlayWithYou, message: [myName, GV.peerToPeerVersion, String(levelIndex), String(countPackages), String(gameNumber)], toPeer: peerID)
         switch answer[0] {
         case answerYes:
             self.gameArt = .multiGame
@@ -2223,7 +2219,7 @@ GCHelperDelegate {
                                                                 
                                                                 self.connectToGameCenter()
                                                                 try! realm.write({
-                                                                    if GKLocalPlayer.localPlayer().isAuthenticated {
+                                                                    if GKLocalPlayer.local.isAuthenticated {
                                                                         GV.player!.GCEnabled = GCEnabledType.GameCenterEnabled.rawValue
                                                                     }
                                                                 })
@@ -2377,7 +2373,6 @@ GCHelperDelegate {
         }
         try! realm.write({
             GV.player!.levelID = levelIndex
-            realm.add(GV.player!, update: true)
         })
         
     }
@@ -2526,7 +2521,7 @@ GCHelperDelegate {
                             self.movingCards.append(cardToPush)
                         }
                         let actionRemoveCardFromMovingCards = SKAction.run {
-                            self.movingCards.remove(at: self.movingCards.index(where: { $0 === cardToPush })!)
+                            self.movingCards.remove(at: self.movingCards.firstIndex(where: { $0 === cardToPush })!)
                         }
                         cardToPush.run(SKAction.sequence([actionAddCardToMovingCards,actionMove, removeOldCard, actionRemoveCardFromMovingCards]))
                     }
@@ -2639,7 +2634,7 @@ GCHelperDelegate {
                         self.movingCards.append(card)
                     }
                     let actionRemoveCardFromMovingCards = SKAction.run {
-                        self.movingCards.remove(at: self.movingCards.index(where: { $0 === card })!)
+                        self.movingCards.remove(at: self.movingCards.firstIndex(where: { $0 === card })!)
                     }
                     actionMoveArray.insert(actionAddCardToMovingCards, at: 0)
                     actionMoveArray.append(actionRemoveCardFromMovingCards)
@@ -3087,7 +3082,7 @@ GCHelperDelegate {
             self.movingCards.append(self.movedFromNode)
         }
         let actionRemoveCardFromMovingCards = SKAction.run {
-            self.movingCards.remove(at: self.movingCards.index(where: { $0 === self.movedFromNode })!)
+            self.movingCards.remove(at: self.movingCards.firstIndex(where: { $0 === self.movedFromNode })!)
         }
         actionArray.insert(actionAddCardToMovingCards, at: 0)
         actionArray.append(actionRemoveCardFromMovingCards)
@@ -3444,8 +3439,9 @@ GCHelperDelegate {
     func comeBackFromSettings() {
         playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
         var myName = ""
-        if let name = GKLocalPlayer.localPlayer().alias {
-            myName = name
+        let name: String? = GKLocalPlayer.local.alias
+        if name != nil {
+            myName = name!
         } else {
             myName = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
         }
