@@ -33,6 +33,12 @@
 		<string>armv7</string>
 		<string>gamekit</string>
 	</array>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_flowercards._tcp</string>
+	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Exchange data with nearby devices running the FlowerCards app.</string>
 	<key>UIRequiresFullScreen</key>
 	<true/>
 	<key>UIStatusBarHidden</key>

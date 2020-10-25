@@ -401,7 +401,7 @@ class CardManager {
             return returnColors
         }
         
-        _ = createTipps()
+        createTipps()
         updateCountColors()
         
         var cardArray: [MySKCard] = []
@@ -534,7 +534,7 @@ class CardManager {
                 specialCards.remove(at: cardIndex)
             }
         }
-        _ = createTipps()
+        createTipps()
         return cardArray
     }
     

@@ -201,7 +201,7 @@ extension P2PHelper : MCNearbyServiceAdvertiserDelegate {
     
 //    func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?,  invitationHandler: (Bool, MCSession) -> Void) {
 //        invitationHandler(true, self.session)
-////        print("from \(myPeerID.displayName): in PeerToPeerServiceManager")
+//        print("from \(myPeerID.displayName): in PeerToPeerServiceManager")
 //    }
 
 }
@@ -278,14 +278,14 @@ extension P2PHelper : MCSessionDelegate {
 //        if fromPeerIndex != -1 {
 //            if command == .myNameIs {
 //                peerID.name = parameterString[0]
-////                self.delegate!.messageReceived(fromPeerIndex, command: command, message: parameterString, messageNr: messageNr!)
+//                self.delegate!.messageReceived(fromPeerIndex, command: command, message: parameterString, messageNr: messageNr!)
 //            } else {
 //                if new { // new message from Partner
 //                    answerArray[messageNr!] = MessageContent(command: command, messages: parameterString, answers: [String](), fromPeer: fromPeerIndex, closed: false, timeStamp: Date())
 //                    self.delegate!.messageReceived(fromPeerIndex, command: command, message: parameterString, messageNr: messageNr!)
 //                } else { // answer to my Message
 //                    messageArray[messageNr!]!.answers = parameterString
-////                    print("used time: \(Date().timeIntervalSince(messageArray[messageNr!]!.timeStamp)), \(parameterString)")
+//                    print("used time: \(Date().timeIntervalSince(messageArray[messageNr!]!.timeStamp)), \(parameterString)")
 //                    messageArray[messageNr!]!.closed = true
 //                }
 //            }

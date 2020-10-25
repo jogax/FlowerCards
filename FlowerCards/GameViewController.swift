@@ -133,11 +133,10 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
 //                realm.add(statistic)
 //            })
 //        } else {
-////            GV.statistic = GV.realm.objects(StatisticModel).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).first!
+//           GV.statistic = GV.realm.objects(StatisticModel).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).first!
 //        }
         
         GV.language.setLanguage(GV.player!.aktLanguageKey)
-        
         let myName = GV.player!.name
         let deviceName = UIDevice.current.name
         GV.peerToPeerService = P2PHelper(peerType: appName, identifier: myName, deviceName: deviceName)  // Start connection

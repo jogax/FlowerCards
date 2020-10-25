@@ -164,7 +164,7 @@ class CardGameScene:    SKScene,
                         GKGameCenterControllerDelegate,
                         GKMatchDelegate,
                         GKLocalPlayerListener,
-GCHelperDelegate {
+                        GCHelperDelegate {
     func firstPlaceFounded() {
         createLabelsForBestPlace()
     }
