@@ -72,8 +72,8 @@ let enDictionary: [TextConstants: String] = [
     .tcGuest:            "Guest",
     .tcAnonym:           "Anonymus",
     .tcStatistic:        "Statistics",
-    .tcPlayerStatisticHeader: "Statistics for %%",
-    .tcPlayerStatisticLevel: "Statistics for %, level: % (%), packages: %",
+    .tcPlayerStatisticHeader: "My statistics",
+    .tcPlayerStatisticLevel: "Statistics for level: % (%), packages: %",
     .tcStatisticOfGame:  "Statistic of game Nr. %",
     .tcBestScoreOfGame:   "Best score: %  %",
     .tcYourScore:           "Your score: %",
@@ -178,4 +178,5 @@ let enDictionary: [TextConstants: String] = [
     .tcWantToPlayWithYouGC: "% want play with you!\r\n" +
                             "Start the Game?",
     .tcCheckPartners:       "Search for nearby players",
+    .tcCopyRight:           "\u{00A9} 2020 % (V %)",
 ]

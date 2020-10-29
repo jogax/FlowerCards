@@ -20,6 +20,7 @@ import AVFoundation
 //}
 //
 struct GV {
+    static var versionTxt = "3.0"
     static var vBounds = CGRect(x: 0, y: 0, width: 0, height: 0)
     static var notificationCenter = NotificationCenter.default
     static var mainScene: CardGameScene?

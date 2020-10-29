@@ -72,8 +72,8 @@ let huDictionary: [TextConstants: String] = [
     .tcGuest:            "Vendég",
     .tcAnonym:           "Anonymus",
     .tcStatistic:        "Statisztikák",
-    .tcPlayerStatisticHeader: "% statisztikái %",
-    .tcPlayerStatisticLevel: "% statisztikái, szint: % (%), csomagok: %",
+    .tcPlayerStatisticHeader: "Statisztikáim",
+    .tcPlayerStatisticLevel: "Statisztikák - szint: % (%), csomagok: %",
     .tcStatisticOfGame:  "%. játék statistikája",
     .tcBestScoreOfGame:   "Legjobb pontszám % %",
     .tcYourScore:         "Pontszámod %",
@@ -178,4 +178,5 @@ let huDictionary: [TextConstants: String] = [
     .tcWantToPlayWithYouGC: "% szeretne játszani veled!\r\n" +
                                 "Játék inditása?",
     .tcCheckPartners:       "Közeli játékosok keresése",
+    .tcCopyRight:           "\u{00A9} 2020 % (V %)",
 ]

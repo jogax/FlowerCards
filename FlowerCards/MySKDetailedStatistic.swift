@@ -26,16 +26,16 @@ class MySKDetailedStatistic: MySKTable {
     
     init(playerID: Int, parent: SKSpriteNode, callBack: @escaping (Bool, Int, Int, Int)->()) {
         self.playerID = playerID
-        let playerName = realm.objects(PlayerModel.self).filter("ID = %d", playerID).first!.name
+//        let playerName = realm.objects(PlayerModel.self).filter("ID = %d", playerID).first!.name
         self.parentNode = parent
         self.callBack = callBack
-        var errorTxt = ""
-        #if TEST
-            let allGamesCount = realm.objects(GameModel.self).filter("playerID = %d and ID != %d", playerID, GV.actGame!.ID).count
-            let errorGamesCount = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and ID != %d", playerID, GV.actGame!.ID).count
-            errorTxt = " errorGames: \(errorGamesCount) / \(allGamesCount)"
-        #endif
-        let headLines = GV.language.getText(.tcPlayerStatisticHeader, values: playerName, errorTxt)
+//        var errorTxt = ""
+//        #if TEST
+//            let allGamesCount = realm.objects(GameModel.self).filter("playerID = %d and ID != %d", playerID, GV.actGame!.ID).count
+//            let errorGamesCount = realm.objects(GameModel.self).filter("playerID = %d and gameFinished = false and ID != %d", playerID, GV.actGame!.ID).count
+//            errorTxt = " errorGames: \(errorGamesCount) / \(allGamesCount)"
+//        #endif
+        let headLines = GV.language.getText(.tcPlayerStatisticHeader)
         super.init(columnWidths: myDetailedColumnWidths, countRows:countLines + 1, headLines: [headLines], parent: parent, myName: "MySKDetailedStatistic", width: parent.parent!.frame.width * 0.9)
         self.showVerticalLines = true
         

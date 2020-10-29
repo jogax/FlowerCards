@@ -72,8 +72,8 @@ let deDictionary: [TextConstants: String] = [
     .tcGuest:            "Gast",
     .tcAnonym:           "Anonymus",
     .tcStatistic:        "Statistiken",
-    .tcPlayerStatisticHeader: "Statistiken für %%",
-    .tcPlayerStatisticLevel: "Statistiken für %, Ebene % (%), Pakete: %",
+    .tcPlayerStatisticHeader: "Meine Statistiken",
+    .tcPlayerStatisticLevel: "Statistiken für Ebene % (%), Pakete: %",
     .tcStatisticOfGame:  "Statistik des Spiels %:",
     .tcBestScoreOfGame:   "Beste Ergebnis % %",
     .tcYourScore:         "Dein Ergebnis %",
@@ -179,6 +179,7 @@ let deDictionary: [TextConstants: String] = [
     .tcWantToPlayWithYouGC: "% will mit dir spielen!\r\n" +
                             "Starten das Spiel?",
     .tcCheckPartners:       "Suche nach Spielern in der Nähe",
+    .tcCopyRight:           "\u{00A9} 2020 % (V %)",
 ]
 
 

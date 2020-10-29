@@ -17,13 +17,19 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.5.9</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>34</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_flowercards._tcp</string>
+	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Exchange data with nearby devices running the FlowerCards app.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -33,12 +39,6 @@
 		<string>armv7</string>
 		<string>gamekit</string>
 	</array>
-	<key>NSBonjourServices</key>
-	<array>
-		<string>_flowercards._tcp</string>
-	</array>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>Exchange data with nearby devices running the FlowerCards app.</string>
 	<key>UIRequiresFullScreen</key>
 	<true/>
 	<key>UIStatusBarHidden</key>

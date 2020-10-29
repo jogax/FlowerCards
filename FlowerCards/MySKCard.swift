@@ -524,12 +524,12 @@ class MySKCard: SKSpriteNode {
     
     
     func connectWith(otherCard: MySKCard) {
-        let cardCountTxt = (MySKCard.cardCount > 100 ? "" : MySKCard.cardCount > 9 ? " " : "  ") + String(MySKCard.cardCount)
+//        let cardCountTxt = (MySKCard.cardCount > 100 ? "" : MySKCard.cardCount > 9 ? " " : "  ") + String(MySKCard.cardCount)
         MySKCard.cardCount += 1
-        var text = ""
-        #if TEST
-            let cardText = createCardText(card: self, from: false)
-        #endif
+//        var text = ""
+//        #if TEST
+//            let cardText = createCardText(card: self, from: false)
+//        #endif
         self.countTransitions += otherCard.countTransitions
         
         if self.minValue == otherCard.maxValue + 1  && self.belongsToPackageMin & otherCard.belongsToPackageMax != 0 /*&& !upperOnly*/ {
@@ -547,12 +547,12 @@ class MySKCard: SKSpriteNode {
             self.minValue = otherCard.minValue
             self.colorIndex = otherCard.colorIndex
         }
-        #if TEST
-            if let colorName = MySKCard.colorNames[colorIndex] {
-                text = "\(cardCountTxt) move \(colorName) \(createCardText(card: otherCard, from: true)) to \(cardText)"
-            }
-            print("\(text): new \(createCardText(card: self, from: false))")
-        #endif
+//        #if TEST
+//            if let colorName = MySKCard.colorNames[colorIndex] {
+//                text = "\(cardCountTxt) move \(colorName) \(createCardText(card: otherCard, from: true)) to \(cardText)"
+//            }
+//            print("\(text): new \(createCardText(card: self, from: false))")
+//        #endif
         
     }
     

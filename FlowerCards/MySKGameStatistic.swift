@@ -28,10 +28,10 @@ class MySKGameStatistic: MySKTable {
     init(playerID: Int, levelID: Int, countPackages: Int, parent: SKSpriteNode, callBack: @escaping (Bool, Int, Int)->()) {
         self.playerID = playerID
         self.levelID = levelID
-        let playerName = realm.objects(PlayerModel.self).filter("ID = %d", playerID).first!.name
+//        let playerName = realm.objects(PlayerModel.self).filter("ID = %d", playerID).first!.name
         self.callBack = callBack
         let headLines = GV.language.getText(.tcPlayerStatisticLevel,
-                        values: playerName, String(levelID + 1), GV.levelsForPlay.getLevelFormat(level: levelID), String(countPackages))
+                        values: String(levelID + 1), GV.levelsForPlay.getLevelFormat(level: levelID), String(countPackages))
         gamesOfThisLevel = realm.objects(GameModel.self).filter("playerID = %d and levelID = %d and played = true and countPackages = %d",
                                                                 playerID, levelID, countPackages).sorted(byKeyPath: "gameNumber")
         super.init(columnWidths: myGameColumnWidths, countRows:gamesOfThisLevel.count + 1, headLines: [headLines], parent: parent, myName: "MySKDetailedStatistic", width: parent.parent!.frame.width * 0.9)
@@ -47,43 +47,43 @@ class MySKGameStatistic: MySKTable {
     
     func showStatistic() {
         let elements: [MultiVar] = [MultiVar(string: GV.language.getText(.tcGame)),
-                                    MultiVar(string: GV.language.getText(.tcGameArt)),
-                                    MultiVar(string: GV.language.getText(.tcOpponent)),
+//                                    MultiVar(string: GV.language.getText(.tcGameArt)),
+//                                    MultiVar(string: GV.language.getText(.tcOpponent)),
                                     MultiVar(string: GV.language.getText(.tcScore)),
                                     MultiVar(string: GV.language.getText(.tcAllTime)),
-                                    MultiVar(string: GV.language.getText(.tcVictory)),
+//                                    MultiVar(string: GV.language.getText(.tcVictory)),
                                     MultiVar(string: GV.language.getText(.tcStart)),
                                     ]
         tableOfRows.append(RowOfTable(elements: elements, selected: true))
 //        showRowOfTable(rowOfTable: RowOfTable(elements: elements, selected: true), row: 0)
         var row = 1
         for game in gamesOfThisLevel {
-            var gameArt = GV.language.getText(.tcGame) // simple Game
-            var opponent = ""
-            var score = String(game.playerScore)
-            var victory: SKTexture = SKTexture(image: DrawImages.getOKImage(CGSize(width: 20, height: 20)))
-            var textureSize:CGFloat = 1.0
+//            var gameArt = GV.language.getText(.tcGame) // simple Game
+//            var opponent = ""
+            let score = String(game.playerScore)
+//            var victory: SKTexture = SKTexture(image: DrawImages.getOKImage(CGSize(width: 20, height: 20)))
+//            var textureSize:CGFloat = 1.0
 //            #if REALM_V2
-            if !game.gameFinished {
-                victory = atlas.textureNamed("help")
-                textureSize = 0.25
-            }
+//            if !game.gameFinished {
+//                victory = atlas.textureNamed("help")
+//                textureSize = 0.25
+//            }
 //            #endif
             let startImage = DrawImages.getStartImage(CGSize(width: 20, height: 20))
-            if game.multiPlay {
-                gameArt = GV.language.getText(.tcCompetitionShort)
-                opponent = game.opponentName
-                score += " / " + String(game.opponentScore)
-                if game.playerScore < game.opponentScore {
-                    victory = SKTexture(image:DrawImages.getNOKImage(CGSize(width: 20, height: 20)))
-                }
-            }
+//            if game.multiPlay {
+//                gameArt = GV.language.getText(.tcCompetitionShort)
+//                opponent = game.opponentName
+//                score += " / " + String(game.opponentScore)
+//                if game.playerScore < game.opponentScore {
+//                    victory = SKTexture(image:DrawImages.getNOKImage(CGSize(width: 20, height: 20)))
+//                }
+//            }
             let elements: [MultiVar] = [MultiVar(string: "#\(game.gameNumber + 1)"),
-                                        MultiVar(string: gameArt),
-                                        MultiVar(string: opponent),
+//                                        MultiVar(string: gameArt),
+//                                        MultiVar(string: opponent),
                                         MultiVar(string: score),
                                         MultiVar(string: game.time.HourMin),
-                                        MultiVar(texture: victory, textureSize: textureSize),
+//                                        MultiVar(texture: victory, textureSize: textureSize),
                                         MultiVar(texture: SKTexture(image: startImage)),
                                         ]
             tableOfRows.append(RowOfTable(elements: elements, selected: true))

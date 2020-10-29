@@ -72,8 +72,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcGuest:            "Гость",
     .tcAnonym:           "Anonymus",
     .tcStatistic:        "Статистика",
-    .tcPlayerStatisticHeader: "Статистика игрока %%",
-    .tcPlayerStatisticLevel: "Статистика игрока %, уровень: % (%), Колоды: %",
+    .tcPlayerStatisticHeader: "Моя статистика",
+    .tcPlayerStatisticLevel: "Статистика на уровне: % (%), Колоды: %",
     .tcStatisticOfGame:  "Статистика %-й игры",
     .tcBestScoreOfGame:   "Лучший результат % %",
     .tcYourScore:         "Твой результат %",
@@ -178,4 +178,5 @@ let ruDictionary: [TextConstants: String] = [
     .tcWantToPlayWithYouGC:     "% хочет поиграть с тобой!\r\n" +
                                 "Начать игру?",
     .tcCheckPartners:           "Поиск игроков в поблизости",
+    .tcCopyRight:               "\u{00A9} 2020 % (V %)",
 ]

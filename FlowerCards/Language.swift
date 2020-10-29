@@ -157,7 +157,8 @@ enum TextConstants: Int {
     tcEnableAutoSearch,
     tcDisableAutoSearch,
     tcWantToPlayWithYouGC,
-    tcCheckPartners
+    tcCheckPartners,
+    tcCopyRight
 }
 
     let LanguageEN = "en" // index 0

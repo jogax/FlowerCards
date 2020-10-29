@@ -742,7 +742,8 @@ class CardGameScene:    SKScene,
             prepareNextGame(newGame: true)
             generateCards(generatingType: .first)
             autoPlayer = AutoPlayer(scene: self)
-            let copyRight = "Copyright \u{00A9} 2017 " + GV.appName + "(Ver:" + GV.versionsNumber + " / Build:" + GV.buildNumber + ")"
+//            let copyRight = "Copyright \u{00A9} 2017 " + GV.appName + " (Version:" + GV.versionTxt + ")"
+            let copyRight = GV.language.getText(.tcCopyRight, values: GV.appName, GV.versionTxt)
             let copyrightLabel = SKLabelNode(fontNamed: "ArialMT")
             copyrightLabel.color = UIColor.white
             copyrightLabel.text = copyRight
@@ -911,7 +912,7 @@ class CardGameScene:    SKScene,
         }
         labelBackground.size = CGSize(width: self.size.width * 0.95, height: labelBGHeight)
         
-      self.addChild(labelBackground)
+        self.addChild(labelBackground)
         
         let tippsTexture = SKTexture(image: images.getTipp())
         tippsButton = MySKButton(texture: tippsTexture, frame: CGRect(x: buttonXPosNormalized * 7.5, y: buttonYPos, width: buttonSize, height: buttonSize))
@@ -991,15 +992,15 @@ class CardGameScene:    SKScene,
         let sizeText = GV.language.getText(.tcSize) + size
         let packageText = GV.language.getText(.tcPackage, values: String(countPackages))
         
-        let whoIsText = GV.language.getText(.tcWhoIs)
-        let whoIsTypeText1 = GV.language.getText(.tcPlayerType)
-        let whoIsTypeText2 = GV.language.getText(.tcOpponentType)
-        let whoIsLenght = max(whoIsText.length, whoIsTypeText1.length, whoIsTypeText2.length) * 2
+//        let whoIsText = GV.language.getText(.tcWhoIs)
+//        let whoIsTypeText1 = GV.language.getText(.tcPlayerType)
+//        let whoIsTypeText2 = GV.language.getText(.tcOpponentType)
+//        let whoIsLenght = max(whoIsText.length, whoIsTypeText1.length) * 2
         
         let playerHeaderText = GV.language.getText(.tcName)
-        let opponentNameText = opponent.name
+//        let opponentNameText = opponent.name
 //        let playerNameLength = max(playerHeaderText.length + 4, playerNameText.length, opponentNameText.length) * 2
-        let playerNameLength = (playerHeaderText.length + 4) * 2
+//        let playerNameLength = (playerHeaderText.length + 4) * 2
         
         let timeHeaderText = GV.language.getText(.tcTime)
         let timeLength = (timeHeaderText.length + 5) * 2
@@ -1013,11 +1014,9 @@ class CardGameScene:    SKScene,
         let levelPos = packagePos + packageText.length * 2
         
         whoIsPos = 10
-        let playerNamePos = whoIsPos + whoIsLenght
-        let timePos = playerNamePos + playerNameLength
+        let playerNamePos = whoIsPos// + whoIsLenght
+        let timePos = 40
         scorePos = timePos + timeLength
-        
-        
         let cardCountPos = scorePos + scoreLength
         
         let settingsLabelText = GV.language.getText(.tcSettings)
@@ -1031,13 +1030,13 @@ class CardGameScene:    SKScene,
         createLabels(label: packageLabel, text: packageText, row: 1, xPosProzent: packagePos)
         createLabels(label: levelLabel, text: GV.language.getText(.tcLevel) + ": \(levelIndex + 1)", row: 1, xPosProzent: levelPos)
         
-        createLabels(label: whoIsHeaderLabel, text: whoIsText, row: 2, xPosProzent: whoIsPos)
+//        createLabels(label: whoIsHeaderLabel, text: whoIsText, row: 2, xPosProzent: whoIsPos)
         createLabels(label: playerHeaderLabel, text: playerHeaderText, row: 2, xPosProzent: playerNamePos)
         createLabels(label: timeHeaderLabel, text: timeHeaderText, row: 2, xPosProzent: timePos)
         createLabels(label: scoreHeaderLabel, text: scoreHeaderText, row: 2, xPosProzent: scorePos)
         createLabels(label: cardCountHeaderLabel, text: GV.language.getText(.tcCardHead), row: 2, xPosProzent: cardCountPos)
 
-        createLabels(label: whoIsLabel, text: whoIsTypeText1, row: 3, xPosProzent: whoIsPos)
+//        createLabels(label: whoIsLabel, text: whoIsTypeText1, row: 3, xPosProzent: whoIsPos)
         createLabels(label: playerNameLabel, text: getName(), row: 3, xPosProzent: playerNamePos)
         createLabels(label: playerTimeLabel, text: "0", row: 3, xPosProzent: timePos)
         createLabels(label: playerScoreLabel, text: String(levelScore), row: 3, xPosProzent: scorePos)
@@ -1052,16 +1051,16 @@ class CardGameScene:    SKScene,
         createLabels(label: cardCountLabel, text: cardCountText, row: 5, buttonLabel: .CardCountPos)
         createLabels(label: tippCountLabel, text: tippCountText, row: 5, buttonLabel: .TippButtonPos)
         
-        createLabels(label: opponentTypeLabel, text: whoIsTypeText2, row: 4, xPosProzent: whoIsPos)
-        createLabels(label: opponentNameLabel, text: opponentNameText, row: 4, xPosProzent: playerNamePos)
-        createLabels(label: opponentTimeLabel, text: "0", row: 4, xPosProzent: timePos)
-        createLabels(label: opponentScoreLabel, text: String(opponent.score), row: 4, xPosProzent: scorePos)
-        createLabels(label: opponentCardCountLabel, text: String(opponent.cardCount), row: 4, xPosProzent: cardCountPos)
+//        createLabels(label: opponentTypeLabel, text: whoIsTypeText2, row: 4, xPosProzent: whoIsPos)
+//        createLabels(label: opponentNameLabel, text: opponentNameText, row: 4, xPosProzent: playerNamePos)
+//        createLabels(label: opponentTimeLabel, text: "0", row: 4, xPosProzent: timePos)
+//        createLabels(label: opponentScoreLabel, text: String(opponent.score), row: 4, xPosProzent: scorePos)
+//        createLabels(label: opponentCardCountLabel, text: String(opponent.cardCount), row: 4, xPosProzent: cardCountPos)
         createLabelsForBestPlace()
         
-        createShape(shape: offShape, toLabel: gameNumberLabel)
-        createShape(shape: searchShape, toLabel: whoIsHeaderLabel)
-        createShape(shape: onShape, toLabel: whoIsLabel)
+//        createShape(shape: offShape, toLabel: gameNumberLabel)
+//        createShape(shape: searchShape, toLabel: whoIsHeaderLabel)
+//        createShape(shape: onShape, toLabel: whoIsLabel)
 
         let mySortedPlays = realm.objects(GameModel.self).filter("playerID = %d and played = true", GV.player!.ID).sorted(byKeyPath: "levelID")
         if mySortedPlays.count > 0 {
@@ -2035,60 +2034,60 @@ class CardGameScene:    SKScene,
 //        GV.mainViewController!.showAlert(alert)
 //    }
     
-    @objc func startSearchPlayers() {
-        let tab = GV.peerToPeerService!.getPartners()
-        if tab.count == 0 {
-            print("hier")
-        }
-    }
+//    @objc func startSearchPlayers() {
+//        let tab = GV.peerToPeerService!.getPartners()
+//        if tab.count == 0 {
+//            print("hier")
+//        }
+//    }
     
-    func callPartner(peerID: MCPeerID, identity: String) {
-        let gameNumber = randomGameNumber()
-        opponent.peerID = peerID
-        let myName = getName()
-        let answer = GV.peerToPeerService!.sendMessage(command: .iWantToPlayWithYou, message: [myName, GV.peerToPeerVersion, String(levelIndex), String(countPackages), String(gameNumber)], toPeer: peerID)
-        switch answer[0] {
-        case answerYes:
-            self.gameArt = .multiGame
-            self.gameNumber = gameNumber
-            self.opponent.name = identity
-            self.opponent.WIFI = true
-            self.opponent.score = 0
-            self.restartGame = true
-            GV.peerToPeerService!.changeStatusToIsPlaying(isPlayingWith: opponent.name)
-        case answerNo, GV.IAmBusy, GV.timeOut:
-            alertOpponentDoesNotWantPlay(alert: .tcOpponentNotPlay)
-            self.opponent = Opponent()
-            GV.peerToPeerService!.changeStatusToFree()
-        case peerToPeerVersionOfOpponentIsHigher:
-            alertOpponentDoesNotWantPlay(alert: .tcPeerToPeerVersionIsHigher, opponentName: identity)
-            self.opponent = Opponent()
-            GV.peerToPeerService!.changeStatusToFree()
-        case peerToPeerVersionOfOpponentIsLower:
-            alertOpponentDoesNotWantPlay(alert: .tcPeerToPeerVersionIsLower, opponentName: identity)
-            self.opponent = Opponent()
-            GV.peerToPeerService!.changeStatusToFree()
-       default:
-            break
-        }
-    }
-    
-    func alertOpponentDoesNotWantPlay(alert: TextConstants, opponentName: String = "") {
-        let alert = UIAlertController(title: GV.language.getText(alert, values: opponentName),
-            message: "",
-            preferredStyle: .alert)
-        
-        let OKAction = UIAlertAction(title: GV.language.getText(.tcok), style: .default,
-                                        handler: {(paramAction:UIAlertAction!) in
-                                            self.doTimeCount = true
-                                            
-        })
-        alert.addAction(OKAction)
-
-        
-        GV.mainViewController!.showAlert(alert)
-        
-    }
+//    func callPartner(peerID: MCPeerID, identity: String) {
+//        let gameNumber = randomGameNumber()
+//        opponent.peerID = peerID
+//        let myName = getName()
+//        let answer = GV.peerToPeerService!.sendMessage(command: .iWantToPlayWithYou, message: [myName, GV.peerToPeerVersion, String(levelIndex), String(countPackages), String(gameNumber)], toPeer: peerID)
+//        switch answer[0] {
+//        case answerYes:
+//            self.gameArt = .multiGame
+//            self.gameNumber = gameNumber
+//            self.opponent.name = identity
+//            self.opponent.WIFI = true
+//            self.opponent.score = 0
+//            self.restartGame = true
+//            GV.peerToPeerService!.changeStatusToIsPlaying(isPlayingWith: opponent.name)
+//        case answerNo, GV.IAmBusy, GV.timeOut:
+//            alertOpponentDoesNotWantPlay(alert: .tcOpponentNotPlay)
+//            self.opponent = Opponent()
+//            GV.peerToPeerService!.changeStatusToFree()
+//        case peerToPeerVersionOfOpponentIsHigher:
+//            alertOpponentDoesNotWantPlay(alert: .tcPeerToPeerVersionIsHigher, opponentName: identity)
+//            self.opponent = Opponent()
+//            GV.peerToPeerService!.changeStatusToFree()
+//        case peerToPeerVersionOfOpponentIsLower:
+//            alertOpponentDoesNotWantPlay(alert: .tcPeerToPeerVersionIsLower, opponentName: identity)
+//            self.opponent = Opponent()
+//            GV.peerToPeerService!.changeStatusToFree()
+//       default:
+//            break
+//        }
+//    }
+//
+//    func alertOpponentDoesNotWantPlay(alert: TextConstants, opponentName: String = "") {
+//        let alert = UIAlertController(title: GV.language.getText(alert, values: opponentName),
+//            message: "",
+//            preferredStyle: .alert)
+//
+//        let OKAction = UIAlertAction(title: GV.language.getText(.tcok), style: .default,
+//                                        handler: {(paramAction:UIAlertAction!) in
+//                                            self.doTimeCount = true
+//
+//        })
+//        alert.addAction(OKAction)
+//
+//
+//        GV.mainViewController!.showAlert(alert)
+//
+//    }
     
     func chooseLevelAndOptions() {
         _ = ChooseLevelAndOptions(callBack: callBackFromChooseLevelAndOptions)
@@ -3366,12 +3365,12 @@ class CardGameScene:    SKScene,
 //            playerStatisticLabel.text = GV.language.getText(.tcStatistic)
 //            writeReviewLabel.text = GV.language.getText(.tcWriteReview)
 //            returnLabel.text = GV.language.getText(.tcReturn)
-            let chooseNameAction = UIAlertAction(title: GV.language.getText(.tcChooseName), style: .default,
-                                           handler: {(paramAction:UIAlertAction!) in
-                                            self.SKPlayerObject = MySKPlayer(parent: parentNode, view: self.view!, callBack: self.comeBackFromSettings)
-
-            })
-            alert.addAction(chooseNameAction)
+//            let chooseNameAction = UIAlertAction(title: GV.language.getText(.tcChooseName), style: .default,
+//                                           handler: {(paramAction:UIAlertAction!) in
+//                                            self.SKPlayerObject = MySKPlayer(parent: parentNode, view: self.view!, callBack: self.comeBackFromSettings)
+//
+//            })
+//            alert.addAction(chooseNameAction)
             let soundVolumeAction = UIAlertAction(title: GV.language.getText(.tcSoundVolume), style: .default,
                                                  handler: {(paramAction:UIAlertAction!) in
                                                     self.SKSliderObject = MySKSlider(parent: parentNode, soundType: .sound, callBack: self.comeBackFromSettings)
@@ -3389,7 +3388,9 @@ class CardGameScene:    SKScene,
             alert.addAction(chooseLanguageAction)
             let playerStatisticAction = UIAlertAction(title: GV.language.getText(.tcStatistic), style: .default,
                                                      handler: {(paramAction:UIAlertAction!) in
-                                                        let _ = MySKStatistic(parent: parentNode, callBack: self.comeBackFromSettingsWithStart)
+//                                                        let _ = MySKStatistic(parent: parentNode, callBack: self.comeBackFromSettingsWithStart)
+//                                                        _ = MySKDetailedStatistic(playerID: playerID, parent: self, callBack: backFromMySKDetailedStatistic)
+                                                        _ = MySKDetailedStatistic(playerID: GV.player!.ID, parent: parentNode, callBack: self.comeBackFromSettingsWithStart)
             })
             alert.addAction(playerStatisticAction)
             let writeReviewAction = UIAlertAction(title: GV.language.getText(.tcWriteReview), style: .default,
