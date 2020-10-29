@@ -534,7 +534,7 @@ class CardManager {
                 specialCards.remove(at: cardIndex)
             }
         }
-        createTipps()
+        	createTipps()
         return cardArray
     }
     

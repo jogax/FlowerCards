@@ -177,4 +177,5 @@ let enDictionary: [TextConstants: String] = [
     .tcDisableAutoSearch:    "Reset Auto Search",
     .tcWantToPlayWithYouGC: "% want play with you!\r\n" +
                             "Start the Game?",
+    .tcCheckPartners:       "Search for nearby players",
 ]

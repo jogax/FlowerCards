@@ -178,6 +178,7 @@ let deDictionary: [TextConstants: String] = [
     .tcDisableAutoSearch:    "Autosuche Aus",
     .tcWantToPlayWithYouGC: "% will mit dir spielen!\r\n" +
                             "Starten das Spiel?",
+    .tcCheckPartners:       "Suche nach Spielern in der Nähe",
 ]
 
 

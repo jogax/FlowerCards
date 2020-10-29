@@ -177,4 +177,5 @@ let huDictionary: [TextConstants: String] = [
     .tcDisableAutoSearch:    "Aut. keresés ki",
     .tcWantToPlayWithYouGC: "% szeretne játszani veled!\r\n" +
                                 "Játék inditása?",
+    .tcCheckPartners:       "Közeli játékosok keresése",
 ]

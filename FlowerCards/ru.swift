@@ -177,4 +177,5 @@ let ruDictionary: [TextConstants: String] = [
     .tcDisableAutoSearch:       "Выкл. автопоиск",
     .tcWantToPlayWithYouGC:     "% хочет поиграть с тобой!\r\n" +
                                 "Начать игру?",
+    .tcCheckPartners:           "Поиск игроков в поблизости",
 ]

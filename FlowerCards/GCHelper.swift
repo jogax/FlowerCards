@@ -228,46 +228,46 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         })
     }
 
-    public func autoFindMatchWithMinPlayers(_ minPlayers: Int, maxPlayers: Int, viewController: UIViewController) {
-        matchStarted = false
-        match = nil
-        presentingViewController = viewController
-//        delegate = theDelegate
-        presentingViewController.dismiss(animated: false, completion: nil)
-        let searchAlert = UIAlertController(title: GV.language.getText(.tcSearchOpponent),
-                                          message: "",
-                                          preferredStyle: .alert)
-        let OKAction = UIAlertAction(title: GV.language.getText(.tcok), style: .default,
-                                             handler: {(paramAction:UIAlertAction!) in
-                                                GV.mainViewController!.stopAlert()
-                                                if self.match != nil {
-                                                    self.match.disconnect()
-                                                }
-                                                self.delegate?.continueTimeCount()
-        })
-        searchAlert.addAction(OKAction)
-        presentingViewController.showAlert(searchAlert, delay: 1)
-        
-
-        let request = GKMatchRequest()
-        request.minPlayers = minPlayers
-        request.maxPlayers = maxPlayers
-        let matchMaker = GKMatchmaker()
-        matchMaker.findMatch(for: request, withCompletionHandler: {
-            
-            (match, error) in
-            if ((error) != nil) {
-                // Process the error.
-            } else if (match != nil) {
-                self.match = match
-                self.match.delegate = self
-                if !self.matchStarted && match?.expectedPlayerCount == 0 {
-                    self.lookupPlayers()
-                }
-            }
-        })
-        self.delegate?.continueTimeCount()
-    }
+//    public func autoFindMatchWithMinPlayers(_ minPlayers: Int, maxPlayers: Int, viewController: UIViewController) {
+//        matchStarted = false
+//        match = nil
+//        presentingViewController = viewController
+////        delegate = theDelegate
+//        presentingViewController.dismiss(animated: false, completion: nil)
+//        let searchAlert = UIAlertController(title: GV.language.getText(.tcSearchOpponent),
+//                                          message: "",
+//                                          preferredStyle: .alert)
+//        let OKAction = UIAlertAction(title: GV.language.getText(.tcok), style: .default,
+//                                             handler: {(paramAction:UIAlertAction!) in
+//                                                GV.mainViewController!.stopAlert()
+//                                                if self.match != nil {
+//                                                    self.match.disconnect()
+//                                                }
+//                                                self.delegate?.continueTimeCount()
+//        })
+//        searchAlert.addAction(OKAction)
+//        presentingViewController.showAlert(searchAlert, delay: 1)
+//        
+//
+//        let request = GKMatchRequest()
+//        request.minPlayers = minPlayers
+//        request.maxPlayers = maxPlayers
+//        let matchMaker = GKMatchmaker()
+//        matchMaker.findMatch(for: request, withCompletionHandler: {
+//            
+//            (match, error) in
+//            if ((error) != nil) {
+//                // Process the error.
+//            } else if (match != nil) {
+//                self.match = match
+//                self.match.delegate = self
+//                if !self.matchStarted && match?.expectedPlayerCount == 0 {
+//                    self.lookupPlayers()
+//                }
+//            }
+//        })
+//        self.delegate?.continueTimeCount()
+//    }
 
 
     /**

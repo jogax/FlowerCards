@@ -317,10 +317,10 @@ class CardGameScene:    SKScene,
         createLabelsForBestPlace()
         let gameCounter = realm.objects(GameModel.self).filter("played = true").count
         GCHelper.sharedInstance.sendGameCountToGameCenter(gameCount: gameCounter)
-        if GV.player!.onlineCompetitionEnabled {
-            GCHelper.sharedInstance.autoFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!)
-            gameStatus = .Searching
-        }
+//        if GV.player!.onlineCompetitionEnabled {
+//            GCHelper.sharedInstance.autoFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!)
+//            gameStatus = .Searching
+//        }
         GCHelper.sharedInstance.importBestScoreFromGameCenter(countPackages: countPackages, levelID: levelIndex)
     }
     
@@ -1979,55 +1979,68 @@ class CardGameScene:    SKScene,
         GV.mainViewController!.showAlert(alert)
     }
     
-    func choosePartner() {
-        var playingPartners: [String] = []
-        let partners = GV.peerToPeerService!.getPartners()
-        let alert = UIAlertController(title: GV.language.getText(partners.count == 0 ?.tcThereIsNoPartner : .tcChoosePartner),
-                                      message: "",
-                                      preferredStyle: .alert)
-        if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
-            let onlineGameAction = UIAlertAction(title: GV.language.getText(.tcOnlineGame), style: .default,
-                                                  handler: {(paramAction:UIAlertAction!) in
-                                                    self.gameStatus = .Searching
-
-                                                    GCHelper.sharedInstance.autoFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!)
-
-            })
-            alert.addAction(onlineGameAction)
+//    func choosePartner() {
+//        var playingPartners: [String] = []
+//        let partners = GV.peerToPeerService!.getPartners()
+//        let alert = UIAlertController(title: GV.language.getText(partners.count == 0 ?.tcThereIsNoPartner : .tcChoosePartner),
+//                                      message: "",
+//                                      preferredStyle: .alert)
+//        if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+//            let onlineGameAction = UIAlertAction(title: GV.language.getText(.tcOnlineGame), style: .default,
+//                                                  handler: {(paramAction:UIAlertAction!) in
+//                                                    self.gameStatus = .Searching
+//
+//                                                    GCHelper.sharedInstance.autoFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!)
+//
+//            })
+//            alert.addAction(onlineGameAction)
+//        }
+//
+//        if partners.count > 0 {
+//            for index in 0..<partners.count {
+//                var identity: String = ""
+//                if partners[index].name != nil && !playingPartners.contains(partners[index].name!) {
+//                    identity = partners[index].name!
+//                    var isEnabled = true
+//                    if partners[index].playingWith != nil && partners[index].playingWith != "" {
+//                        identity = identity + GV.language.getText(.tcIsPlayingWith, values: partners[index].playingWith!)
+//                        playingPartners.append(partners[index].playingWith!)
+//                        isEnabled = false
+//                    }
+//                    let peerID = partners[index]
+//                    let nameAction = UIAlertAction(title: identity, style: .default,
+//                                                    handler: {(paramAction:UIAlertAction!) in
+//                                                        self.opponent.name = identity
+//                                                        self.opponent.score = 0
+//                                                        self.gameStatus = .On
+//                                                        self.callPartner(peerID: peerID, identity: identity)
+//                    })
+//                    alert.addAction(nameAction)
+//                    alert.actions.last?.isEnabled = isEnabled
+//                }
+//            }
+//        } else {
+//            let checkPlayersAction = UIAlertAction(title: GV.language.getText(.tcCheckPartners), style: .default, handler: {_ in
+//                    self.doTimeCount = true
+//                    self.startSearchPlayers()
+//                })
+//            alert.addAction(checkPlayersAction)
+//        }
+//        let returnAction = UIAlertAction(title: GV.language.getText(.tcReturn), style: .cancel,
+//                                         handler: {(paramAction:UIAlertAction!) in
+//                                            self.doTimeCount = true
+//
+//        })
+//        alert.addAction(returnAction)
+//        GV.mainViewController!.showAlert(alert)
+//    }
+    
+    @objc func startSearchPlayers() {
+        let tab = GV.peerToPeerService!.getPartners()
+        if tab.count == 0 {
+            print("hier")
         }
-
-        if partners.count > 0 {
-            for index in 0..<partners.count {
-                var identity: String = ""
-                if partners[index].name != nil && !playingPartners.contains(partners[index].name!) {
-                    identity = partners[index].name!
-                    var isEnabled = true
-                    if partners[index].playingWith != nil && partners[index].playingWith != "" {
-                        identity = identity + GV.language.getText(.tcIsPlayingWith, values: partners[index].playingWith!)
-                        playingPartners.append(partners[index].playingWith!)
-                        isEnabled = false
-                    }
-                    let peerID = partners[index]
-                    let nameAction = UIAlertAction(title: identity, style: .default,
-                                                    handler: {(paramAction:UIAlertAction!) in
-                                                        self.opponent.name = identity
-                                                        self.opponent.score = 0
-                                                        self.gameStatus = .On
-                                                        self.callPartner(peerID: peerID, identity: identity)
-                    })
-                    alert.addAction(nameAction)
-                    alert.actions.last?.isEnabled = isEnabled
-                }
-            }
-        }
-        let returnAction = UIAlertAction(title: GV.language.getText(.tcReturn), style: .cancel,
-                                         handler: {(paramAction:UIAlertAction!) in
-                                            self.doTimeCount = true
-                                            
-        })
-        alert.addAction(returnAction)
-        GV.mainViewController!.showAlert(alert)
-}
+    }
     
     func callPartner(peerID: MCPeerID, identity: String) {
         let gameNumber = randomGameNumber()
@@ -2264,13 +2277,13 @@ class CardGameScene:    SKScene,
             #endif
 
 
-            let competitionAction = UIAlertAction(title: GV.language.getText(.tcCompetition), style: .default,
-                                                  handler: {(paramAction:UIAlertAction!) in
-                                                    self.choosePartner()
-                                                    //self.gameArrayChanged = true
-                                                    
-            })
-            alert.addAction(competitionAction)
+//            let competitionAction = UIAlertAction(title: GV.language.getText(.tcCompetition), style: .default,
+//                                                  handler: {(paramAction:UIAlertAction!) in
+//                                                    self.choosePartner()
+//                                                    //self.gameArrayChanged = true
+//
+//            })
+//            alert.addAction(competitionAction)
             
         }
         let cancelAction = UIAlertAction(title: GV.language.getText(TextConstants.tcCancel), style: .default,
@@ -3402,23 +3415,23 @@ class CardGameScene:    SKScene,
                                                             
                 })
                 alert.addAction(connectToGamecenter)
-                let enableAutoSearch = UIAlertAction(title: GV.language.getText(GV.player!.onlineCompetitionEnabled ? .tcDisableAutoSearch : .tcEnableAutoSearch), style: .default,
-                    handler: {(paramAction:UIAlertAction!) in
-                        try! realm.write({
-                            GV.player!.onlineCompetitionEnabled = !GV.player!.onlineCompetitionEnabled
-                        })
-                        if GV.player!.onlineCompetitionEnabled {
-                            GCHelper.sharedInstance.autoFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!)
-                            self.gameStatus = .Searching
-                            print("Gamestatus = Searching")
-                        } else {
-                            self.gameStatus = .Off
-                            print("Gamestatus = Off")
-                        }
-                        self.doTimeCount = true
-
-                })
-                alert.addAction(enableAutoSearch)
+//                let enableAutoSearch = UIAlertAction(title: GV.language.getText(GV.player!.onlineCompetitionEnabled ? .tcDisableAutoSearch : .tcEnableAutoSearch), style: .default,
+//                    handler: {(paramAction:UIAlertAction!) in
+//                        try! realm.write({
+//                            GV.player!.onlineCompetitionEnabled = !GV.player!.onlineCompetitionEnabled
+//                        })
+//                        if GV.player!.onlineCompetitionEnabled {
+//                            GCHelper.sharedInstance.autoFindMatchWithMinPlayers(2, maxPlayers: 2, viewController: GV.mainViewController!)
+//                            self.gameStatus = .Searching
+//                            print("Gamestatus = Searching")
+//                        } else {
+//                            self.gameStatus = .Off
+//                            print("Gamestatus = Off")
+//                        }
+//                        self.doTimeCount = true
+//
+//                })
+//                alert.addAction(enableAutoSearch)
            }
             let returnAction = UIAlertAction(title: GV.language.getText(.tcReturn), style: .default,
                                                      handler: {(paramAction:UIAlertAction!) in
