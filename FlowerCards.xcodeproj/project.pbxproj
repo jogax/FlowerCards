@@ -67,11 +67,9 @@
 		20B1F10C1D5B458E00963590 /* Container.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F10B1D5B458E00963590 /* Container.m4a */; };
 		20B1F10E1D5B45DB00963590 /* NoSound.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F10D1D5B45DB00963590 /* NoSound.m4a */; };
 		20B1F1101D5B483000963590 /* Winner.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 20B1F10F1D5B483000963590 /* Winner.m4a */; };
-		D046ADD0246049E500D89A50 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203BD1721F77B18C002292F7 /* GameKit.framework */; };
-		D059DC3123DDAE02007BFC6B /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2047D9CC1FACBD6000502857 /* Realm.framework */; };
-		D059DC3223DDAE02007BFC6B /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2047D9CC1FACBD6000502857 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		D059DC3323DDAE04007BFC6B /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2047D9CD1FACBD6000502857 /* RealmSwift.framework */; };
-		D059DC3423DDAE04007BFC6B /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2047D9CD1FACBD6000502857 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D09BE5D4254C4A1800E973E8 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2047D9CC1FACBD6000502857 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D09BE5D8254C4A1B00E973E8 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2047D9CD1FACBD6000502857 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D09BE5D9254C4A2200E973E8 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 203BD1721F77B18C002292F7 /* GameKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,14 +83,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		D059DC3023DDADFF007BFC6B /* Embed Frameworks */ = {
+		D09BE5D5254C4A1800E973E8 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				D059DC3223DDAE02007BFC6B /* Realm.framework in Embed Frameworks */,
-				D059DC3423DDAE04007BFC6B /* RealmSwift.framework in Embed Frameworks */,
+				D09BE5D8254C4A1B00E973E8 /* RealmSwift.framework in Embed Frameworks */,
+				D09BE5D4254C4A1800E973E8 /* Realm.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -174,9 +172,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D046ADD0246049E500D89A50 /* GameKit.framework in Frameworks */,
-				D059DC3123DDAE02007BFC6B /* Realm.framework in Frameworks */,
-				D059DC3323DDAE04007BFC6B /* RealmSwift.framework in Frameworks */,
+				D09BE5D9254C4A2200E973E8 /* GameKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -337,7 +333,8 @@
 				2025F0B61D5B18F300561FBF /* Sources */,
 				2025F0B71D5B18F300561FBF /* Frameworks */,
 				2025F0B81D5B18F300561FBF /* Resources */,
-				D059DC3023DDADFF007BFC6B /* Embed Frameworks */,
+				D09BE5D5254C4A1800E973E8 /* Embed Frameworks */,
+				D035D4E7254DA39A00EF58DC /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -455,6 +452,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		D035D4E7254DA39A00EF58DC /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/Realm.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/RealmSwift.framework",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/local/bin/carthage copy-frameworks\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		2025F0B61D5B18F300561FBF /* Sources */ = {
@@ -588,7 +607,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
@@ -596,6 +615,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				"Texture Atlas Maximum Size" = 4096x4096;
 				VALIDATE_PRODUCT = YES;
@@ -645,12 +665,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				"Texture Atlas Maximum Size" = 4096x4096;
 				VALIDATE_PRODUCT = YES;
@@ -663,8 +684,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = NO;
 				CODE_SIGN_ENTITLEMENTS = FlowerCards/FlowerCards.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 35;
 				DEVELOPMENT_TEAM = WT499VC842;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -683,6 +705,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.FlowerCards;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = TEST;
 				SWIFT_VERSION = 5.0;
 				"Texture Atlas Maximum Size" = 4096x4096;
@@ -695,8 +718,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = NO;
 				CODE_SIGN_ENTITLEMENTS = FlowerCards/FlowerCards.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 35;
 				DEVELOPMENT_TEAM = WT499VC842;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -710,6 +734,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = JOGAX.FlowerCards;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_VERSION = 5.0;
 				"Texture Atlas Maximum Size" = 4096x4096;
