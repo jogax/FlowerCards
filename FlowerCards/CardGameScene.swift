@@ -312,7 +312,7 @@ class CardGameScene:    SKScene,
         GV.player!.GCEnabled = GCEnabledType.GameCenterEnabled.rawValue
         try! realm.commitWrite()
         let name = GKLocalPlayer.local.alias
-        GV.peerToPeerService!.changeIdentifier(name)
+//        GV.peerToPeerService!.changeIdentifier(name)
 
         createLabelsForBestPlace()
         let gameCounter = realm.objects(GameModel.self).filter("played = true").count
@@ -713,13 +713,13 @@ class CardGameScene:    SKScene,
                 }
             }
 
-            if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+//            if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
                 GCHelper.sharedInstance.authenticateLocalUser(theDelegate: self)
-            }
+//            }
 
             myView = view
             GV.mainScene = self
-            GV.peerToPeerService!.delegate = self
+//            GV.peerToPeerService!.delegate = self
             let width:CGFloat = 64.0
             let height: CGFloat = 89.0
             let sizeMultiplierConstant = CGFloat(0.0020)
@@ -752,49 +752,44 @@ class CardGameScene:    SKScene,
             copyrightLabel.position = CGPoint(x: self.frame.minX + (copyrightLabel.frame.size.width / 2) * 1.15, y: self.frame.minY + (copyrightLabel.frame.size.height / 2) * 1.03 + yPosCorrection)
            
             self.addChild(copyrightLabel)
-            switch GV.player!.GCEnabled {
-                case GCEnabledType.GameCenterEnabled.rawValue:
-                    if GCHelper.sharedInstance.authenticateStatus == GCHelper.AuthenticatingStatus.notAuthenticated {
-                        GCHelper.sharedInstance.authenticateLocalUser(theDelegate: self)
-                    }
-//                    if GKLocalPlayer.local.isAuthenticated {
-//                        gameCenterSync.startGameCenterSync()
-//                    } else {
-//                        // when not authenticated, set to GC Not enabled
-//                        realm.beginWrite()
-//                        GV.player!.GCEnabled = GCEnabledType.AskForGameCenter.rawValue
-//                        try! realm.commitWrite()
-//                    }
-                case GCEnabledType.AskForGameCenter.rawValue:
-                    let alert = UIAlertController(title: GV.language.getText(.tcAskForGameCenter),
-                                                  message: "",
-                                                  preferredStyle: .alert)
-                    let connectAction = UIAlertAction(title: GV.language.getText(.tcConnectGC), style: .default,
-                                                       handler: {(paramAction:UIAlertAction!) in
-                                                        self.connectToGameCenter()
-                        })
-                    
-                    alert.addAction(connectAction)
-                    
-                    let askLaterAction = UIAlertAction(title: GV.language.getText(.tcAskLater), style: .default,
-                                                      handler: {(paramAction:UIAlertAction!) in
-                    })
-                    
-                    alert.addAction(askLaterAction)
-                    let askNoMoreAction = UIAlertAction(title: GV.language.getText(.tcAskNoMore), style: .default,
-                                                       handler: {(paramAction:UIAlertAction!) in
-                                                        try! realm.write({
-                                                                GV.player!.GCEnabled = GCEnabledType.GameCenterSupressed.rawValue
-                                                        })
-                    })
-                    
-                    alert.addAction(askNoMoreAction)
-                    myAlert = alert
-                    waitForShow()
-                default:
-                    break
-                
+            if GCHelper.sharedInstance.authenticateStatus == GCHelper.AuthenticatingStatus.notAuthenticated {
+                GCHelper.sharedInstance.authenticateLocalUser(theDelegate: self)
             }
+//           switch GV.player!.GCEnabled {
+//                case GCEnabledType.GameCenterEnabled.rawValue:
+//                    if GCHelper.sharedInstance.authenticateStatus == GCHelper.AuthenticatingStatus.notAuthenticated {
+//                        GCHelper.sharedInstance.authenticateLocalUser(theDelegate: self)
+//                    }
+//                case GCEnabledType.AskForGameCenter.rawValue:
+//                    let alert = UIAlertController(title: GV.language.getText(.tcAskForGameCenter),
+//                                                  message: "",
+//                                                  preferredStyle: .alert)
+//                    let connectAction = UIAlertAction(title: GV.language.getText(.tcConnectGC), style: .default,
+//                                                       handler: {(paramAction:UIAlertAction!) in
+//                                                        self.connectToGameCenter()
+//                        })
+//
+//                    alert.addAction(connectAction)
+//
+//                    let askLaterAction = UIAlertAction(title: GV.language.getText(.tcAskLater), style: .default,
+//                                                      handler: {(paramAction:UIAlertAction!) in
+//                    })
+//
+//                    alert.addAction(askLaterAction)
+//                    let askNoMoreAction = UIAlertAction(title: GV.language.getText(.tcAskNoMore), style: .default,
+//                                                       handler: {(paramAction:UIAlertAction!) in
+//                                                        try! realm.write({
+//                                                                GV.player!.GCEnabled = GCEnabledType.GameCenterSupressed.rawValue
+//                                                        })
+//                    })
+//
+//                    alert.addAction(askNoMoreAction)
+//                    myAlert = alert
+//                    waitForShow()
+//                default:
+//                    break
+//
+//            }
         } else {
             playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
             
@@ -1287,7 +1282,7 @@ class CardGameScene:    SKScene,
     }
     
     func getName() -> String {
-        var name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
+        var name = GKLocalPlayer.local.displayName == "" ? GV.language.getText(.tcMe) : GKLocalPlayer.local.displayName
         if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
             name = GKLocalPlayer.local.alias
         }
@@ -1295,6 +1290,9 @@ class CardGameScene:    SKScene,
     }
     
     func setRankingLabels() -> (String, String) {
+        if GKLocalPlayer.local.displayName == "" {
+            return ("", "")
+        }
         let actResult = realm.objects(HighScoreModel.self).filter("countPackages = %d and levelID = %d", countPackages, levelIndex).first!
         if actResult.myHighScore > actResult.bestPlayerHighScore {
             GCHelper.sharedInstance.sendScoreToGameCenter(score: actResult.myHighScore, countPackages: countPackages, levelID: levelIndex)
@@ -2313,6 +2311,7 @@ class CardGameScene:    SKScene,
                                                 GV.player!.levelID %= GV.levelsForPlay.count()
                                                 if GV.player!.levelID == 0 {
                                                     GV.player!.countPackages += 1
+                                                    GV.player!.levelID = startingLevel
                                                     if GV.player!.countPackages > GV.maxPackageCount {
                                                         GV.player!.countPackages = GV.maxPackageCount
                                                         GV.player!.levelID = GV.levelsForPlay.count() - 1
@@ -3457,7 +3456,7 @@ class CardGameScene:    SKScene,
         if name != nil {
             myName = name!
         } else {
-            myName = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
+            myName = GKLocalPlayer.local.displayName == "" ? GV.language.getText(.tcMe) : GKLocalPlayer.local.displayName
         }
         GV.peerToPeerService!.changeIdentifier(myName)
         playerNameLabel.text = myName
@@ -3553,7 +3552,7 @@ class CardGameScene:    SKScene,
             generateCards(generatingType: .first)
         } else {
             playMusic("MyMusic", volume: GV.player!.musicVolume, loops: playMusicForever)
-            let name = GV.player!.name == GV.language.getText(.tcAnonym) ? GV.language.getText(.tcGuest) : GV.player!.name
+            let name = GKLocalPlayer.local.displayName == "" ? GV.language.getText(.tcMe) : GKLocalPlayer.local.displayName
             playerNameLabel.text = name
             doTimeCount = true
         }

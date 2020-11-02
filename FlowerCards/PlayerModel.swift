@@ -9,10 +9,11 @@
 import Foundation
 import RealmSwift
 
+let startingLevel = 16
 class PlayerModel: Object {
     @objc dynamic var ID = 0
     @objc dynamic var name = ""
-    @objc dynamic var levelID = 0
+    @objc dynamic var levelID = startingLevel
     @objc dynamic var countPackages = 1
     @objc dynamic var isActPlayer = false
     @objc dynamic var aktLanguageKey = GV.language.getAktLanguageKey()

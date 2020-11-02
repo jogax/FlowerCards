@@ -41,7 +41,7 @@ struct GV {
     static var mainViewController: UIViewController?
     static let language = Language()
     static var showHelpLines = 0
-    static var dummyName = GV.language.getText(.tcGuest)
+//    static var dummyName = GV.language.getText(.tcGuest)
     static var initName = false
     static let oneGrad:CGFloat = CGFloat(Double.pi) / 180
     static let timeOut = "TimeOut"
@@ -65,8 +65,7 @@ struct GV {
     
     
     
-//    static let deviceConstants = DeviceConstants(deviceType: UIDevice.current.modelName)
-
+//    static let deviceConstants = DeviceConstants(deviceType: UIDevice.current.modelNamelevelid
     static var countPlayers: Int = 1
 
     static var player: PlayerModel?
@@ -134,7 +133,7 @@ struct GV {
 //        if newID != 0 {
             let newPlayer = PlayerModel()
             newPlayer.aktLanguageKey = GV.language.getPreferredLanguage()
-            newPlayer.name = GV.language.getText(.tcAnonym)
+            newPlayer.name = GV.language.getText(.tcMe)
             newPlayer.isActPlayer = isActPlayer.count == 0 ? false : isActPlayer[0]
             newPlayer.ID = newID
             try! realm.write({
@@ -191,7 +190,7 @@ struct Names {
 struct GameParamStruct {
     var isActPlayer: Bool
     var nameID: Int
-    var name: String
+    var name: String = ""
     var aktLanguageKey: String
     var levelIndex: Int
     var gameScore: Int
@@ -202,7 +201,7 @@ struct GameParamStruct {
     init() {
         nameID = GV.countPlayers
         isActPlayer = false
-        name = GV.dummyName
+//        name = GV.dummyName
         aktLanguageKey = GV.language.getAktLanguageKey()
         levelIndex = 0
         gameScore = 0

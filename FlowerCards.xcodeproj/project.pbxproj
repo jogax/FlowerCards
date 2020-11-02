@@ -213,6 +213,7 @@
 				2025F0F51D5B21AC00561FBF /* MyStructs.swift */,
 				2025F0BD1D5B18F300561FBF /* AppDelegate.swift */,
 				2025F0D31D5B1A1E00561FBF /* GameViewController.swift */,
+				2025F1251D5B256A00561FBF /* JGXLine.swift */,
 				2025F1311D5B26A200561FBF /* MySKPanel.swift */,
 				2025F11D1D5B23F600561FBF /* DrawImages.swift */,
 				2025F0D41D5B1A1E00561FBF /* Extensions.swift */,
@@ -273,7 +274,6 @@
 				2025F0EB1D5B219C00561FBF /* MySKButton.swift */,
 				2025F0EE1D5B219C00561FBF /* MyRandom.swift */,
 				2025F1181D5B23BB00561FBF /* Stack.swift */,
-				2025F1251D5B256A00561FBF /* JGXLine.swift */,
 			);
 			name = GameEngine;
 			sourceTree = "<group>";

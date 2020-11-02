@@ -566,6 +566,9 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     }
     
     func importBestScoreFromGameCenter(countPackages: Int, levelID: Int) {
+        if GKLocalPlayer.local.displayName == "" {
+            return
+        }
         //        if GKLocalPlayer.localPlayer().isAuthenticated == false {return}
         let leaderboardID = "P\(countPackages)L\(levelID + 1)"
         //        print("Downloading Score for leaderboardID: \(leaderboardID) started")

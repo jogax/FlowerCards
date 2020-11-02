@@ -98,12 +98,12 @@ class MySKDetailedStatistic: MySKTable {
 
     }
     
-    func convertNameWhenRequired(_ name: String)->String {
-        if name == GV.language.getText(.tcAnonym) {
-            return GV.language.getText(.tcGuest)
-        }
-        return name
-    }
+//    func convertNameWhenRequired(_ name: String)->String {
+//        if name == GV.language.getText(.tcAnonym) {
+//            return GV.language.getText(.tcGuest)
+//        }
+//        return name
+//    }
     
 //    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        let touchLocation = touches.first!.location(in: self)

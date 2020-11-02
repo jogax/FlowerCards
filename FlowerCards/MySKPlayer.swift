@@ -165,7 +165,7 @@
             try! realm.write({
                 let oldActPlayer = realm.objects(PlayerModel.self).filter("isActPlayer = true").first
                 var newActPlayer = realm.objects(PlayerModel.self).filter("ID =  \(nameTable[nameTableIndex].ID)").first
-                if newActPlayer == nil || newActPlayer!.name == GV.language.getText(.tcGuest) {
+                if newActPlayer == nil || newActPlayer!.name == GV.language.getText(.tcMe) {
                     newActPlayer = PlayerModel()
                     newActPlayer!.ID = nameTable[nameTableIndex].ID
                     newActPlayer!.name = nameTable[nameTableIndex].name

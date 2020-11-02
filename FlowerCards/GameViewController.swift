@@ -135,11 +135,12 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
 //        } else {
 //           GV.statistic = GV.realm.objects(StatisticModel).filter("playerID = %d AND levelID = %d", GV.player!.ID, GV.player!.levelID).first!
 //        }
-        
-        GV.language.setLanguage(GV.player!.aktLanguageKey)
-        let myName = GV.player!.name
-        let deviceName = UIDevice.current.name
-        GV.peerToPeerService = P2PHelper(peerType: appName, identifier: myName, deviceName: deviceName)  // Start connection
+//        GV.player = realm.objects(PlayerModel.self).filter("isActPlayer = TRUE").first!
+
+//        GV.language.setLanguage(GV.player!.aktLanguageKey)
+//        let myName = GV.player!.name
+//        let deviceName = UIDevice.current.name
+//        GV.peerToPeerService = P2PHelper(peerType: appName, identifier: myName, deviceName: deviceName)  // Start connection
 
         skView!.showsFPS = false
         skView!.showsNodeCount = false
