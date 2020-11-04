@@ -149,8 +149,8 @@ let deDictionary: [TextConstants: String] = [
     .tcConnectGC:       "Verbinden mit Gamecenter",
     .tcDisconnectGC:    "Trennen vom Gamecenter",
     .tcShowGameCenter:  "Zeige Game Center",
-    .tcMyPlace:          "%. Platz (ich): %",
-    .tcBestPlace:        "1. Platz (%): %",
+    .tcMyPlace:          "Ich (%): %. Platz: %",
+    .tcBestPlace:        "(%) 1. Platz: %",
     .tcAskForGameCenter: "Sie können jetzt eine Verbindung\r\n" +
                          "zum Game Center herstellen um zu sehen, \r\n" +
                          "welche Ergebnisse andere Spieler haben.",

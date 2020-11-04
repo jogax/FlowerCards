@@ -311,7 +311,7 @@ class CardGameScene:    SKScene,
         realm.beginWrite()
         GV.player!.GCEnabled = GCEnabledType.GameCenterEnabled.rawValue
         try! realm.commitWrite()
-        let name = GKLocalPlayer.local.alias
+//        let name = GKLocalPlayer.local.alias
 //        GV.peerToPeerService!.changeIdentifier(name)
 
         createLabelsForBestPlace()
@@ -521,13 +521,13 @@ class CardGameScene:    SKScene,
     var packageLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var levelLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     
-    var whoIsHeaderLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+//    var whoIsHeaderLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var playerHeaderLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var timeHeaderLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var scoreHeaderLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var cardCountHeaderLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     
-    var whoIsLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+//    var whoIsLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var playerNameLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var playerTimeLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     var playerScoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
@@ -743,7 +743,7 @@ class CardGameScene:    SKScene,
             generateCards(generatingType: .first)
             autoPlayer = AutoPlayer(scene: self)
 //            let copyRight = "Copyright \u{00A9} 2017 " + GV.appName + " (Version:" + GV.versionTxt + ")"
-            let copyRight = GV.language.getText(.tcCopyRight, values: GV.appName, GV.versionTxt)
+            let copyRight = GV.language.getText(.tcCopyRight, values: GV.appName, GV.versionTxt!)
             let copyrightLabel = SKLabelNode(fontNamed: "ArialMT")
             copyrightLabel.color = UIColor.white
             copyrightLabel.text = copyRight
@@ -992,27 +992,28 @@ class CardGameScene:    SKScene,
 //        let whoIsTypeText2 = GV.language.getText(.tcOpponentType)
 //        let whoIsLenght = max(whoIsText.length, whoIsTypeText1.length) * 2
         
-        let playerHeaderText = GV.language.getText(.tcName)
+//        let playerHeaderText = GV.language.getText(.tcName)
 //        let opponentNameText = opponent.name
 //        let playerNameLength = max(playerHeaderText.length + 4, playerNameText.length, opponentNameText.length) * 2
 //        let playerNameLength = (playerHeaderText.length + 4) * 2
         
         let timeHeaderText = GV.language.getText(.tcTime)
-        let timeLength = (timeHeaderText.length + 5) * 2
+//        let timeLength = (timeHeaderText.length + 5) * 2
         
         let scoreHeaderText = GV.language.getText(.tcScoreHead)
-        let scoreLength = (scoreHeaderText.length + 5) * 2
+//        let scoreLength = (scoreHeaderText.length + 5) * 2
         
-        let gameNumberPos = 10
+        let gameNumberPos = 5
         let sizePos = gameNumberPos + gameNumberText.length * 2
         let packagePos = sizePos + sizeText.length * 2
         let levelPos = packagePos + packageText.length * 2
+        let cardHeaderText = GV.language.getText(.tcCardHead)
         
-        whoIsPos = 10
-        let playerNamePos = whoIsPos// + whoIsLenght
-        let timePos = 40
-        scorePos = timePos + timeLength
-        let cardCountPos = scorePos + scoreLength
+        whoIsPos = 5
+//        let playerNamePos = whoIsPos// + whoIsLenght
+        let timePos = 5
+        scorePos = 50
+        let cardCountPos = levelPos
         
         let settingsLabelText = GV.language.getText(.tcSettings)
         let startLabelText = GV.language.getText(.tcStart)
@@ -1026,13 +1027,13 @@ class CardGameScene:    SKScene,
         createLabels(label: levelLabel, text: GV.language.getText(.tcLevel) + ": \(levelIndex + 1)", row: 1, xPosProzent: levelPos)
         
 //        createLabels(label: whoIsHeaderLabel, text: whoIsText, row: 2, xPosProzent: whoIsPos)
-        createLabels(label: playerHeaderLabel, text: playerHeaderText, row: 2, xPosProzent: playerNamePos)
+//        createLabels(label: playerHeaderLabel, text: playerHeaderText, row: 2, xPosProzent: playerNamePos)
         createLabels(label: timeHeaderLabel, text: timeHeaderText, row: 2, xPosProzent: timePos)
         createLabels(label: scoreHeaderLabel, text: scoreHeaderText, row: 2, xPosProzent: scorePos)
-        createLabels(label: cardCountHeaderLabel, text: GV.language.getText(.tcCardHead), row: 2, xPosProzent: cardCountPos)
+        createLabels(label: cardCountHeaderLabel, text: cardHeaderText, row: 2, xPosProzent: cardCountPos)
 
 //        createLabels(label: whoIsLabel, text: whoIsTypeText1, row: 3, xPosProzent: whoIsPos)
-        createLabels(label: playerNameLabel, text: getName(), row: 3, xPosProzent: playerNamePos)
+//        createLabels(label: playerNameLabel, text: getName(), row: 3, xPosProzent: playerNamePos)
         createLabels(label: playerTimeLabel, text: "0", row: 3, xPosProzent: timePos)
         createLabels(label: playerScoreLabel, text: String(levelScore), row: 3, xPosProzent: scorePos)
         createLabels(label: playerCardCountLabel, text: String(cardCount), row: 3, xPosProzent: cardCountPos)
@@ -1248,14 +1249,14 @@ class CardGameScene:    SKScene,
     func changeLanguage()->Bool {
         //printFunc(function: "changeLanguage", start: true)
         
-        whoIsHeaderLabel.text = GV.language.getText(.tcWhoIs)
+//        whoIsHeaderLabel.text = GV.language.getText(.tcWhoIs)
         playerHeaderLabel.text = GV.language.getText(.tcName)
         timeHeaderLabel.text = GV.language.getText(.tcTime)
         scoreHeaderLabel.text = GV.language.getText(.tcScoreHead)
         cardCountHeaderLabel.text = GV.language.getText(.tcCardHead)
         
         playerNameLabel.text = getName()
-        whoIsLabel.text = GV.language.getText(.tcPlayerType)
+//        whoIsLabel.text = GV.language.getText(.tcPlayerType)
         opponentTypeLabel.text = GV.language.getText(.tcOpponentType)
 
         levelLabel.text = GV.language.getText(.tcLevel) + ": \(levelIndex + 1)"
@@ -1282,11 +1283,11 @@ class CardGameScene:    SKScene,
     }
     
     func getName() -> String {
-        var name = GKLocalPlayer.local.displayName == "" ? GV.language.getText(.tcMe) : GKLocalPlayer.local.displayName
-        if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
-            name = GKLocalPlayer.local.alias
-        }
-        return name
+//        let name = GKLocalPlayer.local.displayName == "" ? GV.language.getText(.tcMe) : GKLocalPlayer.local.displayName
+//        if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+//            name = GKLocalPlayer.local.alias
+//        }
+        return GKLocalPlayer.local.displayName == "" ? GV.language.getText(.tcMe) : GKLocalPlayer.local.displayName
     }
     
     func setRankingLabels() -> (String, String) {
@@ -1307,7 +1308,7 @@ class CardGameScene:    SKScene,
         let myBestScore = actResult.myHighScore
         
         let bestPlaceLabelText = GV.language.getText(.tcBestPlace, values: bestPlayer, String(bestPlayerScore))
-        let myPlaceLabelText = GV.language.getText(.tcMyPlace, values: String(myPlace), String(myBestScore))
+        let myPlaceLabelText = GV.language.getText(.tcMyPlace, values: GKLocalPlayer.local.displayName, String(myPlace), String(myBestScore))
         return (bestPlaceLabelText, myPlaceLabelText)
     }
     
@@ -3458,7 +3459,7 @@ class CardGameScene:    SKScene,
         } else {
             myName = GKLocalPlayer.local.displayName == "" ? GV.language.getText(.tcMe) : GKLocalPlayer.local.displayName
         }
-        GV.peerToPeerService!.changeIdentifier(myName)
+//        GV.peerToPeerService!.changeIdentifier(myName)
         playerNameLabel.text = myName
         doTimeCount = true
         SKPlayerObject = nil
@@ -3491,6 +3492,9 @@ class CardGameScene:    SKScene,
     
     
     func createLabelsForBestPlace() {
+        if GKLocalPlayer.local.displayName == "" || GKLocalPlayer.local.alias == "Unknown" {
+            return
+        }
         let bestPlaceLabelName = "bestPlaceLabelName"
         if self.gameArt == .singleGame {
             let (bestPlaceLabelText, myPlaceLabelText) = self.setRankingLabels()

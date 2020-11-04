@@ -12,7 +12,7 @@ import RealmSwift
 class MySKGameStatistic: MySKTable {
     
     var callBack: (Bool , Int, Int) -> ()
-    let myGameColumnWidths: [CGFloat] = [12, 15, 15, 20, 15, 13, 10] // in %
+    let myGameColumnWidths: [CGFloat] = [25, 25, 25, 25] // in %
 //    let myName = "MySKStatistic"
     let playerID: Int
     let levelID: Int

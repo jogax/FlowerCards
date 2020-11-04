@@ -213,7 +213,8 @@ class MySKTable: SKSpriteNode {
     
     func showRowOfTable(rowOfTable: RowOfTable, row: Int) {
         for column in 0..<rowOfTable.elements.count {
-            switch rowOfTable.elements[column].varType {            case .string:
+            switch rowOfTable.elements[column].varType {
+            case .string:
                 showElementOfTable(rowOfTable.elements[column].stringVar!, column: column, row: row, selected: rowOfTable.selected)
             case .texture:
                 showTextureInTable(texture: rowOfTable.elements[column].textureVar!, column: column, row: row, selected: rowOfTable.selected, textureSize: rowOfTable.elements[column].textureSizeVar!)
