@@ -16,13 +16,13 @@ let DegreesToRadians = Pi / 180
 let RadiansToDegrees = 180 / Pi
 let countGames = 10000
 let appName = "FlowerCards"
+var cardGameScene: CardGameScene?
 
 
 class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationDelegate {
     var aktName = ""
 //    var aktModus = GameModusFlowers
     var skView: SKView?
-    var cardsScene: CardGameScene?
 //    var flowersScene: FlowerGameScene?
     
     override func viewDidLoad() {
@@ -102,7 +102,7 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
     func startScene() {
         self.view.isMultipleTouchEnabled = false
         skView = self.view as? SKView
-        cardsScene = nil
+        cardGameScene = nil
 //        flowersScene = nil
         
         /* Sprite Kit applies additional optimizations to improve rendering performance */
@@ -151,7 +151,7 @@ class GameViewController: UIViewController,/* SettingsDelegate,*/ UIApplicationD
             GV.language.addCallback(scene.changeLanguage, callbackName: "CardGameCallBack")
             scene.scaleMode = .resizeFill
             skView!.presentScene(scene)
-            cardsScene = scene
+            cardGameScene = scene
 //            GV.mainScene = scene // global for the whole app
     }
     func printFonts() {

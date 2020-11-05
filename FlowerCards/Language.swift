@@ -136,7 +136,7 @@ enum TextConstants: Int {
     tcIsPlayingWith,
     tcWriteReview,
     tcConnectGC,
-    tcDisconnectGC,
+//    tcDisconnectGC,
     tcShowGameCenter,
     tcMyPlace,
     tcBestPlace,

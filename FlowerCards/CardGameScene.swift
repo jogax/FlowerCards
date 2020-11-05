@@ -1307,8 +1307,8 @@ class CardGameScene:    SKScene,
         let myPlace = actResult.myRank
         let myBestScore = actResult.myHighScore
         
-        let bestPlaceLabelText = GV.language.getText(.tcBestPlace, values: bestPlayer, String(bestPlayerScore))
-        let myPlaceLabelText = GV.language.getText(.tcMyPlace, values: GKLocalPlayer.local.displayName, String(myPlace), String(myBestScore))
+        let bestPlaceLabelText = GV.language.getText(.tcBestPlace, values: String(bestPlayerScore), bestPlayer)
+        let myPlaceLabelText = GV.language.getText(.tcMyPlace, values: String(myPlace), String(myBestScore), GKLocalPlayer.local.displayName)
         return (bestPlaceLabelText, myPlaceLabelText)
     }
     
@@ -2223,25 +2223,25 @@ class CardGameScene:    SKScene,
             
             
         } else {
-            switch GV.player!.GCEnabled {
-                case GCEnabledType.AskForGameCenter.rawValue, GCEnabledType.GameCenterSupressed.rawValue:
-                    let connectToGamecenter = UIAlertAction(title: GV.language.getText(.tcConnectGC), style: .default,
-                                                            handler: {(paramAction:UIAlertAction!) in
-                                                                
-                                                                self.connectToGameCenter()
-                                                                try! realm.write({
-                                                                    if GKLocalPlayer.local.isAuthenticated {
-                                                                        GV.player!.GCEnabled = GCEnabledType.GameCenterEnabled.rawValue
-                                                                    }
-                                                                })
-                                                                
-                    })
-                    alert.addAction(connectToGamecenter)
-                default:
-                    break
-            }
+//            switch GV.player!.GCEnabled {
+//                case GCEnabledType.AskForGameCenter.rawValue, GCEnabledType.GameCenterSupressed.rawValue:
+//                    let connectToGamecenter = UIAlertAction(title: GV.language.getText(.tcConnectGC), style: .default,
+//                                                            handler: {(paramAction:UIAlertAction!) in
+//
+//                                                                self.connectToGameCenter()
+//                                                                try! realm.write({
+//                                                                    if GKLocalPlayer.local.isAuthenticated {
+//                                                                        GV.player!.GCEnabled = GCEnabledType.GameCenterEnabled.rawValue
+//                                                                    }
+//                                                                })
+//
+//                    })
+//                    alert.addAction(connectToGamecenter)
+//                default:
+//                    break
+//            }
 
-            if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+            if GKLocalPlayer.local.isAuthenticated {
                 let gameCenterAction = UIAlertAction(title: GV.language.getText(.tcShowGameCenter), style: .default,
                                                 handler: {(paramAction:UIAlertAction!) in
                                                     self.goToGameCenter(countPackages: GV.actGame!.countPackages, level: self.levelIndex + 1)
@@ -3406,16 +3406,16 @@ class CardGameScene:    SKScene,
 
             })
             alert.addAction(writeReviewAction)
-            if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
-                let connectToGamecenter = UIAlertAction(title: GV.language.getText(.tcDisconnectGC), style: .default,
-                                                        handler: {(paramAction:UIAlertAction!) in
-                                                            try! realm.write({
-                                                                GV.player!.GCEnabled = GCEnabledType.AskForGameCenter.rawValue
-                                                            })
-                                                            self.doTimeCount = true
-                                                            
-                })
-                alert.addAction(connectToGamecenter)
+//            if GV.player!.GCEnabled == GCEnabledType.GameCenterEnabled.rawValue {
+//                let connectToGamecenter = UIAlertAction(title: GV.language.getText(.tcDisconnectGC), style: .default,
+//                                                        handler: {(paramAction:UIAlertAction!) in
+//                                                            try! realm.write({
+//                                                                GV.player!.GCEnabled = GCEnabledType.AskForGameCenter.rawValue
+//                                                            })
+//                                                            self.doTimeCount = true
+//
+//                })
+//                alert.addAction(connectToGamecenter)
 //                let enableAutoSearch = UIAlertAction(title: GV.language.getText(GV.player!.onlineCompetitionEnabled ? .tcDisableAutoSearch : .tcEnableAutoSearch), style: .default,
 //                    handler: {(paramAction:UIAlertAction!) in
 //                        try! realm.write({
@@ -3433,7 +3433,7 @@ class CardGameScene:    SKScene,
 //
 //                })
 //                alert.addAction(enableAutoSearch)
-           }
+//           }
             let returnAction = UIAlertAction(title: GV.language.getText(.tcReturn), style: .default,
                                                      handler: {(paramAction:UIAlertAction!) in
                                                         self.playMusic("MyMusic", volume: GV.player!.musicVolume, loops: self.playMusicForever)
@@ -3492,10 +3492,14 @@ class CardGameScene:    SKScene,
     
     
     func createLabelsForBestPlace() {
+        let bestPlaceLabelName = "bestPlaceLabelName"
         if GKLocalPlayer.local.displayName == "" || GKLocalPlayer.local.alias == "Unknown" {
+            if self.childNode(withName: bestPlaceLabelName) != nil {
+                bestPlaceLabel.removeFromParent()
+                myPlaceLabel.removeFromParent()
+            }
             return
         }
-        let bestPlaceLabelName = "bestPlaceLabelName"
         if self.gameArt == .singleGame {
             let (bestPlaceLabelText, myPlaceLabelText) = self.setRankingLabels()
             if self.childNode(withName: bestPlaceLabelName) == nil {
@@ -3534,8 +3538,8 @@ class CardGameScene:    SKScene,
         let gcVC = GKGameCenterViewController()
         gcVC.gameCenterDelegate = self
         gcVC.viewState = .leaderboards
-        gcVC.leaderboardIdentifier = "P\(countPackages)L\(level)"
-        GV.mainViewController?.present(gcVC, animated: true, completion: nil)
+        gcVC.leaderboardIdentifier = "P\(countPackages)L126"
+        GV.mainViewController!.present(gcVC, animated: true, completion: nil)
     }
     
     

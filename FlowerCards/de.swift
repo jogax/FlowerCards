@@ -146,11 +146,11 @@ let deDictionary: [TextConstants: String] = [
     .tcThereIsNoPartner: "Keine Spieler in der nähe!",
     .tcIsPlayingWith:   " spielt mit %",
     .tcWriteReview:     "Bewertung im App Store",
-    .tcConnectGC:       "Verbinden mit Gamecenter",
-    .tcDisconnectGC:    "Trennen vom Gamecenter",
+//    .tcConnectGC:       "Verbinden mit Gamecenter",
+//    .tcDisconnectGC:    "Trennen vom Gamecenter",
     .tcShowGameCenter:  "Zeige Game Center",
-    .tcMyPlace:          "Ich (%): %. Platz: %",
-    .tcBestPlace:        "(%) 1. Platz: %",
+    .tcMyPlace:          "%. Platz: % (Ich - %)",
+    .tcBestPlace:        "1. Platz: % (%)",
     .tcAskForGameCenter: "Sie können jetzt eine Verbindung\r\n" +
                          "zum Game Center herstellen um zu sehen, \r\n" +
                          "welche Ergebnisse andere Spieler haben.",

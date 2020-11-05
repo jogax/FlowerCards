@@ -147,10 +147,10 @@ let huDictionary: [TextConstants: String] = [
     .tcIsPlayingWith:   " ellenfele %",
     .tcWriteReview:     "Írj véleményt az App Store-ban",
     .tcConnectGC:       "Kapcsolódás a Game Center-hez",
-    .tcDisconnectGC:    "Lekapcsolódás a Game Center-ről",
+//    .tcDisconnectGC:    "Lekapcsolódás a Game Center-ről",
     .tcShowGameCenter:  "Mutasd a Game Center-t",
-    .tcMyPlace:          "Én (%) %. Hely: %",
-    .tcBestPlace:        "(%) 1. Hely: %",
+    .tcMyPlace:          "%. Hely: % (Én - %)",
+    .tcBestPlace:        "1. Hely: % (%)",
     .tcAskForGameCenter: "Most már csatlakozhat a Game Centerhez, \r\n" +
                          "hogy megnézze, hány pontja van a többi játékosnak.",
     .tcAskLater:        "Kérdezz később",
